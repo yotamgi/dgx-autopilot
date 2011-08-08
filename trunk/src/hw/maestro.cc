@@ -1,5 +1,6 @@
 #include "maestro.h"
 
+#include <sstream>
 #include <stdlib.h>
 #include <unistd.h>  // UNIX standard function definitions
 #include <fcntl.h>   // File control definitions
@@ -11,7 +12,7 @@ Maestro::Maestro(std::string port_name):m_port_name(port_name) {
 	m_device_fd = open(m_port_name.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
 
 	if (m_device_fd == -1) {  // Could not open the port
-		throw(HwExcetion(std::string("Could not open port ") + m_port_name));
+		throw(HwExcetion("Could not open port " + m_port_name + ". is device connected?"));
 	}
 	std::cout << "Opened port " << m_port_name << std::endl;
 
@@ -20,7 +21,7 @@ Maestro::Maestro(std::string port_name):m_port_name(port_name) {
 	// Create the data channels:
 	for (int i=0; i<6; i++) {
 		m_channels.push_back(
-				boost::shared_ptr<MaestroServoChannel>(new MaestroServoChannel(i, m_device_fd))
+				boost::shared_ptr<MaestroServoChannel>(new MaestroServoChannel(i, *this))
 		);
 	}
 
@@ -61,9 +62,34 @@ Maestro::~Maestro() {
 	std::cout << "Closed port " << m_port_name << std::endl;
 }
 
-Maestro::MaestroServoChannel::MaestroServoChannel(size_t channel, int device_fd):
+void Maestro::check_errors() const {
+
+	// ask for error state
+	uint8_t packet = Maestro::GET_ERROR_OPCODE;
+	size_t count = write(m_device_fd,&packet,1);
+	if (count != 1) {
+		throw ServoException("Could not write to device file");
+	}
+
+	// check it
+	uint16_t error_reg;
+	count = read(m_device_fd, (uint8_t*)&error_reg, 2);
+	if (count != 2) {
+		std::cout << count << std::endl;
+		throw ServoException("Could not read from device file");
+	}
+
+	if (error_reg != 0) {
+		std::stringstream ss;
+		ss << "There was an error in the device. The error register is " <<
+				std::hex << error_reg;
+		throw ServoException(ss.str());
+	}
+}
+
+Maestro::MaestroServoChannel::MaestroServoChannel(size_t channel, Maestro& father):
 	m_channel(channel),
-	m_device_fd(device_fd),
+	m_father(father),
 	SERVO_MIN(4000),
 	SERVO_MAX(8000)
 {}
@@ -79,14 +105,17 @@ void Maestro::MaestroServoChannel::set_state(float statePercentage) {
 
 	int a;
 
-	serialBytes[0] = 0x40; // Unknown command.
-	serialBytes[1] = 0x84; // Command byte: Set Target.
+	serialBytes[0] = Maestro::MAGIC_OPCODE; // Unknown command.
+	serialBytes[1] = Maestro::SET_STATE_OPCODE; // Command byte: Set Target.
 	serialBytes[2] = m_channel; // First data byte holds channel number.
 	serialBytes[3] = 0x7f&target; // Second byte holds the lower 7 bits of target.
 	serialBytes[4] = 0x7f&(target>>7);   // Third data byte holds the bits 7-13 of target.
 
-	a = write(m_device_fd,serialBytes,5);
+	a = write(m_father.m_device_fd, serialBytes,5);
 	if (a != 5) {
-		throw ServoException("Could not write to file");
+		throw ServoException("Could not write to device file");
 	}
+
+	m_father.check_errors();
 }
+
