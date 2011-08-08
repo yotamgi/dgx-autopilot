@@ -10,6 +10,14 @@ public:
 
 class Servo {
 public:
+
+	/**
+	 * Sets the servo state/angle.
+	 *
+	 * @ param statePercentage - a float number between 0 and 100 that
+	 * 		determines the state of the servo.
+	 * @ throws - exceptions if it failes.
+	 */
 	virtual void set_state(float statePercentage) = 0;
 };
 
