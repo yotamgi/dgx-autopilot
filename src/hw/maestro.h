@@ -10,8 +10,8 @@
 #include <boost/shared_ptr.hpp>
 
 /**
- * Class representing the Maestro servo controller, and contains 6 servo
- * channels that implement the Servo interface.
+ * Class representing the Pololu Maestro 6 channel USB servo controller, and
+ * contains 6 servo channels that implement the Servo interface.
  */
 class Maestro {
 public:
