@@ -23,7 +23,9 @@ public:
 
 	~MaestroServoController();
 
-	// DATA TYPES
+	/**
+	 * The servo channel class, that implements the Servo interface.
+	 */
 	class MaestroServoChannel : public Servo {
 	public:
 		MaestroServoChannel(size_t channel, MaestroServoController& father);
@@ -51,7 +53,6 @@ public:
 	void check_errors() const;
 
 private:
-
 	/**
 	 * Takes the fd and configures it with the termios stuff.
 	 */
