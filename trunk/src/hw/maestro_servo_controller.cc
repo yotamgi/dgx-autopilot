@@ -1,4 +1,4 @@
-#include "maestro.h"
+#include "maestro_servo_controller.h"
 
 #include <sstream>
 #include <stdlib.h>
@@ -6,7 +6,7 @@
 #include <fcntl.h>   // File control definitions
 #include <termios.h> // POSIX terminal control definitions
 
-Maestro::Maestro(std::string port_name):m_port_name(port_name) {
+MaestroServoController::MaestroServoController(std::string port_name):m_port_name(port_name) {
 
 	// open the file
 	m_device_fd = open(m_port_name.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
@@ -28,7 +28,7 @@ Maestro::Maestro(std::string port_name):m_port_name(port_name) {
 	usleep(1000);
 }
 
-void Maestro::configure_port() {
+void MaestroServoController::configure_port() {
    struct termios options;
 
    // Get the current settings of the serial port.
@@ -54,7 +54,7 @@ void Maestro::configure_port() {
    options.c_cflag |= CS8;
 }
 
-Maestro::~Maestro() {
+MaestroServoController::~MaestroServoController() {
 	   // Close the serial port
 	if (close(m_device_fd) == -1) {
 		throw(HwExcetion(std::string("Could not close port ") + m_port_name));
@@ -62,10 +62,10 @@ Maestro::~Maestro() {
 	std::cout << "Closed port " << m_port_name << std::endl;
 }
 
-void Maestro::check_errors() const {
+void MaestroServoController::check_errors() const {
 
 	// ask for error state
-	uint8_t packet = Maestro::GET_ERROR_OPCODE;
+	uint8_t packet = MaestroServoController::GET_ERROR_OPCODE;
 	size_t count = write(m_device_fd,&packet,1);
 	if (count != 1) {
 		throw ServoException("Could not write to device file");
@@ -87,14 +87,14 @@ void Maestro::check_errors() const {
 	}
 }
 
-Maestro::MaestroServoChannel::MaestroServoChannel(size_t channel, Maestro& father):
+MaestroServoController::MaestroServoChannel::MaestroServoChannel(size_t channel, MaestroServoController& father):
 	m_channel(channel),
 	m_father(father),
 	SERVO_MIN(4000),
 	SERVO_MAX(8000)
 {}
 
-void Maestro::MaestroServoChannel::set_state(float statePercentage) {
+void MaestroServoController::MaestroServoChannel::set_state(float statePercentage) {
 
 	if ((statePercentage < 0.0f) || (statePercentage > 100.0f)) {
 		throw ServoException("You asked for illegal servo percentage");
@@ -105,8 +105,8 @@ void Maestro::MaestroServoChannel::set_state(float statePercentage) {
 
 	int a;
 
-	serialBytes[0] = Maestro::MAGIC_OPCODE; // Unknown command.
-	serialBytes[1] = Maestro::SET_STATE_OPCODE; // Command byte: Set Target.
+	serialBytes[0] = MaestroServoController::MAGIC_OPCODE; // Unknown command.
+	serialBytes[1] = MaestroServoController::SET_STATE_OPCODE; // Command byte: Set Target.
 	serialBytes[2] = m_channel; // First data byte holds channel number.
 	serialBytes[3] = 0x7f&target; // Second byte holds the lower 7 bits of target.
 	serialBytes[4] = 0x7f&(target>>7);   // Third data byte holds the bits 7-13 of target.

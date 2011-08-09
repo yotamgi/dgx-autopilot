@@ -10,26 +10,26 @@
 #include <boost/shared_ptr.hpp>
 
 /**
- * Class representing the Pololu Maestro 6 channel USB servo controller, and
+ * Class representing the Pololu MaestroServoController 6 channel USB servo controller, and
  * contains 6 servo channels that implement the Servo interface.
  */
-class Maestro {
+class MaestroServoController {
 public:
 	/**
 	 * Inits everyting.
 	 * @throws HwException if anything failes
 	 */
-	Maestro(std::string _port_name);
+	MaestroServoController(std::string _port_name);
 
-	~Maestro();
+	~MaestroServoController();
 
 	// DATA TYPES
 	class MaestroServoChannel : public Servo {
 	public:
-		MaestroServoChannel(size_t channel, Maestro& father);
+		MaestroServoChannel(size_t channel, MaestroServoController& father);
 		void set_state(float statePercentage);
 	private:
-		Maestro& m_father;
+		MaestroServoController& m_father;
 		size_t m_channel;
 
 		const int SERVO_MIN;
