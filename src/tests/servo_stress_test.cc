@@ -1,4 +1,4 @@
-#include "hw/maestro.h"
+#include "hw/maestro_servo_controller.h"
 #include <stdlib.h>
 #include <iostream>
 
@@ -8,7 +8,7 @@ int main(int argc, char** argv) {
 		exit(-1); // EXIT
 	}
 
-	Maestro m(argv[1]);
+	MaestroServoController m(argv[1]);
 	int target;
 
 	while(1) {
