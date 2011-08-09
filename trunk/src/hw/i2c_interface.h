@@ -7,6 +7,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <iostream>
 
 
 /**
@@ -17,6 +18,7 @@ public:
 
 	I2C_Interface(size_t device_num, uint8_t device_i2c_add);
 	I2C_Interface(std::string device_filename, uint8_t device_i2c_add);
+	I2C_Interface(int device_fd):m_i2c_device_fd(device_fd){}
 
 	void write_buff(const std::string& data, uint8_t reg) const {
 		std::string packet = std::string(1, char(reg)) + data;
@@ -26,7 +28,7 @@ public:
 	template <typename T>
 	void write_num(const T& num, uint8_t reg) {
 		char packet[sizeof(T)+1];
-		char* pnum = reinterpret_cast<char*>(&num);
+		const char* pnum = reinterpret_cast<const char*>(&num);
 
 		packet[0] = (char)reg;
 
@@ -63,6 +65,7 @@ private:
 		size_t count = write(m_i2c_device_fd, packet, size);
 
 		if (count != size) {
+			std::cout << count << ", " << size << std::endl;
 			throw HwExcetion("Could not write to i2c device");
 		}
 	}
