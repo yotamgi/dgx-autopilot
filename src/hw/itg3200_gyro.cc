@@ -31,9 +31,9 @@ boost::shared_ptr<angular_velocity_t> Itg3200Gyro::get_data() {
 	boost::shared_ptr<angular_velocity_t> ans(new angular_velocity_t);
 
 	// read the data
-	ans->vx = (float)m_i2c.read_num<int16_t>(0x1d);
-	ans->vy = (float)m_i2c.read_num<int16_t>(0x1f);
-	ans->vz = (float)m_i2c.read_num<int16_t>(0x21);
+	ans->x = (float)m_i2c.read_num<int16_t>(0x1d);
+	ans->y = (float)m_i2c.read_num<int16_t>(0x1f);
+	ans->z = (float)m_i2c.read_num<int16_t>(0x21);
 
 	return ans;
 }
