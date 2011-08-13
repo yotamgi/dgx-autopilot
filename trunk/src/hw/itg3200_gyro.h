@@ -4,12 +4,7 @@
 
 #include "components/generators.h"
 #include "hw/i2c_interface.h"
-
-struct angular_velocity_t {
-	float vx;
-	float vy;
-	float vz;
-};
+#include "common/types.h"
 
 class Itg3200Gyro : public DataGenerator<angular_velocity_t> {
 public:
