@@ -16,22 +16,34 @@ public:
 	Itg3200Gyro(size_t device_i2c_num);
 	virtual ~Itg3200Gyro() {}
 
+	/**
+	 * Return the angular velocity
+	 */
 	boost::shared_ptr<angular_velocity_t> get_data();
 
 private:
 
+	/**
+	 * fixed values.
+	 */
+	const uint8_t I2C_ADDRESS;
+	const uint8_t WHO_AM_I_VALUE;
+
+	/**
+	 * Internal registers
+	 */
+	const uint8_t WHO_AM_I;
+	const uint8_t SAMPLE_RATE_DIVIDOR;
+	const uint8_t SAMPLING_CONF;
+	const uint8_t TEMP_READ_ADDRES;
+	const uint8_t X_READ_ADDRES;
+	const uint8_t Y_READ_ADDRES;
+	const uint8_t Z_READ_ADDRES;
+
+	/**
+	 * the i2c device communication object.
+	 */
 	I2C_Interface m_i2c;
-
-	const uint8_t I2C_ADDRESS = 0x68;
-	const uint8_t WHO_AM_I_VALUE = I2C_ADDRESS;
-
-	const uint8_t WHO_AM_I				= 0x00;
-	const uint8_t SAMPLE_RATE_DIVIDOR	= 0x15;
-	const uint8_t SAMPLING_CONF			= 0x16;
-	const uint8_t TEMP_READ_ADDRES 		= 0x1b;
-	const uint8_t X_READ_ADDRES 		= 0x1d;
-	const uint8_t Y_READ_ADDRES 		= 0x1f;
-	const uint8_t Z_READ_ADDRES 		= 0x21;
 };
 
 
