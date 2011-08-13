@@ -3,3 +3,7 @@ Servo control:
 
 Wireless:
  * install the rt3070 and rt3070-firmeare from opkg
+
+GPS:
+ * Install kernel-module-pl2303 from opkg
+ * Install gpsd
