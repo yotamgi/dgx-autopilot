@@ -11,6 +11,8 @@ template <typename data_t>
 class DataGenerator {
 public:
 
+	virtual ~DataGenerator() {}
+
 	/**
 	 * Suppose to return the current value/sample of the data.
 	 */
