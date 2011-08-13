@@ -44,14 +44,14 @@ public:
 	 * passes the question to the generator, because there is no way how data can
 	 * be lossed in a filter.
 	 */
-	bool is_data_losed() { return m_generator->is_data_losed; }
+	bool is_data_losed() { return m_generator->is_data_losed(); }
 
 protected:
 
 	/**
 	 * The generator that it filters.
 	 */
-	DataGenerator<data_t> m_generator;
+	DataGenerator<data_t>* m_generator;
 };
 
 #endif /* GANERATOR_H_ */
