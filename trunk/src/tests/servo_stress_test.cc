@@ -17,10 +17,12 @@ int main(int argc, char** argv) {
 			for (int i=0; i<1000; i++ ) {
 				int shaked_target = target + (((i*13)%500) - 250);
 
-				m.getServoChannel(0)->set_state(float(target-4000)/40); // in percentage
+                try {
+				m.getServoChannel(5)->set_state(float(target-4000)/40); // in percentage
+                } catch (...) {
+                }
 			}
 		}
 	}
-
 	return 0;
 }
