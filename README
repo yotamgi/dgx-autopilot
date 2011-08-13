@@ -1,0 +1,5 @@
+Servo control:
+ * install kernel-module-cdc-acm
+
+Wireless:
+ * install the rt3070 and rt3070-firmeare from opkg
