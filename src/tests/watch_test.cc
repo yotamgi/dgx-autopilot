@@ -34,6 +34,7 @@ int main(int argc, char** argv) {
 
 	while (true) {
 		watch.get_data();
+		usleep(10000);
 	}
 	return 0;
 }
