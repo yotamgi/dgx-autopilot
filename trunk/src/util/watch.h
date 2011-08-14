@@ -1,14 +1,9 @@
-/*
- * watch.h
- *
- *  Created on: Aug 13, 2011
- *      Author: yotam
- */
 
 #ifndef WATCH_H_
 #define WATCH_H_
 
 #include <boost/shared_ptr.hpp>
+#include <boost/thread.hpp>
 #include "components/generators.h"
 #include "common/types.h"
 #include "common/exceptions.h"
@@ -24,13 +19,15 @@ public:
 
 	boost::shared_ptr<vector_t> get_data();
 
-	void run();
+	void run(bool open_thread=true);
 
 private:
+
+	boost::shared_ptr<boost::thread> m_thread;
+	boost::shared_ptr<vector_t> m_curr_data;
+
 	int m_sock_fd;
 	const int PORT_NUM;
-
-	boost::shared_ptr<vector_t> m_curr_data;
 };
 
 
