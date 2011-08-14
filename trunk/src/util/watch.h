@@ -23,10 +23,19 @@ public:
 
 private:
 
+	/**
+	 * Connects to the server at m_host. Non blocking.
+	 * @param - sock_fd - output param, the connected socket filedescryptor.
+	 * @return - true if succeded, false otherwise.
+	 */
+	bool connect_to_host(int &sock_fd);
+
 	boost::shared_ptr<boost::thread> m_thread;
 	boost::shared_ptr<vector_t> m_curr_data;
 
-	int m_sock_fd;
+	std::string m_host;
+
+	//int m_sock_fd;
 	const int PORT_NUM;
 };
 
