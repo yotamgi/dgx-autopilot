@@ -25,6 +25,7 @@ public:
 private:
 	float m_a;
 };
+
 int main(int argc, char** argv) {
 
 	SimpleGen gen;
