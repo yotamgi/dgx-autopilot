@@ -8,6 +8,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <boost/thread.hpp>
 
 
 VecWatch::VecWatch(DataGenerator<vector_t>* data_gen, std::string hostname):
@@ -50,23 +51,30 @@ boost::shared_ptr<vector_t> VecWatch::get_data() {
 	return m_curr_data;
 }
 
-void VecWatch::run() {
+void VecWatch::run(bool open_thread) {
+	if (open_thread) {
+		m_thread.reset(new boost::thread(&VecWatch::run, this, false));
+	} else {
 
-	while (true) {
-		char buff[4];
+		while (true) {
+			if (m_curr_data) {
+				char buff[4];
 
-		// wait for asking
-		ssize_t n = read(m_sock_fd, buff, 4);
-		if (n != 4 || strncmp(buff, "GIVE", 4) != 0) {
-			 throw HostException("Wierd server");
-		}
+				// wait for asking
+				ssize_t n = read(m_sock_fd, buff, 4);
+				if (n != 4 || strncmp(buff, "GIVE", 4) != 0) {
+					 throw HostException("Wierd server");
+				}
 
-		std::cout << "GOT GIVE" << std::endl;
+				std::cout << "GOT GIVE" << std::endl;
 
-		// write data
-		n = write(m_sock_fd, (char*)m_curr_data.get(), sizeof(vector_t));
-		if (n < 0) {
-			 throw HwExcetion("Could not write to host");
-		}
-	}
+				// write data
+				n = write(m_sock_fd, (const char*)m_curr_data.get(), sizeof(vector_t));
+				if (n < 0) {
+					 throw HwExcetion("Could not write to host");
+				}
+			} // if
+		} // while
+
+	} // else
 }

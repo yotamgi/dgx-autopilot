@@ -1,5 +1,6 @@
 from socket import *
 import struct
+import time
 
 
 server_sock = socket(AF_INET, SOCK_STREAM)
@@ -16,4 +17,5 @@ while True:
 	data = client.recv(4*3)
 	print len(data)
 	print struct.unpack("fff", data)
+	time.sleep(1.0/10)
 
