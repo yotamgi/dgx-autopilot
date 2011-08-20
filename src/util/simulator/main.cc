@@ -18,6 +18,8 @@ and tell the linker to link with the .lib file.
 #endif
 
 #include <irrlicht/irrlicht.h>
+#include "plane.h"
+#include "camera.h"
 //#include "driverChoce.h"
 
 using namespace irr;
@@ -83,29 +85,14 @@ int main()
 	video::IVideoDriver* driver = device->getVideoDriver();
 	scene::ISceneManager* smgr = device->getSceneManager();
 
-	/*
-	Create the node which will be moved with the WSAD keys. We create a
-	sphere node, which is a built-in geometry primitive. We place the node
-	at (0,0,30) and assign a texture to it to let it look a little bit more
-	interesting. Because we have no dynamic lights in this scene we disable
-	lighting for each model (otherwise the models would be black).
-	*/
-	scene::ISceneNode * f16 = smgr->addMeshSceneNode(smgr->getMesh("F16_Thuderbirds.x"));
-	if (f16)
-	{
-		f16->setPosition(core::vector3df(0,0,30));
-		f16->setScale(core::vector3df(10.0f, 10.0f, 10.0f));
-		f16->setMaterialTexture(0, driver->getTexture("F16_Thuderbirds.bmp"));
-		f16->setMaterialFlag(video::EMF_LIGHTING, false);
-	}
-
+	simulator::Plane p(device, core::vector3df(0.0f, 0.0f, 0.0f));
 
     // add terrain scene node
     scene::ITerrainSceneNode* terrain = smgr->addTerrainSceneNode(
         "terrain-heightmap.bmp",
         0,                  // parent node
         -1,                 // node id
-        core::vector3df(0.f, -300.f, 0.f),     // position
+        core::vector3df(-5000.0f, -400.f, -5000.f),     // position
         core::vector3df(0.f, 0.f, 0.f),     // rotation
         core::vector3df(40.f, 4.4f, 40.f),  // scale
         video::SColor ( 255, 255, 255, 255 ),   // vertexColor
@@ -125,79 +112,15 @@ int main()
 
     terrain->scaleTexture(1.0f, 20.0f);
 
-	/*
-	Now we create another node, movable using a scene node animator. Scene
-	node animators modify scene nodes and can be attached to any scene node
-	like mesh scene nodes, billboards, lights and even camera scene nodes.
-	Scene node animators are not only able to modify the position of a
-	scene node, they can also animate the textures of an object for
-	example. We create a cube scene node and attach a 'fly circle' scene
-	node animator to it, letting this node fly around our sphere scene node.
-	*/
-	scene::ISceneNode* n = smgr->addCubeSceneNode();
-
-	if (n)
-	{
-		n->setMaterialTexture(0, driver->getTexture("../../media/t351sml.jpg"));
-		n->setMaterialFlag(video::EMF_LIGHTING, false);
-		scene::ISceneNodeAnimator* anim =
-			smgr->createFlyCircleAnimator(core::vector3df(0,0,30), 20.0f);
-		if (anim)
-		{
-			n->addAnimator(anim);
-			anim->drop();
-		}
-	}
-
-	/*
-	The last scene node we add to show possibilities of scene node animators is
-	a b3d model, which uses a 'fly straight' animator to run between to points.
-	*/
-	scene::IAnimatedMeshSceneNode* anms =
-		smgr->addAnimatedMeshSceneNode(smgr->getMesh("../../media/ninja.b3d"));
-
-	if (anms)
-	{
-		scene::ISceneNodeAnimator* anim =
-			smgr->createFlyStraightAnimator(core::vector3df(100,0,60),
-			core::vector3df(-100,0,60), 3500, true);
-		if (anim)
-		{
-			anms->addAnimator(anim);
-			anim->drop();
-		}
-
-		/*
-		To make the model look right we disable lighting, set the
-		frames between which the animation should loop, rotate the
-		model around 180 degrees, and adjust the animation speed and
-		the texture. To set the right animation (frames and speed), we
-		would also be able to just call
-		"anms->setMD2Animation(scene::EMAT_RUN)" for the 'run'
-		animation instead of "setFrameLoop" and "setAnimationSpeed",
-		but this only works with MD2 animations, and so you know how to
-		start other animations. But a good advice is to not use
-		hardcoded frame-numbers...
-		*/
-		anms->setMaterialFlag(video::EMF_LIGHTING, false);
-
-		anms->setFrameLoop(0, 13);
-		anms->setAnimationSpeed(15);
-//		anms->setMD2Animation(scene::EMAT_RUN);
-
-		anms->setScale(core::vector3df(2.f,2.f,2.f));
-		anms->setRotation(core::vector3df(0,-90,0));
-//		anms->setMaterialTexture(0, driver->getTexture("../../media/sydney.bmp"));
-
-	}
-
 
 	/*
 	To be able to look at and move around in this scene, we create a first
 	person shooter style camera and make the mouse cursor invisible.
-	*/
+
 	smgr->addCameraSceneNodeFPS();
 	device->getCursorControl()->setVisible(false);
+*/
+    simulator::Camera c(device, &p, irr::core::vector3df(0.f, -30.f, 0.f));
 
 	/*
 	Add a colorful irrlicht logo
@@ -231,21 +154,8 @@ int main()
 		const f32 frameDeltaTime = (f32)(now - then) / 1000.f; // Time in seconds
 		then = now;
 
-		/* Check if keys W, S, A or D are being held down, and move the
-		sphere node around respectively. */
-		core::vector3df f16Position = f16->getPosition();
-
-		if(receiver.IsKeyDown(irr::KEY_KEY_W))
-			f16Position.Y += MOVEMENT_SPEED * frameDeltaTime;
-		else if(receiver.IsKeyDown(irr::KEY_KEY_S))
-			f16Position.Y -= MOVEMENT_SPEED * frameDeltaTime;
-
-		if(receiver.IsKeyDown(irr::KEY_KEY_A))
-			f16Position.X -= MOVEMENT_SPEED * frameDeltaTime;
-		else if(receiver.IsKeyDown(irr::KEY_KEY_D))
-			f16Position.X += MOVEMENT_SPEED * frameDeltaTime;
-
-		f16->setPosition(f16Position);
+		p.update(frameDeltaTime);
+		c.update(frameDeltaTime);
 
 		driver->beginScene(true, true, video::SColor(255,113,113,133));
 

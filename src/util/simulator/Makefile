@@ -9,5 +9,11 @@ all: sim
 main.o: main.cc
 	$(CXX) -c main.cc $(CXXFLAGS)
 
-sim: main.o
-	$(CXX) main.o $(LDFLAGS)
+plane.o: plane.cc
+	$(CXX) -c plane.cc $(CXXFLAGS)
+
+camera.o: camera.cc
+	$(CXX) -c camera.cc $(CXXFLAGS)
+
+sim: main.o plane.o camera.o
+	$(CXX) main.o plane.o camera.o $(LDFLAGS)
