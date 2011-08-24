@@ -28,8 +28,13 @@ private:
 
 int main(int argc, char** argv) {
 
+	if (argc != 2) {
+		std::cout << "usage: " << argv[0] << " <server ip>" << std::endl;	
+		return 1;
+	}
+
 	SimpleGen gen;
-	VecWatch watch(&gen, "localhost");
+	VecWatch watch(&gen, argv[1]);
 
 	watch.run();
 
