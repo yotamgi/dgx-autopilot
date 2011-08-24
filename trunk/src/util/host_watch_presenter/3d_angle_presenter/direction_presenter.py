@@ -1,12 +1,12 @@
 import thread
+import time
 import time, sys
 import direction
 
 def data_gen():
-    t = data_gen.t
-    data_gen.t = time.time()
-    return (1.0/(data_gen.t - t), 1.0/(data_gen.t - t), 1.0/(data_gen.t - t)) #np.sin(2*np.pi*t) * np.exp(-t/10.)
-data_gen.t = 0
+	data_gen.t += 0.4
+	return (data_gen.t, data_gen.t, data_gen.t)
+data_gen.t = 0.
 
 class session():
 	def __init__(self, generator):
@@ -14,16 +14,19 @@ class session():
 		self.direction = direction.DirectionPresenter()
 
 	def run(self, *args):
-		thread.start_new(self.direction.run, ())
+		self.direction.run()
+		time.sleep(2)
+		self.direction.stop()
 
 		while 1:
-			print "In run!"
 			data = self.generator()
 			angle = direction.angle3d_t()
-			angle.x = data[0]
-			angle.y = data[1]
-			angle.z = data[2]
+			angle.ax = data[0]
+			angle.ay = data[1]
+			angle.az = data[2]
 			self.direction.set_angle(angle)
+			time.sleep(0.01)
+			print angle.ax, angle.ay, angle.az
 
 
 if __name__ == "__main__":
