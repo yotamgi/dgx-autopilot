@@ -9,7 +9,9 @@ int main () {
 	angle.ay = 3.0f;
 	angle.az = 20.0f;
 
-	a.set_angle(angle);
 	a.run();
+	while (true) {
+//	a.set_angle(angle);
+	}
 	return 0;
 }
