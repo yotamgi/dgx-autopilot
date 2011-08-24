@@ -15,8 +15,6 @@ class session():
 
 	def run(self, *args):
 		self.direction.run()
-		time.sleep(2)
-		self.direction.stop()
 
 		while 1:
 			data = self.generator()
