@@ -24,7 +24,6 @@ class session():
 			angle.az = data[2]
 			self.direction.set_angle(angle)
 			time.sleep(0.01)
-			print angle.ax, angle.ay, angle.az
 
 
 if __name__ == "__main__":
