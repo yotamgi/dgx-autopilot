@@ -30,6 +30,8 @@ void Camera::update(float time_delta) {
 		m_tracking_camera_node->setTarget(tracked_pos);
 		m_tracking_camera_node->setPosition(tracked_pos - tracked_dir*20.f);
 
+		m_tracked_prev_pos = tracked_pos;
+
 		break;
 
 
