@@ -18,21 +18,34 @@ namespace simulator {
  * A class representing all the parameters that differ from one plane object
  * to another.
  */
-struct PlanesParams {
+struct PlainParams {
 
-	PlanesParams(const std::string& mesh_file,
+	PlainParams(const std::string& mesh_file,
 				const std::string& texture_file,
-				const irr::core::vector3df scale);
+				const irr::core::vector3df scale,
+				float speed,
+				float yaw_speed,					// degrees/sec
+				float pitch_speed,					// degrees/sec
+				float ailron_speed);				// degrees/sec
+
 
 	const std::string& get_mesh_file() const { return m_mesh_file; }
 	const std::string& get_texture_file() const { return m_texture_file; }
 	const irr::core::vector3df& get_scale() const {	return m_scale; }
+	float get_speed() const { return m_speed; }
+	float get_yaw_speed() const { return m_yaw_speed; }
+	float get_pitch_speed() const { return m_pitch_speed; }
+	float get_ailron_speed() const { return m_ailron_speed; }
 
 private:
 
 	std::string m_mesh_file;
 	std::string m_texture_file;
 	irr::core::vector3df m_scale;
+	float m_speed;
+	float m_yaw_speed;
+	float m_pitch_speed;
+	float m_ailron_speed;
 };
 
 
@@ -43,7 +56,7 @@ class Plane : public FlyingObject {
 public:
 	Plane(irr::IrrlichtDevice* device,
 			irr::core::vector3df start_pos,
-			const PlanesParams plane_params);
+			const PlainParams plane_params);
 
 	virtual void update(float time_delta);
 
@@ -67,6 +80,8 @@ private:
 	};
 
 	servo_states m_servos;
+
+	PlainParams m_params;
 
 };
 
