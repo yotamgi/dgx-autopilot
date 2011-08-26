@@ -85,10 +85,14 @@ int main()
 	video::IVideoDriver* driver = device->getVideoDriver();
 	scene::ISceneManager* smgr = device->getSceneManager();
 
-	simulator::PlanesParams plane_params(
+	simulator::PlainParams plane_params(
 			 "media/F16_Thuderbirds.x",
 			 "media/F16_Thuderbirds.bmp",
-			 irr::core::vector3df(10.0f, 10.0f, 10.0f));
+			 irr::core::vector3df(10.0f, 10.0f, 10.0f),
+			 30.0f,
+			 30.0f,
+			 30.0f,
+			 30.0f);
 
 	simulator::Plane p(device, core::vector3df(0.0f, 0.0f, 0.0f), plane_params);
 
@@ -118,14 +122,8 @@ int main()
     terrain->scaleTexture(1.0f, 20.0f);
 
 
-	/*
-	To be able to look at and move around in this scene, we create a first
-	person shooter style camera and make the mouse cursor invisible.
-
-	smgr->addCameraSceneNodeFPS();
-	device->getCursorControl()->setVisible(false);
-*/
     simulator::Camera c(device, &p, irr::core::vector3df(0.f, -30.f, 0.f));
+    c.setType(simulator::Camera::TRACK_BEHIND);
 
 	/*
 	We have done everything, so lets draw it. We also write the current
