@@ -23,7 +23,7 @@ public:
 
 	virtual void update(float timeDelta) =0;
 
-	virtual irr::core::vector3df get_pos() =0;
+	virtual irr::core::vector3df get_pos() const  =0;
 
 protected:
 
