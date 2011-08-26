@@ -3,17 +3,29 @@ CXX = g++
 CXXFLAGS =  -O3 -I/usr/X11R6/include 
 LDFLAGS = -L/usr/X11R6/lib -lGL -lXxf86vm -lXext -lX11 -lIrrlicht
 
+OBJDIR = ./obj
+
+
+.PHONY: all clean
+
 all: sim
+clean:
+	rm -rf obj sim
 
 
-main.o: main.cc
-	$(CXX) -c main.cc $(CXXFLAGS)
+$(OBJDIR):
+	mkdir $(OBJDIR)
 
-plane.o: plane.cc
-	$(CXX) -c plane.cc $(CXXFLAGS)
+$(OBJDIR)/main.o: main.cc $(OBJDIR)
+	$(CXX) -c main.cc $(CXXFLAGS) -o $(OBJDIR)/main.o
 
-camera.o: camera.cc
-	$(CXX) -c camera.cc $(CXXFLAGS)
+$(OBJDIR)/plane.o: plane.cc $(OBJDIR)
+	$(CXX) -c plane.cc $(CXXFLAGS) -o $(OBJDIR)/plane.o
 
-sim: main.o plane.o camera.o
-	$(CXX) main.o plane.o camera.o $(LDFLAGS)
+$(OBJDIR)/camera.o: camera.cc $(OBJDIR)
+	$(CXX) -c camera.cc $(CXXFLAGS) -o $(OBJDIR)/camera.o
+
+sim: $(OBJDIR)/main.o $(OBJDIR)/plane.o $(OBJDIR)/camera.o
+	$(CXX) $(OBJDIR)/main.o $(OBJDIR)/plane.o $(OBJDIR)/camera.o $(LDFLAGS) -o sim
+
+

@@ -89,7 +89,7 @@ int main()
 
     // add terrain scene node
     scene::ITerrainSceneNode* terrain = smgr->addTerrainSceneNode(
-        "terrain-heightmap.bmp",
+        "media/terrain-heightmap.bmp",
         0,                  // parent node
         -1,                 // node id
         core::vector3df(-5000.0f, -400.f, -5000.f),     // position
@@ -104,9 +104,9 @@ int main()
     terrain->setMaterialFlag(video::EMF_LIGHTING, false);
 
     terrain->setMaterialTexture(0,
-            driver->getTexture("terrain-texture.jpg"));
+            driver->getTexture("media/terrain-texture.jpg"));
     terrain->setMaterialTexture(1,
-            driver->getTexture("detailmap3.jpg"));
+            driver->getTexture("media/detailmap3.jpg"));
 
     terrain->setMaterialType(video::EMT_DETAIL_MAP);
 
@@ -121,17 +121,6 @@ int main()
 	device->getCursorControl()->setVisible(false);
 */
     simulator::Camera c(device, &p, irr::core::vector3df(0.f, -30.f, 0.f));
-
-	/*
-	Add a colorful irrlicht logo
-	*/
-	device->getGUIEnvironment()->addImage(
-		driver->getTexture("../../media/irrlichtlogoalpha2.tga"),
-		core::position2d<s32>(10,20));
-
-	gui::IGUIStaticText* diagnostics = device->getGUIEnvironment()->addStaticText(
-		L"", core::rect<s32>(10, 10, 400, 20));
-	diagnostics->setOverrideColor(video::SColor(255, 255, 255, 0));
 
 	/*
 	We have done everything, so lets draw it. We also write the current
