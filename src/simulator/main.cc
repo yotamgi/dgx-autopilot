@@ -85,7 +85,12 @@ int main()
 	video::IVideoDriver* driver = device->getVideoDriver();
 	scene::ISceneManager* smgr = device->getSceneManager();
 
-	simulator::Plane p(device, core::vector3df(0.0f, 0.0f, 0.0f));
+	simulator::PlanesParams plane_params(
+			 "media/F16_Thuderbirds.x",
+			 "media/F16_Thuderbirds.bmp",
+			 irr::core::vector3df(10.0f, 10.0f, 10.0f));
+
+	simulator::Plane p(device, core::vector3df(0.0f, 0.0f, 0.0f), plane_params);
 
     // add terrain scene node
     scene::ITerrainSceneNode* terrain = smgr->addTerrainSceneNode(
