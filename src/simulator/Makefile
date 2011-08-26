@@ -8,7 +8,7 @@ OBJDIR = ./obj
 
 .PHONY: all clean
 
-all: sim
+all: $(OBJDIR) sim
 clean:
 	rm -rf obj sim
 
@@ -16,13 +16,13 @@ clean:
 $(OBJDIR):
 	mkdir $(OBJDIR)
 
-$(OBJDIR)/main.o: main.cc $(OBJDIR)
+$(OBJDIR)/main.o: main.cc 
 	$(CXX) -c main.cc $(CXXFLAGS) -o $(OBJDIR)/main.o
 
-$(OBJDIR)/plane.o: plane.cc $(OBJDIR)
+$(OBJDIR)/plane.o: plane.cc 
 	$(CXX) -c plane.cc $(CXXFLAGS) -o $(OBJDIR)/plane.o
 
-$(OBJDIR)/camera.o: camera.cc $(OBJDIR)
+$(OBJDIR)/camera.o: camera.cc
 	$(CXX) -c camera.cc $(CXXFLAGS) -o $(OBJDIR)/camera.o
 
 sim: $(OBJDIR)/main.o $(OBJDIR)/plane.o $(OBJDIR)/camera.o
