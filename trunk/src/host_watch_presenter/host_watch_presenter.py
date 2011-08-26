@@ -1,7 +1,7 @@
 from socket import *
 import struct
 import time
-import graph
+import graph_presenter
 
 class SockDataGen(object):
 	def __init__(self, sock, n):
