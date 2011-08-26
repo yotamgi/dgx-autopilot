@@ -10,14 +10,14 @@ Plane::Plane(irr::IrrlichtDevice* device,
 {
 	irr::scene::ISceneManager* smgr = m_device->getSceneManager();
 
-	m_object = smgr->addMeshSceneNode(smgr->getMesh("F16_Thuderbirds.x"));
+	m_object = smgr->addMeshSceneNode(smgr->getMesh("media/F16_Thuderbirds.x"));
 	if (!m_object) {
 		throw std::runtime_error("Could not load the plane mesh");
 	}
 
 	m_object->setPosition(start_pos);
 	m_object->setScale(irr::core::vector3df(10.0f, 10.0f, 10.0f));
-	m_object->setMaterialTexture(0, m_device->getVideoDriver()->getTexture("F16_Thuderbirds.bmp"));
+	m_object->setMaterialTexture(0, m_device->getVideoDriver()->getTexture("media/F16_Thuderbirds.bmp"));
 	m_object->setMaterialFlag(irr::video::EMF_LIGHTING, false);
 }
 
