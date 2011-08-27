@@ -9,6 +9,16 @@
 #include <fcntl.h>
 #include <iostream>
 
+template <typename T>
+void reverse_endianity(T* data) {
+	char* bytes = reinterpret_cast<char*>(data);
+	for (unsigned int i=0; i<sizeof(T)/2; i++) {
+		char tmp = bytes[i];
+		bytes[i] = bytes[sizeof(T)-i-1]; 
+		bytes[sizeof(T)-i-1] = tmp;
+	
+	}
+}
 
 /**
  * Helpful class for dealing with i2c devices.
@@ -33,9 +43,10 @@ public:
 		packet[0] = (char)reg;
 
 		// simple memcpy
-		for (int i=0; i<sizeof(T); i++) {
+		for (unsigned int i=0; i<sizeof(T); i++) {
 			packet[i+1] = pnum[i];
 		}
+		reverse_endianity(reinterpret_cast<T*>(packet+1));
 		raw_write(packet, sizeof(T)+1);
 	}
 
@@ -50,6 +61,7 @@ public:
 	T read_num(uint8_t reg) const {
 		T data;
 		raw_read(reinterpret_cast<char*>(&data), sizeof(T), reg);
+		reverse_endianity(&data);
 		return data;
 	}
 
