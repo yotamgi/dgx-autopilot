@@ -23,7 +23,7 @@ int main() {
     std::cout << "Yeh!" << std::endl;
 
     // CONFIGURING
-    if (ioctl(file, I2C_SLAVE, GYRO_I2C_ADD) < 0) {
+    if (ioctl(file, I2C_SLAVE_FORCE, GYRO_I2C_ADD) < 0) {
       /* ERROR HANDLING; you can check errno to see what went wrong */
       std::cout << "Fuck!" << std::endl;
       std::exit(1);
