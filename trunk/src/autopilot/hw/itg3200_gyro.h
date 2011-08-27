@@ -15,6 +15,8 @@ public:
 	 * Return the angular velocity
 	 */
 	boost::shared_ptr<angular_velocity_t> get_data();
+	
+	virtual bool is_data_losed() { return false; };
 
 private:
 
