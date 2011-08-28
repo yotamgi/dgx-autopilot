@@ -31,8 +31,8 @@ public:
 		MaestroServoChannel(size_t channel, MaestroServoController& father);
 		void set_state(float statePercentage);
 	private:
-		MaestroServoController& m_father;
 		size_t m_channel;
+		MaestroServoController& m_father;
 
 		const int SERVO_MIN;
 		const int SERVO_MAX;
