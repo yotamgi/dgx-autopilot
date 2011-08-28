@@ -32,5 +32,5 @@ $(LIBDIR):
 $(LIBDIR)/libautopilot.a: $(AUTOPILIT_OBJS)
 	$(ARCHIVE) cr  $(LIBDIR)/libautopilot.a $(AUTOPILIT_OBJS)
 
-orientation_watch_test: tests/orientation_watch_test.o $(LIBDIR) $(LIBDIR)/libautopilot.a 
-	$(CXX) ./tests/orientation_watch_test.o $(LDFLAGS) -lautopilot -o orientation_watch_test
+orientation_watch_test: sandbox/orientation_watch_test.o $(LIBDIR) $(LIBDIR)/libautopilot.a 
+	$(CXX) ./sandbox/orientation_watch_test.o $(LDFLAGS) -lautopilot -o orientation_watch_test
