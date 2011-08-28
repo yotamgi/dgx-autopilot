@@ -25,7 +25,7 @@ public:
 		gettimeofday(&curr, NULL);
 		boost::shared_ptr<vector_t> ans(new vector_t(
 				1.f,
-				(curr.tv_usec - m_start_time.tv_usec)/1000000.,
+				(curr.tv_usec - m_start_time.tv_usec)/1000000. + curr.tv_sec - m_start_time.tv_sec,
 				1.f
 		));
 		return ans;
@@ -49,7 +49,7 @@ TEST(IntegralTest, stress_test) {
 	curr_tv = start_tv;
 
 	// for three seconds
-	while (curr_tv.tv_usec/1000000. - start_tv.tv_usec/1000000. < 0.3f) {
+	while (curr_tv.tv_usec/1000000. - start_tv.tv_usec/1000000. + curr_tv.tv_sec - start_tv.tv_sec < 0.3f) {
 		integ.get_data();
 		gettimeofday(&curr_tv, NULL);
 	}
@@ -73,7 +73,7 @@ TEST(IntegralTest, random_test) {
 	curr_tv = start_tv;
 
 	// for three seconds
-	while (curr_tv.tv_usec/1000000. + curr_tv.tv_sec - start_tv.tv_usec/1000000. - start_tv.tv_sec < 0.3f) {
+	while (curr_tv.tv_usec/1000000. - start_tv.tv_usec/1000000. + curr_tv.tv_sec - start_tv.tv_sec < 0.3f) {
 		integ.get_data();
 		gettimeofday(&curr_tv, NULL);
 		usleep(rand()%1000);
