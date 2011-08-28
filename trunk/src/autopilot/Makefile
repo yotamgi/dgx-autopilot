@@ -1,7 +1,7 @@
 CXX = g++
 ARCHIVE = ar
 CXXFLAGS = -O2 -g -I.
-LDFLAGS = -lboost_thread 
+LDFLAGS = -lboost_thread -L./lib
 
 LIBDIR = ./lib
 
@@ -31,3 +31,6 @@ $(LIBDIR):
 
 $(LIBDIR)/libautopilot.a: $(AUTOPILIT_OBJS)
 	$(ARCHIVE) cr  $(LIBDIR)/libautopilot.a $(AUTOPILIT_OBJS)
+
+orientation_watch_test: tests/orientation_watch_test.o $(LIBDIR) $(LIBDIR)/libautopilot.a 
+	$(CXX) ./tests/orientation_watch_test.o $(LDFLAGS) -lautopilot -o orientation_watch_test
