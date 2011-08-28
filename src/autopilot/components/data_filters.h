@@ -49,9 +49,9 @@ public:
 		if (m_sum.z > m_up_limit) 	m_sum.z = m_down_limit;
 		if (m_sum.z < m_down_limit) m_sum.z = m_up_limit;
 
-		boost::shared_ptr<vector_t> ans(new vector_t);
-		*ans = m_sum;
-		return  ans;
+		*data = m_sum;
+
+		return  data;
 	}
 
 private:
