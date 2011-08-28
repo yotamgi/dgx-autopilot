@@ -38,7 +38,7 @@ public:
 		// integrate the data with time
 		timeval curr_time;
 		gettimeofday(&curr_time, NULL);
-		m_sum += (*data)*(curr_time.tv_usec - m_prev_time.tv_usec);
+		m_sum += (*data)*(curr_time.tv_usec - m_prev_time.tv_usec)/1000000;
 		m_prev_time = curr_time;
 
 		// apply limits
