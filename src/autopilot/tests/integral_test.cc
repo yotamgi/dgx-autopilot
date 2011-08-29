@@ -6,6 +6,7 @@
 #include "common/types.h"
 #include "components/generators.h"
 #include "components/data_filters.h"
+#include "util/time.h"
 
 /**
  * Dummy generator for testing the integral.
@@ -44,44 +45,36 @@ TEST(IntegralTest, stress_test) {
 	DummyGen a;
 	IntergralFilter integ(&a);
 
-	timeval start_tv, curr_tv;
-	gettimeofday(&start_tv, NULL);
-	curr_tv = start_tv;
+	Timer t;
 
 	// for three seconds
-	while (curr_tv.tv_usec/1000000. - start_tv.tv_usec/1000000. + curr_tv.tv_sec - start_tv.tv_sec < 0.3f) {
+	while (t.passed() < 1.0f) {
 		integ.get_data();
-		gettimeofday(&curr_tv, NULL);
 	}
 
 	// validate that the integral is as expected
-	ASSERT_NEAR(integ.get_data()->x, 0.3, 0.001);
-	ASSERT_NEAR(integ.get_data()->y, 0.3*0.3/2., 0.001);
-	ASSERT_NEAR(integ.get_data()->z, 0.3, 0.001);
+	ASSERT_NEAR(integ.get_data()->x, t.passed(), 0.0001);
+	ASSERT_NEAR(integ.get_data()->y, t.passed()*t.passed()/2., 0.001);
+	ASSERT_NEAR(integ.get_data()->z, t.passed(), 0.001);
 }
 
 
 
 TEST(IntegralTest, random_test) {
 
-	std::srand(32);
 	DummyGen a;
 	IntergralFilter integ(&a);
 
-	timeval start_tv, curr_tv;
-	gettimeofday(&start_tv, NULL);
-	curr_tv = start_tv;
+	Timer t;
 
 	// for three seconds
-	while (curr_tv.tv_usec/1000000. - start_tv.tv_usec/1000000. + curr_tv.tv_sec - start_tv.tv_sec < 0.3f) {
-		integ.get_data();
-		gettimeofday(&curr_tv, NULL);
+	while (t.passed() < 1.0f) {
 		usleep(rand()%1000);
+		integ.get_data();
 	}
 
 	// validate that the integral is as expected
-	ASSERT_NEAR(integ.get_data()->x, 0.3, 0.001);
-	ASSERT_NEAR(integ.get_data()->y, 0.3*0.3/2., 0.001);
-	ASSERT_NEAR(integ.get_data()->z, 0.3, 0.001);
-
+	ASSERT_NEAR(integ.get_data()->x, t.passed(), 0.001);
+	ASSERT_NEAR(integ.get_data()->y, t.passed()*t.passed()/2., 0.001);
+	ASSERT_NEAR(integ.get_data()->z, t.passed(), 0.001);
 }
