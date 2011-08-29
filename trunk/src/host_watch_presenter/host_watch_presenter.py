@@ -2,6 +2,7 @@ from socket import *
 import struct
 import time
 import graph_presenter as graph
+import angle_presenter_3d as angle3d
 import sys
 
 class SockDataGen(object):
@@ -13,6 +14,18 @@ class SockDataGen(object):
         client.send("GIVE")
         data = self.sock.recv(4*3)
         unpacked =  struct.unpack("fff", data)[self.n]
+        print unpacked
+        return unpacked
+
+    
+class SockDataGen3d(object):
+    def __init__(self, sock):
+        self.sock = sock
+    
+    def __call__(self):
+        client.send("GIVE")
+        data = self.sock.recv(4*3)
+        unpacked =  struct.unpack("fff", data)
         print unpacked
         return unpacked
         
@@ -36,7 +49,8 @@ while (True):
         data = client.recv(100)
         (watch_name, minval, maxval, stam) = data.split(";")
         print watch_name, "connected!"
-        session = graph.session(SockDataGen(client, 0), float(minval), float(maxval))
+        #session = graph.session(SockDataGen(client, 0), float(minval), float(maxval))
+        session = angle3d.session(SockDataGen3d(client))
         session.start()
 
     except Exception  as e:
