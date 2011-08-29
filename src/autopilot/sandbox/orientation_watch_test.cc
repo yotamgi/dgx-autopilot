@@ -6,8 +6,8 @@
 int main(int argc, char** argv) {
 
 	Itg3200Gyro gen(2);
-	IntergralFilter integ(&gen);
-	VecWatch watch(&integ, "192.168.0.19");
+	IntergralFilter integ(&gen, -360.0, 360.0f);
+	VecWatch watch(&integ, "192.168.0.19", "gyro_test", -360.0f, 360.0f);
 
 	watch.run();
 
