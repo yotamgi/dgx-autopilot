@@ -12,6 +12,7 @@
 #include <sys/time.h>
 #include "common/types.h"
 #include "components/generators.h"
+#include "util/time.h"
 
 /*
  * TODO:
@@ -25,9 +26,9 @@ public:
 		DataFilter(data_gen),
 		m_sum(0., 0., 0.),
 		m_up_limit(up_limit),
-		m_down_limit(down_limit)
+		m_down_limit(down_limit),
+		m_prev_time(get_curr_time())
 	{
-		gettimeofday(&m_prev_time, NULL);
 	}
 
 	virtual ~IntergralFilter() {}
@@ -36,14 +37,11 @@ public:
 		boost::shared_ptr<vector_t> data = m_generator->get_data();
 
 		// integrate the data with time
-		timeval curr_time;
-		gettimeofday(&curr_time, NULL);
-		float time_delta = (curr_time.tv_usec - m_prev_time.tv_usec)/1000000.;
-
-		if (curr_time.tv_sec != m_prev_time.tv_sec) time_delta = 0.0f;
+		double curr_time = get_curr_time();
+		double time_delta = curr_time - m_prev_time;
+		m_prev_time = curr_time;
 
 		m_sum += (*data) * time_delta;
-		m_prev_time = curr_time;
 
 		// apply limits
 		if (m_sum.x > m_up_limit) 	m_sum.x = m_down_limit;
@@ -62,7 +60,7 @@ private:
 	vector_t m_sum;
 	float m_up_limit;
 	float m_down_limit;
-	timeval m_prev_time;
+	double m_prev_time;
 };
 
 #endif /* DATA_FILTERS_H_ */
