@@ -9,14 +9,8 @@ all: dir swig
 swig: _direction.so
 
 
-main.o: main.cc
-	$(CXX) -c main.cc $(CXXFLAGS)
-
 direction_presenter.o: direction_presenter.cc
 	$(CXX) -c direction_presenter.cc $(CXXFLAGS)
-
-dir: main.o direction_presenter.o
-	$(CXX) main.o direction_presenter.o $(LDFLAGS)
 
 wrap_direction.cc: direction.i direction_presenter.h
 	swig -c++ -python -o wrap_direction.cc direction.i 
