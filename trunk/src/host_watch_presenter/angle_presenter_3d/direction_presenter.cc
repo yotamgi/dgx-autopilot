@@ -31,19 +31,19 @@ void DirectionPresenter::run(bool open_thread) {
 		video::IVideoDriver* driver = m_device->getVideoDriver();
 		scene::ISceneManager* smgr = m_device->getSceneManager();
 
-		m_object = smgr->addMeshSceneNode(smgr->getMesh("media/F16_Thuderbirds.x"));
+		m_object = smgr->addMeshSceneNode(smgr->getMesh("angle_presenter_3d/media/F16_Thuderbirds.x"));
 		if (!m_object) {
 			throw std::runtime_error("Could not load the plane mesh");
 		}
 
 		m_object->setPosition(core::vector3df(0.f, 0.f, 30.f));
 		m_object->setScale(irr::core::vector3df(10.0f, 10.0f, 10.0f));
-		m_object->setMaterialTexture(0, m_device->getVideoDriver()->getTexture("media/F16_Thuderbirds.bmp"));
+		m_object->setMaterialTexture(0, m_device->getVideoDriver()->getTexture("angle_presenter_3d/media/F16_Thuderbirds.bmp"));
 		m_object->setMaterialFlag(irr::video::EMF_LIGHTING, false);
 
 		// add terrain scene node
 		scene::ITerrainSceneNode* terrain = smgr->addTerrainSceneNode(
-			"media/terrain-heightmap.bmp",
+			"angle_presenter_3d/media/terrain-heightmap.bmp",
 			0,                  // parent node
 			-1,                 // node id
 			core::vector3df(-5000.0f, -400.f, -5000.f),     // position
@@ -58,9 +58,9 @@ void DirectionPresenter::run(bool open_thread) {
 		terrain->setMaterialFlag(video::EMF_LIGHTING, false);
 
 		terrain->setMaterialTexture(0,
-				driver->getTexture("media/terrain-texture.jpg"));
+				driver->getTexture("angle_presenter_3d/media/terrain-texture.jpg"));
 		terrain->setMaterialTexture(1,
-				driver->getTexture("media/detailmap3.jpg"));
+				driver->getTexture("angle_presenter_3d/media/detailmap3.jpg"));
 
 		terrain->setMaterialType(video::EMT_DETAIL_MAP);
 
