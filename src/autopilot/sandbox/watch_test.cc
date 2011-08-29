@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
 	}
 
 	SimpleGen gen;
-	VecWatch watch(&gen, argv[1]);
+	VecWatch watch(&gen, argv[1], "test", 0.0f, 36.4f);
 
 	watch.run();
 

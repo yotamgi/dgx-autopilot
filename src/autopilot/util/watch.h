@@ -14,7 +14,12 @@
  */
 class VecWatch : DataFilter<vector_t> {
 public:
-	VecWatch(DataGenerator<vector_t>* data_gen, std::string hostname);
+	VecWatch(DataGenerator<vector_t>* data_gen,
+			std::string hostname,
+			std::string watch_name,
+			float minval,
+			float maxval);
+
 	virtual ~VecWatch();
 
 	boost::shared_ptr<vector_t> get_data();
@@ -35,7 +40,11 @@ private:
 
 	std::string m_host;
 
-	//int m_sock_fd;
+	std::string m_watch_name;
+
+	float m_minval;
+	float m_maxval;
+
 	const int PORT_NUM;
 };
 

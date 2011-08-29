@@ -11,11 +11,11 @@ def data_gen():
 data_gen.t = 0
 
 class session():
-	def __init__(self, generator):
+	def __init__(self, generator, minval, maxval):
 		self.fig = plt.figure()
 		self.ax = self.fig.add_subplot(111)
 		self.line, = self.ax.plot([], [], animated=True, lw=2)
-		self.ax.set_ylim(0, 40)
+		self.ax.set_ylim(minval, maxval)
 		self.ax.set_xlim(0, 100)
 		self.ax.grid()
 

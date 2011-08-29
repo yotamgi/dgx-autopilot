@@ -12,9 +12,16 @@
 #include <stdexcept>
 
 
-VecWatch::VecWatch(DataGenerator<vector_t>* data_gen, std::string hostname):
+VecWatch::VecWatch(DataGenerator<vector_t>* data_gen,
+					std::string hostname,
+					std::string watch_name,
+					float minval,
+					float maxval):
 	DataFilter(data_gen),
 	m_host(hostname),
+	m_watch_name(watch_name),
+	m_minval(minval),
+	m_maxval(maxval),
 	PORT_NUM(0x6666)
 {}
 
@@ -72,6 +79,14 @@ void VecWatch::run(bool open_thread) {
 			}
 
 			std::cout << "Connected" << std::endl;
+
+			// send first messages:
+			std::stringstream ss;
+			ss << m_watch_name << ";" << m_minval << ";" << m_maxval << ";";
+			assert(ss.str().size() < 100);
+			ss << std::string('-', 100 - ss.str().size());
+			write(sock_fd, ss.str().c_str(), 100);
+
 
 			// connected. now talk to server
 			while (true) {
