@@ -5,7 +5,7 @@ LDFLAGS = -L/usr/X11R6/lib -lGL -lXxf86vm -lXext -lX11 -lIrrlicht -lboost_thread
 
 SWIG_PY_VER=2.6
 
-all: dir swig
+all: swig
 swig: _direction.so
 
 
