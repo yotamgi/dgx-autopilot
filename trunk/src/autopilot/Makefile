@@ -43,5 +43,8 @@ gtest: $(GTESTS_OBJS) $(LIBDIR) $(LIBDIR)/libautopilot.a
 test: gtest
 	./gtest --gtest_color=yes
 	
+watch_test: sandbox/watch_test.o $(LIBDIR) $(LIBDIR)/libautopilot.a 
+	$(CXX) ./sandbox/watch_test.o $(LDFLAGS) -lautopilot -o watch_test
+
 orientation_watch_test: sandbox/orientation_watch_test.o $(LIBDIR) $(LIBDIR)/libautopilot.a 
 	$(CXX) ./sandbox/orientation_watch_test.o $(LDFLAGS) -lautopilot -o orientation_watch_test
