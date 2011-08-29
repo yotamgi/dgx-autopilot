@@ -67,7 +67,7 @@ boost::shared_ptr<T> Watch<T, channels>::get_data() {
 template <typename T, int channels>
 void Watch<T, channels>::run(bool open_thread) {
 	if (open_thread) {
-		m_thread.reset(new boost::thread(&VecWatch::run, this, false));
+		m_thread.reset(new boost::thread(&Watch<T, channels>::run, this, false));
 	} else {
 
 		while(true) {
