@@ -3,6 +3,8 @@
 #include "components/data_filters.h"
 #include "hw/itg3200_gyro.h"
 
+typedef Watch<vector_t, 3> VecWatch;
+
 int main(int argc, char** argv) {
 
 	Itg3200Gyro gen(2);
