@@ -13,7 +13,7 @@ class session():
 		self.generator = generator
 		self.direction = direction.DirectionPresenter()
 
-	def run(self, *args):
+	def start(self, *args):
 		self.direction.run()
 
 		while 1:
@@ -28,5 +28,5 @@ class session():
 
 if __name__ == "__main__":
 		a = session(data_gen)
-		a.run()
+		a.start()
 
