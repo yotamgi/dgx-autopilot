@@ -6,29 +6,20 @@ import angle_presenter_3d as angle3d
 import sys
 
 class SockDataGen(object):
-    def __init__(self, sock, n):
+    def __init__(self, sock, channels, n = -1):
         self.sock = sock
+        self.channels = channels
         self.n = n
     
     def __call__(self):
         client.send("GIVE")
         data = self.sock.recv(4*3)
-        unpacked =  struct.unpack("fff", data)[self.n]
+        if self.n == -1:
+            unpacked =  struct.unpack("f"*self.channels, data)
+        else:
+            unpacked =  struct.unpack("f"*self.channels, data)[self.n]
         print unpacked
         return unpacked
-
-    
-class SockDataGen3d(object):
-    def __init__(self, sock):
-        self.sock = sock
-    
-    def __call__(self):
-        client.send("GIVE")
-        data = self.sock.recv(4*3)
-        unpacked =  struct.unpack("fff", data)
-        print unpacked
-        return unpacked
-        
 
 if len(sys.argv) != 2:
     print "usage:", sys.argv[0], "<bind_addr>"
@@ -47,15 +38,21 @@ while (True):
         print client_addr, "Connected!"
 
         data = client.recv(100)
-        (watch_name, minval, maxval, stam) = data.split(";")
-        print watch_name, "connected!"
-        #session = graph.session(SockDataGen(client, 0), float(minval), float(maxval))
-        session = angle3d.session(SockDataGen3d(client))
+        (watch_name, minval, maxval, channels, stam) = data.split(";")
+        print watch_name, "connected with", channels, "channels"
+        channels = int(channels)
+        
+        if channels == 1:
+            session = graph.session(SockDataGen(client, channels), float(minval), float(maxval))
+        else:
+            #session = graph.session(SockDataGen(client, channels, 2), float(minval), float(maxval))
+            session = angle3d.session(SockDataGen(client, channels))
         session.start()
 
-    except Exception  as e:
-        raise e;
+    #except Exception  as e:
+    #    raise e;
     finally:
+        print "Closing connections"
         client.close()
         server_sock.close()
 

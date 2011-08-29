@@ -5,24 +5,24 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
 #include "components/generators.h"
-#include "common/types.h"
 #include "common/exceptions.h"
 
 /**
  * Connects to a server and sends the data.
  * Should work with WatchPresenter program.
  */
-class VecWatch : DataFilter<vector_t> {
+template <typename T, int channels>
+class Watch : public DataFilter<T> {
 public:
-	VecWatch(DataGenerator<vector_t>* data_gen,
+	Watch(DataGenerator<T>* data_gen,
 			std::string hostname,
 			std::string watch_name,
 			float minval,
 			float maxval);
 
-	virtual ~VecWatch();
+	virtual ~Watch();
 
-	boost::shared_ptr<vector_t> get_data();
+	boost::shared_ptr<T> get_data();
 
 	void run(bool open_thread=true);
 
@@ -36,7 +36,7 @@ private:
 	bool connect_to_host(int &sock_fd);
 
 	boost::shared_ptr<boost::thread> m_thread;
-	boost::shared_ptr<vector_t> m_curr_data;
+	boost::shared_ptr<T> m_curr_data;
 
 	std::string m_host;
 
@@ -48,5 +48,6 @@ private:
 	const int PORT_NUM;
 };
 
+#include "watch.inl"
 
 #endif /* WATCH_H_ */

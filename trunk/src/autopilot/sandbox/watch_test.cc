@@ -2,6 +2,9 @@
 #include "common/types.h"
 #include <iostream>
 
+typedef Watch<vector_t, 3> VecWatch;
+
+
 class SimpleGen : public DataGenerator<vector_t> {
 public:
 

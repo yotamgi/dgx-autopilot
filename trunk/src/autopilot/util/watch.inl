@@ -1,4 +1,3 @@
-#include "watch.h"
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,12 +11,13 @@
 #include <stdexcept>
 
 
-VecWatch::VecWatch(DataGenerator<vector_t>* data_gen,
+template <typename T, int channels>
+Watch<T, channels>::Watch(DataGenerator<T>* data_gen,
 					std::string hostname,
 					std::string watch_name,
 					float minval,
 					float maxval):
-	DataFilter(data_gen),
+	DataFilter<T>(data_gen),
 	m_host(hostname),
 	m_watch_name(watch_name),
 	m_minval(minval),
@@ -25,7 +25,8 @@ VecWatch::VecWatch(DataGenerator<vector_t>* data_gen,
 	PORT_NUM(0x6666)
 {}
 
-bool VecWatch::connect_to_host(int& sock_fd) {
+template <typename T, int channels>
+bool Watch<T, channels>::connect_to_host(int& sock_fd) {
 	// init the connection
     struct sockaddr_in serv_addr;
     struct hostent *server;
@@ -53,15 +54,18 @@ bool VecWatch::connect_to_host(int& sock_fd) {
     return true;
 }
 
-VecWatch::~VecWatch() {}
+template <typename T, int channels>
+Watch<T, channels>::~Watch() {}
 
-boost::shared_ptr<vector_t> VecWatch::get_data() {
+template <typename T, int channels>
+boost::shared_ptr<T> Watch<T, channels>::get_data() {
 
-	m_curr_data = m_generator->get_data();
+	m_curr_data = DataFilter<T>::m_generator->get_data();
 	return m_curr_data;
 }
 
-void VecWatch::run(bool open_thread) {
+template <typename T, int channels>
+void Watch<T, channels>::run(bool open_thread) {
 	if (open_thread) {
 		m_thread.reset(new boost::thread(&VecWatch::run, this, false));
 	} else {
@@ -82,7 +86,7 @@ void VecWatch::run(bool open_thread) {
 
 			// send first messages:
 			std::stringstream ss;
-			ss << m_watch_name << ";" << m_minval << ";" << m_maxval << ";";
+			ss << m_watch_name << ";" << m_minval << ";" << m_maxval << ";" << channels << ";";
 			assert(ss.str().size() < 100);
 			ss << std::string('-', 100 - ss.str().size());
 			write(sock_fd, ss.str().c_str(), 100);
@@ -102,7 +106,7 @@ void VecWatch::run(bool open_thread) {
 				std::cout << "GOT GIVE" << std::endl;
 
 				// write data
-				n = write(sock_fd, (const char*)m_curr_data.get(), sizeof(vector_t));
+				n = write(sock_fd, (const char*)m_curr_data.get(), sizeof(T));
 				if (n < 0) {
 					std::cout << "server closed" << std::endl;
 					break;
