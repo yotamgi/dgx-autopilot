@@ -22,7 +22,7 @@ all: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.a
 
 .PHONY:
 clean:
-	rm -fr */*.o *.o $(LIBDIR) gtest orientation_watch_test
+	rm -fr */*.o *.o $(LIBDIR) gtest orientation_watch_test watch_test
 
 $(LIBDIR):
 	mkdir $(LIBDIR)
