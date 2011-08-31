@@ -4,7 +4,8 @@
 
 #include <boost/thread.hpp>
 #include <boost/optional.hpp>
-#include "components/generators.h"
+
+#include "generators.h"
 #include "common/exceptions.h"
 
 /**
