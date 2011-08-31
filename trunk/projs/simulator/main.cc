@@ -20,7 +20,8 @@ and tell the linker to link with the .lib file.
 #include <irrlicht/irrlicht.h>
 #include "plane.h"
 #include "camera.h"
-//#include "driverChoce.h"
+
+#include "stream_watch.h"
 
 using namespace irr;
 
@@ -62,6 +63,12 @@ private:
 	bool KeyIsDown[KEY_KEY_CODES_COUNT];
 };
 
+template <typename gen_t>
+void sampler(gen_t* gen) {
+	while (true) {
+		gen->get_data();
+	}
+}
 
 /*
 The event receiver for keeping the pressed keys is ready, the actual responses
@@ -95,6 +102,10 @@ int main()
 			 200.0f);
 
 	simulator::Plane p(device, core::vector3df(0.0f, 0.0f, 0.0f), plane_params);
+
+	Watch<float,3> watch(p.gyro_gen(), "localhost", "simulator_gyro", 1.0, -1.0);
+	boost::thread t(sampler<VecGenerator<float,3> >, &watch);
+	watch.run();
 
     // add terrain scene node
     scene::ITerrainSceneNode* terrain = smgr->addTerrainSceneNode(
@@ -190,6 +201,8 @@ int main()
 	*/
 	device->drop();
 	
+	t.interrupt();
+
 	return 0;
 }
 
