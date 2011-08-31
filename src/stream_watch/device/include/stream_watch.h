@@ -5,8 +5,20 @@
 #include <boost/thread.hpp>
 #include <boost/optional.hpp>
 
+#include <stdexcept>
+
 #include "generators.h"
-#include "common/exceptions.h"
+
+
+/**
+ * Thrown when a ground station or any other units does not wait for
+ * connection.
+ */
+class HostException : public std::runtime_error {
+public:
+	HostException(std::string _what): runtime_error(_what) {}
+};
+
 
 /**
  * Connects to a server and sends the data.
@@ -49,6 +61,6 @@ private:
 	const int PORT_NUM;
 };
 
-#include "watch.inl"
+#include "stream_watch.inl"
 
 #endif /* WATCH_H_ */
