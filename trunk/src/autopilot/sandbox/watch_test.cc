@@ -15,10 +15,7 @@ public:
 	 * Return the angular velocity
 	 */
 	vector_t get_data() {
-		vector_t ans;
-		ans[0] = m_a;
-		ans[1] = m_a+1.0f;
-		ans[2] = m_a+2.0f;
+		vector_t ans = {{ m_a, m_a+1.0f, m_a+2.0f }};
 		m_a+=0.01f;
 		return ans;
 	}
