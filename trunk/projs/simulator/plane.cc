@@ -43,6 +43,14 @@ Plane::Plane(irr::IrrlichtDevice* device,
 	m_object->setMaterialFlag(irr::video::EMF_LIGHTING, false);
 }
 
+irr::core::vector3df Plane::calc_angle_diff(float time_delta) const {
+	return irr::core::vector3df(
+				((m_servos.pitch_percentage   - 50.0f)/50.0f)*time_delta*m_params.get_pitch_speed(),
+				((m_servos.yaw_percentage 	  - 50.0f)/50.0f)*time_delta*m_params.get_yaw_speed(),
+				((m_servos.ailron_percentage  - 50.0f)/50.0f)*time_delta*m_params.get_ailron_speed()
+	);
+}
+
 
 void Plane::update(float time_delta) {
 	irr::core::vector3df pos = m_object->getPosition();
@@ -51,14 +59,9 @@ void Plane::update(float time_delta) {
 	// update the the rotation by the servos values
 	irr::core::matrix4 transformation = m_object->getAbsoluteTransformation();
 
+	irr::core::vector3df angle_diff = calc_angle_diff(time_delta);
 	irr::core::matrix4 rot_mat;
-	rot_mat.setRotationDegrees(
-		irr::core::vector3df(
-			((m_servos.pitch_percentage   - 50.0f)/50.0f)*time_delta*m_params.get_pitch_speed(),
-			((m_servos.yaw_percentage 	  - 50.0f)/50.0f)*time_delta*m_params.get_yaw_speed(),
-			((m_servos.ailron_percentage  - 50.0f)/50.0f)*time_delta*m_params.get_ailron_speed()
-		)
-	);
+	rot_mat.setRotationDegrees(angle_diff);
 	transformation *= rot_mat;
 
 	// update the direction by the rotation values
@@ -67,6 +70,9 @@ void Plane::update(float time_delta) {
 	dir.rotateXZBy(-1.*rot.Y);
 	dir.rotateXYBy(rot.Z);
 
+	// update the sensors
+	SensorGenerator::vector_t gyro_data = {{ angle_diff.X, angle_diff.Y, angle_diff.Z }};
+	m_gyro.set_data(gyro_data);
 
 	// update the position by the dirction value
 	pos  += dir*time_delta*m_params.get_speed();
