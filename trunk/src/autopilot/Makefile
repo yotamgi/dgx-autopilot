@@ -20,7 +20,7 @@ GTESTS_OBJS=	./tests/integral_test.o
 
 ## dummy targets ##############################################################
 .PHONY:
-all: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.a
+all: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.a orientation_watch_test watch_test gtest 
 
 .PHONY:
 clean:

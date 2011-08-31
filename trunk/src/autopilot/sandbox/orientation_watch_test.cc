@@ -1,5 +1,5 @@
 #include "util/watch.h"
-#include "components/data_filters.h"
+#include "integral_filter.h"
 #include "hw/itg3200_gyro.h"
 
 typedef Watch<float,3> VecWatch;

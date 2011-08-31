@@ -3,8 +3,8 @@
 #include <gtest/gtest.h>
 #include <sys/time.h>
 #include <cstdlib>
-#include "components/generators.h"
-#include "components/data_filters.h"
+#include "generators.h"
+#include "integral_filter.h"
 #include "util/time.h"
 
 /**

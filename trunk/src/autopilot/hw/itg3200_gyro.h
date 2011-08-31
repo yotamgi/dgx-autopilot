@@ -2,7 +2,7 @@
 #ifndef ITG3200_GYRO_H_
 #define ITG3200_GYRO_H_
 
-#include "components/generators.h"
+#include "generators.h"
 #include "hw/i2c_interface.h"
 
 class Itg3200Gyro : public VecGenerator<float,3> {
