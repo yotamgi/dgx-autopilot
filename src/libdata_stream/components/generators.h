@@ -54,20 +54,33 @@ protected:
 	DataGenerator<data_t>* m_generator;
 };
 
+/**
+ * Specific Vector type Data Generator.
+ * It defines the typedef vector_t which is the type of the vector it generates.
+ */
 template <typename T, size_t N>
-class VecGenerator : public DataGenerator<boost::array<T,N> >
+class VecGenerator : public DataGenerator< boost::array<T,N> >
 {
 public:
 	typedef boost::array<T,N> vector_t;
 };
 
+/**
+ * Specific filter for VecGenerators.
+ */
 template <typename T, size_t N>
-class VecFilter : public DataFilter<boost::array<T,N> >
+class VecFilter : public VecGenerator< T,N >
 {
 public:
-	typedef boost::array<T,N> vector_t;
+	typedef typename VecGenerator< T,N >::vector_t vector_t;
 
-	VecFilter(VecGenerator<T,N>* generator):DataFilter<vector_t>(generator) {}
+	VecFilter(VecGenerator<T,N>* generator):m_generator(generator) {}
+
+	bool is_data_losed() { return m_generator->is_data_losed(); }
+
+protected:
+
+	VecGenerator<T,N>* m_generator;
 };
 
 

@@ -38,7 +38,8 @@ public:
 	virtual ~IntergralFilter() {}
 
 	typename VecFilter<T,N>::vector_t get_data() {
-		boost::array<T,N> data = VecFilter<T,N>::m_generator->get_data();
+		typename VecFilter<T,N>::vector_t data =
+				VecFilter<T,N>::m_generator->get_data();
 
 		// integrate the data with time
 		double curr_time = get_curr_time();
