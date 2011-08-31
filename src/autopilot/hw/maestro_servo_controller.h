@@ -5,7 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <components/servo.h>
+#include <interfaces/servo.h>
 #include <common/exceptions.h>
 #include <boost/shared_ptr.hpp>
 
