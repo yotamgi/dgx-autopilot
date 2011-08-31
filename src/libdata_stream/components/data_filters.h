@@ -10,7 +10,9 @@
 
 #include <limits>
 #include <sys/time.h>
-#include "common/types.h"
+
+#include <boost/array.hpp>
+
 #include "components/generators.h"
 #include "util/time.h"
 
@@ -18,46 +20,49 @@
  * TODO:
  *  - seperate to inl
  */
-class IntergralFilter : public DataFilter<vector_t> {
+template <typename T, size_t N>
+class IntergralFilter : public VecFilter<T,N> {
 public:
-	IntergralFilter(DataGenerator<vector_t>* data_gen,
+
+	IntergralFilter(VecGenerator<T,N>* data_gen,
 			float up_limit = std::numeric_limits<float>::max(),
 			float down_limit = std::numeric_limits<float>::min()):
-		DataFilter(data_gen),
-		m_sum(0., 0., 0.),
+		VecFilter<T,N>(data_gen),
 		m_up_limit(up_limit),
 		m_down_limit(down_limit),
 		m_prev_time(get_curr_time())
 	{
+		m_sum[0] = 0.; m_sum[1] =  0.; m_sum[2] =  0.;
 	}
 
 	virtual ~IntergralFilter() {}
 
-	boost::shared_ptr<vector_t> get_data() {
-		boost::shared_ptr<vector_t> data = m_generator->get_data();
+	typename VecFilter<T,N>::vector_t get_data() {
+		boost::array<T,N> data = VecFilter<T,N>::m_generator->get_data();
 
 		// integrate the data with time
 		double curr_time = get_curr_time();
 		double time_delta = curr_time - m_prev_time;
 		m_prev_time = curr_time;
 
-		m_sum += (*data) * time_delta;
+		for (size_t i=0; i != data.size(); i++) {
 
-		// apply limits
-		if (m_sum.x > m_up_limit) 	m_sum.x = m_down_limit;
-		if (m_sum.x < m_down_limit) m_sum.x = m_up_limit;
-		if (m_sum.y > m_up_limit) 	m_sum.y = m_down_limit;
-		if (m_sum.y < m_down_limit) m_sum.y = m_up_limit;
-		if (m_sum.z > m_up_limit) 	m_sum.z = m_down_limit;
-		if (m_sum.z < m_down_limit) m_sum.z = m_up_limit;
+			// integrate
+			m_sum[i] += data[i] * time_delta;
 
-		*data = m_sum;
+			// limit
+			if (m_sum[i] > m_up_limit) {
+				m_sum[i] = m_down_limit;
+			} else if (m_sum[i] < m_down_limit) {
+				m_sum[i] = m_up_limit;
+			}
+		}
 
-		return  data;
+		return  m_sum;
 	}
 
 private:
-	vector_t m_sum;
+	typename VecFilter<T,N>::vector_t m_sum;
 	float m_up_limit;
 	float m_down_limit;
 	double m_prev_time;

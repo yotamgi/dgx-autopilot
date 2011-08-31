@@ -1,11 +1,11 @@
-#include "util/watch.h"
-#include "common/types.h"
 #include <iostream>
 
-typedef Watch<vector_t, 3> VecWatch;
+#include "util/watch.h"
+
+typedef Watch<float,3> VecWatch;
 
 
-class SimpleGen : public DataGenerator<vector_t> {
+class SimpleGen : public VecGenerator<float,3> {
 public:
 
 	SimpleGen():m_a(0.0f) {}
@@ -14,11 +14,11 @@ public:
 	/**
 	 * Return the angular velocity
 	 */
-	boost::shared_ptr<vector_t> get_data() {
-		boost::shared_ptr<vector_t> ans(new vector_t);
-		ans->x = m_a;
-		ans->y = m_a+1.0f;
-		ans->z = m_a+2.0f;
+	vector_t get_data() {
+		vector_t ans;
+		ans[0] = m_a;
+		ans[1] = m_a+1.0f;
+		ans[2] = m_a+2.0f;
 		m_a+=0.01f;
 		return ans;
 	}

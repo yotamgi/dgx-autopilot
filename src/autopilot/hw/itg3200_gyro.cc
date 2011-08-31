@@ -27,16 +27,13 @@ Itg3200Gyro::Itg3200Gyro(size_t device_i2c_num):
 	m_i2c.write_num<uint8_t>(SAMPLING_CONF, (0x3<<3) | 0x0); // FS_SEL=0x3, DLFP_CFG=0x0
 }
 
-boost::shared_ptr<angular_velocity_t> Itg3200Gyro::get_data() {
-	boost::shared_ptr<angular_velocity_t> ans(new angular_velocity_t);
-
-
+Itg3200Gyro::vector_t Itg3200Gyro::get_data() {
 
 	// read the data
-	ans->x = (float)m_i2c.read_num<int16_t>(0x1d);
-	ans->y = (float)m_i2c.read_num<int16_t>(0x1f);
-	ans->z = (float)m_i2c.read_num<int16_t>(0x21);
-
-
+	vector_t ans = {
+			(float)m_i2c.read_num<int16_t>(X_READ_ADDRES),
+			(float)m_i2c.read_num<int16_t>(Y_READ_ADDRES),
+			(float)m_i2c.read_num<int16_t>(Z_READ_ADDRES)
+	};
 	return ans;
 }
