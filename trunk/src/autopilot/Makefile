@@ -1,6 +1,8 @@
+LIBDATA_STREAM_PATH = ../libdata_stream/
+
 CXX = g++
 ARCHIVE = ar
-CXXFLAGS = -g -I. -Wall 
+CXXFLAGS = -g -I. -Wall  -I$(LIBDATA_STREAM_PATH)
 LDFLAGS = -lboost_thread -L./lib
 
 LIBDIR = ./lib
