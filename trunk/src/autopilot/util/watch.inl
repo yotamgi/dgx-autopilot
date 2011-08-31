@@ -113,6 +113,5 @@ void Watch<T, channels>::run(bool open_thread) {
 				}
 			} // while
 		} // while
-
 	} // else
 }
