@@ -8,9 +8,11 @@
 #ifndef PLANE_H_
 #define PLANE_H_
 
-#include "flying_object.h"
 #include <boost/shared_ptr.hpp>
 #include <stdexcept>
+
+#include "generators.h"
+#include "flying_object.h"
 
 namespace simulator {
 
@@ -67,7 +69,36 @@ public:
 	void set_yaw_servo(float percentage);
 	void set_ailron_servo(float percentage);
 
+	/**
+	 * Our generic sensor generator.
+	 * The plane class will calculate the sensor data and tell every sensor
+	 * what is its data.
+	 */
+	class SensorGenerator : public VecGenerator<float,3> {
+	public:
+		vector_t get_data() {return m_data; }
+
+		bool is_data_losed() { return false; }
+
+	private:
+		void set_data(vector_t data) { m_data = data; }
+		vector_t m_data;
+
+		friend class Plane;
+	};
+
+	SensorGenerator* gyro_gen() { return &m_gyro; }
+
 private:
+
+	SensorGenerator m_gyro;
+
+	/**
+	 * Returns the angle_diff for this frame
+	 * It uses the data from the servos and various other things.
+	 * It is responsible to make it realistic.
+	 */
+	irr::core::vector3df calc_angle_diff(float time_delta) const;
 
 	irr::core::vector3df m_direction;
 
