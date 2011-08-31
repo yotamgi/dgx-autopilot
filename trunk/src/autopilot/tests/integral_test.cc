@@ -3,7 +3,6 @@
 #include <gtest/gtest.h>
 #include <sys/time.h>
 #include <cstdlib>
-#include "common/types.h"
 #include "components/generators.h"
 #include "components/data_filters.h"
 #include "util/time.h"
@@ -15,20 +14,21 @@
  *  - y: time since creation
  *  - z: constant 1.0
  */
-class DummyGen : public DataGenerator<vector_t> {
+class DummyGen : public VecGenerator<float,3> {
 public:
 	DummyGen() {
 		gettimeofday(&m_start_time, NULL);
 	}
 
-	virtual boost::shared_ptr<vector_t> get_data() {
+	vector_t get_data() {
 		timeval curr;
 		gettimeofday(&curr, NULL);
-		boost::shared_ptr<vector_t> ans(new vector_t(
-				1.f,
-				(curr.tv_usec - m_start_time.tv_usec)/1000000. + curr.tv_sec - m_start_time.tv_sec,
-				1.f
-		));
+
+		vector_t ans;
+		ans[0] = 1.f;
+		ans[1] = (curr.tv_usec - m_start_time.tv_usec)/1000000. + curr.tv_sec - m_start_time.tv_sec;
+		ans[2] = 1.f;
+
 		return ans;
 	}
 
@@ -43,7 +43,7 @@ private:
 TEST(IntegralTest, stress_test) {
 
 	DummyGen a;
-	IntergralFilter integ(&a);
+	IntergralFilter<float,3> integ(&a);
 
 	Timer t;
 
@@ -53,9 +53,9 @@ TEST(IntegralTest, stress_test) {
 	}
 
 	// validate that the integral is as expected
-	ASSERT_NEAR(integ.get_data()->x, t.passed(), 0.0001);
-	ASSERT_NEAR(integ.get_data()->y, t.passed()*t.passed()/2., 0.001);
-	ASSERT_NEAR(integ.get_data()->z, t.passed(), 0.001);
+	ASSERT_NEAR(integ.get_data()[0], t.passed(), 0.0001);
+	ASSERT_NEAR(integ.get_data()[1], t.passed()*t.passed()/2., 0.001);
+	ASSERT_NEAR(integ.get_data()[2], t.passed(), 0.001);
 }
 
 
@@ -63,7 +63,7 @@ TEST(IntegralTest, stress_test) {
 TEST(IntegralTest, random_test) {
 
 	DummyGen a;
-	IntergralFilter integ(&a);
+	IntergralFilter<float,3> integ(&a);
 
 	Timer t;
 
@@ -74,7 +74,7 @@ TEST(IntegralTest, random_test) {
 	}
 
 	// validate that the integral is as expected
-	ASSERT_NEAR(integ.get_data()->x, t.passed(), 0.001);
-	ASSERT_NEAR(integ.get_data()->y, t.passed()*t.passed()/2., 0.001);
-	ASSERT_NEAR(integ.get_data()->z, t.passed(), 0.001);
+	ASSERT_NEAR(integ.get_data()[0], t.passed(), 0.001);
+	ASSERT_NEAR(integ.get_data()[1], t.passed()*t.passed()/2., 0.001);
+	ASSERT_NEAR(integ.get_data()[2], t.passed(), 0.001);
 }

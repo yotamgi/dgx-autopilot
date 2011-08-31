@@ -11,13 +11,13 @@
 #include <stdexcept>
 
 
-template <typename T, int channels>
-Watch<T, channels>::Watch(DataGenerator<T>* data_gen,
+template <typename T, size_t N>
+Watch<T,N>::Watch(VecGenerator<T,N>* data_gen,
 					std::string hostname,
 					std::string watch_name,
 					float minval,
 					float maxval):
-	DataFilter<T>(data_gen),
+	VecFilter<T,N>(data_gen),
 	m_host(hostname),
 	m_watch_name(watch_name),
 	m_minval(minval),
@@ -25,8 +25,8 @@ Watch<T, channels>::Watch(DataGenerator<T>* data_gen,
 	PORT_NUM(0x6666)
 {}
 
-template <typename T, int channels>
-bool Watch<T, channels>::connect_to_host(int& sock_fd) {
+template <typename T, size_t N>
+bool Watch<T,N>::connect_to_host(int& sock_fd) {
 	// init the connection
     struct sockaddr_in serv_addr;
     struct hostent *server;
@@ -54,20 +54,22 @@ bool Watch<T, channels>::connect_to_host(int& sock_fd) {
     return true;
 }
 
-template <typename T, int channels>
-Watch<T, channels>::~Watch() {}
-
-template <typename T, int channels>
-boost::shared_ptr<T> Watch<T, channels>::get_data() {
-
-	m_curr_data = DataFilter<T>::m_generator->get_data();
-	return m_curr_data;
+template <typename T, size_t N>
+Watch<T,N>::~Watch() {
+	// TODO: close connection
 }
 
-template <typename T, int channels>
-void Watch<T, channels>::run(bool open_thread) {
+template <typename T, size_t N>
+typename VecFilter<T,N>::vector_t  Watch<T,N>::get_data() {
+
+	m_curr_data = boost::make_optional(VecFilter<T,N>::m_generator->get_data());
+	return *m_curr_data;
+}
+
+template <typename T, size_t N>
+void Watch<T,N>::run(bool open_thread) {
 	if (open_thread) {
-		m_thread.reset(new boost::thread(&Watch<T, channels>::run, this, false));
+		m_thread.reset(new boost::thread(&Watch<T,N>::run, this, false));
 	} else {
 
 		while(true) {
@@ -86,7 +88,7 @@ void Watch<T, channels>::run(bool open_thread) {
 
 			// send first messages:
 			std::stringstream ss;
-			ss << m_watch_name << ";" << m_minval << ";" << m_maxval << ";" << channels << ";";
+			ss << m_watch_name << ";" << m_minval << ";" << m_maxval << ";" << N << ";";
 			assert(ss.str().size() < 100);
 			ss << std::string('-', 100 - ss.str().size());
 			write(sock_fd, ss.str().c_str(), 100);
@@ -106,11 +108,16 @@ void Watch<T, channels>::run(bool open_thread) {
 				std::cout << "GOT GIVE" << std::endl;
 
 				// write data
-				n = write(sock_fd, (const char*)m_curr_data.get(), sizeof(T));
+				T data_buff[N];
+				for (size_t i=0; i<N;i++) {
+					data_buff[i] = m_curr_data->at(i);
+				}
+				n = write(sock_fd, (const char*)data_buff, sizeof(T)*N);
 				if (n < 0) {
 					std::cout << "server closed" << std::endl;
 					break;
 				}
+
 			} // while
 		} // while
 	} // else

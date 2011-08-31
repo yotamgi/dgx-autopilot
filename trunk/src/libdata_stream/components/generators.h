@@ -1,7 +1,7 @@
 #ifndef GANERATOR_H_
 #define GANERATOR_H_
 
-#include <boost/shared_ptr.hpp>
+#include <boost/array.hpp>
 
 /**
  * Represents a any type of data generator. It may be a sensor, or a combination
@@ -16,7 +16,7 @@ public:
 	/**
 	 * Suppose to return the current value/sample of the data.
 	 */
-	virtual boost::shared_ptr<data_t> get_data() = 0;
+	virtual data_t get_data() = 0;
 
 	/**
 	 * Returns true if there was data losed in the generator due to insufficient
@@ -53,5 +53,22 @@ protected:
 	 */
 	DataGenerator<data_t>* m_generator;
 };
+
+template <typename T, size_t N>
+class VecGenerator : public DataGenerator<boost::array<T,N> >
+{
+public:
+	typedef boost::array<T,N> vector_t;
+};
+
+template <typename T, size_t N>
+class VecFilter : public DataFilter<boost::array<T,N> >
+{
+public:
+	typedef boost::array<T,N> vector_t;
+
+	VecFilter(VecGenerator<T,N>* generator):DataFilter<vector_t>(generator) {}
+};
+
 
 #endif /* GANERATOR_H_ */

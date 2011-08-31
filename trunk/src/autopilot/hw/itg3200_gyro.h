@@ -4,9 +4,8 @@
 
 #include "components/generators.h"
 #include "hw/i2c_interface.h"
-#include "common/types.h"
 
-class Itg3200Gyro : public DataGenerator<angular_velocity_t> {
+class Itg3200Gyro : public VecGenerator<float,3> {
 public:
 	Itg3200Gyro(size_t device_i2c_num);
 	virtual ~Itg3200Gyro() {}
@@ -14,7 +13,7 @@ public:
 	/**
 	 * Return the angular velocity
 	 */
-	boost::shared_ptr<angular_velocity_t> get_data();
+	vector_t get_data();
 	
 	virtual bool is_data_losed() { return false; };
 
