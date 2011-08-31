@@ -1,7 +1,6 @@
 # libdata_stream pathes
 LIBDS_PATH = ../../../libdata_stream/
-LIBDS_CXXFLAGS= -I$(LIBDS_PATH)
-LIBDS_LDFLAGS = 
+include $(LIBDS_PATH)/Makefile.include
 
 # stream_watch pathes
 STREAMWATCH_PATH = ../

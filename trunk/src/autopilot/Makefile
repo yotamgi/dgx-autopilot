@@ -1,9 +1,13 @@
-LIBDATA_STREAM_PATH = ../libdata_stream/
+LIBDS_PATH = ../libdata_stream/
+include $(LIBDS_PATH)/Makefile.include
+
+STREAMWATCH_PATH = ../stream_watch/device
+include $(STREAMWATCH_PATH)/Makefile.include
 
 CXX = g++
 ARCHIVE = ar
-CXXFLAGS = -g -I. -Wall  -I$(LIBDATA_STREAM_PATH)
-LDFLAGS = -lboost_thread -L./lib
+CXXFLAGS = -g -I. -Wall  $(LIBDS_CXXFLAGS) $(STREAMWATCH_CXXFLAGS)
+LDFLAGS = -lboost_thread -L./lib $(LIBDS_LDFLAGS) $(STREAMWATCH_LDFLAGS)
 
 LIBDIR = ./lib
 
@@ -20,7 +24,7 @@ GTESTS_OBJS=	./tests/integral_test.o
 
 ## dummy targets ##############################################################
 .PHONY:
-all: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.a orientation_watch_test watch_test gtest 
+all: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.a orientation_watch_test gtest 
 
 .PHONY:
 clean:
@@ -43,9 +47,6 @@ gtest: $(GTESTS_OBJS) $(LIBDIR) $(LIBDIR)/libautopilot.a
 .PHONY:
 test: gtest
 	./gtest --gtest_color=yes
-	
-watch_test: sandbox/watch_test.o $(LIBDIR) $(LIBDIR)/libautopilot.a 
-	$(CXX) ./sandbox/watch_test.o $(LDFLAGS) -lautopilot -o watch_test
 
 orientation_watch_test: sandbox/orientation_watch_test.o $(LIBDIR) $(LIBDIR)/libautopilot.a 
 	$(CXX) ./sandbox/orientation_watch_test.o $(LDFLAGS) -lautopilot -o orientation_watch_test

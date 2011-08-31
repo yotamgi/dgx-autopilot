@@ -1,4 +1,4 @@
-#include "util/watch.h"
+#include "stream_watch.h"
 #include "integral_filter.h"
 #include "hw/itg3200_gyro.h"
 
