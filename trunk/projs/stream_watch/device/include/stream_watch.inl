@@ -91,7 +91,11 @@ void Watch<T,N>::run(bool open_thread) {
 			ss << m_watch_name << ";" << m_minval << ";" << m_maxval << ";" << N << ";";
 			assert(ss.str().size() < 100);
 			ss << std::string('-', 100 - ss.str().size());
-			write(sock_fd, ss.str().c_str(), 100);
+			ssize_t res = write(sock_fd, ss.str().c_str(), 100);
+			if (res < 0) {
+				std::cout << "server couldn't recieve header" << std::endl;
+				break;
+			}
 
 
 			// connected. now talk to server
