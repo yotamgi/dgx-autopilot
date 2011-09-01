@@ -34,7 +34,7 @@ private:
 
 	angle3d_t m_curr_angle;
 
-	bool m_running;
+	volatile bool m_running;
 
 };
 
