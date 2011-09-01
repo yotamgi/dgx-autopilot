@@ -112,5 +112,7 @@ void DirectionPresenter::run(bool open_thread) {
 				lastFPS = fps;
 			}
 		}
+		m_device->closeDevice();
+		m_device->drop();
 	}
 }

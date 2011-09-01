@@ -35,7 +35,12 @@ class session():
 			# restore the clean slate background
 			self.fig.canvas.restore_region(self.background)
 
-			self.ydata.append(self.generator())
+                        try:
+                            self.ydata.append(self.generator())
+                        except IOError as e:
+                            print "closing session."
+                            return
+                            
 			self.ydata = self.ydata[1:]
 			self.line.set_data(self.xdata, self.ydata)
 

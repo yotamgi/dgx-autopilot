@@ -17,7 +17,13 @@ class session():
 		self.direction.run()
 
 		while 1:
-			data = self.generator()
+                        try:
+        			data = self.generator()
+        		except IOError as e:
+                                print e
+                                print "Closing"
+                                self.direction.stop()
+                                return
 			angle = direction.angle3d_t()
 			angle.ax = data[0]
 			angle.ay = data[1]

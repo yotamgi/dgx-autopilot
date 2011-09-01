@@ -12,14 +12,19 @@ class SockDataGen(object):
         self.n = n
     
     def __call__(self):
-        client.send("GIVE")
-        data = self.sock.recv(4*3)
-        if self.n == -1:
-            unpacked =  struct.unpack("f"*self.channels, data)
-        else:
-            unpacked =  struct.unpack("f"*self.channels, data)[self.n]
-        print unpacked
-        return unpacked
+        try:
+            client.send("GIVE")
+            data = self.sock.recv(4*3)
+            if self.n == -1:
+                unpacked =  struct.unpack("f"*self.channels, data)
+            else:
+                unpacked =  struct.unpack("f"*self.channels, data)[self.n]
+            print unpacked
+            return unpacked
+        except Exception as e:
+            print e
+            raise IOError("Closed")
+        
 
 if len(sys.argv) != 2:
     print "usage:", sys.argv[0], "<bind_addr>"
@@ -30,18 +35,18 @@ server_sock = socket(AF_INET, SOCK_STREAM)
 server_sock.bind((sys.argv[1], 0x6666))
 server_sock.listen(1)
 
-
-while (True):
-    print "Waiting for connections..."
-    client, client_addr  = server_sock.accept()
-    try:
+try:
+    while (True):
+        print "Waiting for connections..."
+        client, client_addr  = server_sock.accept()
+        
         print client_addr, "Connected!"
 
         data = client.recv(100)
         (watch_name, minval, maxval, channels, stam) = data.split(";")
         print watch_name, "connected with", channels, "channels"
         channels = int(channels)
-        
+            
         if channels == 1:
             session = graph.session(SockDataGen(client, channels), float(minval), float(maxval))
         else:
@@ -49,10 +54,10 @@ while (True):
             session = angle3d.session(SockDataGen(client, channels))
         session.start()
 
-    #except Exception  as e:
-    #    raise e;
-    finally:
-        print "Closing connections"
-        client.close()
-        server_sock.close()
+#except Exception  as e:
+#    raise e;
+finally:
+    print "Closing connections"
+    client.close()
+    server_sock.close()
 
