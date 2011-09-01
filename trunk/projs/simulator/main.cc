@@ -18,10 +18,12 @@ and tell the linker to link with the .lib file.
 #endif
 
 #include <irrlicht/irrlicht.h>
+#include <cmath>
 #include "plane.h"
 #include "camera.h"
 
 #include "stream_watch.h"
+#include "integral_filter.h"
 
 using namespace irr;
 
@@ -67,6 +69,7 @@ template <typename gen_t>
 void sampler(gen_t* gen) {
 	while (true) {
 		gen->get_data();
+		usleep(10000);
 	}
 }
 
@@ -103,7 +106,10 @@ int main()
 
 	simulator::Plane p(device, core::vector3df(0.0f, 0.0f, 0.0f), plane_params);
 
-	Watch<float,3> watch(p.gyro_gen(), "localhost", "simulator_gyro", 1.0, -1.0);
+	Watch<float,3> watch(
+			new IntergralFilter<float, 3> (p.gyro_gen(), 360, -360),
+	//		p.gyro_gen(),
+			"localhost", "simulator_gyro", 1.0, -1.0);
 	boost::thread t(sampler<VecGenerator<float,3> >, &watch);
 	watch.run();
 
@@ -194,6 +200,10 @@ int main()
 		if (receiver.IsKeyDown(KEY_KEY_Z)) c.setType(simulator::Camera::FPS);
 		if (receiver.IsKeyDown(KEY_KEY_X)) c.setType(simulator::Camera::TRACK_BEHIND);
 		if (receiver.IsKeyDown(KEY_KEY_C)) c.setType(simulator::Camera::TRACK_FIXED);
+
+		// make it have exactly 20 fps
+		int64_t wt = ((int64_t)(((1./50.) - frameDeltaTime) * 1000000.));
+		usleep(wt>0?wt:0);
 	}
 
 	/*
@@ -201,7 +211,7 @@ int main()
 	*/
 	device->drop();
 	
-	t.interrupt();
+	//t.interrupt();
 
 	return 0;
 }
