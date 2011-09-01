@@ -25,8 +25,8 @@ class IntergralFilter : public VecFilter<T,N> {
 public:
 
 	IntergralFilter(VecGenerator<T,N>* data_gen,
-			float up_limit = std::numeric_limits<float>::max(),
-			float down_limit = std::numeric_limits<float>::min()):
+			T up_limit = std::numeric_limits<T>::max(),
+			T down_limit = std::numeric_limits<T>::min()):
 		VecFilter<T,N>(data_gen),
 		m_up_limit(up_limit),
 		m_down_limit(down_limit),
@@ -64,8 +64,8 @@ public:
 
 private:
 	typename VecFilter<T,N>::vector_t m_sum;
-	float m_up_limit;
-	float m_down_limit;
+	T m_up_limit;
+	T m_down_limit;
 	double m_prev_time;
 };
 
