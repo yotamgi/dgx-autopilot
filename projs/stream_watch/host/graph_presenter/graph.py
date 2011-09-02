@@ -39,6 +39,7 @@ class session():
                             self.ydata.append(self.generator())
                         except IOError as e:
                             print "closing session."
+                            self.fig.remove()
                             return
                             
 			self.ydata = self.ydata[1:]
