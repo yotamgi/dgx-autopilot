@@ -109,7 +109,7 @@ int main()
 	Watch<float,3> watch(
 			new IntergralFilter<float, 3> (p.gyro_gen(), 360, -360),
 	//		p.gyro_gen(),
-			"localhost", "simulator_gyro", 1.0, -1.0);
+			"localhost", "simulator_gyro", 360.0, -360.0);
 	boost::thread t(sampler<VecGenerator<float,3> >, &watch);
 	watch.run();
 

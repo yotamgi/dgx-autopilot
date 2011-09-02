@@ -98,7 +98,7 @@ private:
 	 * It uses the data from the servos and various other things.
 	 * It is responsible to make it realistic.
 	 */
-	irr::core::vector3df calc_angle_diff(float time_delta) const;
+	irr::core::vector3df calc_angle_vel() const;
 
 	irr::core::vector3df m_direction;
 
