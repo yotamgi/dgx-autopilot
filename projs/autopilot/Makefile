@@ -24,7 +24,7 @@ GTESTS_OBJS=	./tests/integral_test.o
 
 ## dummy targets ##############################################################
 .PHONY:
-all: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.a orientation_watch_test gtest 
+all: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.a orientation_watch_test orientation_test gtest 
 
 .PHONY:
 clean:
@@ -47,6 +47,9 @@ gtest: $(GTESTS_OBJS) $(LIBDIR) $(LIBDIR)/libautopilot.a
 .PHONY:
 test: gtest
 	./gtest --gtest_color=yes
+
+orientation_test: sandbox/orientation_test.o $(LIBDIR) $(LIBDIR)/libautopilot.a 
+	$(CXX) ./sandbox/orientation_test.o $(LDFLAGS) -lautopilot -o orientation_test
 
 orientation_watch_test: sandbox/orientation_watch_test.o $(LIBDIR) $(LIBDIR)/libautopilot.a 
 	$(CXX) ./sandbox/orientation_watch_test.o $(LDFLAGS) -lautopilot -o orientation_watch_test
