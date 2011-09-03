@@ -1,16 +1,15 @@
-#include "util/watch.h"
-#include "common/types.h"
 #include "hw/itg3200_gyro.h"
 #include <iostream>
+#include "integral_filter.h"
 
 int main(int argc, char** argv) {
 
-	Itg3200Gyro gen(2);
-
+	Itg3200Gyro gyro(2);
+	IntergralFilter<float,3> gen(&gyro, 10000.0f, -10000.0f);
 
 	while (true) {
-		boost::shared_ptr<angular_velocity_t> av = gen.get_data();
-		std::cout << std::hex << "(" << av->x << ", " << av->y << ", " << av->z << ")" << std::endl;
+		Itg3200Gyro::vector_t av = gen.get_data();
+		std::cout << std::hex << "(" << av[0] << ", " << av[1] << ", " << av[2]  << ")" << std::endl;
 		usleep(100000);
 	}
 	return 0;

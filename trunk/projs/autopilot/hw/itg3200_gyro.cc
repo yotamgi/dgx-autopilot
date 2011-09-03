@@ -31,9 +31,9 @@ Itg3200Gyro::vector_t Itg3200Gyro::get_data() {
 
 	// read the data
 	vector_t ans = {{
-			(float)m_i2c.read_num<int16_t>(X_READ_ADDRES),
-			(float)m_i2c.read_num<int16_t>(Y_READ_ADDRES),
-			(float)m_i2c.read_num<int16_t>(Z_READ_ADDRES)
+			(float)m_i2c.read_num<int16_t>(X_READ_ADDRES)/54.7,
+			(float)m_i2c.read_num<int16_t>(Z_READ_ADDRES)/54.7,
+			(float)m_i2c.read_num<int16_t>(Y_READ_ADDRES)/54.7
 	}};
 	return ans;
 }
