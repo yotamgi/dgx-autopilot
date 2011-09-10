@@ -72,7 +72,11 @@ void Plane::update(float time_delta) {
 	dir.rotateXYBy(rot.Z);
 
 	// update the sensors
-	SensorGenerator::vector_t gyro_data = {{ angle_vel.X, angle_vel.Y, angle_vel.Z }};
+	SensorGenerator::vector_t gyro_data;
+	gyro_data[0] = angle_vel.X;
+	gyro_data[1] = angle_vel.Y;
+	gyro_data[2] = angle_vel.Z;
+
 	m_gyro.set_data(gyro_data);
 
 	// update the position by the dirction value

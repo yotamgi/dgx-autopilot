@@ -1,6 +1,8 @@
 #ifndef GANERATOR_H_
 #define GANERATOR_H_
 
+#include <boost/numeric/ublas/vector.hpp>
+#include <boost/numeric/ublas/io.hpp>
 #include <boost/array.hpp>
 
 /**
@@ -59,10 +61,10 @@ protected:
  * It defines the typedef vector_t which is the type of the vector it generates.
  */
 template <typename T, size_t N>
-class VecGenerator : public DataGenerator< boost::array<T,N> >
+class VecGenerator : public DataGenerator< boost::numeric::ublas::vector<T, boost::array<T,N> > >
 {
 public:
-	typedef boost::array<T,N> vector_t;
+	typedef boost::numeric::ublas::vector<T, boost::array<T,N> > vector_t;
 };
 
 /**
