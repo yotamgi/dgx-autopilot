@@ -24,6 +24,7 @@ and tell the linker to link with the .lib file.
 
 #include "stream_watch.h"
 #include "integral_filter.h"
+#include "euler_angles_integral.h"
 
 using namespace irr;
 
@@ -107,7 +108,7 @@ int main()
 	simulator::Plane p(device, core::vector3df(0.0f, 0.0f, 0.0f), plane_params);
 
 	Watch<float,3> watch(
-			new IntergralFilter<float, 3> (p.gyro_gen(), 360, -360),
+			new EulerAnglesIntegral<float> (p.gyro_gen()),
 	//		p.gyro_gen(),
 			"localhost", "simulator_gyro", 360.0, -360.0);
 	boost::thread t(sampler<VecGenerator<float,3> >, &watch);
