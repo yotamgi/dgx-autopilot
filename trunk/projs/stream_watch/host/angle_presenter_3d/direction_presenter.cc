@@ -90,7 +90,15 @@ void DirectionPresenter::run(bool open_thread) {
 			const f32 frameDeltaTime = (f32)(now - then) / 1000.f; // Time in seconds
 			then = now;
 
-			m_object->setRotation(core::vector3df(m_curr_angle.ax, m_curr_angle.ay, m_curr_angle.az));
+			irr::core::matrix4 rotx, roty, rotz;
+			rotx.setRotationDegrees(core::vector3df(m_curr_angle.ax, 0., 0.));
+			roty.setRotationDegrees(core::vector3df(0., m_curr_angle.ay, 0.));
+			rotz.setRotationDegrees(core::vector3df(0., 0., m_curr_angle.az));
+
+			irr::core::matrix4 trans = rotx * roty * rotz;
+			m_object->setRotation(trans.getRotationDegrees());
+
+			//m_object->setRotation(core::vector3df(m_curr_angle.ax, m_curr_angle.ay, m_curr_angle.az));
 
 			m_device->getVideoDriver()->beginScene(true, true, video::SColor(255,113,113,133));
 
