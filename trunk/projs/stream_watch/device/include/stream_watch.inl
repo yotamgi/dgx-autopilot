@@ -114,7 +114,7 @@ void Watch<T,N>::run(bool open_thread) {
 				// write data
 				T data_buff[N];
 				for (size_t i=0; i<N;i++) {
-					data_buff[i] = m_curr_data->at(i);
+					data_buff[i] = (*m_curr_data)[i];
 				}
 				n = write(sock_fd, (const char*)data_buff, sizeof(T)*N);
 				if (n < 0) {
