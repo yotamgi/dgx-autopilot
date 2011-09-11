@@ -15,70 +15,100 @@
  * TODO:
  *  - seperate to inl
  */
-template <typename T>
-class EulerAnglesIntegral : public VecFilter<T,3> {
+template <typename float_t>
+class EulerAnglesIntegral : public VecFilter<float_t,3> {
 public:
 
-	EulerAnglesIntegral(VecGenerator<T,3>* data_gen):
-		VecFilter<T,3>(data_gen),
-		m_sum_vec(3),
-		m_prev_time(get_curr_time())
-	{
-		// initialize the vector to point right
-		m_sum_vec[0] = 0.; m_sum_vec[1] =  0.; m_sum_vec[2] =  1.;
+	typedef typename boost::numeric::ublas::vector<float_t> vector_t;
 
-		// initialize the rotation to be zero
-		m_sum_rot = 0.;
+	EulerAnglesIntegral(VecGenerator<float_t,3>* data_gen):
+		VecFilter<float_t,3>(data_gen),
+		m_sum((vector_t[3]){ vector_t(3), vector_t(3),vector_t(3) }	),
+		rot_sum(0.),
+		m_prev_time(get_curr_time()),
+		PI(3.141592654)
+	{
+		// initialize the coordinate system
+		m_sum[0][0] = 1.; m_sum[0][1] =  0.; m_sum[0][2] =  0.;
+		m_sum[1][0] = 0.; m_sum[1][1] =  1.; m_sum[1][2] =  0.;
+		m_sum[2][0] = 0.; m_sum[2][1] =  0.; m_sum[2][2] =  1.;
 	}
+
 
 	virtual ~EulerAnglesIntegral() {}
 
-	typename VecFilter<T,3>::vector_t get_data() {
-		typename VecFilter<T,3>::vector_t data =
-				VecFilter<T,3>::m_generator->get_data();
+	typename VecFilter<float_t,3>::vector_t get_data() {
+		typename VecFilter<float_t,3>::vector_t data =
+				VecFilter<float_t,3>::m_generator->get_data();
 
-		// integrate the data with time
+		// caclulate angles diff
 		double curr_time = get_curr_time();
 		double time_delta = curr_time - m_prev_time;
 		m_prev_time = curr_time;
 
-		// integrate the roll
-		m_sum_rot += data[2] * time_delta;
+		rot_sum += data[2] * time_delta;
 
-		// rotate the vector
-		T sx = std::sin(data[0] * time_delta / 180. * 3.141592);
-		T cx = std::cos(data[0] * time_delta / 180. * 3.141592);
-		T sy = std::sin(data[1] * time_delta / 180. * 3.141592);
-		T cy = std::cos(data[1] * time_delta / 180. * 3.141592);
+		// rotate the coordinate system
+		rotate_coordinate_around(0, data[0]*time_delta);
+		rotate_coordinate_around(1, data[1]*time_delta);
+		rotate_coordinate_around(2, data[2]*time_delta);
 
-		boost::numeric::ublas::matrix<float> rot(3, 3);
-		rot(0,0) = 1;	rot(0,1) = 0;	rot(0,2) = 0;
-		rot(1,0) = 0;	rot(1,1) = cx;	rot(1,2) = sx*-1.;
-		rot(2,0) = 0;	rot(2,1) = sx;	rot(2,2) = cx;
+		// calculate the euler angle
+		typename VecFilter<float_t,3>::vector_t ans;
+		float_t z_len = vec_len(m_sum[2]);
+		ans[0] = sign(m_sum[2][1]) * std::acos(std::sqrt(m_sum[2][2]*m_sum[2][2] + m_sum[2][0]*m_sum[2][0]) / z_len) * 180. / PI;
+		ans[1] = sign(m_sum[2][0]) * std::acos(std::sqrt(m_sum[2][2]*m_sum[2][2] + m_sum[2][1]*m_sum[2][1]) / z_len) * 180. / PI;
+		ans[2] = rot_sum;
 
-		m_sum_vec = boost::numeric::ublas::prod(rot, m_sum_vec);
-
-		std::cout << m_sum_vec << std::endl;
-
-		typename VecFilter<T,3>::vector_t ans;
-		T vec_len = std::sqrt(m_sum_vec[0]*m_sum_vec[0] + m_sum_vec[1]*m_sum_vec[1] + m_sum_vec[2]*m_sum_vec[2]);
-		ans[0] = std::acos( std::sqrt(m_sum_vec[2]*m_sum_vec[2] + m_sum_vec[0]*m_sum_vec[0]) / vec_len) * 180. / 3.141592;
-		ans[1] = std::acos( std::sqrt(m_sum_vec[2]*m_sum_vec[2] + m_sum_vec[1]*m_sum_vec[1]) / vec_len) * 180. / 3.141592;
-		ans[2] = m_sum_rot;
-
-		std::cout << "angles are " << ans << std::endl;
+		std::cout << "Z is " << m_sum[2] << std::endl;
 		return  ans;
 	}
 
 private:
-	/**
-	 * In this integral, we save the vector pointing right and the rotation aroud it.
-	 * The vector length should be 1.
-	 */
-	boost::numeric::ublas::vector<T> m_sum_vec;
-	T m_sum_rot;
 
+	void rotate_coordinate_around(size_t index, float howmuch) {
+
+		vector_t& a = m_sum[(index+1) % 3];
+		vector_t& b = m_sum[(index+2) % 3];
+
+		float_t rot_factor = std::tan(howmuch / 180. * PI);
+		vector_t tmp_a = a - rot_factor * b;
+		b = b + rot_factor * a;
+		a = tmp_a;
+
+		normalize(a);
+		normalize(b);
+	}
+
+	void normalize(vector_t& vec) {
+		vec /= vec_len(vec);
+	}
+
+	float_t sign(float_t num) {
+		return (num>0.)?1.:-1.;
+	}
+
+	float_t vec_len(const vector_t& vec) const {
+		return std::sqrt(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2]);
+	}
+
+	/**
+	 * In this integral, we rotate an coordinate system according to the
+	 * angles diff it gets.
+	 * float_those are the three vectors that represents the coordinate system
+	 * Index 0 is the X vector, 1 is the Y vector and 2 is Z.
+	 */
+	vector_t m_sum[3];
+
+	float_t rot_sum;
+
+	/**
+	 * Needed for time_delta calculation.
+	 */
 	double m_prev_time;
+
+	const float_t PI;
 };
+
 
 #endif /* EULER_ANGLES_INTEGRAL_H_ */
