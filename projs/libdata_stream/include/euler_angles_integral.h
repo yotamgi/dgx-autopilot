@@ -66,15 +66,42 @@ public:
 private:
 
 	typename VecFilter<float_t,3>::vector_t calc_euler_angles(){
-		// calculate the euler angle
 		typename VecFilter<float_t,3>::vector_t ans;
 		float_t z_len = vec_len(m_sum[2]);
-		ans[0] = sign(m_sum[2][1]) * std::acos(std::sqrt(m_sum[2][2]*m_sum[2][2] + m_sum[2][0]*m_sum[2][0]) / z_len) * 180. / PI;
-		ans[1] = sign(m_sum[2][0]) * std::acos(std::sqrt(m_sum[2][2]*m_sum[2][2] + m_sum[2][1]*m_sum[2][1]) / z_len) * 180. / PI;
-		ans[2] = rot_sum;
 
-		if (m_sum[2][2] < 0.) {
-			ans[1] = 180. - ans[1];
+		// The Pitch
+		// Calculated by the calculating the angle between
+		vector_t y(3); y[0] = 0.; y[1] = 1.; y[2] = 0.;
+		ans[0] = 90. - angle_between(m_sum[2], y);
+
+		// The Yaw
+		// Calculate it by calculating the angle of the z projection on the xz
+		// surface and the real world z.
+		vector_t z_xz(3), world_z(3);
+		z_xz[0] = m_sum[2][0] ;z_xz[1] = 0.; z_xz[2] = m_sum[2][2];
+		world_z[0] = 0.; world_z[1] = 0.; world_z[2] = 1.;
+		normalize(z_xz);
+		ans[1] = angle_between(z_xz, world_z);
+		if (m_sum[2][0] < 0) {
+			ans[1] = 360-ans[1];
+		}
+
+		// The Roll
+		// First, find the vector that is the crossection between the the plane
+		// XY surface and the real world XZ surface. we call it rot_ref.
+		float m = m_sum[0][1] / m_sum[1][1] * -1.;
+		vector_t rot_ref = m_sum[0] + m*m_sum[1];
+		normalize(rot_ref);
+
+		// Roll, continues. Now find the angle between rot_ref and the plane's x
+		// axis. In order to make the rotation be 360 degrees, we look at two things:
+		//  - is the rot_ref vector from the right or to the left of the plane's
+		// 	  Z axis? This is calculated by rot_ref[0] - m_sum[2][0] < 0.
+		//  - is the plan's X axis is above or below XZ surface? It is calculated
+		//    by sign(m_sum[0][1]).
+		ans[2] = -1.*sign(m_sum[0][1])*angle_between(rot_ref, m_sum[0]);
+		if (rot_ref[0] - m_sum[2][0] < 0.) {
+			ans[2] = 180.0 - ans[2];
 		}
 
 		return ans;
@@ -104,6 +131,14 @@ private:
 
 	void orthogonalize(vector_t& a, vector_t& b) {
 		a[2] = -1.0 * (a[0]*b[0] + a[1]*b[1]) / b[2];
+	}
+
+	/**
+	 * Expects two normalized vectors
+	 */
+	float angle_between(const vector_t& a, const vector_t& b) const {
+
+		return std::acos(a[0]*b[0] + a[1]*b[1] + a[2]*b[2]) * 180. / PI;
 	}
 
 	float_t vec_len(const vector_t& vec) const {
