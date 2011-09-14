@@ -53,6 +53,19 @@ public:
 		rotate_coordinate_around(1, data[1]*time_delta);
 		rotate_coordinate_around(2, data[2]*time_delta);
 
+		// maintain the coordinate orthogonal
+		orthogonalize(m_sum[0], m_sum[1]);
+		orthogonalize(m_sum[1], m_sum[2]);
+		orthogonalize(m_sum[0], m_sum[2]);
+
+		typename VecFilter<float_t,3>::vector_t ans = calc_euler_angles();
+		std::cout << "ans is " << ans << std::endl;
+		return  ans;
+	}
+
+private:
+
+	typename VecFilter<float_t,3>::vector_t calc_euler_angles(){
 		// calculate the euler angle
 		typename VecFilter<float_t,3>::vector_t ans;
 		float_t z_len = vec_len(m_sum[2]);
@@ -60,11 +73,12 @@ public:
 		ans[1] = sign(m_sum[2][0]) * std::acos(std::sqrt(m_sum[2][2]*m_sum[2][2] + m_sum[2][1]*m_sum[2][1]) / z_len) * 180. / PI;
 		ans[2] = rot_sum;
 
-		std::cout << "Z is " << m_sum[2] << std::endl;
-		return  ans;
-	}
+		if (m_sum[2][2] < 0.) {
+			ans[1] = 180. - ans[1];
+		}
 
-private:
+		return ans;
+	}
 
 	void rotate_coordinate_around(size_t index, float howmuch) {
 
@@ -86,6 +100,10 @@ private:
 
 	float_t sign(float_t num) {
 		return (num>0.)?1.:-1.;
+	}
+
+	void orthogonalize(vector_t& a, vector_t& b) {
+		a[2] = -1.0 * (a[0]*b[0] + a[1]*b[1]) / b[2];
 	}
 
 	float_t vec_len(const vector_t& vec) const {
