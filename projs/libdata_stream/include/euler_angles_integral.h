@@ -70,7 +70,8 @@ private:
 		float_t z_len = vec_len(m_sum[2]);
 
 		// The Pitch
-		// Calculated by the calculating the angle between
+		// Calculated by the calculating the angle between the plan's Z axis
+		// and the Y axis.
 		vector_t y(3); y[0] = 0.; y[1] = 1.; y[2] = 0.;
 		ans[0] = 90. - angle_between(m_sum[2], y);
 
@@ -95,13 +96,13 @@ private:
 
 		// Roll, continues. Now find the angle between rot_ref and the plane's x
 		// axis. In order to make the rotation be 360 degrees, we look at two things:
-		//  - is the rot_ref vector from the right or to the left of the plane's
-		// 	  Z axis? This is calculated by rot_ref[0] - m_sum[2][0] < 0.
+		//  - Is the plane up-side-down? this is calculated by checking if plane's y
+		//    axis is pointing up or down: m_sum[1][1] < 0.
 		//  - is the plan's X axis is above or below XZ surface? It is calculated
 		//    by sign(m_sum[0][1]).
 		ans[2] = -1.*sign(m_sum[0][1])*angle_between(rot_ref, m_sum[0]);
-		if (rot_ref[0] - m_sum[2][0] < 0.) {
-			ans[2] = 180.0 - ans[2];
+		if (m_sum[1][1] < 0.) {
+			ans[2] = 180. - ans[2];
 		}
 
 		return ans;
