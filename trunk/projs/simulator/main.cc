@@ -111,8 +111,8 @@ int main()
 			new EulerAnglesIntegral<float> (p.gyro_gen()),
 	//		p.gyro_gen(),
 			"localhost", "simulator_gyro", 360.0, -360.0);
-	boost::thread t(sampler<VecGenerator<float,3> >, &watch);
 	watch.run();
+	boost::thread t(sampler<VecGenerator<float,3> >, &watch);
 
     // add terrain scene node
     scene::ITerrainSceneNode* terrain = smgr->addTerrainSceneNode(
