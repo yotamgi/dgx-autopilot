@@ -17,7 +17,7 @@ public:
 
 TEST(static_filter, functional) {
 	DummyGen gen;
-	DummyGen::vector_t a; a[0] = 1.; a[1] = 2.; a[2] = 3.;
+	DummyGen::vector_t a; a[0] =-1.; a[1] =-2.; a[2] =-3.;
 	DummyGen::vector_t b; b[0] = 1.; b[1] = 1.; b[2] = 1.;
 
 	StaticFilter<float, 3> filter(&gen, a, b);
