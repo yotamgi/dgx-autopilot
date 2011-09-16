@@ -1,0 +1,4 @@
+all:
+host:
+device:
+clean:

@@ -1,9 +1,9 @@
 # REQUIRES IRRLICHT
 CXX = g++
-CXXFLAGS =  -O3 -I/usr/X11R6/include  -g
-LDFLAGS = -L/usr/X11R6/lib -lGL -lXxf86vm -lXext -lX11 -lIrrlicht -lboost_thread
+CXXFLAGS =  -O3 -I/usr/X11R6/include  -g -fPIC
+LDFLAGS = -L/usr/X11R6/lib -lGL -lXxf86vm -lXext -lX11 -lIrrlicht -lboost_thread -fPIC
 
-SWIG_PY_VER=2.6
+SWIG_PY_VER=2.7
 
 all: swig
 swig: _direction.so
