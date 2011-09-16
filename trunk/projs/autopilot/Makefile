@@ -15,7 +15,8 @@ AUTOPILIT_OBJS =  hw/i2c_interface.o	\
 		hw/itg3200_gyro.o				\
 		hw/maestro_servo_controller.o
 
-GTESTS_OBJS=	./tests/integral_test.o
+GTESTS_OBJS=	./tests/integral_test.o  \
+				./tests/static_filter_test.o
 
 ###############################################################################
 ## TARGETS 
