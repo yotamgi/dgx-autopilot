@@ -29,14 +29,14 @@ GTESTS_OBJS=	./tests/integral_test.o  \
 all: host device
 
 .PHONY:
-host: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.a orientation_watch_test orientation_test gtest 
+host: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.a gyro_watch_test acc_watch_test orientation_test gtest 
 
 .PHONY:
-device: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.a orientation_watch_test orientation_test gtest 
+device: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.a gyro_watch_test acc_watch_test orientation_test gtest 
 
 .PHONY:
 clean:
-	rm -fr */*.o *.o $(LIBDIR) gtest orientation_watch_test watch_test orientation_test
+	rm -fr */*.o *.o $(LIBDIR) gtest gyro_watch_test watch_test orientation_test
 
 $(LIBDIR):
 	mkdir $(LIBDIR)
@@ -50,7 +50,7 @@ $(LIBDIR)/libautopilot.a: $(AUTOPILIT_OBJS)
 	$(ARCHIVE) cr  $(LIBDIR)/libautopilot.a $(AUTOPILIT_OBJS)
 
 gtest: $(GTESTS_OBJS) $(LIBDIR) $(LIBDIR)/libautopilot.a
-	$(CXX) $(LDFLAGS) $(GTESTS_OBJS) -lautopilot -o orientation_watch_test -lgtest_main -o gtest
+	$(CXX) $(LDFLAGS) $(GTESTS_OBJS) -lautopilot -o gyro_watch_test -lgtest_main -o gtest
 
 .PHONY:
 test: gtest
@@ -59,5 +59,8 @@ test: gtest
 orientation_test: sandbox/orientation_test.o $(LIBDIR) $(LIBDIR)/libautopilot.a 
 	$(CXX) ./sandbox/orientation_test.o $(LDFLAGS) -lautopilot -o orientation_test
 
-orientation_watch_test: sandbox/orientation_watch_test.o $(LIBDIR) $(LIBDIR)/libautopilot.a 
-	$(CXX) ./sandbox/orientation_watch_test.o $(LDFLAGS) -lautopilot -o orientation_watch_test
+acc_watch_test: sandbox/acc_watch_test.o $(LIBDIR) $(LIBDIR)/libautopilot.a 
+	$(CXX) ./sandbox/acc_watch_test.o $(LDFLAGS) -lautopilot -o acc_watch_test
+
+gyro_watch_test: sandbox/gyro_watch_test.o $(LIBDIR) $(LIBDIR)/libautopilot.a 
+	$(CXX) ./sandbox/gyro_watch_test.o $(LDFLAGS) -lautopilot -o gyro_watch_test
