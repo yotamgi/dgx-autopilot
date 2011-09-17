@@ -15,6 +15,7 @@ class session():
 
 	def start(self, *args):
 		self.direction.run()
+                self.direction.show_angle(True)
 
 		while 1:
                         try:

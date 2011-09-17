@@ -7,11 +7,18 @@ DirectionPresenter::~DirectionPresenter() {
 	m_device->drop();
 }
 
-DirectionPresenter::DirectionPresenter():m_running(true) {
+DirectionPresenter::DirectionPresenter():
+		m_running(true),
+		m_show_object(false),
+		m_show_arrow(false)
+{
 	m_curr_angle.ax = 0.f;
 	m_curr_angle.ay = 0.f;
 	m_curr_angle.az = 0.f;
 
+	m_curr_vec.ax = 0.f;
+	m_curr_vec.ay = 0.f;
+	m_curr_vec.az = 0.f;
 }
 
 void DirectionPresenter::run(bool open_thread) {
@@ -31,6 +38,8 @@ void DirectionPresenter::run(bool open_thread) {
 		video::IVideoDriver* driver = m_device->getVideoDriver();
 		scene::ISceneManager* smgr = m_device->getSceneManager();
 
+		// initalize the meshs
+		m_arrow = smgr->addMeshSceneNode(smgr->addArrowMesh("arrow"));
 		m_object = smgr->addMeshSceneNode(smgr->getMesh("angle_presenter_3d/media/F16_Thuderbirds.x"));
 		if (!m_object) {
 			throw std::runtime_error("Could not load the plane mesh");
@@ -76,19 +85,25 @@ void DirectionPresenter::run(bool open_thread) {
 
 
 		int lastFPS = -1;
-		u32 then = m_device->getTimer()->getTime();
-
 		m_running = true;
 
 		while(m_device->run() && m_running)
 		{
+			// set the rotation object
 			irr::core::matrix4 rotx, roty, rotz;
 			rotx.setRotationDegrees(core::vector3df(m_curr_angle.ax, 0., 0.));
 			roty.setRotationDegrees(core::vector3df(0., m_curr_angle.ay, 0.));
 			rotz.setRotationDegrees(core::vector3df(0., 0., m_curr_angle.az));
 
+			m_object->setVisible(m_show_object);
+			m_arrow->setVisible(m_show_arrow);
+
+
 			irr::core::matrix4 trans = rotx * roty * rotz;
 			m_object->setRotation(trans.getRotationDegrees());
+
+			// set the
+			m_arrow->setScale(core::vector3df(m_curr_vec.ax, m_curr_vec.ay, m_curr_vec.az));
 
 			//m_object->setRotation(core::vector3df(m_curr_angle.ax, m_curr_angle.ay, m_curr_angle.az));
 
