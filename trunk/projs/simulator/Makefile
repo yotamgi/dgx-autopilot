@@ -15,7 +15,9 @@ OBJDIR = ./obj
 
 .PHONY: all clean
 
-all: $(OBJDIR) sim
+all: host device
+host: $(OBJDIR) sim
+device:
 clean:
 	rm -rf obj sim
 
