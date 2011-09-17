@@ -1,3 +1,7 @@
+
+CXXFLAGS += -Wall
+export CXXFLAGS
+
 .PHONY:
 all:
 	make -C  autopilot        all
