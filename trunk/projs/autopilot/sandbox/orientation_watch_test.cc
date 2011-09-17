@@ -1,6 +1,7 @@
 #include "stream_watch.h"
 #include "euler_angles_integral.h"
 #include "static_filter.h"
+#include <util/time.h>
 #include "hw/itg3200_gyro.h"
 
 typedef Watch<float,3> VecWatch;
@@ -37,9 +38,16 @@ int main(int argc, char** argv) {
 
 	watch.run();
 
+	size_t times;
+	Timer t;
 	while (true) {
 		VecWatch::vector_t v =  watch.get_data();
-		//usleep(100);
+		times ++;
+		if (t.passed() > 1.0) {
+			t.reset();
+			std::cout << "FPS " << times << std::endl;
+			times = 0;
+		}
 	}
 	return 0;
 }
