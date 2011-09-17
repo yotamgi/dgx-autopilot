@@ -6,8 +6,8 @@ include $(STREAMWATCH_PATH)/Makefile.include
 
 CXX = g++
 ARCHIVE = ar
-CXXFLAGS = -g -I. -Wall  $(LIBDS_CXXFLAGS) $(STREAMWATCH_CXXFLAGS)
-LDFLAGS = -lboost_thread -L./lib $(LIBDS_LDFLAGS) $(STREAMWATCH_LDFLAGS)
+CXXFLAGS += -g -I. -Wall  $(LIBDS_CXXFLAGS) $(STREAMWATCH_CXXFLAGS)
+LDFLAGS += -lboost_thread -L./lib $(LIBDS_LDFLAGS) $(STREAMWATCH_LDFLAGS)
 
 LIBDIR = ./lib
 
