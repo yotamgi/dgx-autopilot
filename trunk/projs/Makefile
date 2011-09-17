@@ -1,5 +1,8 @@
-
 CXXFLAGS += -Wall
+ifneq ($(shell grep ARM /proc/cpuinfo),)
+	CXXFLAGS += -march=cortex-a8 -mfpu=neon -ftree-vectorize -mfloat-abi=hard -ffast-math -fsingle-precision-constant
+endif
+
 export CXXFLAGS
 
 .PHONY:
