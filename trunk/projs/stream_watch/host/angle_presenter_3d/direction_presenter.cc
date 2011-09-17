@@ -39,7 +39,6 @@ void DirectionPresenter::run(bool open_thread) {
 		scene::ISceneManager* smgr = m_device->getSceneManager();
 
 		// initalize the meshs
-		m_arrow = smgr->addMeshSceneNode(smgr->addArrowMesh("arrow"));
 		m_object = smgr->addMeshSceneNode(smgr->getMesh("angle_presenter_3d/media/F16_Thuderbirds.x"));
 		if (!m_object) {
 			throw std::runtime_error("Could not load the plane mesh");
@@ -96,14 +95,11 @@ void DirectionPresenter::run(bool open_thread) {
 			rotz.setRotationDegrees(core::vector3df(0., 0., m_curr_angle.az));
 
 			m_object->setVisible(m_show_object);
-			m_arrow->setVisible(m_show_arrow);
+			//m_arrow->setVisible(m_show_arrow);
 
 
 			irr::core::matrix4 trans = rotx * roty * rotz;
 			m_object->setRotation(trans.getRotationDegrees());
-
-			// set the
-			m_arrow->setScale(core::vector3df(m_curr_vec.ax, m_curr_vec.ay, m_curr_vec.az));
 
 			//m_object->setRotation(core::vector3df(m_curr_angle.ax, m_curr_angle.ay, m_curr_angle.az));
 
@@ -111,6 +107,13 @@ void DirectionPresenter::run(bool open_thread) {
 
 			m_device->getSceneManager()->drawAll(); // draw the 3d scene
 			m_device->getGUIEnvironment()->drawAll(); // draw the gui environment (the logo)
+
+			// draw the line
+			if (m_show_arrow) {
+				driver->draw3DLine(core::vector3df(0., 0., 30.),
+						core::vector3df(0., 0., 30.) + core::vector3df(m_curr_vec.ax, m_curr_vec.ay, m_curr_vec.az));
+			}
+
 
 			m_device->getVideoDriver()->endScene();
 

@@ -35,7 +35,6 @@ private:
 	irr::IrrlichtDevice* m_device;
 
 	irr::scene::ISceneNode * m_object;
-	irr::scene::ISceneNode * m_arrow;
 
 	boost::shared_ptr<boost::thread> m_thread;
 
@@ -44,8 +43,8 @@ private:
 
 	volatile bool m_running;
 
-	bool m_show_arrow;
 	bool m_show_object;
+	bool m_show_arrow;
 };
 
 #endif /* DIRECTIONPRESENTER_H_ */
