@@ -78,18 +78,10 @@ void DirectionPresenter::run(bool open_thread) {
 		int lastFPS = -1;
 		u32 then = m_device->getTimer()->getTime();
 
-		// This is the movemen speed in units per second.
-		const f32 MOVEMENT_SPEED = 5.f;
-
 		m_running = true;
 
 		while(m_device->run() && m_running)
 		{
-			// Work out a frame delta time.
-			const u32 now = m_device->getTimer()->getTime();
-			const f32 frameDeltaTime = (f32)(now - then) / 1000.f; // Time in seconds
-			then = now;
-
 			irr::core::matrix4 rotx, roty, rotz;
 			rotx.setRotationDegrees(core::vector3df(m_curr_angle.ax, 0., 0.));
 			roty.setRotationDegrees(core::vector3df(0., m_curr_angle.ay, 0.));

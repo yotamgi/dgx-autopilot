@@ -154,9 +154,6 @@ int main()
 	// how long it was since the last frame
 	u32 then = device->getTimer()->getTime();
 
-	// This is the movemen speed in units per second.
-	const f32 MOVEMENT_SPEED = 5.f;
-
 	while(device->run())
 	{
 		// Work out a frame delta time.
