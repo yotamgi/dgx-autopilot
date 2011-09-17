@@ -59,7 +59,6 @@ public:
 		orthogonalize(m_sum[0], m_sum[2]);
 
 		typename VecFilter<float_t,3>::vector_t ans = calc_euler_angles();
-		std::cout << "ans is " << ans << std::endl;
 		return  ans;
 	}
 
