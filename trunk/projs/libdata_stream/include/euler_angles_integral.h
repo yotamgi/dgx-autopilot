@@ -67,7 +67,6 @@ private:
 
 	typename VecFilter<float_t,3>::vector_t calc_euler_angles(){
 		typename VecFilter<float_t,3>::vector_t ans;
-		float_t z_len = vec_len(m_sum[2]);
 
 		// The Pitch
 		// Calculated by the calculating the angle between the plan's Z axis
