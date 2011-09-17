@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
 
 	watch.run();
 
-	size_t times;
+	size_t times=0;
 	Timer t;
 	while (true) {
 		VecWatch::vector_t v =  watch.get_data();
@@ -28,6 +28,7 @@ int main(int argc, char** argv) {
 			std::cout << "FPS " << times << std::endl;
 			times = 0;
 		}
+		//std::cout << v << std::endl;
 	}
 	return 0;
 }
