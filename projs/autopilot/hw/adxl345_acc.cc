@@ -14,7 +14,7 @@ Adxl345Acc::Adxl345Acc(size_t device_i2c_num):
 {
 	// sanity check
 	uint8_t who_am_i = m_i2c.read_num<uint8_t>(WHO_AM_I);
-	if (who_am_i != WHO_AM_I_VALUE+1) {
+	if (who_am_i != WHO_AM_I_VALUE) {
 		std::stringstream ss;
 		ss << "The value of the who am i value of the adxl345 accelerometer was " <<
 				std::hex << (int)who_am_i << "and not " << (int)WHO_AM_I_VALUE;
