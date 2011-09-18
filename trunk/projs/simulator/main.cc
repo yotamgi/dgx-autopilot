@@ -22,9 +22,9 @@ and tell the linker to link with the .lib file.
 #include "plane.h"
 #include "camera.h"
 
-#include "stream_watch.h"
-#include "integral_filter.h"
-#include "euler_angles_integral.h"
+#include <stream_watch.h>
+#include <stream/integral_filter.h>
+#include <stream/euler_angles_integral.h>
 
 using namespace irr;
 

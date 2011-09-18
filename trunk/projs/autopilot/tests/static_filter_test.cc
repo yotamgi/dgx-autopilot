@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include <static_filter.h>
-#include <generators.h>
+#include <stream/static_filter.h>
+#include <stream/generators.h>
 
 class DummyGen : public VecGenerator<float, 3> {
 public:

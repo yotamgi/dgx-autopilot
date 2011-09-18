@@ -11,7 +11,7 @@
 #include <boost/shared_ptr.hpp>
 #include <stdexcept>
 
-#include "generators.h"
+#include "stream/generators.h"
 #include "flying_object.h"
 
 namespace simulator {
