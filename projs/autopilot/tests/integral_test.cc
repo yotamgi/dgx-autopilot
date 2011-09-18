@@ -3,9 +3,9 @@
 #include <gtest/gtest.h>
 #include <sys/time.h>
 #include <cstdlib>
-#include "generators.h"
-#include "integral_filter.h"
-#include "util/time.h"
+#include <stream/generators.h>
+#include <stream/integral_filter.h>
+#include <stream/util/time.h>
 
 /**
  * Dummy generator for testing the integral.

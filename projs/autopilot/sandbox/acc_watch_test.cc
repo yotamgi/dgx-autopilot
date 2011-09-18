@@ -1,7 +1,7 @@
 #include "stream_watch.h"
-#include "euler_angles_integral.h"
-#include "static_filter.h"
-#include <util/time.h>
+#include <stream/euler_angles_integral.h>
+#include <stream/static_filter.h>
+#include <stream/util/time.h>
 #include "hw/adxl345_acc.h"
 
 typedef Watch<float,3> VecWatch;

@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "stream_watch.h"
+#include <stream_watch.h>
 
 typedef Watch<float,3> VecWatch;
 

@@ -7,7 +7,7 @@
 
 #include <stdexcept>
 
-#include "generators.h"
+#include <stream/generators.h>
 
 
 /**

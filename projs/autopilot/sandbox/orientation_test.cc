@@ -1,6 +1,6 @@
 #include "hw/itg3200_gyro.h"
 #include <iostream>
-#include "integral_filter.h"
+#include <stream/integral_filter.h>
 
 int main(int argc, char** argv) {
 
