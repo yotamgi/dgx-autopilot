@@ -10,7 +10,7 @@ all: host device
 host: $(LIBDIR)/libdata_stream.so gtest
 device: $(LIBDIR)/libdata_stream.so gtest
 clean:
-	rm -f $(LIBDIR)/libdata_stream.so */*.o gtest
+	rm -rf $(LIBDIR) */*.o gtest
 
 .cc.o:
 	$(CXX) -c $(CXXFLAGS) $<  -o $*.o
