@@ -3,7 +3,8 @@ CXXFLAGS += -g -Wall -O3 -Isrc
 LDFLAGS = 
 LIBDIR = ./lib
 
-DATA_STREAM_OBJS = src/stream_exporter.o
+DATA_STREAM_OBJS = src/stream_exporter.o \
+				   src/stream_importer.o
 GTEST_OBJS = tests/exporter_test.o 
 
 all: host device 
@@ -23,6 +24,7 @@ $(LIBDIR)/libdata_stream.so: $(LIBDIR) $(DATA_STREAM_OBJS)
 	$(CXX)  $(DATA_STREAM_OBJS) -fPIC -shared -o $(LIBDIR)/libdata_stream.so
 	
 gtest: $(GTEST_OBJS) $(LIBDIR) $(LIBDIR)/libdata_stream.so
-	$(CXX) $(LDFLAGS) $(GTEST_OBJS) -Llib -ldata_stream -lpthread -lgtest_main -Wl,--rpath,./lib -o  gtest 
+	$(CXX) $(LDFLAGS) $(GTEST_OBJS) -Llib -ldata_stream -lpthread -lgtest_main -lboost_thread \
+			 -Wl,--rpath,./lib -o  gtest 
 
 	  

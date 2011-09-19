@@ -8,6 +8,7 @@
 #include <map>
 #include <boost/shared_ptr.hpp>
 #include "generators.h"
+#include "protocol.h"
 
 class StreamExporter {
 public:
@@ -26,11 +27,11 @@ private:
 
 	class AnyStream {
 	public:
-		virtual void serialize(std::ostream&);
+		virtual void serialize(std::ostream&) = 0;
 	};
 
 	template <typename T>
-	class SpecificStream {
+	class SpecificStream : public AnyStream {
 	public:
 		SpecificStream(DataGenerator<T>* gen):m_gen(gen) {}
 
@@ -44,8 +45,6 @@ private:
 	void handle_client(int sock);
 
 	std::map<std::string, boost::shared_ptr<AnyStream> > m_exported_streams;
-
-	const uint32_t PORT;
 };
 
 
