@@ -1,7 +1,7 @@
 #ifndef STATIC_FILTER_H_
 #define STATIC_FILTER_H_
 
-#include "generators.h"
+#include "data_filter.h"
 
 template <class T, size_t N>
 class StaticFilter : public VecFilter<T,N> {

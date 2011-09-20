@@ -6,56 +6,65 @@
 #include <string.h>
 #include <unistd.h>
 #include <netinet/in.h>
+#include <iostream>
 
-StreamExporter::StreamExporter()
+StreamExporter::StreamExporter():m_is_running(false), m_client_sock(0), m_server_sock(0)
 {}
 
+StreamExporter::~StreamExporter()
+{
+	if (m_server_sock) close(m_server_sock);
+	if (m_client_sock) close(m_client_sock);
+	std::cout << "Exporter closed sockets." << std::endl;
+}
+
 void StreamExporter::run() {
-    int serversock, clientsock;
-    struct sockaddr_in echoserver, echoclient;
+    struct sockaddr_in server_add, client_add;
 
     // Create the TCP socket
-    if ((serversock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
+    if ((m_server_sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
     	throw std::runtime_error("Failed to create socket");
     }
 
     // Construct the server sockaddr_in structure
-    memset(&echoserver, 0, sizeof(echoserver));       // Clear struct
-    echoserver.sin_family = AF_INET;                  // Internet/IP
-    echoserver.sin_addr.s_addr = htonl(INADDR_ANY);   // Incoming addr
-    echoserver.sin_port = htons(protocol::PORT);      // server port
+    memset(&server_add, 0, sizeof(server_add));       // Clear struct
+    server_add.sin_family = AF_INET;                  // Internet/IP
+    server_add.sin_addr.s_addr = htonl(INADDR_ANY);   // Incoming addr
+    server_add.sin_port = htons(protocol::PORT);      // server port
 
     // Bind the server socket
-    if (bind(serversock, (struct sockaddr *) &echoserver,
-                                 sizeof(echoserver)) < 0) {
+    if (bind(m_server_sock, (struct sockaddr *) &server_add,
+                                 sizeof(server_add)) < 0) {
     	throw std::runtime_error("Failed to bind the server socket");
     }
 
     // Listen on the server socket
-    if (listen(serversock, 5) < 0) {
+    if (listen(m_server_sock, 5) < 0) {
     	throw std::runtime_error("Failed to listen on server socket");
     }
 
     // Run until cancelled
-    while (1) {
-		unsigned int clientlen = sizeof(echoclient);
+    m_is_running = true;
+    while (m_is_running) {
+		unsigned int clientlen = sizeof(client_add);
 		// Wait for client connection
-		if ((clientsock =
-		   accept(serversock, (struct sockaddr *) &echoclient,
+		if ((m_client_sock =
+		   accept(m_server_sock, (struct sockaddr *) &client_add,
 				  &clientlen)) < 0)
 		{
-		continue;
+			continue;
 		}
-		std::cout << "Client connected: " << inet_ntoa(echoclient.sin_addr) << std::endl;
-		handle_client(clientsock);
+		std::cout << "Client connected: " << inet_ntoa(client_add.sin_addr) << std::endl;
+		handle_client();
     }
+    close(m_server_sock);
 }
 
-void StreamExporter::handle_client(int sock) {
+void StreamExporter::handle_client() {
 	const size_t BUFF_SIZE = 100;
-	while (true) {
+	while (m_is_running) {
 		char buff[BUFF_SIZE];
-		size_t read_size = read(sock, buff, BUFF_SIZE);
+		size_t read_size = read(m_client_sock, buff, BUFF_SIZE);
 
 		buff[read_size] = '\0';
 		if (buff[0] == protocol::GET_COMMAND) {
@@ -63,7 +72,7 @@ void StreamExporter::handle_client(int sock) {
 
 			if (m_exported_streams.count(name) != 1) {
 				std::cout << "Asked for a non-existing stream" << std::endl;
-				if (write(sock, protocol::NOT_EXIST_COMMAND.c_str(), 9) != 9) {
+				if (write(m_client_sock, protocol::NOT_EXIST_COMMAND.c_str(), 9) != 9) {
 					break;
 				}
 			}
@@ -71,7 +80,7 @@ void StreamExporter::handle_client(int sock) {
 				std::stringstream ss;
 				m_exported_streams[name]->serialize(ss);
 				ss << protocol::SEPERATOR;
-				size_t written_size = write(sock, ss.str().c_str(), ss.str().size());
+				size_t written_size = write(m_client_sock, ss.str().c_str(), ss.str().size());
 				if (written_size != ss.str().size()) {
 					std::cout << "It seems like the client closed" << std::endl;
 					break;
@@ -79,5 +88,10 @@ void StreamExporter::handle_client(int sock) {
 			}
 		}
 	}
-	close(sock);
+	close(m_client_sock);
+	m_client_sock = 0;
+}
+
+void StreamExporter::stop() {
+	m_is_running = false;
 }

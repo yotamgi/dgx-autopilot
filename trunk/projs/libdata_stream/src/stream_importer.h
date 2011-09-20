@@ -11,6 +11,7 @@
 #include <boost/shared_ptr.hpp>
 #include <sstream>
 #include <stdexcept>
+#include <boost/numeric/ublas/io.hpp>
 #include "generators.h"
 #include "protocol.h"
 

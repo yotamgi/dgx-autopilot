@@ -7,7 +7,7 @@
 
 #include <stdexcept>
 
-#include <stream/generators.h>
+#include <stream/data_filter.h>
 
 
 /**

@@ -82,11 +82,11 @@ TEST(stream_export_import, vec_stream) {
 	boost::shared_ptr< DataGenerator<DummyVecStream::vector_t> > a =
 			importer.import_stream<DummyVecStream::vector_t>("dummy_vec");
 
-
 	ASSERT_NEAR(a->get_data()[2], 2, 0.01);
 	ASSERT_NEAR(a->get_data()[1], 2, 0.01);
 	ASSERT_NEAR(a->get_data()[0], 2, 0.01);
 
 	// kill the exporter.
-	exporter_thread.detach();
+	exporter.stop();
+	exporter_thread.join();
 }

@@ -12,9 +12,14 @@ vector_t calibrate_(VecGenerator<float,3>* gen) {
 	sum[0]= 0.; sum[1]=0.; sum[2]=0.;
 	size_t num =0;
 	while (true) {
-		sum += gen->get_data();
+		typename VecGenerator<float,3>::vector_t a = gen->get_data();
+		for (size_t i=0; i<3; i++) {
+			sum[i] += a[i];
+		}
 		num++;
-		std::cout << sum / float(num)  << std::endl;
+		for (size_t i=0; i<3; i++) {
+			std::cout << sum[i] / float(num)  << ", " << std::endl;
+		}
 	}
 		return sum;
 }
