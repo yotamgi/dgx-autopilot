@@ -13,7 +13,7 @@
 
 #include <boost/array.hpp>
 
-#include "generators.h"
+#include "data_filter.h"
 #include "util/time.h"
 
 /*

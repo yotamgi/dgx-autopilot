@@ -36,7 +36,7 @@ device: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.a gyro_watch_test acc_watch_t
 
 .PHONY:
 clean:
-	rm -fr */*.o *.o $(LIBDIR) gtest gyro_watch_test watch_test orientation_test
+	rm -fr */*.o *.o $(LIBDIR) gtest gyro_watch_test watch_test orientation_test acc_watch_test
 
 $(LIBDIR):
 	mkdir $(LIBDIR)

@@ -13,6 +13,7 @@
 class StreamExporter {
 public:
 	StreamExporter();
+	~StreamExporter();
 
 	template <typename T>
 	void register_stream(DataGenerator<T>* stream, std::string stream_name) {
@@ -21,7 +22,18 @@ public:
 		);
 	}
 
+	/**
+	 * Runs the server.
+	 * This function will block.
+	 */
 	void run();
+
+	/**
+	 * Stops the server.
+	 * Can be called asynchronusly while run function runs, and it will stop
+	 * it.
+	 */
+	void stop();
 
 private:
 
@@ -42,7 +54,13 @@ private:
 		DataGenerator<T>* m_gen;
 	};
 
-	void handle_client(int sock);
+	void handle_client();
+
+	volatile bool m_is_running;
+
+	int m_client_sock;
+    int m_server_sock;
+
 
 	std::map<std::string, boost::shared_ptr<AnyStream> > m_exported_streams;
 };
