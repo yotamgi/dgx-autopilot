@@ -11,9 +11,14 @@
 
 
 StreamImporter::StreamImporter(std::string address):
-	m_host_address(address)
+	m_host_address(address),
+	m_sock(0)
 {
 	connect_to_host();
+}
+
+StreamImporter::~StreamImporter() {
+	if (m_sock) close(m_sock);
 }
 
 void StreamImporter::connect_to_host() {

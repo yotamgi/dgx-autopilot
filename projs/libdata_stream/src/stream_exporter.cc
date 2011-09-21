@@ -13,8 +13,8 @@ StreamExporter::StreamExporter():m_is_running(false), m_client_sock(0), m_server
 
 StreamExporter::~StreamExporter()
 {
-	if (m_server_sock) close(m_server_sock);
 	if (m_client_sock) close(m_client_sock);
+	if (m_server_sock) close(m_server_sock);
 	std::cout << "Exporter closed sockets." << std::endl;
 }
 
@@ -62,11 +62,19 @@ void StreamExporter::run() {
 
 void StreamExporter::handle_client() {
 	const size_t BUFF_SIZE = 100;
+
+	// make the socket nonblock
+	timeval tv;
+	tv.tv_sec = 0;
+	tv.tv_usec = 100000;
+
+	setsockopt(m_client_sock, SOL_SOCKET, SO_RCVTIMEO, (void*)&tv, sizeof(tv));
 	while (m_is_running) {
 		char buff[BUFF_SIZE];
-		size_t read_size = read(m_client_sock, buff, BUFF_SIZE);
-
+		size_t read_size;
+		if ( (read_size = read(m_client_sock, buff, BUFF_SIZE)) == 0) continue;
 		buff[read_size] = '\0';
+
 		if (buff[0] == protocol::GET_COMMAND) {
 			std::string name(&buff[1]);
 
