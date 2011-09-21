@@ -10,6 +10,8 @@
 #include "generators.h"
 #include "protocol.h"
 
+namespace stream {
+
 class StreamExporter {
 public:
 	StreamExporter();
@@ -65,5 +67,6 @@ private:
 	std::map<std::string, boost::shared_ptr<AnyStream> > m_exported_streams;
 };
 
+} // namespace stream
 
 #endif /* STREAM_SEVER_H_ */

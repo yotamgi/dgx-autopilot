@@ -9,6 +9,7 @@
 #include <netdb.h>
 #include <iostream>
 
+namespace stream {
 
 StreamImporter::StreamImporter(std::string address):
 	m_host_address(address),
@@ -49,3 +50,5 @@ void StreamImporter::connect_to_host() {
 		sleep(1);
     }
 }
+
+} // namespace stream

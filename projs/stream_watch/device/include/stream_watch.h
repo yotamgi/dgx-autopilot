@@ -25,9 +25,9 @@ public:
  * Should work with WatchPresenter program.
  */
 template <typename T, size_t N>
-class Watch : public VecFilter<T,N> {
+class Watch : public stream::VecFilter<T,N> {
 public:
-	Watch(VecGenerator<T,N>* data_gen,
+	Watch(stream::VecGenerator<T,N>* data_gen,
 			std::string hostname,
 			std::string watch_name,
 			float minval,
@@ -35,7 +35,7 @@ public:
 
 	virtual ~Watch();
 
-	typename VecFilter<T,N>::vector_t get_data();
+	typename stream::VecFilter<T,N>::vector_t get_data();
 
 	void run(bool open_thread=true);
 
@@ -49,7 +49,7 @@ private:
 	bool connect_to_host(int &sock_fd);
 
 	boost::shared_ptr<boost::thread> m_thread;
-	boost::optional< typename VecFilter<T,N>::vector_t > m_curr_data;
+	boost::optional< typename stream::VecFilter<T,N>::vector_t > m_curr_data;
 
 	std::string m_host;
 

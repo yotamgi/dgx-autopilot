@@ -1,11 +1,11 @@
 #include "hw/itg3200_gyro.h"
 #include <iostream>
-#include <stream/integral_filter.h>
+#include <stream/filters/integral_filter.h>
 
 int main(int argc, char** argv) {
 
 	Itg3200Gyro gyro(2);
-	IntergralFilter<float,3> gen(&gyro, 10000.0f, -10000.0f);
+	stream::filters::IntergralFilter<float,3> gen(&gyro, 10000.0f, -10000.0f);
 
 	while (true) {
 		Itg3200Gyro::vector_t av = gen.get_data();

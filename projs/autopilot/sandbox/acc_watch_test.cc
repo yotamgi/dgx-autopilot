@@ -1,6 +1,6 @@
 #include "stream_watch.h"
-#include <stream/euler_angles_integral.h>
-#include <stream/static_filter.h>
+#include <stream/filters/euler_angles_integral.h>
+#include <stream/filters/static_filter.h>
 #include <stream/util/time.h>
 #include "hw/adxl345_acc.h"
 

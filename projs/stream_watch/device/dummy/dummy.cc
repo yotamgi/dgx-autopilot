@@ -5,7 +5,7 @@
 typedef Watch<float,3> VecWatch;
 
 
-class SimpleGen : public VecGenerator<float,3> {
+class SimpleGen : public stream::VecGenerator<float,3> {
 public:
 
 	SimpleGen():m_a(0.0f) {}

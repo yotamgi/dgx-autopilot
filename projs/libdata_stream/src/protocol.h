@@ -10,6 +10,8 @@
 
 #include <string>
 
+namespace stream {
+
 namespace protocol {
 
 	const size_t PORT = 0x6666;
@@ -21,5 +23,7 @@ namespace protocol {
 	const std::string SEPERATOR = "|";
 
 }  // namespace protocol
+
+} // namespace stream
 
 #endif /* PROTOCOL_H_ */

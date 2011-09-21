@@ -5,7 +5,7 @@
 #include "stream/generators.h"
 #include "hw/i2c_interface.h"
 
-class Adxl345Acc : public VecGenerator<float,3> {
+class Adxl345Acc : public stream::VecGenerator<float,3> {
 public:
 	Adxl345Acc(size_t device_i2c_num);
 	virtual ~Adxl345Acc() {}

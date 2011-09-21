@@ -12,12 +12,12 @@
 
 
 template <typename T, size_t N>
-Watch<T,N>::Watch(VecGenerator<T,N>* data_gen,
+Watch<T,N>::Watch(stream::VecGenerator<T,N>* data_gen,
 					std::string hostname,
 					std::string watch_name,
 					float minval,
 					float maxval):
-	VecFilter<T,N>(data_gen),
+	stream::VecFilter<T,N>(data_gen),
 	m_host(hostname),
 	m_watch_name(watch_name),
 	m_minval(minval),
@@ -60,9 +60,9 @@ Watch<T,N>::~Watch() {
 }
 
 template <typename T, size_t N>
-typename VecFilter<T,N>::vector_t  Watch<T,N>::get_data() {
+typename stream::VecFilter<T,N>::vector_t  Watch<T,N>::get_data() {
 
-	m_curr_data = boost::make_optional(VecFilter<T,N>::m_generator->get_data());
+	m_curr_data = boost::make_optional(stream::VecFilter<T,N>::m_generator->get_data());
 	return *m_curr_data;
 }
 

@@ -4,6 +4,8 @@
 #include "stream_exporter.h"
 #include "stream_importer.h"
 
+using namespace stream;
+
 class DummyIntStream : public DataGenerator<int> {
 public:
 	DummyIntStream():m_counter(0){}

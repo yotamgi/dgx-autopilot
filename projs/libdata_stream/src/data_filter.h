@@ -4,6 +4,7 @@
 
 #include "generators.h"
 
+namespace stream {
 
 /**
  * A filter, which is a decoretor to the DataGenerator class.
@@ -51,6 +52,6 @@ protected:
 	VecGenerator<T,N>* m_generator;
 };
 
-
+} // namespace stream
 
 #endif /* DATA_FILTER_H_ */
