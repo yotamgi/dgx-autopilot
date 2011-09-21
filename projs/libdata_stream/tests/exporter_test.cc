@@ -25,8 +25,8 @@ public:
 	typename VecGenerator<float, 3>::vector_t get_data() {
 		typename VecGenerator<float, 3>::vector_t v;
 		v[0] = (float)m_counter;
-		v[0] = (float)m_counter+1.;
-		v[0] = (float)m_counter+2.;
+		v[1] = (float)m_counter+1.;
+		v[2] = (float)m_counter+2.;
 		m_counter++;
 		return v;
 	}
@@ -44,14 +44,12 @@ TEST(stream_export_import, int_stream) {
 	DummyIntStream is;
 
 	// exporting the stream
-	std::cout << "Running exporter" << std::endl;
 	StreamExporter exporter;
 	exporter.register_stream(&is, "dummy_int");
 	boost::thread exporter_thread(&StreamExporter::run, &exporter);
 
 	// importing the stream
 	StreamImporter importer("localhost");
-	std::cout << "importer is connected" << std::endl;
 
 	// checking that the data is correct
 	boost::shared_ptr< DataGenerator<int> > a = importer.import_stream<int>("dummy_int");
@@ -60,7 +58,8 @@ TEST(stream_export_import, int_stream) {
 	ASSERT_EQ(a->get_data(), 2);
 
 	// kill the exporter.
-	exporter_thread.detach();
+	exporter.stop();
+	exporter_thread.join();
 }
 
 TEST(stream_export_import, vec_stream) {
@@ -69,14 +68,12 @@ TEST(stream_export_import, vec_stream) {
 	DummyVecStream vs;
 
 	// exporting the stream
-	std::cout << "Running exporter" << std::endl;
 	StreamExporter exporter;
 	exporter.register_stream(&vs, "dummy_vec");
 	boost::thread exporter_thread(&StreamExporter::run, &exporter);
 
 	// importing the stream
 	StreamImporter importer("localhost");
-	std::cout << "importer is connected" << std::endl;
 
 	// checking that the data is correct
 	boost::shared_ptr< DataGenerator<DummyVecStream::vector_t> > a =
