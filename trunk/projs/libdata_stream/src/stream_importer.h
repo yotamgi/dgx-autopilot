@@ -18,6 +18,7 @@
 class StreamImporter {
 public:
 	StreamImporter(std::string address);
+	~StreamImporter();
 
 	template <typename T>
 	boost::shared_ptr<DataGenerator<T> > import_stream(std::string name) {
