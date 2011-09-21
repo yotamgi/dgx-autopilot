@@ -1,11 +1,13 @@
 CXX = g++
-CXXFLAGS += -g -Wall -O3 -Isrc
+CXXFLAGS += -g -Wall -O3 -Isrc -Iinclude
 LDFLAGS = 
 LIBDIR = ./lib
 
 DATA_STREAM_OBJS = src/stream_exporter.o \
 				   src/stream_importer.o
-GTEST_OBJS = tests/exporter_test.o 
+GTEST_OBJS = tests/exporter_test.o  \
+			 tests/integral_test.o \
+			 tests/static_filter_test.o
 
 all: host device 
 host: $(LIBDIR)/libdata_stream.so gtest
