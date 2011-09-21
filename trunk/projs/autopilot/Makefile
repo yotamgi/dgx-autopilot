@@ -16,8 +16,7 @@ AUTOPILIT_OBJS =  hw/i2c_interface.o	\
 		hw/adxl345_acc.o				\
 		hw/maestro_servo_controller.o
 
-GTESTS_OBJS=	./tests/integral_test.o  \
-				./tests/static_filter_test.o
+GTESTS_OBJS=	
 
 ###############################################################################
 ## TARGETS 
@@ -50,7 +49,7 @@ $(LIBDIR)/libautopilot.a: $(AUTOPILIT_OBJS)
 	$(ARCHIVE) cr  $(LIBDIR)/libautopilot.a $(AUTOPILIT_OBJS)
 
 gtest: $(GTESTS_OBJS) $(LIBDIR) $(LIBDIR)/libautopilot.a
-	$(CXX) $(LDFLAGS) $(GTESTS_OBJS) -lautopilot -o gyro_watch_test -lgtest_main -o gtest
+	$(CXX) $(LDFLAGS) $(GTESTS_OBJS) -lautopilot -lgtest_main -o gtest
 
 .PHONY:
 test: gtest

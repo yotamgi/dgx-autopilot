@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include <stream/filters/static_filter.h>
-#include <stream/generators.h>
+#include "filters/static_filter.h"
+#include "generators.h"
 
 class DummyGen : public stream::VecGenerator<float, 3> {
 public:
