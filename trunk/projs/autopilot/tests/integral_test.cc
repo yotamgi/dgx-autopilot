@@ -4,7 +4,7 @@
 #include <sys/time.h>
 #include <cstdlib>
 #include <stream/generators.h>
-#include <stream/integral_filter.h>
+#include <stream/filters/integral_filter.h>
 #include <stream/util/time.h>
 
 /**
@@ -14,7 +14,7 @@
  *  - y: time since creation
  *  - z: constant 1.0
  */
-class DummyGen : public VecGenerator<float,3> {
+class DummyGen : public stream::VecGenerator<float,3> {
 public:
 	DummyGen() {
 		gettimeofday(&m_start_time, NULL);
@@ -43,7 +43,7 @@ private:
 TEST(IntegralTest, stress_test) {
 
 	DummyGen a;
-	IntergralFilter<float,3> integ(&a);
+	stream::filters::IntergralFilter<float,3> integ(&a);
 
 	Timer t;
 
@@ -63,7 +63,7 @@ TEST(IntegralTest, stress_test) {
 TEST(IntegralTest, random_test) {
 
 	DummyGen a;
-	IntergralFilter<float,3> integ(&a);
+	stream::filters::IntergralFilter<float,3> integ(&a);
 
 	Timer t;
 

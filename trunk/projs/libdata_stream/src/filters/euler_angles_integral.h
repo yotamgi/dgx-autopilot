@@ -8,8 +8,11 @@
 #include <boost/array.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 
-#include "generators.h"
-#include "util/time.h"
+#include "stream/generators.h"
+#include "stream/util/time.h"
+
+namespace stream {
+namespace filters {
 
 /*
  * TODO:
@@ -162,5 +165,7 @@ private:
 	const float_t PI;
 };
 
+} // namespace filters
+} // namespace stream
 
 #endif /* EULER_ANGLES_INTEGRAL_H_ */

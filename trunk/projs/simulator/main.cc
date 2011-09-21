@@ -23,8 +23,8 @@ and tell the linker to link with the .lib file.
 #include "camera.h"
 
 #include <stream_watch.h>
-#include <stream/integral_filter.h>
-#include <stream/euler_angles_integral.h>
+#include <stream/filters/integral_filter.h>
+#include <stream/filters/euler_angles_integral.h>
 
 using namespace irr;
 
@@ -108,11 +108,11 @@ int main()
 	simulator::Plane p(device, core::vector3df(0.0f, 0.0f, 0.0f), plane_params);
 
 	Watch<float,3> watch(
-			new EulerAnglesIntegral<float> (p.gyro_gen()),
+			new stream::filters::EulerAnglesIntegral<float> (p.gyro_gen()),
 	//		p.gyro_gen(),
 			"localhost", "simulator_gyro", 360.0, -360.0);
 	watch.run();
-	boost::thread t(sampler<VecGenerator<float,3> >, &watch);
+	boost::thread t(sampler<stream::VecGenerator<float,3> >, &watch);
 
     // add terrain scene node
     scene::ITerrainSceneNode* terrain = smgr->addTerrainSceneNode(

@@ -15,6 +15,8 @@
 #include "generators.h"
 #include "protocol.h"
 
+namespace stream {
+
 class StreamImporter {
 public:
 	StreamImporter(std::string address);
@@ -90,5 +92,7 @@ private:
 	std::string m_host_address;
 	int m_sock;
 };
+
+} // namespace stream
 
 #endif /* STREAM_IMPORTER_H_ */

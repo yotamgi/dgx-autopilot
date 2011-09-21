@@ -1,7 +1,10 @@
 #ifndef STATIC_FILTER_H_
 #define STATIC_FILTER_H_
 
-#include "data_filter.h"
+#include "stream/data_filter.h"
+
+namespace stream {
+namespace filters {
 
 template <class T, size_t N>
 class StaticFilter : public VecFilter<T,N> {
@@ -38,4 +41,8 @@ private:
 	typename VecFilter<T,N>::vector_t m_mul;
 };
 
+} // namespace filters
+} // namespace stream
+
 #endif /* STATIC_FILTER_H_ */
+

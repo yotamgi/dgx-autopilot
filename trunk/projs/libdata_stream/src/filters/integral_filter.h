@@ -13,8 +13,11 @@
 
 #include <boost/array.hpp>
 
-#include "data_filter.h"
-#include "util/time.h"
+#include "stream/data_filter.h"
+#include "stream/util/time.h"
+
+namespace stream {
+namespace filters {
 
 /*
  * TODO:
@@ -68,5 +71,8 @@ private:
 	T m_down_limit;
 	double m_prev_time;
 };
+
+} // namespace filters
+} // namespace stream
 
 #endif /* DATA_FILTERS_H_ */

@@ -8,6 +8,8 @@
 #include <netinet/in.h>
 #include <iostream>
 
+namespace stream {
+
 StreamExporter::StreamExporter():m_is_running(false), m_client_sock(0), m_server_sock(0)
 {}
 
@@ -103,3 +105,5 @@ void StreamExporter::handle_client() {
 void StreamExporter::stop() {
 	m_is_running = false;
 }
+
+} // namespace stream

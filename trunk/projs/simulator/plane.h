@@ -74,7 +74,7 @@ public:
 	 * The plane class will calculate the sensor data and tell every sensor
 	 * what is its data.
 	 */
-	class SensorGenerator : public VecGenerator<float,3> {
+	class SensorGenerator : public stream::VecGenerator<float,3> {
 	public:
 		vector_t get_data() {return m_data; }
 

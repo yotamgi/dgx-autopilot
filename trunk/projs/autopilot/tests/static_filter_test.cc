@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
-#include <stream/static_filter.h>
+#include <stream/filters/static_filter.h>
 #include <stream/generators.h>
 
-class DummyGen : public VecGenerator<float, 3> {
+class DummyGen : public stream::VecGenerator<float, 3> {
 public:
 	typedef typename VecGenerator<float, 3>::vector_t vector_t;
 
@@ -20,7 +20,7 @@ TEST(static_filter, functional) {
 	DummyGen::vector_t a; a[0] =-1.; a[1] =-2.; a[2] =-3.;
 	DummyGen::vector_t b; b[0] = 1.; b[1] = 1.; b[2] = 1.;
 
-	StaticFilter<float, 3> filter(&gen, a, b);
+	stream::filters::StaticFilter<float, 3> filter(&gen, a, b);
 
 	for (size_t i=0; i<100; i++) {
 		DummyGen::vector_t data = filter.get_data();

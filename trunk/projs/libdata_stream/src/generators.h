@@ -6,6 +6,8 @@
 #include <istream>
 #include <iterator>
 
+namespace stream {
+
 /**
  * Represents a any type of data generator. It may be a sensor, or a combination
  * of some.
@@ -40,6 +42,8 @@ class VecGenerator : public DataGenerator< boost::array<T,N> >
 public:
 	typedef boost::array<T,N> vector_t;
 };
+
+} // namespace stream
 
 /**
  * Global vector operators

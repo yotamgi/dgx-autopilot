@@ -5,7 +5,7 @@
 #include "stream/generators.h"
 #include "hw/i2c_interface.h"
 
-class Itg3200Gyro : public VecGenerator<float,3> {
+class Itg3200Gyro : public stream::VecGenerator<float,3> {
 public:
 	Itg3200Gyro(size_t device_i2c_num);
 	virtual ~Itg3200Gyro() {}
