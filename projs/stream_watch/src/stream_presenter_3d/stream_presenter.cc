@@ -1,30 +1,33 @@
-#include "direction_presenter.h"
+#include "stream_presenter.h"
 #include <iostream>
 
 using namespace irr;
 
-DirectionPresenter::~DirectionPresenter() {
+StreamPresenter::~StreamPresenter()
+{
 	m_device->drop();
 }
 
-DirectionPresenter::DirectionPresenter():
-		m_running(true),
-		m_show_object(false),
-		m_show_arrow(false)
+StreamPresenter::StreamPresenter():
+		m_angle(NULL),
+		m_vec(NULL),
+		m_running(false)
 {
-	m_curr_angle.ax = 0.f;
-	m_curr_angle.ay = 0.f;
-	m_curr_angle.az = 0.f;
-
-	m_curr_vec.ax = 0.f;
-	m_curr_vec.ay = 0.f;
-	m_curr_vec.az = 0.f;
 }
 
-void DirectionPresenter::run(bool open_thread) {
+void StreamPresenter::setAngleStream(stream::VecGenerator<float,3>* angle_stream) {
+	m_angle = angle_stream;
+}
+
+void StreamPresenter::setVecStream(stream::VecGenerator<float,3>* vec_stream) {
+	m_vec = vec_stream;
+}
+
+
+void StreamPresenter::run(bool open_thread) {
 
 	if (open_thread) {
-		m_thread.reset(new boost::thread(&DirectionPresenter::run, this, false));
+		m_thread.reset(new boost::thread(&StreamPresenter::run, this, false));
 	} else {
 
 		irr::video::E_DRIVER_TYPE driverType=video::EDT_OPENGL;
@@ -88,20 +91,22 @@ void DirectionPresenter::run(bool open_thread) {
 
 		while(m_device->run() && m_running)
 		{
-			// set the rotation object
-			irr::core::matrix4 rotx, roty, rotz;
-			rotx.setRotationDegrees(core::vector3df(m_curr_angle.ax, 0., 0.));
-			roty.setRotationDegrees(core::vector3df(0., m_curr_angle.ay, 0.));
-			rotz.setRotationDegrees(core::vector3df(0., 0., m_curr_angle.az));
+			// draw the angle
+			if (m_angle) {
+				// set the rotation object
+				irr::core::matrix4 rotx, roty, rotz;
+				stream::VecGenerator<float,3>::vector_t curr_angle = m_angle->get_data();
+				rotx.setRotationDegrees(core::vector3df(curr_angle[0], 0., 0.));
+				roty.setRotationDegrees(core::vector3df(0., curr_angle[1], 0.));
+				rotz.setRotationDegrees(core::vector3df(0., 0., curr_angle[2]));
 
-			m_object->setVisible(m_show_object);
-			//m_arrow->setVisible(m_show_arrow);
+				irr::core::matrix4 trans = rotx * roty * rotz;
+				m_object->setRotation(trans.getRotationDegrees());
 
-
-			irr::core::matrix4 trans = rotx * roty * rotz;
-			m_object->setRotation(trans.getRotationDegrees());
-
-			//m_object->setRotation(core::vector3df(m_curr_angle.ax, m_curr_angle.ay, m_curr_angle.az));
+				m_object->setVisible(true);
+			} else {
+				m_object->setVisible(false);
+			}
 
 			m_device->getVideoDriver()->beginScene(true, true, video::SColor(255,113,113,133));
 
@@ -109,11 +114,11 @@ void DirectionPresenter::run(bool open_thread) {
 			m_device->getGUIEnvironment()->drawAll(); // draw the gui environment (the logo)
 
 			// draw the line
-			if (m_show_arrow) {
+			if (m_vec) {
+				stream::VecGenerator<float,3>::vector_t curr_vec = m_vec->get_data();
 				driver->draw3DLine(core::vector3df(0., 0., 30.),
-						core::vector3df(0., 0., 30.) + core::vector3df(m_curr_vec.ax, m_curr_vec.ay, m_curr_vec.az));
+						core::vector3df(0., 0., 30.) + core::vector3df(curr_vec[0], curr_vec[1], curr_vec[2]));
 			}
-
 
 			m_device->getVideoDriver()->endScene();
 

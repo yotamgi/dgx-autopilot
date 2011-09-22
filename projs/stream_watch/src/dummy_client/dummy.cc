@@ -1,9 +1,7 @@
 #include <iostream>
 
-#include <stream_watch.h>
-
-typedef Watch<float,3> VecWatch;
-
+#include <stream/generators.h>
+#include "stream_watch/stream_presenter_3d.h"
 
 class SimpleGen : public stream::VecGenerator<float,3> {
 public:
@@ -29,19 +27,15 @@ private:
 
 int main(int argc, char** argv) {
 
-	if (argc != 2) {
-		std::cout << "usage: " << argv[0] << " <server ip>" << std::endl;	
-		return 1;
-	}
-
 	SimpleGen gen;
-	VecWatch watch(&gen, argv[1], "test", 0.0f, 36.4f);
 
-	watch.run();
+	StreamPresenter s;
+	s.setAngleStream(&gen);
+	s.run();
 
 	while (true) {
-		watch.get_data();
-		usleep(10000);
+
 	}
+
 	return 0;
 }
