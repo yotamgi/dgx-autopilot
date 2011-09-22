@@ -1,6 +1,12 @@
 #include "stream_presenter.h"
 #include <iostream>
 
+#ifndef MEDIA_DIR
+#error "MEDIA_DIR macro must be defined and contain the media dir path"
+#define MEDIA_DIR ""
+#endif
+
+
 using namespace irr;
 
 StreamPresenter::~StreamPresenter()
@@ -42,19 +48,19 @@ void StreamPresenter::run(bool open_thread) {
 		scene::ISceneManager* smgr = m_device->getSceneManager();
 
 		// initalize the meshs
-		m_object = smgr->addMeshSceneNode(smgr->getMesh("angle_presenter_3d/media/F16_Thuderbirds.x"));
+		m_object = smgr->addMeshSceneNode(smgr->getMesh(MEDIA_DIR "/F16_Thuderbirds.x"));
 		if (!m_object) {
 			throw std::runtime_error("Could not load the plane mesh");
 		}
 
 		m_object->setPosition(core::vector3df(0.f, 0.f, 30.f));
 		m_object->setScale(irr::core::vector3df(10.0f, 10.0f, 10.0f));
-		m_object->setMaterialTexture(0, m_device->getVideoDriver()->getTexture("angle_presenter_3d/media/F16_Thuderbirds.bmp"));
+		m_object->setMaterialTexture(0, m_device->getVideoDriver()->getTexture(MEDIA_DIR "/F16_Thuderbirds.bmp"));
 		m_object->setMaterialFlag(irr::video::EMF_LIGHTING, false);
 
 		// add terrain scene node
 		scene::ITerrainSceneNode* terrain = smgr->addTerrainSceneNode(
-			"angle_presenter_3d/media/terrain-heightmap.bmp",
+			MEDIA_DIR "/terrain-heightmap.bmp",
 			0,                  // parent node
 			-1,                 // node id
 			core::vector3df(-5000.0f, -400.f, -5000.f),     // position
@@ -69,7 +75,7 @@ void StreamPresenter::run(bool open_thread) {
 		terrain->setMaterialFlag(video::EMF_LIGHTING, false);
 
 		terrain->setMaterialTexture(0,
-				driver->getTexture("angle_presenter_3d/media/terrain-texture.jpg"));
+				driver->getTexture(MEDIA_DIR "terrain-texture.jpg"));
 		terrain->setMaterialTexture(1,
 				driver->getTexture("angle_presenter_3d/media/detailmap3.jpg"));
 
