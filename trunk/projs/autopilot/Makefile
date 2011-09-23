@@ -1,7 +1,7 @@
 LIBDS_PATH = ../libdata_stream/
 include $(LIBDS_PATH)/Makefile.include
 
-STREAMWATCH_PATH = ../stream_watch/device
+STREAMWATCH_PATH = ../stream_watch
 include $(STREAMWATCH_PATH)/Makefile.include
 
 CXX = g++
