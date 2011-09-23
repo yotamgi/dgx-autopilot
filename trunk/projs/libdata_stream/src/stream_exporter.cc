@@ -97,6 +97,17 @@ void StreamExporter::handle_client() {
 				}
 			}
 		}
+		else if (buff[0] == protocol::LIST_COMMAND) {
+			std::string data;
+			for(stream_map_t::iterator i=m_exported_streams.begin(); i != m_exported_streams.end(); i++) {
+				data += std::string(i->first);
+				data += protocol::SEPERATOR;
+			}
+			while (write(m_client_sock, data.c_str(), data.size()) != (signed)data.size()) {
+				std::cout << "It seems like the client closed" << std::endl;
+				break;
+			}
+		}
 	}
 	close(m_client_sock);
 	m_client_sock = 0;

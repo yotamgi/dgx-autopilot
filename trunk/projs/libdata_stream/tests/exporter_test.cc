@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <gtest/gtest.h>
 #include <boost/thread.hpp>
 #include "generators.h"
@@ -9,6 +10,7 @@ using namespace stream;
 class DummyIntStream : public DataGenerator<int> {
 public:
 	DummyIntStream():m_counter(0){}
+	virtual ~DummyIntStream() {}
 
 	int get_data() {
 		return m_counter++;
@@ -23,6 +25,7 @@ private:
 class DummyVecStream : public VecGenerator<float, 3> {
 public:
 	DummyVecStream():m_counter(0){}
+	virtual ~DummyVecStream() {}
 
 	typename VecGenerator<float, 3>::vector_t get_data() {
 		typename VecGenerator<float, 3>::vector_t v;
@@ -88,4 +91,29 @@ TEST(stream_export_import, vec_stream) {
 	// kill the exporter.
 	exporter.stop();
 	exporter_thread.join();
+}
+
+
+
+TEST(stream_export_import, list) {
+
+	// the stream we are about to send
+	DummyVecStream vs;
+
+	// exporting the stream
+	StreamExporter exporter;
+	exporter.register_stream(&vs, "dummy_vec0");
+	exporter.register_stream(&vs, "dummy_vec1");
+	exporter.register_stream(&vs, "dummy_vec2");
+	boost::thread exporter_thread(&StreamExporter::run, &exporter);
+
+	// importing the stream
+	StreamImporter importer("localhost");
+
+	// getting the streams from the importer
+	std::vector<std::string> avail = importer.list_avail();
+
+	ASSERT_EQ(std::count(avail.begin(), avail.end(), std::string("dummy_vec0")), 1);
+	ASSERT_EQ(std::count(avail.begin(), avail.end(), std::string("dummy_vec1")), 1);
+	ASSERT_EQ(std::count(avail.begin(), avail.end(), std::string("dummy_vec2")), 1);
 }

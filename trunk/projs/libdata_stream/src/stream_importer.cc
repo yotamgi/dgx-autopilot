@@ -51,4 +51,35 @@ void StreamImporter::connect_to_host() {
     }
 }
 
+std::vector<std::string> StreamImporter::list_avail() {
+	std::vector<std::string> avail;
+
+	// ask for the streams
+	while (write(m_sock, &protocol::LIST_COMMAND, 1) != 1)  {
+		connect_to_host();
+	}
+
+	// get the data
+	const size_t BLOCK_SIZE = 100;
+	char buff[BLOCK_SIZE];
+	std::string data;
+	while (read(m_sock, buff, BLOCK_SIZE) == (int)BLOCK_SIZE) {
+		data += std::string(buff);
+	}
+	data += std::string(buff);
+
+	// parse the data
+	size_t begin = 0;
+	size_t end  = data.find(protocol::SEPERATOR, begin);
+	while (end != std::string::npos) {
+		std::string one = data.substr(begin, end-begin);
+		avail.push_back(one);
+
+		begin = end+1;
+		end = data.find(protocol::SEPERATOR, begin);
+	}
+
+	return avail;
+}
+
 } // namespace stream
