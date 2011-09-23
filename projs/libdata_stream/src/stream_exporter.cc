@@ -103,7 +103,7 @@ void StreamExporter::handle_client() {
 				data += std::string(i->first);
 				data += protocol::SEPERATOR;
 			}
-			while (write(m_client_sock, data.c_str(), data.size()) != (signed)data.size()) {
+			if (write(m_client_sock, data.c_str(), data.size()) != (signed)data.size()) {
 				std::cout << "It seems like the client closed" << std::endl;
 				break;
 			}
