@@ -51,15 +51,12 @@ void StreamImporter::connect_to_host() {
     }
 }
 
-std::vector<std::string> StreamImporter::list_avail() {
-	std::vector<std::string> avail;
-
-	// ask for the streams
-	while (write(m_sock, &protocol::LIST_COMMAND, 1) != 1)  {
+void StreamImporter::write_sock(std::string data) {
+	while (write(m_sock, data.c_str(), data.size()) != (signed)data.size())  {
 		connect_to_host();
 	}
-
-	// get the data
+}
+std::string StreamImporter::read_sock() {
 	const size_t BLOCK_SIZE = 100;
 	char buff[BLOCK_SIZE];
 	std::string data;
@@ -67,6 +64,17 @@ std::vector<std::string> StreamImporter::list_avail() {
 		data += std::string(buff);
 	}
 	data += std::string(buff);
+	return data;
+}
+
+std::vector<std::string> StreamImporter::list_avail() {
+	std::vector<std::string> avail;
+
+	// ask for the streams
+	write_sock(std::string(&protocol::LIST_COMMAND, 1));
+
+	// get the data
+	std::string data = read_sock();
 
 	// parse the data
 	size_t begin = 0;
