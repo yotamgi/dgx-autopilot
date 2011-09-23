@@ -37,24 +37,12 @@ private:
 	public:
 
 		T get_data() {
-			int sock = m_father->get_socket();
 
 			// ask for the data
-			std::string ask;
-			ask = protocol::GET_COMMAND + m_name;
-			while (write(sock, ask.c_str(), ask.size()) != (int)ask.size()) {
-				m_father->connect_to_host();
-			}
+			m_father->write_sock(std::string(&protocol::GET_COMMAND, 1) + m_name);
 
 			// get the serialized data
-			const size_t BLOCK_SIZE = 100;
-			char buff[BLOCK_SIZE];
-			std::string serialized_data;
-			while (read(sock, buff, BLOCK_SIZE) == (int)BLOCK_SIZE) {
-				serialized_data += std::string(buff);
-			}
-			serialized_data += std::string(buff);
-
+			std::string serialized_data = m_father->read_sock();
 			if (serialized_data == protocol::NOT_EXIST_COMMAND) {
 				throw std::runtime_error("The stream asked is not exported");
 			}
@@ -81,7 +69,7 @@ private:
 		friend class StreamImporter;
 	};
 
-private:
+protected:
 
 	/**
 	 * Connect func.
@@ -90,7 +78,10 @@ private:
 	 */
 	void connect_to_host();
 
-	int get_socket() { return m_sock; }
+	void write_sock(std::string);
+	std::string read_sock();
+
+private:
 
 	std::string m_host_address;
 	int m_sock;
