@@ -18,6 +18,8 @@ namespace protocol {
 
 	const char GET_COMMAND = 'G';
 
+	const char LIST_COMMAND = 'L';
+
 	const std::string NOT_EXIST_COMMAND = "NOT_EXIST";
 
 	const std::string SEPERATOR = "|";

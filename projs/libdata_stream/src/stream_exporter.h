@@ -39,6 +39,7 @@ public:
 
 private:
 
+
 	class AnyStream {
 	public:
 		virtual void serialize(std::ostream&) = 0;
@@ -56,6 +57,8 @@ private:
 		DataGenerator<T>* m_gen;
 	};
 
+	typedef std::map<std::string, boost::shared_ptr<AnyStream> > stream_map_t;
+
 	void handle_client();
 
 	volatile bool m_is_running;
@@ -64,7 +67,7 @@ private:
     int m_server_sock;
 
 
-	std::map<std::string, boost::shared_ptr<AnyStream> > m_exported_streams;
+	stream_map_t m_exported_streams;
 };
 
 } // namespace stream

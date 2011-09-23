@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS += -g -Wall -O3 -Isrc -Iinclude
+CXXFLAGS += -g -Wall -O3 -Isrc -Iinclude -fPIC
 LDFLAGS = 
 LIBDIR = ./lib
 

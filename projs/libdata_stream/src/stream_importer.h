@@ -11,6 +11,7 @@
 #include <boost/shared_ptr.hpp>
 #include <sstream>
 #include <stdexcept>
+#include <vector>
 #include <boost/numeric/ublas/io.hpp>
 #include "generators.h"
 #include "protocol.h"
@@ -26,6 +27,8 @@ public:
 	boost::shared_ptr<DataGenerator<T> > import_stream(std::string name) {
 		return boost::shared_ptr< DataGenerator<T> >(new StreamProxy<T>(this, name));
 	}
+
+	std::vector<std::string> list_avail();
 
 private:
 
