@@ -85,8 +85,10 @@ TEST(stream_export_import, vec_stream) {
 			importer.import_stream<DummyVecStream::vector_t>("dummy_vec");
 
 	ASSERT_NEAR(a->get_data()[2], 2, 0.01);
+	sleep(1);
 	ASSERT_NEAR(a->get_data()[1], 2, 0.01);
 	ASSERT_NEAR(a->get_data()[0], 2, 0.01);
+
 
 	// kill the exporter.
 	exporter.stop();

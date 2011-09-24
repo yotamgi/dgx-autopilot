@@ -73,12 +73,17 @@ void StreamExporter::handle_client() {
 	setsockopt(m_client_sock, SOL_SOCKET, SO_RCVTIMEO, (void*)&tv, sizeof(tv));
 	while (m_is_running) {
 		char buff[BUFF_SIZE];
-		size_t read_size;
-		if ( (read_size = read(m_client_sock, buff, BUFF_SIZE)) == 0) continue;
+		ssize_t read_size;
+		if ( (read_size = read(m_client_sock, buff, BUFF_SIZE)) <= 0) {
+			write(m_client_sock, protocol::SEPERATOR.c_str(), protocol::SEPERATOR.size());
+			continue;
+		}
+		std::cout << "eporter read " << read_size << "b" << std::endl;
 		buff[read_size] = '\0';
 
 		if (buff[0] == protocol::GET_COMMAND) {
 			std::string name(&buff[1]);
+			std::cout << "Got GET command from " << name << std::endl;
 
 			if (m_exported_streams.count(name) != 1) {
 				std::cout << "Asked for a non-existing stream" << std::endl;
@@ -90,6 +95,7 @@ void StreamExporter::handle_client() {
 				std::stringstream ss;
 				m_exported_streams[name]->serialize(ss);
 				ss << protocol::SEPERATOR;
+				std::cout << "Ansering with " << ss.str() << std::endl;
 				size_t written_size = write(m_client_sock, ss.str().c_str(), ss.str().size());
 				if (written_size != ss.str().size()) {
 					std::cout << "It seems like the client closed" << std::endl;
@@ -98,11 +104,13 @@ void StreamExporter::handle_client() {
 			}
 		}
 		else if (buff[0] == protocol::LIST_COMMAND) {
+			std::cout << "Got LIST command" << std::endl;
 			std::string data;
 			for(stream_map_t::iterator i=m_exported_streams.begin(); i != m_exported_streams.end(); i++) {
 				data += std::string(i->first);
 				data += protocol::SEPERATOR;
 			}
+			std::cout << "avail are " << data << std::endl;
 			if (write(m_client_sock, data.c_str(), data.size()) != (signed)data.size()) {
 				std::cout << "It seems like the client closed" << std::endl;
 				break;
