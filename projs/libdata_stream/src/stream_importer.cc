@@ -64,6 +64,7 @@ std::string StreamImporter::read_sock() {
 		data += std::string(buff);
 	}
 	data += std::string(buff);
+	std::cout << "Read " << data << std::endl;
 	return data;
 }
 

@@ -43,6 +43,11 @@ private:
 
 			// get the serialized data
 			std::string serialized_data = m_father->read_sock();
+			// remove any seperators in the begining
+			while (serialized_data.substr(0, protocol::SEPERATOR.size()) == protocol::SEPERATOR) {
+				std::cout << "Choping..." << std::endl;
+				serialized_data = serialized_data.substr(protocol::SEPERATOR.size(), serialized_data.size() - protocol::SEPERATOR.size());
+			}
 			if (serialized_data == protocol::NOT_EXIST_COMMAND) {
 				throw std::runtime_error("The stream asked is not exported");
 			}
@@ -50,6 +55,7 @@ private:
 			// deserialize
 			std::stringstream ss(serialized_data);
 			T data;
+			std::cout << "The Serialized data after choping is " << serialized_data << std::endl;
 			ss >> data;
 			if (ss.fail()) {
 				throw std::runtime_error("The exported stream does not match");
