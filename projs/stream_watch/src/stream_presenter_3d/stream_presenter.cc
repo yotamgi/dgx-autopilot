@@ -75,9 +75,9 @@ void StreamPresenter::run(bool open_thread) {
 		terrain->setMaterialFlag(video::EMF_LIGHTING, false);
 
 		terrain->setMaterialTexture(0,
-				driver->getTexture(MEDIA_DIR "terrain-texture.jpg"));
+				driver->getTexture(MEDIA_DIR "/terrain-texture.jpg"));
 		terrain->setMaterialTexture(1,
-				driver->getTexture("angle_presenter_3d/media/detailmap3.jpg"));
+				driver->getTexture(MEDIA_DIR "/detailmap3.jpg"));
 
 		terrain->setMaterialType(video::EMT_DETAIL_MAP);
 
