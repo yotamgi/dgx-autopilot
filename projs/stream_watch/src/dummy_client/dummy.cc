@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include <stream/generators.h>
+#include <stream/stream_exporter.h>
 #include "stream_watch/stream_presenter_3d.h"
 
 class SimpleGen : public stream::VecGenerator<float,3> {
@@ -29,12 +30,17 @@ int main(int argc, char** argv) {
 
 	SimpleGen gen;
 
-	StreamPresenter s;
-	s.setAngleStream(&gen);
-	s.run();
-
-	while (true) {
-
+	if (argc == 1) {
+		StreamPresenter s;
+		s.setAngleStream(&gen);
+		s.run(false);
+	} else if (argc == 2 && std::string(argv[1]) == std::string("--net")) {
+		stream::StreamExporter exp;
+		exp.register_stream(&gen, "dummy");
+		exp.run();
+	} else {
+		std::cout <<"usage: " << argv[0] << " [--net] " << std::endl;
+		exit(1);
 	}
 
 	return 0;
