@@ -1,2 +1,2 @@
 LIBDS_CXXFLAGS=-I$(LIBDS_PATH)/include
-LIBDS_LDFLAGS = 
+LIBDS_LDFLAGS =  -L$(LIBDS_PATH)/lib -ldata_stream
