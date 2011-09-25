@@ -9,6 +9,7 @@
 #include <boost/numeric/ublas/matrix.hpp>
 
 #include "stream/generators.h"
+#include "stream/data_filter.h"
 #include "stream/util/time.h"
 
 namespace stream {
