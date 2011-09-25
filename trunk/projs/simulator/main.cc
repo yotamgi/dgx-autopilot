@@ -22,9 +22,11 @@ and tell the linker to link with the .lib file.
 #include "plane.h"
 #include "camera.h"
 
-#include <stream_watch.h>
+#include <stream/stream_exporter.h>
 #include <stream/filters/integral_filter.h>
 #include <stream/filters/euler_angles_integral.h>
+
+#include <boost/thread.hpp>
 
 using namespace irr;
 
@@ -66,14 +68,6 @@ private:
 	bool KeyIsDown[KEY_KEY_CODES_COUNT];
 };
 
-template <typename gen_t>
-void sampler(gen_t* gen) {
-	while (true) {
-		gen->get_data();
-		usleep(10000);
-	}
-}
-
 /*
 The event receiver for keeping the pressed keys is ready, the actual responses
 will be made inside the render loop, right before drawing the scene. So lets
@@ -107,12 +101,14 @@ int main()
 
 	simulator::Plane p(device, core::vector3df(0.0f, 0.0f, 0.0f), plane_params);
 
-	Watch<float,3> watch(
+	stream::StreamExporter exporter;
+	exporter.register_stream(
 			new stream::filters::EulerAnglesIntegral<float> (p.gyro_gen()),
 	//		p.gyro_gen(),
-			"localhost", "simulator_gyro", 360.0, -360.0);
-	watch.run();
-	boost::thread t(sampler<stream::VecGenerator<float,3> >, &watch);
+			"simulator_gyro"
+	);
+
+	boost::thread t(&stream::StreamExporter::run, &exporter);
 
     // add terrain scene node
     scene::ITerrainSceneNode* terrain = smgr->addTerrainSceneNode(

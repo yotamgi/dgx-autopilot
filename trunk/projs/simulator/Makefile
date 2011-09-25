@@ -3,12 +3,9 @@
 LIBDS_PATH = ../libdata_stream
 include $(LIBDS_PATH)/Makefile.include
 
-STREAMWATCH_PATH = ../stream_watch
-include $(STREAMWATCH_PATH)/Makefile.include
-
 CXX = g++
-CXXFLAGS +=  -O3 -I/usr/X11R6/include  -g $(LIBDS_CXXFLAGS) $(STREAMWATCH_CXXFLAGS)
-LDFLAGS += -L/usr/X11R6/lib -lGL -lXxf86vm -lXext -lX11 -lIrrlicht $(LIBDS_LDFLAGS) $(STREAMWATCH_LDFLAGS)
+CXXFLAGS +=  -O3 -I/usr/X11R6/include  -g $(LIBDS_CXXFLAGS)
+LDFLAGS += -L/usr/X11R6/lib -lGL -lXxf86vm -lXext -lX11 -lIrrlicht $(LIBDS_LDFLAGS) -lboost_thread -Wl,-rpath,$(LIBDS_LIBDIRS)
 
 OBJDIR = ./obj
 
