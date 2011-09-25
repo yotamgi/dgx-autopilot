@@ -28,18 +28,18 @@ int main(int argc, char** argv) {
 	char c;
 	std::cin >> c;
 
-	std::cout << "asked for " << avail.at(which) << std::endl;
 	boost::shared_ptr<stream::DataGenerator< stream::VecGenerator<float,3>::vector_t > > chosen =
 			imp.import_stream<stream::VecGenerator<float,3>::vector_t >(avail.at(which));
 
-	std::cout << chosen->get_data() << std::endl;
-	/*if (c == 'a') {
-		presenter.setAngleStream(chosen);
-	} else if (c == 'v') {
-		presenter.setVecStream(chosen);
-	}*/
+	//std::cout << chosen->get_data() << std::endl;
 
-	//presenter.run(false);
+	if (c == 'a') {
+		presenter.setAngleStream((stream::VecGenerator<float,3>*)chosen.get());
+	} else if (c == 'v') {
+		presenter.setVecStream((stream::VecGenerator<float,3>*)chosen.get());
+	}
+
+	presenter.run(false);
 
 	return 0;
 }
