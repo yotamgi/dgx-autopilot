@@ -24,6 +24,8 @@ namespace protocol {
 
 	const std::string SEPERATOR = "|";
 
+	const char END = 'E';
+
 }  // namespace protocol
 
 } // namespace stream
