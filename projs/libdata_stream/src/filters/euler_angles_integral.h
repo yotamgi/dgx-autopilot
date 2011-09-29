@@ -7,6 +7,7 @@
 
 #include <boost/array.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/io.hpp>
 
 #include "stream/generators.h"
 #include "stream/data_filter.h"
@@ -52,17 +53,37 @@ public:
 
 		rot_sum += data[2] * time_delta;
 
-		// rotate the coordinate system
-		rotate_coordinate_around(0, data[0]*time_delta);
-		rotate_coordinate_around(1, data[1]*time_delta);
-		rotate_coordinate_around(2, data[2]*time_delta);
+		float_t wx = data[0]*time_delta / 180. * PI;
+		float_t wy = data[1]*time_delta / 180. * PI;
+		float_t wz = data[2]*time_delta / 180. * PI;
+
+		boost::numeric::ublas::matrix<float> update(3, 3);
+		update(0,0) = 0.;		update(0,1) = -1.*wz;	update(0,2) = wy;
+		update(1,0) = wz;   	update(1,1) = 0.;   	update(1,2) = -1.*wx;
+		update(2,0) = -1.*wy;  	update(2,1) = wx;   	update(2,2) = 0.;
+
+		boost::numeric::ublas::matrix<float> curr(3, 3);
+		curr(0,0) = m_sum[0][0];	curr(0,1) = m_sum[0][1];	curr(0,2) = m_sum[0][2];
+		curr(1,0) = m_sum[1][0];   	curr(1,1) = m_sum[1][1];   	curr(1,2) = m_sum[1][2];
+		curr(2,0) = m_sum[2][0];  	curr(2,1) = m_sum[2][1];   	curr(2,2) = m_sum[2][2];
+
+		curr = curr +  boost::numeric::ublas::prod(update, curr);
+
+		m_sum[0][0] = curr(0,0);	m_sum[0][1] = curr(0,1);	m_sum[0][2] = curr(0,2);
+		m_sum[1][0] = curr(1,0);   	m_sum[1][1] = curr(1,1);   	m_sum[1][2] = curr(1,2);
+		m_sum[2][0] = curr(2,0);  	m_sum[2][1] = curr(2,1);   	m_sum[2][2] = curr(2,2);
 
 		// maintain the coordinate orthogonal
 		orthogonalize(m_sum[0], m_sum[1]);
 		orthogonalize(m_sum[1], m_sum[2]);
 		orthogonalize(m_sum[0], m_sum[2]);
 
+		normalize(m_sum[0]);
+		normalize(m_sum[1]);
+		normalize(m_sum[2]);
+
 		typename VecFilter<float_t,3>::vector_t ans = calc_euler_angles();
+		std::cout << "angle is " << ans << std::endl;
 		return  ans;
 	}
 
@@ -107,21 +128,10 @@ private:
 			ans[2] = 180. - ans[2];
 		}
 
+//		ans[0] = 0.;//atan2(m_sum[2][1],m_sum[1][1]) * 180. / PI;
+//		ans[1] = atan2(m_sum[0][0], m_sum[0][2]) * 180. / PI;
+//		ans[2] = asin(m_sum[0][1]) * 180. / PI;
 		return ans;
-	}
-
-	void rotate_coordinate_around(size_t index, float howmuch) {
-
-		vector_t& a = m_sum[(index+1) % 3];
-		vector_t& b = m_sum[(index+2) % 3];
-
-		float_t rot_factor = std::tan(howmuch / 180. * PI);
-		vector_t tmp_a = a - rot_factor * b;
-		b = b + rot_factor * a;
-		a = tmp_a;
-
-		normalize(a);
-		normalize(b);
 	}
 
 	void normalize(vector_t& vec) {
@@ -155,8 +165,6 @@ private:
 	 * Index 0 is the X vector, 1 is the Y vector and 2 is Z.
 	 */
 	vector_t m_sum[3];
-
-	float_t rot_sum;
 
 	/**
 	 * Needed for time_delta calculation.
