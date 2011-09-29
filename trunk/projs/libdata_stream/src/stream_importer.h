@@ -56,7 +56,7 @@ private:
 			T data;
 			ss >> data;
 			if (ss.fail()) {
-				throw std::runtime_error("The exported stream does not match");
+				throw std::runtime_error("The exported stream does not match: couldn't parse: " + ss.str());
 			}
 			return data;
 		}
