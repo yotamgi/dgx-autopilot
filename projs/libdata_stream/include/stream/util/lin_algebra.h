@@ -42,18 +42,21 @@ void orthogonalize(vector_t& a, vector_t& b) {
 /**
  * Expects two normalized vectors
  */
-float angle_between(const vector_t& a, const vector_t& b) {
+inline float angle_between(const vector_t& a, const vector_t& b) {
 
 	return std::acos(a[0]*b[0] + a[1]*b[1] + a[2]*b[2]) * 180. / PI;
 }
 
-float vec_len(const vector_t& vec) {
+template <typename float_t>
+inline float_t vec_len(const vector_t& vec) {
 	return std::sqrt(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2]);
 }
 
-void normalize(vector_t& vec) {
-	vec /= vec_len(vec);
+template <typename float_t>
+inline void normalize(vector_t& vec) {
+	vec /= vec_len<float_t>(vec);
 }
+
 }
 
 #endif /* LIN_ALGEBRA_H_ */
