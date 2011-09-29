@@ -80,18 +80,19 @@ public:
 
 		bool is_data_losed() { return false; }
 
-	private:
 		void set_data(vector_t data) { m_data = data; }
-		vector_t m_data;
 
-		friend class Plane;
+	private:
+		vector_t m_data;
 	};
 
-	SensorGenerator* gyro_gen() { return &m_gyro; }
+	stream::VecGenerator<float,3>* gyro_gen() { return &m_gyro; }
+	stream::VecGenerator<float,3>* acc_gen() { return &m_acc; }
 
 private:
 
 	SensorGenerator m_gyro;
+	SensorGenerator m_acc;
 
 	/**
 	 * Returns the angle_diff for this frame
@@ -101,6 +102,7 @@ private:
 	irr::core::vector3df calc_angle_vel() const;
 
 	irr::core::vector3df m_direction;
+	irr::core::vector3df m_priv_dir;
 
 	irr::scene::ISceneNode * m_object;
 

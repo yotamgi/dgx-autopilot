@@ -71,16 +71,30 @@ void Plane::update(float time_delta) {
 	dir.rotateXZBy(-1.*rot.Y);
 	dir.rotateXYBy(rot.Z);
 
-	// update the sensors
+	// update the gyro
 	SensorGenerator::vector_t gyro_data;
 	gyro_data[0] = angle_vel.X;
 	gyro_data[1] = angle_vel.Y;
 	gyro_data[2] = angle_vel.Z;
-
 	m_gyro.set_data(gyro_data);
+
+	// update the accelerometer
+	SensorGenerator::vector_t acc_data;
+	irr::core::vector3df g(0, -10., 0);
+	g.rotateYZBy(rot.X);
+	g.rotateXZBy(-1.*rot.Y);
+	g.rotateXYBy(rot.Z);
+	irr::core::vector3df acc = g + 4.*(m_priv_dir - dir)/time_delta;
+	acc_data[0] = acc.X;
+	acc_data[1] = acc.Y;
+	acc_data[2] = acc.Z;
+	m_acc.set_data(acc_data);
+
 
 	// update the position by the dirction value
 	pos  += dir*time_delta*m_params.get_speed();
+
+	m_priv_dir = dir;
 
 	// tell the object all the info
 	m_object->setRotation(transformation.getRotationDegrees());

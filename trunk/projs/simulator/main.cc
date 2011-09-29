@@ -107,6 +107,7 @@ int main()
 	//		p.gyro_gen(),
 			"simulator_gyro"
 	);
+	exporter.register_stream(p.acc_gen(), "simulator_acc");
 
 	boost::thread t(&stream::StreamExporter::run, &exporter);
 
