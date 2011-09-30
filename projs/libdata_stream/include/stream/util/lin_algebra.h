@@ -20,13 +20,13 @@ using namespace boost::numeric::ublas;
 /////////////////////////////////////////////////////////////////////
 // Types
 //////////////////////////
-typedef boost::numeric::ublas::vector<float_t> vector_t;
-typedef boost::numeric::ublas::matrix<float_t> matrix_t;
+typedef boost::numeric::ublas::vector<float> vector_t;
+typedef boost::numeric::ublas::matrix<float> matrix_t;
 
 /////////////////////////////////////////////////////////////////////
 // Constants
 //////////////////////////
-const float_t PI = 3.14159265;
+const float PI = 3.14159265;
 
 
 /////////////////////////////////////////////////////////////////////
@@ -47,14 +47,12 @@ inline float angle_between(const vector_t& a, const vector_t& b) {
 	return std::acos(a[0]*b[0] + a[1]*b[1] + a[2]*b[2]) * 180. / PI;
 }
 
-template <typename float_t>
-inline float_t vec_len(const vector_t& vec) {
+inline float vec_len(const vector_t& vec) {
 	return std::sqrt(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2]);
 }
 
-template <typename float_t>
 inline void normalize(vector_t& vec) {
-	vec /= vec_len<float_t>(vec);
+	vec /= vec_len(vec);
 }
 
 }
