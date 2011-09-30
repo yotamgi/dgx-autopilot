@@ -14,7 +14,7 @@
  * Returns the curr time in seconds in high resolution.
  * Returns the seconds since the epoch (or something...)
  */
-double get_curr_time() {
+inline double get_curr_time() {
 	timeval curr_tv;
 	gettimeofday(&curr_tv, NULL);
 	return (double)curr_tv.tv_sec + curr_tv.tv_usec/1000000.;
