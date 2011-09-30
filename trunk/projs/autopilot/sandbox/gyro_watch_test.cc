@@ -36,7 +36,7 @@ int main(int argc, char** argv) {
 
 	Itg3200Gyro gen(2);
 	stream::filters::StaticFilter<float,3> s(&gen, a, b);
-	stream::filters::EulerAnglesIntegral<float> integ(&s);
+	stream::filters::EulerAnglesIntegral integ(&s);
 
 	stream::StreamExporter exporter;
 	exporter.register_stream(&integ, std::string("gyro_test"));
