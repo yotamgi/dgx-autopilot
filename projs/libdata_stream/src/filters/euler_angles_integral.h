@@ -30,7 +30,7 @@ private:
 	 * floathose are the three vectors that represents the coordinate system
 	 * Index 0 is the X vector, 1 is the Y vector and 2 is Z.
 	 */
-	lin_algebra::vector_t m_sum[3];
+	lin_algebra::matrix_t m_rot;
 
 	/**
 	 * Needed for time_delta calculation.
