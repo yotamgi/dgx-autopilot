@@ -35,7 +35,8 @@ const float PI = 3.14159265;
 typedef boost::numeric::ublas::matrix_row<matrix_t> mat_row;
 typedef boost::numeric::ublas::matrix_column<matrix_t> mat_col;
 
-void orthogonalize(vector_t& a, vector_t& b) {
+template <typename vec>
+void orthogonalize(vec& a, vec& b) {
 	a[2] = -1.0 * (a[0]*b[0] + a[1]*b[1]) / b[2];
 }
 
@@ -51,8 +52,9 @@ inline float vec_len(const vector_t& vec) {
 	return std::sqrt(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2]);
 }
 
-inline void normalize(vector_t& vec) {
-	vec /= vec_len(vec);
+template <typename vec>
+inline void normalize(vec& v) {
+	v /= vec_len(v);
 }
 
 }
