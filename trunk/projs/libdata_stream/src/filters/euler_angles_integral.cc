@@ -28,13 +28,13 @@ typename VecFilter<float,3>::vector_t EulerAnglesIntegral::get_data() {
 	float wy = data[1]*time_delta / 180. * lin_algebra::PI;
 	float wz = data[2]*time_delta / 180. * lin_algebra::PI;
 
-	lin_algebra::matrix_t update(3, 3);
-	update(0,0) = 0.;		update(0,1) = -1.*wz;	update(0,2) = wy;
-	update(1,0) = wz;   	update(1,1) = 0.;   	update(1,2) = -1.*wx;
-	update(2,0) = -1.*wy;  	update(2,1) = wx;   	update(2,2) = 0.;
+	lin_algebra::matrix_t update(3, 3); // = W + I
+	update(0,0) = 1.;		update(0,1) = -1.*wz;	update(0,2) = wy;
+	update(1,0) = wz;   	update(1,1) = 1.;   	update(1,2) = -1.*wx;
+	update(2,0) = -1.*wy;  	update(2,1) = wx;   	update(2,2) = 1.;
 
 	// update the coordinate system
-	m_rot = m_rot +  lin_algebra::prod(update, m_rot);
+	m_rot = lin_algebra::prod(update, m_rot);
 
 	// maintain the matrix ortho-normal
 	lin_algebra::mat_row row0 = lin_algebra::mat_row(m_rot, 0);
