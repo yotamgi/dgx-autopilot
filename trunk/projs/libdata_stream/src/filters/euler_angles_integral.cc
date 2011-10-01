@@ -97,9 +97,9 @@ typename VecFilter<float,3>::vector_t EulerAnglesIntegral::calc_euler_angles(){
 		ans[2] = 180. - ans[2];
 	}
 
-//		ans[0] = 0.;//atan2(m_sum[2][1],m_sum[1][1]) * 180. / PI;
-//		ans[1] = atan2(m_sum[0][0], m_sum[0][2]) * 180. / PI;
-//		ans[2] = asin(m_sum[0][1]) * 180. / PI;
+//	ans[0] = -asin(m_rot(2,1)) * 180. / lin_algebra::PI;
+//	ans[1] = -atan2(m_rot(2,0), m_rot(2,2)) * 180. / lin_algebra::PI;
+//	ans[2] = atan2(m_rot(0,1), m_rot(1,1)) * 180. / lin_algebra::PI;
 	return ans;
 }
 
