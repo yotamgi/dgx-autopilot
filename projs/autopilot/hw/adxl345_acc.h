@@ -1,6 +1,6 @@
 
-#ifndef ITG3200_GYRO_H_
-#define ITG3200_GYRO_H_
+#ifndef ADXL345_ACC_H_ 
+#define ADXL345_ACC_H_ 
 
 #include "stream/generators.h"
 #include "hw/i2c_interface.h"
