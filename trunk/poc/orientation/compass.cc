@@ -46,12 +46,34 @@ int main() {
                 std::exit(1);
             }
 
-            uint8_t data;
-            if (read(file, &data, 1) != 1) {
+            uint16_t datax;
+            if (read(file, &datax, 2) != 2) {
                 std::cout << "Fuck" << std::endl;
                 std::exit(1);
             }
-            std::cout << "Yeh! data=0x" << std::hex << (unsigned int)data << std::endl;
+            reg = 0x05;
+            if (write(file, &reg, 1) != 1) {
+                std::cout << "Fuck" << std::endl;
+                std::exit(1);
+            }
+
+            uint16_t datay;
+            if (read(file, &datay, 2) != 2) {
+                std::cout << "Fuck" << std::endl;
+                std::exit(1);
+            }
+            reg = 0x07;
+            if (write(file, &reg, 1) != 1) {
+                std::cout << "Fuck" << std::endl;
+                std::exit(1);
+            }
+
+            uint16_t dataz;
+            if (read(file, &dataz, 2) != 2) {
+                std::cout << "Fuck" << std::endl;
+                std::exit(1);
+            }
+            std::cout << "Yeh! data=0x" << std::hex << (unsigned int)datax << ", " << (unsigned int)datay << ", " << (unsigned int)dataz << std::endl;
             usleep(10000);
     }
 
