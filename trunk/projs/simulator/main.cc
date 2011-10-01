@@ -109,7 +109,9 @@ int main()
 			"simulator_gyro"
 	);
 	exporter.register_stream(
-			new stream::filters::AccToEulerFilter(p.acc_gen()), "simulator_acc");
+			new stream::filters::AccToEulerFilter(p.acc_gen()), "simulator_filter_acc");
+	exporter.register_stream(p.acc_gen(), "simulator_acc");
+
 
 	boost::thread t(&stream::StreamExporter::run, &exporter);
 
