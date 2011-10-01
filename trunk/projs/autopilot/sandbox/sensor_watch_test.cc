@@ -3,6 +3,8 @@
 #include <stream/filters/static_filter.h>
 #include <stream/util/time.h>
 #include "hw/itg3200_gyro.h"
+#include "hw/adxl345_acc.h"
+#include "hw/hmc5843_compass.h"
 
 typedef typename stream::VecGenerator<float,3>::vector_t vector_t;
 
@@ -30,17 +32,29 @@ int main(int argc, char** argv) {
 		std::cout << "usage: " << argv[0] << " <server_ip> " << std::endl;	
 		exit(1);
 	}
+
+	stream::StreamExporter exporter;
+
+	// gyro
 	typename stream::filters::StaticFilter<float, 3>::vector_t a, b;
 	a[0] = -1.217; a[1] = -3.966; a[2] = 2.614;
 	b[0] = 1.; b[1] = 1.; b[2] = 1.;
 
-	Itg3200Gyro gen(2);
-	stream::filters::StaticFilter<float,3> s(&gen, a, b);
+	Itg3200Gyro gyro(2);
+	stream::filters::StaticFilter<float,3> s(&gyro, a, b);
 	stream::filters::EulerAnglesIntegral integ(&s);
 
-	stream::StreamExporter exporter;
 	exporter.register_stream(&integ, std::string("gyro_test"));
 
+	// accelerometer
+	Adxl345Acc acc(2);
+	exporter.register_stream(&acc, std::string("acc_test"));
+
+	// compass
+	Hmc5843Compass c(2);
+	exporter.register_stream(&c, std::string("compass_test"));
+
+	std::cout << "Watiging for connections. " << std::endl;
 	exporter.run();
 
 	return 0;

@@ -14,6 +14,7 @@ LIBDIR = ./lib
 AUTOPILIT_OBJS =  hw/i2c_interface.o	\
 		hw/itg3200_gyro.o				\
 		hw/adxl345_acc.o				\
+		hw/hmc5843_compass.o		 	\
 		hw/maestro_servo_controller.o
 
 GTESTS_OBJS=	
@@ -28,14 +29,14 @@ GTESTS_OBJS=
 all: host device
 
 .PHONY:
-host: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.a gyro_watch_test acc_watch_test orientation_test gtest 
+host: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.a sensor_watch_test orientation_test gtest 
 
 .PHONY:
-device: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.a gyro_watch_test acc_watch_test orientation_test gtest 
+device: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.a sensor_watch_test orientation_test gtest 
 
 .PHONY:
 clean:
-	rm -fr */*.o *.o $(LIBDIR) gtest gyro_watch_test watch_test orientation_test acc_watch_test
+	rm -fr */*.o *.o $(LIBDIR) gtest sensor_watch_test watch_test orientation_test 
 
 $(LIBDIR):
 	mkdir $(LIBDIR)
@@ -58,8 +59,5 @@ test: gtest
 orientation_test: sandbox/orientation_test.o $(LIBDIR) $(LIBDIR)/libautopilot.a 
 	$(CXX) ./sandbox/orientation_test.o $(LDFLAGS) -lautopilot -o orientation_test
 
-acc_watch_test: sandbox/acc_watch_test.o $(LIBDIR) $(LIBDIR)/libautopilot.a 
-	$(CXX) ./sandbox/acc_watch_test.o $(LDFLAGS) -lautopilot -o acc_watch_test
-
-gyro_watch_test: sandbox/gyro_watch_test.o $(LIBDIR) $(LIBDIR)/libautopilot.a 
-	$(CXX) ./sandbox/gyro_watch_test.o $(LDFLAGS) -lautopilot -o gyro_watch_test
+sensor_watch_test: sandbox/sensor_watch_test.o $(LIBDIR) $(LIBDIR)/libautopilot.a 
+	$(CXX) ./sandbox/sensor_watch_test.o $(LDFLAGS) -lautopilot -o sensor_watch_test
