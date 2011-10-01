@@ -30,6 +30,7 @@ private:
 	 */
 	const uint8_t WHO_AM_I;
 	const uint8_t POWER_CONTROL;
+	const uint8_t DATA_FORMAT;
 	const uint8_t X_READ_ADDRES;
 	const uint8_t Y_READ_ADDRES;
 	const uint8_t Z_READ_ADDRES;
