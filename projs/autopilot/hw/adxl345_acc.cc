@@ -7,6 +7,7 @@ Adxl345Acc::Adxl345Acc(size_t device_i2c_num):
 			WHO_AM_I_VALUE(0xe5),
 			WHO_AM_I(0x00),
 			POWER_CONTROL(0x2d),
+			DATA_FORMAT(0x31),
 			X_READ_ADDRES(0x32),
 			Y_READ_ADDRES(0x34),
 			Z_READ_ADDRES(0x36),
@@ -23,6 +24,7 @@ Adxl345Acc::Adxl345Acc(size_t device_i2c_num):
 
 	// configuration
 	m_i2c.write_num<uint8_t>(POWER_CONTROL, 1<<3);
+	m_i2c.write_num<uint8_t>(DATA_FORMAT, 1); // +-4G
 }
 
 Adxl345Acc::vector_t Adxl345Acc::get_data() {
@@ -37,8 +39,8 @@ Adxl345Acc::vector_t Adxl345Acc::get_data() {
 	//std::cout << ans[0] << std::endl;
 	//std::cout << (ans[0] << 8) + (ans[0] >> 8) << std::endl;
 
-	fans[0] = float((int16_t)((ans[0]<<8)&0xff00) + (ans[0]>>8));
-	fans[1] = float((int16_t)((ans[1]<<8)&0xff00) + (ans[1]>>8));
-	fans[2] = float((int16_t)((ans[2]<<8)&0xff00) + (ans[2]>>8));
+	fans[0] = float((int16_t)((ans[0]<<8)&0xff00) + (ans[0]>>8))*-0.004;
+	fans[1] = float((int16_t)((ans[1]<<8)&0xff00) + (ans[1]>>8))*-0.004;
+	fans[2] = float((int16_t)((ans[2]<<8)&0xff00) + (ans[2]>>8))*-0.004;
 	return fans;
 }
