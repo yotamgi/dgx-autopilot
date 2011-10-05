@@ -9,18 +9,18 @@ namespace stream {
 namespace filters {
 
 
-class RotationIntegral : public VecFilter<float,3> {
+class RotationIntegral :
+	public DataFilter<typename VecGenerator<float,3>::vector_t, lin_algebra::matrix_t>
+{
 public:
 
 
 	RotationIntegral(VecGenerator<float,3>* data_gen);
 	virtual ~RotationIntegral();
 
-	typename VecFilter<float,3>::vector_t get_data();
+	lin_algebra::matrix_t get_data();
 
 private:
-
-	typename VecFilter<float,3>::vector_t calc_euler_angles();
 
 	/**
 	 * In this integral, we rotate an coordinate system according to the

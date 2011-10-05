@@ -1,6 +1,7 @@
 #include "stream/stream_exporter.h"
 #include <stream/filters/rotation_integral.h>
 #include <stream/filters/static_filter.h>
+#include <stream/filters/matrix_to_euler_filter.h>
 #include <stream/util/time.h>
 #include "hw/itg3200_gyro.h"
 #include "hw/adxl345_acc.h"
@@ -42,9 +43,10 @@ int main(int argc, char** argv) {
 
 	Itg3200Gyro gyro(2);
 	stream::filters::StaticFilter<float,3> s(&gyro, a, b);
-	stream::filters::RotationIntegral integ(&s);
+	stream::filters::RotationIntegral gyro_rot(&s);
+	stream::filters::MatrixToEulerFilter gyro_rot_euler(&gyro_rot);
 
-	exporter.register_stream(&integ, std::string("gyro_test"));
+	exporter.register_stream(&gyro_rot_euler, std::string("gyro_test"));
 
 	// accelerometer
 	Adxl345Acc acc(2);
