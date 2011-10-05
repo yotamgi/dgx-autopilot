@@ -62,7 +62,7 @@ inline float sign(float num) {
 }
 
 inline vector_t cross_product(vector_t a, vector_t b) {
-	vector_t ans;
+	vector_t ans(3);
 	ans[0] = a[1]*b[2] - a[2]*b[1];
 	ans[1] = a[2]*b[0] - a[0]*b[2];
 	ans[2] = a[0]*b[1] - a[1]*b[0];
