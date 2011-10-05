@@ -61,6 +61,14 @@ inline float sign(float num) {
 	return (num>0.)?1.:-1.;
 }
 
+inline vector_t cross_product(vector_t a, vector_t b) {
+	vector_t ans;
+	ans[0] = a[1]*b[2] - a[2]*b[1];
+	ans[1] = a[2]*b[0] - a[0]*b[2];
+	ans[2] = a[0]*b[1] - a[1]*b[0];
+	return ans;
+}
+
 }
 
 #endif /* LIN_ALGEBRA_H_ */
