@@ -22,8 +22,6 @@ private:
 
 	typename VecFilter<float,3>::vector_t calc_euler_angles();
 
-	float sign(float num);
-
 	/**
 	 * In this integral, we rotate an coordinate system according to the
 	 * angles diff it gets.

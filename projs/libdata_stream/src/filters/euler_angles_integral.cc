@@ -92,7 +92,7 @@ typename VecFilter<float,3>::vector_t EulerAnglesIntegral::calc_euler_angles(){
 	//    axis is pointing up or down: m_sum[1][1] < 0.
 	//  - is the plan's X axis is above or below XZ surface? It is calculated
 	//    by sign(m_sum[0][1]).
-	ans[2] = -1.*sign(plan_x[1])*lin_algebra::angle_between(rot_ref, plan_x);
+	ans[2] = -1.*lin_algebra::sign(plan_x[1])*lin_algebra::angle_between(rot_ref, plan_x);
 	if (plan_y[1] < 0.) {
 		ans[2] = 180. - ans[2];
 	}
@@ -102,11 +102,6 @@ typename VecFilter<float,3>::vector_t EulerAnglesIntegral::calc_euler_angles(){
 //	ans[2] = atan2(m_rot(0,1), m_rot(1,1)) * 180. / lin_algebra::PI;
 	return ans;
 }
-
-float EulerAnglesIntegral::sign(float num) {
-	return (num>0.)?1.:-1.;
-}
-
 
 } // namespace filters
 } // namespace stream
