@@ -23,13 +23,6 @@ public:
 	 */
 	virtual data_t get_data() = 0;
 
-	/**
-	 * Returns true if there was data losed in the generator due to insufficient
-	 * reading speed.
-	 * Should turn false after reading from it.
-	 */
-	virtual bool is_data_losed() = 0;
-
 };
 
 /**
