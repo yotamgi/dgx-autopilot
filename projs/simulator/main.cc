@@ -25,7 +25,7 @@ and tell the linker to link with the .lib file.
 #include <stream/stream_exporter.h>
 #include <stream/filters/integral_filter.h>
 #include <stream/filters/rotation_integral.h>
-#include <stream/filters/acc_to_euler_filter.h>
+#include <stream/filters/acc_compass_rot.h>
 #include <stream/filters/matrix_to_euler_filter.h>
 
 #include <boost/thread.hpp>
@@ -112,8 +112,14 @@ int main()
 			"simulator_gyro"
 	);
 	exporter.register_stream(
-			new stream::filters::AccToEulerFilter(p.acc_gen()), "simulator_filter_acc");
+		new stream::filters::MatrixToEulerFilter(
+			new stream::filters::AccCompassRotation(p.acc_gen(), p.compass_gen())
+		),
+		"simulator_acc_compass"
+	);
+
 	exporter.register_stream(p.acc_gen(), "simulator_acc");
+	exporter.register_stream(p.compass_gen(), "simulator_compass");
 
 
 	boost::thread t(&stream::StreamExporter::run, &exporter);
