@@ -10,7 +10,7 @@ namespace stream {
  * A filter, which is a decoretor to the DataGenerator class.
  * To implement it, one must implement the get_data function.
  */
-template <typename data_t, typename data_source_t = data_t>
+template <typename data_source_t, typename data_t = data_source_t>
 class DataFilter : public DataGenerator<data_t> {
 public:
 

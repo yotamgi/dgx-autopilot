@@ -57,6 +57,10 @@ inline void normalize(vec& v) {
 	v /= vec_len(v);
 }
 
+inline float sign(float num) {
+	return (num>0.)?1.:-1.;
+}
+
 }
 
 #endif /* LIN_ALGEBRA_H_ */
