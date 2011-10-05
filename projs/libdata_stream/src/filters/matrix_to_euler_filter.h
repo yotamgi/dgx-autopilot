@@ -8,8 +8,8 @@
 #ifndef MATRIX_TO_EULER_FILTER_H_
 #define MATRIX_TO_EULER_FILTER_H_
 
-#include <data_filter.h>
-#include <util/lin_algebra.h>
+#include <stream/data_filter.h>
+#include <stream/util/lin_algebra.h>
 
 namespace stream {
 namespace filters {
