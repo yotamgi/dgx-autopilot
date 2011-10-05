@@ -90,6 +90,16 @@ void Plane::update(float time_delta) {
 	acc_data[2] = acc.Z;
 	m_acc.set_data(acc_data);
 
+	// update the compass
+	SensorGenerator::vector_t compass_data;
+	irr::core::vector3df north(1, 0, 0);
+	north.rotateYZBy(rot.X);
+	north.rotateXZBy(-1.*rot.Y);
+	north.rotateXYBy(rot.Z);
+	compass_data[0] = north.X;
+	compass_data[1] = north.Y;
+	compass_data[2] = north.Z;
+	m_compass.set_data(compass_data);
 
 	// update the position by the dirction value
 	pos  += dir*time_delta*m_params.get_speed();
