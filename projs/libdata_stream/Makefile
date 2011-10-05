@@ -7,7 +7,7 @@ DATA_STREAM_OBJS = src/stream_exporter.o \
 				   src/stream_importer.o \
 				   src/filters/rotation_integral.o \
 				   src/filters/matrix_to_euler_filter.o \
-				   src/filters/acc_to_euler_filter.o
+				   src/filters/acc_compass_rot.o
 				    
 GTEST_OBJS = tests/exporter_test.o  \
 			 tests/integral_test.o \
