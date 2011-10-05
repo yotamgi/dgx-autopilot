@@ -1,21 +1,21 @@
 
-#include "euler_angles_integral.h"
+#include "rotation_integral.h"
 #include <cmath>
 #include "stream/util/time.h"
 
 namespace stream {
 namespace filters {
 
-EulerAnglesIntegral::EulerAnglesIntegral(VecGenerator<float,3>* data_gen):
+RotationIntegral::RotationIntegral(VecGenerator<float,3>* data_gen):
 	VecFilter<float,3>(data_gen),
 	m_rot(lin_algebra::identity_matrix<float>(3)),
 	m_prev_time(get_curr_time())
 {}
 
-EulerAnglesIntegral::~EulerAnglesIntegral() {}
+RotationIntegral::~RotationIntegral() {}
 
 
-typename VecFilter<float,3>::vector_t EulerAnglesIntegral::get_data() {
+typename VecFilter<float,3>::vector_t RotationIntegral::get_data() {
 	typename VecFilter<float,3>::vector_t data =
 			VecFilter<float,3>::m_generator->get_data();
 
@@ -54,7 +54,7 @@ typename VecFilter<float,3>::vector_t EulerAnglesIntegral::get_data() {
 	return  ans;
 }
 
-typename VecFilter<float,3>::vector_t EulerAnglesIntegral::calc_euler_angles(){
+typename VecFilter<float,3>::vector_t RotationIntegral::calc_euler_angles(){
 	typename VecFilter<float,3>::vector_t ans;
 
 	const lin_algebra::mat_row plan_x = lin_algebra::mat_row(m_rot, 0);

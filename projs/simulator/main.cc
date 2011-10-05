@@ -24,7 +24,7 @@ and tell the linker to link with the .lib file.
 
 #include <stream/stream_exporter.h>
 #include <stream/filters/integral_filter.h>
-#include <stream/filters/euler_angles_integral.h>
+#include <stream/filters/rotation_integral.h>
 #include <stream/filters/acc_to_euler_filter.h>
 
 #include <boost/thread.hpp>
@@ -104,7 +104,7 @@ int main()
 
 	stream::StreamExporter exporter;
 	exporter.register_stream(
-			new stream::filters::EulerAnglesIntegral(p.gyro_gen()),
+			new stream::filters::RotationIntegral(p.gyro_gen()),
 	//		p.gyro_gen(),
 			"simulator_gyro"
 	);

@@ -9,12 +9,12 @@ namespace stream {
 namespace filters {
 
 
-class EulerAnglesIntegral : public VecFilter<float,3> {
+class RotationIntegral : public VecFilter<float,3> {
 public:
 
 
-	EulerAnglesIntegral(VecGenerator<float,3>* data_gen);
-	virtual ~EulerAnglesIntegral();
+	RotationIntegral(VecGenerator<float,3>* data_gen);
+	virtual ~RotationIntegral();
 
 	typename VecFilter<float,3>::vector_t get_data();
 
