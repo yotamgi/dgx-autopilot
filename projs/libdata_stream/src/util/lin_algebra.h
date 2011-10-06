@@ -48,7 +48,8 @@ inline float angle_between(const vector_t& a, const vector_t& b) {
 	return std::acos(a[0]*b[0] + a[1]*b[1] + a[2]*b[2]) * 180. / PI;
 }
 
-inline float vec_len(const vector_t& vec) {
+template <typename Vector>
+inline float vec_len(const Vector& vec) {
 	return std::sqrt(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2]);
 }
 
