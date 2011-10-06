@@ -111,9 +111,11 @@ int main()
 	//		p.gyro_gen(),
 			"simulator_gyro"
 	);
+	simulator::Plane::SensorGenerator::vector_t vec;
+	vec[0] = 1; vec[1] = 1; vec[2] = 0;
 	exporter.register_stream(
 		new stream::filters::MatrixToEulerFilter(
-			new stream::filters::AccCompassRotation(p.acc_gen(), p.compass_gen())
+			new stream::filters::AccCompassRotation(p.acc_gen(), p.compass_gen(), vec)
 		),
 		"simulator_acc_compass"
 	);
