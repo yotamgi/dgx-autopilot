@@ -11,13 +11,25 @@ namespace filters {
 
 class AccCompassRotation : public DataGenerator<lin_algebra::matrix_t> {
 public:
-	AccCompassRotation(VecGenerator<float,3> *acc, VecGenerator<float,3> *compass);
+	AccCompassRotation(
+			VecGenerator<float,3> *acc,
+			VecGenerator<float,3> *compass,
+			VecGenerator<float,3>::vector_t expected_north);
+
+	AccCompassRotation(
+			VecGenerator<float,3> *acc,
+			VecGenerator<float,3> *compass,
+			float north_pitch_angle,
+			float north_yaw_angle);
 
 	lin_algebra::matrix_t get_data();
 
 private:
 	VecGenerator<float,3> *m_acc;
 	VecGenerator<float,3> *m_compass;
+
+	float m_north_pitch_angle;
+	float m_north_yaw_angle;
 };
 
 } // namespace filters
