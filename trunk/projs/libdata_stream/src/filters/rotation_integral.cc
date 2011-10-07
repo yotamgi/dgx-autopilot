@@ -34,7 +34,7 @@ lin_algebra::matrix_t RotationIntegral::get_data() {
 	update(2,0) = -1.*wy;  	update(2,1) = wx;   	update(2,2) = 1.;
 
 	// update the coordinate system
-	m_rot = lin_algebra::prod(update, m_rot);
+	m_rot = update * m_rot;
 
 	// maintain the matrix ortho-normal
 	lin_algebra::mat_row row0 = lin_algebra::mat_row(m_rot, 0);

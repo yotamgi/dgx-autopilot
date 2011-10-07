@@ -70,6 +70,19 @@ inline vector_t cross_product(vector_t a, vector_t b) {
 	return ans;
 }
 
+} // namepsace lin_algebra
+
+inline lin_algebra::vector_t operator * (lin_algebra::matrix_t M, lin_algebra::vector_t v) {
+	return lin_algebra::prod(M, v);
 }
+
+inline lin_algebra::vector_t operator * (lin_algebra::vector_t v, lin_algebra::matrix_t M) {
+	return lin_algebra::prod(v, M);
+}
+
+inline lin_algebra::matrix_t operator * (lin_algebra::matrix_t M1, lin_algebra::matrix_t M2) {
+	return lin_algebra::prod(M1, M2);
+}
+
 
 #endif /* LIN_ALGEBRA_H_ */
