@@ -5,6 +5,16 @@ namespace filters {
 
 AccCompassRotation::AccCompassRotation(
 				VecGenerator<float,3> *acc,
+				VecGenerator<float,3> *compass):
+	m_acc(acc),
+	m_compass(compass)
+{
+	VecGenerator<float,3>::vector_t expected_north = m_compass->get_data();
+	m_north_pitch_angle = std::asin(expected_north[1]/lin_algebra::vec_len(expected_north));
+}
+
+AccCompassRotation::AccCompassRotation(
+				VecGenerator<float,3> *acc,
 				VecGenerator<float,3> *compass,
 				VecGenerator<float,3>::vector_t expected_north):
 	m_acc(acc),
@@ -13,15 +23,14 @@ AccCompassRotation::AccCompassRotation(
 	m_north_pitch_angle = std::asin(expected_north[1]/lin_algebra::vec_len(expected_north));
 }
 
+
 AccCompassRotation::AccCompassRotation(
 				VecGenerator<float,3> *acc,
 				VecGenerator<float,3> *compass,
-				float north_pitch_angle,
-				float north_yaw_angle):
+				float north_pitch_angle):
 	m_acc(acc),
 	m_compass(compass),
-	m_north_pitch_angle(north_pitch_angle),
-	m_north_yaw_angle(north_yaw_angle)
+	m_north_pitch_angle(north_pitch_angle)
 {}
 
 
