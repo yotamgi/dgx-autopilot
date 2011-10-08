@@ -2,8 +2,8 @@
 #ifndef HMC5843_COMPASS_H
 #define HMC5843_COMPASS_H
 
-#include "stream/generators.h"
-#include "hw/i2c_interface.h"
+#include <stream/generators.h>
+#include "platform/hw/i2c_interface.h"
 
 class Hmc5843Compass : public stream::VecGenerator<float,3> {
 public:
