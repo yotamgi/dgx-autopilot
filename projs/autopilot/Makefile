@@ -29,14 +29,14 @@ GTESTS_OBJS=
 all: host device
 
 .PHONY:
-host: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.a sensor_watch_test orientation_test gtest 
+host: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.a sensor_watch_test gtest 
 
 .PHONY:
-device: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.a sensor_watch_test orientation_test gtest 
+device: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.a sensor_watch_test gtest 
 
 .PHONY:
 clean:
-	rm -fr */*.o *.o $(LIBDIR) gtest sensor_watch_test watch_test orientation_test 
+	rm -fr */*.o *.o $(LIBDIR) gtest sensor_watch_test watch_test 
 
 $(LIBDIR):
 	mkdir $(LIBDIR)
@@ -55,9 +55,6 @@ gtest: $(GTESTS_OBJS) $(LIBDIR) $(LIBDIR)/libautopilot.a
 .PHONY:
 test: gtest
 	./gtest --gtest_color=yes
-
-orientation_test: sandbox/orientation_test.o $(LIBDIR) $(LIBDIR)/libautopilot.a 
-	$(CXX) ./sandbox/orientation_test.o $(LDFLAGS) -lautopilot -o orientation_test
 
 sensor_watch_test: sandbox/sensor_watch_test.o $(LIBDIR) $(LIBDIR)/libautopilot.a 
 	$(CXX) ./sandbox/sensor_watch_test.o $(LDFLAGS) -lautopilot -o sensor_watch_test
