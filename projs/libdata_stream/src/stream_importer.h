@@ -1,10 +1,3 @@
-/*
- * stream_importer.h
- *
- *  Created on: Sep 19, 2011
- *      Author: yotam
- */
-
 #ifndef STREAM_IMPORTER_H_
 #define STREAM_IMPORTER_H_
 
@@ -23,20 +16,20 @@ public:
 	StreamImporter(std::string address);
 	~StreamImporter();
 
-	template <typename T>
-	boost::shared_ptr<DataGenerator<T> > import_stream(std::string name) {
-		return boost::shared_ptr< DataGenerator<T> >(new StreamProxy<T>(this, name));
+	template <typename Stream>
+	boost::shared_ptr<Stream> import_stream(std::string name) {
+		return boost::shared_ptr<Stream>(new StreamProxy<Stream>(this, name));
 	}
 
 	std::vector<std::string> list_avail();
 
 private:
 
-	template <typename T>
-	class StreamProxy : public DataGenerator<T> {
+	template <typename Stream>
+	class StreamProxy : public Stream {
 	public:
 
-		T get_data() {
+		typename Stream::type get_data() {
 
 			// ask for the data
 			m_father->write_sock(std::string(&protocol::GET_COMMAND, 1) + m_name);
@@ -53,7 +46,7 @@ private:
 
 			// deserialize
 			std::stringstream ss(serialized_data);
-			T data;
+			typename Stream::type data;
 			ss >> data;
 			if (ss.fail()) {
 				throw std::runtime_error("The exported stream does not match: couldn't parse: " + ss.str());

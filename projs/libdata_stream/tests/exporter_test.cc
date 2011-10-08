@@ -57,7 +57,7 @@ TEST(stream_export_import, int_stream) {
 	StreamImporter importer("localhost");
 
 	// checking that the data is correct
-	boost::shared_ptr< DataGenerator<int> > a = importer.import_stream<int>("dummy_int");
+	boost::shared_ptr< DataGenerator<int> > a = importer.import_stream< DataGenerator<int> >("dummy_int");
 	ASSERT_EQ(a->get_data(), 0);
 	ASSERT_EQ(a->get_data(), 1);
 	ASSERT_EQ(a->get_data(), 2);
@@ -82,7 +82,7 @@ TEST(stream_export_import, vec_stream) {
 
 	// checking that the data is correct
 	boost::shared_ptr< DataGenerator<DummyVecStream::vector_t> > a =
-			importer.import_stream<DummyVecStream::vector_t>("dummy_vec");
+			importer.import_stream<DummyVecStream>("dummy_vec");
 
 	ASSERT_NEAR(a->get_data()[2], 2, 0.01);
 	sleep(1);

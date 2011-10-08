@@ -29,7 +29,7 @@ int main(int argc, char** argv) {
 	std::cin >> c;
 
 	boost::shared_ptr<stream::DataGenerator< stream::VecGenerator<float,3>::vector_t > > chosen =
-			imp.import_stream<stream::VecGenerator<float,3>::vector_t >(avail.at(which));
+			imp.import_stream<stream::VecGenerator<float,3> >(avail.at(which));
 
 	//std::cout << chosen->get_data() << std::endl;
 
