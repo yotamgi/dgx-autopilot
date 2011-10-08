@@ -16,6 +16,8 @@ template <typename data_t>
 class DataGenerator {
 public:
 
+	typedef data_t type;
+
 	virtual ~DataGenerator() {}
 
 	/**
