@@ -24,9 +24,9 @@ lin_algebra::matrix_t RotationIntegral::get_data() {
 	double time_delta = m_rot_time - m_prev_time;
 	m_prev_time = m_rot_time;
 
-	float wx = data[0]*time_delta / 180. * lin_algebra::PI;
-	float wy = data[1]*time_delta / 180. * lin_algebra::PI;
-	float wz = data[2]*time_delta / 180. * lin_algebra::PI;
+	float wx = -data[0]*time_delta / 180. * lin_algebra::PI;
+	float wy = -data[1]*time_delta / 180. * lin_algebra::PI;
+	float wz = -data[2]*time_delta / 180. * lin_algebra::PI;
 
 	lin_algebra::matrix_t update(3, 3); // = W + I
 	update(0,0) = 1.;		update(0,1) = -1.*wz;	update(0,2) = wy;
@@ -34,20 +34,20 @@ lin_algebra::matrix_t RotationIntegral::get_data() {
 	update(2,0) = -1.*wy;  	update(2,1) = wx;   	update(2,2) = 1.;
 
 	// update the coordinate system
-	m_rot = update * m_rot;
+	m_rot = m_rot * update;
 
 	// maintain the matrix ortho-normal
-	lin_algebra::mat_row row0 = lin_algebra::mat_row(m_rot, 0);
-	lin_algebra::mat_row row1 = lin_algebra::mat_row(m_rot, 1);
-	lin_algebra::mat_row row2 = lin_algebra::mat_row(m_rot, 2);
+	lin_algebra::mat_col col0 = lin_algebra::mat_col(m_rot, 0);
+	lin_algebra::mat_col col1 = lin_algebra::mat_col(m_rot, 1);
+	lin_algebra::mat_col col2 = lin_algebra::mat_col(m_rot, 2);
 
-	lin_algebra::orthogonalize(row0, row1);
-	lin_algebra::orthogonalize(row1, row2);
-	lin_algebra::orthogonalize(row0, row2);
+	lin_algebra::orthogonalize(col0, col1);
+	lin_algebra::orthogonalize(col1, col2);
+	lin_algebra::orthogonalize(col0, col2);
 
-	lin_algebra::normalize(row0);
-	lin_algebra::normalize(row1);
-	lin_algebra::normalize(row2);
+	lin_algebra::normalize(col0);
+	lin_algebra::normalize(col1);
+	lin_algebra::normalize(col2);
 
 	return  m_rot;
 }
