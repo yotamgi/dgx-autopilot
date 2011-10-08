@@ -1,0 +1,4 @@
+ - Refactor the autopilot dir-tree.
+ - Move all the autopilot-sepcific filters (AccCompass, Gyro) to be in the autopilot other than libdata_stream
+ - Add Reciever to the libdata_stream for the servo
+ - Change both in the plane and in the AccCompass to use the RevievedStream.
