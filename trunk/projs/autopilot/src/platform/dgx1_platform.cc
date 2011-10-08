@@ -44,4 +44,10 @@ Servo* DGX1Platform::pitch_servo() {
 	return NULL;
 }
 
+Servo* DGX1Platform::gas_servo() {
+	throw std::logic_error("Servos not implemented yet on dgx1 platform");
+	return NULL;
+}
+
+
 } //namespace autopilot

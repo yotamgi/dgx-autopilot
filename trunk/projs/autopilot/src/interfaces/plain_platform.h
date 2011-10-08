@@ -31,6 +31,8 @@ public:
 	virtual Servo* yaw_servo() = 0;
 
 	virtual Servo* pitch_servo() = 0;
+
+	virtual Servo* gas_servo() = 0;
 };
 
 } //namespace autopilot
