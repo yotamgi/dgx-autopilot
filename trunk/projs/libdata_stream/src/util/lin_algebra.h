@@ -35,11 +35,6 @@ const float PI = 3.14159265;
 typedef boost::numeric::ublas::matrix_row<matrix_t> mat_row;
 typedef boost::numeric::ublas::matrix_column<matrix_t> mat_col;
 
-template <typename vec>
-void orthogonalize(vec& a, vec& b) {
-	a[2] = -1.0 * (a[0]*b[0] + a[1]*b[1]) / b[2];
-}
-
 /**
  * Expects two normalized vectors
  */
