@@ -1,5 +1,5 @@
 #include "stream/stream_exporter.h"
-#include <stream/filters/rotation_integral.h>
+#include <stream/filters/gyro_to_av_matrix.h>
 #include <stream/filters/static_filter.h>
 #include <stream/filters/matrix_to_euler_filter.h>
 #include <stream/util/time.h>
@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
 
 	Itg3200Gyro gyro(2);
 	stream::filters::StaticFilter<float,3> s(&gyro, a, b);
-	stream::filters::RotationIntegral gyro_rot(&s);
+	stream::filters::GyroToAVMatrix gyro_rot(&s);
 	stream::filters::MatrixToEulerFilter gyro_rot_euler(&gyro_rot);
 
 	exporter.register_stream(&gyro_rot_euler, std::string("gyro_test"));
