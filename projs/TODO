@@ -13,3 +13,8 @@
  - Add Reciever to the libdata_stream for the servo
 
  - Change both in the plane and in the AccCompass to use the RevievedStream.
+
+
+OPTIMIZATIONS:
+ - The time_delta is multiplied with the whole matrix in IntegralFilter<mtrix_t> - that's not fast. 
+ - Make the Platform inline - this will lead to less virtual calls (the sensor generators).
