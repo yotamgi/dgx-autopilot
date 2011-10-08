@@ -52,17 +52,17 @@ lin_algebra::matrix_t AccCompassRotation::get_data() {
 	lin_algebra::matrix_t rot(3,3);
 
 	// the y we know, so just set it
-	lin_algebra::mat_row(rot, 1) = -1. * ground;
+	lin_algebra::mat_col(rot, 1) = -ground;
 
 	// calculating the x using the north
 	north += ground * std::sin(m_north_pitch_angle);
 	lin_algebra::normalize(north);
 	std::cout << north << std::endl;
-	lin_algebra::mat_row(rot, 0) = north;
-
+	lin_algebra::mat_col(rot, 0) = -north;
 
 	// calculate z as the vector orthogonal to x and y
-	lin_algebra::mat_row(rot, 2) = lin_algebra::cross_product(north, ground);
+	lin_algebra::mat_col(rot, 2) = lin_algebra::cross_product(north, ground);
+	std::cout << rot << std::endl;
 
 	return rot;
 }
