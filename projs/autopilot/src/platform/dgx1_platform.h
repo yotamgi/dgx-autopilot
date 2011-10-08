@@ -25,6 +25,8 @@ public:
 
 	Servo* pitch_servo();
 
+	Servo* gas_servo();
+
 private:
 	boost::shared_ptr<stream::VecGenerator<float,3> > m_acc;
 	boost::shared_ptr<stream::VecGenerator<float,3> > m_gyro;
