@@ -1,14 +1,14 @@
 
-#ifndef ADXL345_ACC_H_ 
-#define ADXL345_ACC_H_ 
+#ifndef ITG3200_GYRO_H_
+#define ITG3200_GYRO_H_
 
 #include "stream/generators.h"
-#include "hw/i2c_interface.h"
+#include "platform/hw/i2c_interface.h"
 
-class Adxl345Acc : public stream::VecGenerator<float,3> {
+class Itg3200Gyro : public stream::VecGenerator<float,3> {
 public:
-	Adxl345Acc(size_t device_i2c_num);
-	virtual ~Adxl345Acc() {}
+	Itg3200Gyro(size_t device_i2c_num);
+	virtual ~Itg3200Gyro() {}
 
 	/**
 	 * Return the angular velocity
@@ -29,8 +29,9 @@ private:
 	 * Internal registers
 	 */
 	const uint8_t WHO_AM_I;
-	const uint8_t POWER_CONTROL;
-	const uint8_t DATA_FORMAT;
+	const uint8_t SAMPLE_RATE_DIVIDOR;
+	const uint8_t SAMPLING_CONF;
+	const uint8_t TEMP_READ_ADDRES;
 	const uint8_t X_READ_ADDRES;
 	const uint8_t Y_READ_ADDRES;
 	const uint8_t Z_READ_ADDRES;
