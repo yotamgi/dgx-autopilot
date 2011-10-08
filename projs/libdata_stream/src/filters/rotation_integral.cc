@@ -41,9 +41,8 @@ lin_algebra::matrix_t RotationIntegral::get_data() {
 	lin_algebra::mat_col col1 = lin_algebra::mat_col(m_rot, 1);
 	lin_algebra::mat_col col2 = lin_algebra::mat_col(m_rot, 2);
 
-	lin_algebra::orthogonalize(col0, col1);
-	lin_algebra::orthogonalize(col1, col2);
-	lin_algebra::orthogonalize(col0, col2);
+	col2 = lin_algebra::cross_product(col0, col1);
+	col0 = lin_algebra::cross_product(col1, col2);
 
 	lin_algebra::normalize(col0);
 	lin_algebra::normalize(col1);
