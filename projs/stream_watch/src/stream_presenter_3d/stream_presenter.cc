@@ -106,7 +106,7 @@ void StreamPresenter::run(bool open_thread) {
 				roty.setRotationDegrees(core::vector3df(0., curr_angle[1], 0.));
 				rotz.setRotationDegrees(core::vector3df(0., 0., curr_angle[2]));
 
-				irr::core::matrix4 trans = rotx * roty * rotz;
+				irr::core::matrix4 trans = roty * rotx * rotz;
 				m_object->setRotation(trans.getRotationDegrees());
 
 				m_object->setVisible(true);
