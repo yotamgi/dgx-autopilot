@@ -5,9 +5,9 @@ namespace stream {
 namespace filters {
 
 template <typename data_t>
-KalmanFilter<data_t>::KalmanFilter(DataGenerator<data_t>* predict,
-			 DataGenerator<data_t>* obserbed,
-			 DataGenerator<float>* reliable):
+KalmanFilter<data_t>::KalmanFilter(boost::shared_ptr<DataGenerator<data_t> > predict,
+		boost::shared_ptr<DataGenerator<data_t> > obserbed,
+		boost::shared_ptr<DataGenerator<float> > reliable):
 	m_predict(predict),
 	m_obserbed(obserbed),
 	m_reliable(reliable)

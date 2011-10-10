@@ -18,7 +18,7 @@ class MatrixToEulerFilter :
 	public DataFilter<lin_algebra::matrix_t, typename VecGenerator<float,3>::vector_t>
 {
 public:
-	MatrixToEulerFilter(DataGenerator<lin_algebra::matrix_t>* gen);
+	MatrixToEulerFilter(boost::shared_ptr<DataGenerator<lin_algebra::matrix_t> > gen);
 
 	typename VecGenerator<float,3>::vector_t get_data();
 };

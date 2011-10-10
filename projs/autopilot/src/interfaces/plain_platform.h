@@ -18,13 +18,13 @@ public:
 
 	virtual ~NormalPlainPlatform() {}
 
-	virtual stream::VecGenerator<float,3>* acc_sensor() = 0;
+	virtual boost::shared_ptr<stream::VecGenerator<float,3> > acc_sensor() = 0;
 
-	virtual stream::VecGenerator<float,3>* gyro_sensor() = 0;
+	virtual boost::shared_ptr<stream::VecGenerator<float,3> > gyro_sensor() = 0;
 
-	virtual stream::VecGenerator<float,3>* compass_sensor() = 0;
+	virtual boost::shared_ptr<stream::VecGenerator<float,3> > compass_sensor() = 0;
 
-	virtual stream::VecGenerator<float,3>* gps_sensor() = 0;
+	virtual boost::shared_ptr<stream::VecGenerator<float,3> > gps_sensor() = 0;
 
 	virtual Servo* tilt_servo() = 0;
 

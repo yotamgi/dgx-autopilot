@@ -2,6 +2,7 @@
 #define ACC_TO_EULER_FILTER_H_
 
 #include <boost/array.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <stream/util/lin_algebra.h>
 #include <stream/generators.h>
@@ -12,17 +13,17 @@ namespace filters {
 class AccCompassRotation : public DataGenerator<lin_algebra::matrix_t> {
 public:
 	AccCompassRotation(
-			VecGenerator<float,3> *acc,
-			VecGenerator<float,3> *compass);
+			boost::shared_ptr<VecGenerator<float,3> > acc,
+			boost::shared_ptr<VecGenerator<float,3> > compass);
 
 	AccCompassRotation(
-			VecGenerator<float,3> *acc,
-			VecGenerator<float,3> *compass,
+			boost::shared_ptr<VecGenerator<float,3> > acc,
+			boost::shared_ptr<VecGenerator<float,3> > compass,
 			VecGenerator<float,3>::vector_t expected_north);
 
 	AccCompassRotation(
-			VecGenerator<float,3> *acc,
-			VecGenerator<float,3> *compass,
+			boost::shared_ptr<VecGenerator<float,3> > acc,
+			boost::shared_ptr<VecGenerator<float,3> > compass,
 			float north_pitch_angle);
 
 	lin_algebra::matrix_t get_data();
@@ -42,8 +43,8 @@ private:
 		friend class AccCompassRotation;
 	};
 
-	VecGenerator<float,3> *m_acc;
-	VecGenerator<float,3> *m_compass;
+	boost::shared_ptr<VecGenerator<float,3> > m_acc;
+	boost::shared_ptr<VecGenerator<float,3> > m_compass;
 
 	float m_north_pitch_angle;
 

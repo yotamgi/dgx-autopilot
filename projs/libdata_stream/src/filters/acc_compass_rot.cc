@@ -4,8 +4,8 @@ namespace stream {
 namespace filters {
 
 AccCompassRotation::AccCompassRotation(
-				VecGenerator<float,3> *acc,
-				VecGenerator<float,3> *compass):
+		boost::shared_ptr<VecGenerator<float,3> > acc,
+		boost::shared_ptr<VecGenerator<float,3> > compass):
 	m_acc(acc),
 	m_compass(compass)
 {
@@ -14,9 +14,9 @@ AccCompassRotation::AccCompassRotation(
 }
 
 AccCompassRotation::AccCompassRotation(
-				VecGenerator<float,3> *acc,
-				VecGenerator<float,3> *compass,
-				VecGenerator<float,3>::vector_t expected_north):
+		boost::shared_ptr<VecGenerator<float,3> > acc,
+		boost::shared_ptr<VecGenerator<float,3> > compass,
+		VecGenerator<float,3>::vector_t expected_north):
 	m_acc(acc),
 	m_compass(compass)
 {
@@ -25,9 +25,9 @@ AccCompassRotation::AccCompassRotation(
 
 
 AccCompassRotation::AccCompassRotation(
-				VecGenerator<float,3> *acc,
-				VecGenerator<float,3> *compass,
-				float north_pitch_angle):
+		boost::shared_ptr<VecGenerator<float,3> > acc,
+		boost::shared_ptr<VecGenerator<float,3> > compass,
+		float north_pitch_angle):
 	m_acc(acc),
 	m_compass(compass),
 	m_north_pitch_angle(north_pitch_angle)

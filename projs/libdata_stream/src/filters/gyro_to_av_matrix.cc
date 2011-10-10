@@ -6,7 +6,7 @@
 namespace stream {
 namespace filters {
 
-GyroToAVMatrix::GyroToAVMatrix(VecGenerator<float,3>* data_gen):
+GyroToAVMatrix::GyroToAVMatrix(boost::shared_ptr<VecGenerator<float,3> > data_gen):
 	DataFilter<typename VecGenerator<float,3>::vector_t, lin_algebra::matrix_t>(data_gen)
 {}
 

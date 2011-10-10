@@ -3,8 +3,9 @@
 namespace stream {
 namespace filters {
 
-MatrixToEulerFilter::MatrixToEulerFilter(DataGenerator<lin_algebra::matrix_t>* gen):
-		DataFilter<lin_algebra::matrix_t, typename VecGenerator<float,3>::vector_t>(gen)
+MatrixToEulerFilter::MatrixToEulerFilter(
+		boost::shared_ptr<DataGenerator<lin_algebra::matrix_t> > gen):
+	DataFilter<lin_algebra::matrix_t, typename VecGenerator<float,3>::vector_t>(gen)
 {}
 
 typename VecGenerator<float,3>::vector_t MatrixToEulerFilter::get_data() {
