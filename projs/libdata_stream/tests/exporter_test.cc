@@ -46,11 +46,11 @@ private:
 TEST(stream_export_import, int_stream) {
 
 	// the stream we are about to send
-	DummyIntStream is;
+	boost::shared_ptr<DataGenerator<int> > is(new DummyIntStream);
 
 	// exporting the stream
 	StreamExporter exporter;
-	exporter.register_stream(&is, "dummy_int");
+	exporter.register_stream(is, "dummy_int");
 	boost::thread exporter_thread(&StreamExporter::run, &exporter);
 
 	// importing the stream
@@ -70,11 +70,11 @@ TEST(stream_export_import, int_stream) {
 TEST(stream_export_import, vec_stream) {
 
 	// the stream we are about to send
-	DummyVecStream vs;
+	boost::shared_ptr<DataGenerator<VecGenerator<float, 3>::vector_t> > vs(new DummyVecStream);
 
 	// exporting the stream
 	StreamExporter exporter;
-	exporter.register_stream(&vs, "dummy_vec");
+	exporter.register_stream(vs, "dummy_vec");
 	boost::thread exporter_thread(&StreamExporter::run, &exporter);
 
 	// importing the stream
@@ -95,18 +95,16 @@ TEST(stream_export_import, vec_stream) {
 	exporter_thread.join();
 }
 
-
-
 TEST(stream_export_import, list) {
 
 	// the stream we are about to send
-	DummyVecStream vs;
+	boost::shared_ptr<DataGenerator<VecGenerator<float, 3>::vector_t> > vs(new DummyVecStream);
 
 	// exporting the stream
 	StreamExporter exporter;
-	exporter.register_stream(&vs, "dummy_vec0");
-	exporter.register_stream(&vs, "dummy_vec1");
-	exporter.register_stream(&vs, "dummy_vec2");
+	exporter.register_stream(vs, "dummy_vec0");
+	exporter.register_stream(vs, "dummy_vec1");
+	exporter.register_stream(vs, "dummy_vec2");
 	boost::thread exporter_thread(&StreamExporter::run, &exporter);
 
 	// importing the stream

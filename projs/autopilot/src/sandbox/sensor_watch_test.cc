@@ -43,6 +43,7 @@ int main(int argc, char** argv) {
 	a[0] = -1.217; a[1] = -3.966; a[2] = 2.614;
 	b[0] = 1.; b[1] = 1.; b[2] = 1.;
 
+	using namespace stream;
 	using namespace stream::filters;
 	using namespace boost;
 
@@ -51,17 +52,17 @@ int main(int argc, char** argv) {
 	shared_ptr<GyroToAVMatrix> gyro_rot = make_shared<GyroToAVMatrix>(s);
 	shared_ptr<MatrixToEulerFilter> gyro_rot_euler = make_shared<MatrixToEulerFilter>(gyro_rot);
 
-	exporter.register_stream(gyro_rot_euler.get(), std::string("gyro_test"));
+	exporter.register_stream(gyro_rot_euler, std::string("gyro_test"));
 
 	// accelerometer
-	Adxl345Acc acc(2);
-	exporter.register_stream(&acc, std::string("acc_test"));
+	shared_ptr<Adxl345Acc> acc(new Adxl345Acc(2));
+	exporter.register_stream(acc, std::string("acc_test"));
 
 	// compass
-	Hmc5843Compass c(2);
-	exporter.register_stream(&c, std::string("compass_test"));
+	shared_ptr<Hmc5843Compass> c(new Hmc5843Compass(2));
+	exporter.register_stream(c, std::string("compass_test"));
 
-	std::cout << "Watiging for connections. " << std::endl;
+	std::cout << "Waiting for connections. " << std::endl;
 	exporter.run();
 
 	return 0;

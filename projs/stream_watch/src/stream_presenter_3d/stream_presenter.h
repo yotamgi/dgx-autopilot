@@ -13,8 +13,8 @@ public:
 	StreamPresenter();
 	~StreamPresenter();
 
-	void setAngleStream(stream::VecGenerator<float,3>* angle_stream);
-	void setVecStream(stream::VecGenerator<float,3>* vec_stream);
+	void setAngleStream(boost::shared_ptr<stream::VecGenerator<float,3> > angle_stream);
+	void setVecStream(boost::shared_ptr<stream::VecGenerator<float,3> > vec_stream);
 
 	void run(bool open_thread=true);
 
@@ -28,8 +28,8 @@ private:
 
 	boost::shared_ptr<boost::thread> m_thread;
 
-	stream::VecGenerator<float,3>* m_angle;
-	stream::VecGenerator<float,3>* m_vec;
+	boost::shared_ptr<stream::VecGenerator<float,3> > m_angle;
+	boost::shared_ptr<stream::VecGenerator<float,3> > m_vec;
 
 	volatile bool m_running;
 };
