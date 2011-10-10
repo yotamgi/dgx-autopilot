@@ -13,21 +13,21 @@ DGX1SimulatorPlatform::DGX1SimulatorPlatform(std::string address)
 	m_compass = importer.import_stream<stream::VecGenerator<float,3> >("simulator_compass");
 }
 
-stream::VecGenerator<float,3>* DGX1SimulatorPlatform::acc_sensor() {
-	return m_acc.get();
+boost::shared_ptr<stream::VecGenerator<float,3> > DGX1SimulatorPlatform::acc_sensor() {
+	return m_acc;
 }
 
-stream::VecGenerator<float,3>* DGX1SimulatorPlatform::gyro_sensor() {
-	return m_gyro.get();
+boost::shared_ptr<stream::VecGenerator<float,3> > DGX1SimulatorPlatform::gyro_sensor() {
+	return m_gyro;
 }
 
-stream::VecGenerator<float,3>* DGX1SimulatorPlatform::compass_sensor() {
-	return m_compass.get();
+boost::shared_ptr<stream::VecGenerator<float,3> > DGX1SimulatorPlatform::compass_sensor() {
+	return m_compass;
 }
 
-stream::VecGenerator<float,3>* DGX1SimulatorPlatform::gps_sensor() {
+boost::shared_ptr<stream::VecGenerator<float,3> > DGX1SimulatorPlatform::gps_sensor() {
 	throw std::logic_error("GPS not implemented yet on dgx1 platform");
-	return NULL;
+	return boost::shared_ptr<stream::VecGenerator<float,3> >();
 }
 
 Servo* DGX1SimulatorPlatform::tilt_servo() {

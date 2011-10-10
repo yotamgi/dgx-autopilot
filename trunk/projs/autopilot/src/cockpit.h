@@ -10,6 +10,7 @@
 
 #include "interfaces/plain_cockpit.h"
 #include "interfaces/plain_platform.h"
+#include <stream/util/lin_algebra.h>
 
 #include <boost/shared_ptr.hpp>
 
@@ -44,8 +45,8 @@ public:
 private:
 	boost::shared_ptr<NormalPlainPlatform> m_platform;
 
-	boost::shared_ptr<stream::VecGenerator<float,3> > m_gyro_orientation;
-	boost::shared_ptr<stream::VecGenerator<float,3> > m_rest_orientation;
+	boost::shared_ptr<stream::DataGenerator<lin_algebra::matrix_t> > m_gyro_orientation;
+	boost::shared_ptr<stream::DataGenerator<lin_algebra::matrix_t> > m_rest_orientation;
 
 };
 

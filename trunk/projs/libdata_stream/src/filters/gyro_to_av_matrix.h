@@ -14,8 +14,7 @@ class GyroToAVMatrix :
 {
 public:
 
-
-	GyroToAVMatrix(VecGenerator<float,3>* data_gen);
+	GyroToAVMatrix(boost::shared_ptr<VecGenerator<float,3> > data_gen);
 	virtual ~GyroToAVMatrix();
 
 	lin_algebra::matrix_t get_data();

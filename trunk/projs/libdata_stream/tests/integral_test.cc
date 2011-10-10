@@ -62,8 +62,8 @@ private:
 
 TEST(IntegralTest, vec_stress_test) {
 
-	DummyVecGen a;
-	stream::filters::VecIntegralFilter<float,3> integ(&a);
+	boost::shared_ptr<DummyVecGen> a(new DummyVecGen);
+	stream::filters::VecIntegralFilter<float,3> integ(a);
 
 	Timer t;
 
@@ -82,8 +82,9 @@ TEST(IntegralTest, vec_stress_test) {
 
 TEST(IntegralTest, vec_random_test) {
 
-	DummyVecGen a;
-	stream::filters::VecIntegralFilter<float,3> integ(&a);
+	boost::shared_ptr<DummyVecGen> a(new DummyVecGen);
+	stream::filters::VecIntegralFilter<float,3> integ(a);
+
 
 	Timer t;
 
@@ -102,8 +103,8 @@ TEST(IntegralTest, vec_random_test) {
 
 TEST(IntegralTest, stress_test) {
 
-	DummyGen a;
-	stream::filters::IntegralFilter<float> integ(&a, 0.);
+	boost::shared_ptr<DummyGen> a(new DummyGen);
+	stream::filters::IntegralFilter<float> integ(a, 0.);
 
 	Timer t;
 
@@ -120,8 +121,8 @@ TEST(IntegralTest, stress_test) {
 
 TEST(IntegralTest, random_test) {
 
-	DummyGen a;
-	stream::filters::IntegralFilter<float> integ(&a, 0.);
+	boost::shared_ptr<DummyGen> a(new DummyGen);
+	stream::filters::IntegralFilter<float> integ(a, 0.);
 
 	Timer t;
 

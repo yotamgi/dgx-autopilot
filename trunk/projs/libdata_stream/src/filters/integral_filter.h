@@ -24,7 +24,7 @@ namespace filters {
 template <typename data_t>
 class IntegralFilter : public DataFilter<data_t> {
 public:
-	IntegralFilter(DataGenerator<data_t>* data_gen,
+	IntegralFilter(boost::shared_ptr<DataGenerator<data_t> > data_gen,
 			data_t start_val,
 			boost::function<data_t(data_t, data_t)> apply =  std::plus<float>()):
 		DataFilter<data_t>(data_gen),
@@ -58,7 +58,7 @@ template <typename T, size_t N>
 class VecIntegralFilter : public VecFilter<T,N> {
 public:
 
-	VecIntegralFilter(VecGenerator<T,N>* data_gen,
+	VecIntegralFilter(boost::shared_ptr<VecGenerator<T,N> > data_gen,
 			T up_limit = std::numeric_limits<T>::max(),
 			T down_limit = std::numeric_limits<T>::min()):
 		VecFilter<T,N>(data_gen),

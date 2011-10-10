@@ -3,6 +3,7 @@
 #define DATA_FILTER_H_
 
 #include "generators.h"
+#include <boost/shared_ptr.hpp>
 
 namespace stream {
 
@@ -17,14 +18,14 @@ public:
 	/**
 	 * Inits the filter with the DataGenerator object it will filter
 	 */
-	DataFilter(DataGenerator<data_source_t>* generator):m_generator(generator) {}
+	DataFilter(boost::shared_ptr<DataGenerator<data_source_t> > generator):m_generator(generator) {}
 
 protected:
 
 	/**
 	 * The generator that it filters.
 	 */
-	DataGenerator<data_source_t>* m_generator;
+	boost::shared_ptr<DataGenerator<data_source_t> > m_generator;
 };
 
 /**
@@ -36,11 +37,11 @@ class VecFilter : public VecGenerator< T,N >
 public:
 	typedef typename VecGenerator< T,N >::vector_t vector_t;
 
-	VecFilter(VecGenerator<SourceT,SourceN>* generator):m_generator(generator) {}
+	VecFilter(boost::shared_ptr<VecGenerator<SourceT,SourceN> > generator):m_generator(generator) {}
 
 protected:
 
-	VecGenerator<SourceT,SourceN>* m_generator;
+	boost::shared_ptr<VecGenerator<SourceT,SourceN> > m_generator;
 };
 
 } // namespace stream

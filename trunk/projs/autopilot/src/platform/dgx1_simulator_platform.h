@@ -10,13 +10,13 @@ class DGX1SimulatorPlatform : public NormalPlainPlatform {
 public:
 	DGX1SimulatorPlatform(std::string address);
 
-	stream::VecGenerator<float,3>* acc_sensor();
+	boost::shared_ptr<stream::VecGenerator<float,3> > acc_sensor();
 
-	stream::VecGenerator<float,3>* gyro_sensor();
+	boost::shared_ptr<stream::VecGenerator<float,3> > gyro_sensor();
 
-	stream::VecGenerator<float,3>* compass_sensor();
+	boost::shared_ptr<stream::VecGenerator<float,3> > compass_sensor();
 
-	stream::VecGenerator<float,3>* gps_sensor();
+	boost::shared_ptr<stream::VecGenerator<float,3> > gps_sensor();
 
 	Servo* tilt_servo();
 

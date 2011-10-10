@@ -12,21 +12,21 @@ DGX1Platform::DGX1Platform():
 		m_compass(new Hmc5843Compass(2))
 {}
 
-stream::VecGenerator<float,3>* DGX1Platform::acc_sensor() {
-	return m_acc.get();
+boost::shared_ptr<stream::VecGenerator<float,3> > DGX1Platform::acc_sensor() {
+	return m_acc;
 }
 
-stream::VecGenerator<float,3>* DGX1Platform::gyro_sensor() {
-	return m_gyro.get();
+boost::shared_ptr<stream::VecGenerator<float,3> > DGX1Platform::gyro_sensor() {
+	return m_gyro;
 }
 
-stream::VecGenerator<float,3>* DGX1Platform::compass_sensor() {
-	return m_compass.get();
+boost::shared_ptr<stream::VecGenerator<float,3> > DGX1Platform::compass_sensor() {
+	return m_compass;
 }
 
-stream::VecGenerator<float,3>* DGX1Platform::gps_sensor() {
+boost::shared_ptr<stream::VecGenerator<float,3> > DGX1Platform::gps_sensor() {
 	throw std::logic_error("GPS not implemented yet on dgx1 platform");
-	return NULL;
+	return boost::shared_ptr<stream::VecGenerator<float,3> >();
 }
 
 Servo* DGX1Platform::tilt_servo() {

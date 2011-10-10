@@ -3,9 +3,11 @@
 #include <stream/filters/static_filter.h>
 #include <stream/filters/matrix_to_euler_filter.h>
 #include <stream/util/time.h>
-#include "hw/itg3200_gyro.h"
-#include "hw/adxl345_acc.h"
-#include "hw/hmc5843_compass.h"
+#include "platform/hw/itg3200_gyro.h"
+#include "platform/hw/adxl345_acc.h"
+#include "platform/hw/hmc5843_compass.h"
+
+#include <boost/make_shared.hpp>
 
 typedef typename stream::VecGenerator<float,3>::vector_t vector_t;
 
@@ -41,12 +43,15 @@ int main(int argc, char** argv) {
 	a[0] = -1.217; a[1] = -3.966; a[2] = 2.614;
 	b[0] = 1.; b[1] = 1.; b[2] = 1.;
 
-	Itg3200Gyro gyro(2);
-	stream::filters::StaticFilter<float,3> s(&gyro, a, b);
-	stream::filters::GyroToAVMatrix gyro_rot(&s);
-	stream::filters::MatrixToEulerFilter gyro_rot_euler(&gyro_rot);
+	using namespace stream::filters;
+	using namespace boost;
 
-	exporter.register_stream(&gyro_rot_euler, std::string("gyro_test"));
+	shared_ptr<Itg3200Gyro> gyro = make_shared<Itg3200Gyro>(2);
+	shared_ptr<StaticFilter<float,3> > s = make_shared<StaticFilter<float,3> >(gyro, a, b);
+	shared_ptr<GyroToAVMatrix> gyro_rot = make_shared<GyroToAVMatrix>(s);
+	shared_ptr<MatrixToEulerFilter> gyro_rot_euler = make_shared<MatrixToEulerFilter>(gyro_rot);
+
+	exporter.register_stream(gyro_rot_euler.get(), std::string("gyro_test"));
 
 	// accelerometer
 	Adxl345Acc acc(2);
