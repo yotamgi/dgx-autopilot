@@ -14,9 +14,9 @@ namespace autopilot {
 class NormalPlainCockpit {
 public:
 
-	~NormalPlainCockpit();
+	~NormalPlainCockpit() {}
 
-	virtual stream::VecGenerator<float,3>* orientation() = 0;
+	virtual boost::shared_ptr<stream::VecGenerator<float,3> > orientation() = 0;
 
 	virtual stream::DataGenerator<float>* speed() = 0;
 

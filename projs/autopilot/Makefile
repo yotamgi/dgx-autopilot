@@ -1,16 +1,16 @@
 LIBDS_PATH = ../libdata_stream/
 include $(LIBDS_PATH)/Makefile.include
 
-STREAMWATCH_PATH = ../stream_watch
-include $(STREAMWATCH_PATH)/Makefile.include
+STREAM_WATCH_PATH = ../stream_watch
+include $(STREAM_WATCH_PATH)/Makefile.include
 
 LIBDIR = ./lib
 SRCDIR = ./src
 
 CXX = g++
 ARCHIVE = ar
-CXXFLAGS += -g -I$(SRCDIR) -Wall  $(LIBDS_CXXFLAGS) $(STREAMWATCH_CXXFLAGS) -O3
-LDFLAGS += -lboost_thread -L./lib $(LIBDS_LDFLAGS) $(STREAMWATCH_LDFLAGS)
+CXXFLAGS += -g -I$(SRCDIR) -Wall  $(LIBDS_CXXFLAGS) $(STREAM_WATCH_CXXFLAGS) -O3
+LDFLAGS += -lboost_thread -L./lib $(LIBDS_LDFLAGS) $(STREAM_WATCH_LDFLAGS)
 
 AUTOPILIT_OBJS =  $(SRCDIR)/platform/hw/i2c_interface.o	\
 		$(SRCDIR)/platform/hw/itg3200_gyro.o				\
@@ -33,14 +33,14 @@ GTESTS_OBJS=
 all: host device
 
 .PHONY:
-host: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.a sensor_watch_test gtest 
+host: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.a sensor_watch_test cockpit_test gtest  
 
 .PHONY:
-device: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.a sensor_watch_test gtest 
+device: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.a sensor_watch_test cockpit_test gtest 
 
 .PHONY:
 clean:
-	rm -fr $(AUTOPILIT_OBJS) */*/*.o */*.o *.o $(LIBDIR) gtest sensor_watch_test watch_test 
+	rm -fr $(AUTOPILIT_OBJS) */*/*.o */*.o *.o $(LIBDIR) gtest sensor_watch_test watch_test cockpit_test
 
 $(LIBDIR):
 	mkdir $(LIBDIR)
@@ -62,3 +62,6 @@ test: gtest
 
 sensor_watch_test: $(SRCDIR)/sandbox/sensor_watch_test.o $(LIBDIR) $(LIBDIR)/libautopilot.a 
 	$(CXX) $(SRCDIR)/sandbox/sensor_watch_test.o $(LDFLAGS) -lautopilot -o sensor_watch_test
+	
+cockpit_test: $(SRCDIR)/sandbox/cockpit_test.o $(LIBDIR) $(LIBDIR)/libautopilot.a
+	$(CXX) $(SRCDIR)/sandbox/cockpit_test.o $(LDFLAGS) -lautopilot -o cockpit_test
