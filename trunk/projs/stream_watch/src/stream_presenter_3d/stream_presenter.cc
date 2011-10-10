@@ -15,17 +15,15 @@ StreamPresenter::~StreamPresenter()
 }
 
 StreamPresenter::StreamPresenter():
-		m_angle(NULL),
-		m_vec(NULL),
 		m_running(false)
 {
 }
 
-void StreamPresenter::setAngleStream(stream::VecGenerator<float,3>* angle_stream) {
+void StreamPresenter::setAngleStream(boost::shared_ptr<stream::VecGenerator<float,3> > angle_stream) {
 	m_angle = angle_stream;
 }
 
-void StreamPresenter::setVecStream(stream::VecGenerator<float,3>* vec_stream) {
+void StreamPresenter::setVecStream(boost::shared_ptr<stream::VecGenerator<float,3> > vec_stream) {
 	m_vec = vec_stream;
 }
 

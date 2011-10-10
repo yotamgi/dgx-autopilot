@@ -17,10 +17,10 @@ public:
 	StreamExporter();
 	~StreamExporter();
 
-	template <typename T>
-	void register_stream(DataGenerator<T>* stream, std::string stream_name) {
+	template <typename Stream>
+	void register_stream(boost::shared_ptr<Stream> stream, std::string stream_name) {
 		m_exported_streams[stream_name] =
-			boost::shared_ptr<AnyStream>(new SpecificStream<T>(stream)
+			boost::shared_ptr<AnyStream>(new SpecificStream<typename Stream::type>(stream)
 		);
 	}
 
@@ -48,13 +48,13 @@ private:
 	template <typename T>
 	class SpecificStream : public AnyStream {
 	public:
-		SpecificStream(DataGenerator<T>* gen):m_gen(gen) {}
+		SpecificStream(boost::shared_ptr<DataGenerator<T> > gen):m_gen(gen) {}
 
 		void serialize(std::ostream& os) {
 			os << m_gen->get_data();
 		}
 	private:
-		DataGenerator<T>* m_gen;
+		boost::shared_ptr<DataGenerator<T> > m_gen;
 	};
 
 	typedef std::map<std::string, boost::shared_ptr<AnyStream> > stream_map_t;

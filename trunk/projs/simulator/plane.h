@@ -86,15 +86,15 @@ public:
 		vector_t m_data;
 	};
 
-	stream::VecGenerator<float,3>* gyro_gen() { return &m_gyro; }
-	stream::VecGenerator<float,3>* acc_gen() { return &m_acc; }
-	stream::VecGenerator<float,3>* compass_gen() { return &m_compass; }
+	boost::shared_ptr<stream::VecGenerator<float,3> > gyro_gen() { return m_gyro; }
+	boost::shared_ptr<stream::VecGenerator<float,3> > acc_gen() { return m_acc; }
+	boost::shared_ptr<stream::VecGenerator<float,3> > compass_gen() { return m_compass; }
 
 private:
 
-	SensorGenerator m_gyro;
-	SensorGenerator m_acc;
-	SensorGenerator m_compass;
+	boost::shared_ptr<SensorGenerator> m_gyro;
+	boost::shared_ptr<SensorGenerator> m_acc;
+	boost::shared_ptr<SensorGenerator> m_compass;
 
 	/**
 	 * Returns the angle_diff for this frame

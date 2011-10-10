@@ -28,15 +28,15 @@ private:
 
 int main(int argc, char** argv) {
 
-	SimpleGen gen;
+	boost::shared_ptr<SimpleGen> gen(new SimpleGen);
 
 	if (argc == 1) {
 		StreamPresenter s;
-		s.setAngleStream(&gen);
+		s.setAngleStream(gen);
 		s.run(false);
 	} else if (argc == 2 && std::string(argv[1]) == std::string("--net")) {
 		stream::StreamExporter exp;
-		exp.register_stream(&gen, "dummy");
+		exp.register_stream(gen, "dummy");
 		std::cout << "Running..." << std::endl;
 		exp.run();
 	} else {

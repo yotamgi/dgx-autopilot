@@ -23,6 +23,9 @@ Plane::Plane(irr::IrrlichtDevice* device,
 		irr::core::vector3df start_pos,
 		const PlainParams plane_params):
 		FlyingObject(device),
+		m_gyro(new SensorGenerator),
+		m_acc(new SensorGenerator),
+		m_compass(new SensorGenerator),
 		m_direction(irr::core::vector3df(0.0f, 0.0f, -1.0f)),
 		m_params(plane_params)
 {
@@ -76,7 +79,7 @@ void Plane::update(float time_delta) {
 	gyro_data[0] = angle_vel.X;
 	gyro_data[1] = angle_vel.Y;
 	gyro_data[2] = angle_vel.Z;
-	m_gyro.set_data(gyro_data);
+	m_gyro->set_data(gyro_data);
 
 	// update the accelerometer
 	SensorGenerator::vector_t acc_data;
@@ -88,7 +91,7 @@ void Plane::update(float time_delta) {
 	acc_data[0] = acc.X;
 	acc_data[1] = acc.Y;
 	acc_data[2] = acc.Z;
-	m_acc.set_data(acc_data);
+	m_acc->set_data(acc_data);
 
 	// update the compass
 	SensorGenerator::vector_t compass_data;
@@ -100,7 +103,7 @@ void Plane::update(float time_delta) {
 	compass_data[0] = north.X;
 	compass_data[1] = north.Y;
 	compass_data[2] = north.Z;
-	m_compass.set_data(compass_data);
+	m_compass->set_data(compass_data);
 
 	// update the position by the dirction value
 	pos  += dir*time_delta*m_params.get_speed();
