@@ -52,16 +52,20 @@ Cockpit::Cockpit(boost::shared_ptr<NormalPlainPlatform> platform):
 	);
 }
 
-stream::VecGenerator<float,3>* Cockpit::orientation_gyro() {
-	return (stream::VecGenerator<float,3>*)new stream::filters::MatrixToEulerFilter(m_gyro_orientation);
+boost::shared_ptr<stream::VecGenerator<float,3> > Cockpit::orientation_gyro() {
+	return boost::shared_ptr<stream::VecGenerator<float,3> >(
+			(stream::VecGenerator<float,3>*)new stream::filters::MatrixToEulerFilter(m_gyro_orientation)
+	);
 }
-stream::VecGenerator<float,3>* Cockpit::orientation_rest() {
-	return (stream::VecGenerator<float,3>*)new stream::filters::MatrixToEulerFilter(m_rest_orientation);
+boost::shared_ptr<stream::VecGenerator<float,3> > Cockpit::orientation_rest() {
+	return boost::shared_ptr<stream::VecGenerator<float,3> >(
+			(stream::VecGenerator<float,3>*)new stream::filters::MatrixToEulerFilter(m_rest_orientation)
+	);
 }
 
-stream::VecGenerator<float,3>* Cockpit::orientation() {
+boost::shared_ptr<stream::VecGenerator<float,3> > Cockpit::orientation() {
 	throw std::logic_error("orientation not implemented yet on Cockpit");
-	return NULL;
+	return boost::shared_ptr<stream::VecGenerator<float,3> >();
 }
 
 stream::DataGenerator<float>* Cockpit::speed() {

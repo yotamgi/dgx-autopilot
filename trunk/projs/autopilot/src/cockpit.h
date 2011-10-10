@@ -26,7 +26,7 @@ public:
 
 	/* NormalPlainCockpit Implementation */
 
-	stream::VecGenerator<float,3>* orientation();
+	boost::shared_ptr<stream::VecGenerator<float,3> > orientation();
 
 	stream::DataGenerator<float>* speed();
 
@@ -39,8 +39,8 @@ public:
 	Servo* gas_servo();
 
 	/* Extending Fcuntions */
-	stream::VecGenerator<float,3>* orientation_gyro();
-	stream::VecGenerator<float,3>* orientation_rest();
+	boost::shared_ptr<stream::VecGenerator<float,3> > orientation_gyro();
+	boost::shared_ptr<stream::VecGenerator<float,3> > orientation_rest();
 
 private:
 	boost::shared_ptr<NormalPlainPlatform> m_platform;

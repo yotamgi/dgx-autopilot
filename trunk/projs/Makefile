@@ -8,24 +8,24 @@ export CXXFLAGS
 .PHONY:
 all:
 	make -C  libdata_stream/  all
-	make -C  autopilot        all
 	make -C  simulator/       all
 	make -C  stream_watch/    all
+	make -C  autopilot        all
 .PHONY:
 host:
 	make -C  libdata_stream/  host
-	make -C  autopilot        host
 	make -C  simulator/       host
 	make -C  stream_watch/    host
+	make -C  autopilot        host
 .PHONY:
 device:
 	make -C  libdata_stream/  device
-	make -C  autopilot        device
 	make -C  simulator/       device
 	make -C  stream_watch/    device
+	make -C  autopilot        device
 .PHONY:
 clean:
 	make -C  libdata_stream/  clean
-	make -C  autopilot        clean
 	make -C  simulator/       clean
 	make -C  stream_watch/    clean
+	make -C  autopilot        clean
