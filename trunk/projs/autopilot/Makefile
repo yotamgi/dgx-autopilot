@@ -10,7 +10,7 @@ SRCDIR = ./src
 CXX = g++
 ARCHIVE = ar
 CXXFLAGS += -g -I$(SRCDIR) -Wall  $(LIBDS_CXXFLAGS) $(STREAM_WATCH_CXXFLAGS) -O3
-LDFLAGS += -lboost_thread -L./lib $(LIBDS_LDFLAGS) $(STREAM_WATCH_LDFLAGS)
+LDFLAGS += -lboost_thread -L./lib $(LIBDS_LDFLAGS) $(STREAM_WATCH_LDFLAGS) -Wl,--rpath,$(LIBDS_LIBDIRS):$(STREAM_WATCH_LIBDIRS)
 
 AUTOPILIT_OBJS =  $(SRCDIR)/platform/hw/i2c_interface.o	\
 		$(SRCDIR)/platform/hw/itg3200_gyro.o				\
@@ -47,7 +47,7 @@ $(LIBDIR):
 
 ## real targets ###############################################################
 
-.cc.o:
+.cc.o: Makefile
 	$(CXX) -c $(CXXFLAGS) $<  -o $*.o
 
 $(LIBDIR)/libautopilot.a: $(AUTOPILIT_OBJS)
