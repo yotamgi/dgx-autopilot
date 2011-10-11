@@ -10,7 +10,7 @@ LDFLAGS += -L/usr/X11R6/lib -lGL -lXxf86vm -lXext -lX11 -lIrrlicht -lboost_threa
 LIBDIR=./lib
 BINDIR=./bin
 SRCDIR=./src
-MEDIADIR=./media
+MEDIADIR=`pwd`/media
 
 DUMMY_OBJS = ./src/dummy_client/dummy.o
 PRESENTER_OBJS = ./src/stream_presenter_3d/main.o
@@ -28,7 +28,7 @@ $(BINDIR):
 $(LIBDIR):
 	mkdir $(LIBDIR)
 
-.cc.o:
+.cc.o: Makefile
 	$(CXX) -c $(CXXFLAGS) $<  -o $*.o
 
 $(SRCDIR)/stream_presenter_3d/stream_presenter.o: $(SRCDIR)/stream_presenter_3d/stream_presenter.cc
