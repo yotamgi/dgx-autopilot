@@ -122,40 +122,11 @@ int main()
 
 	simulator::Plane p(device, core::vector3df(0.0f, 0.0f, 0.0f), plane_params);
 
+	// export all the sensors
 	stream::StreamExporter exporter;
-	exporter.register_stream(
-//			new stream::filters::MatrixToEulerFilter(
-//				new stream::filters::IntegralFilter<lin_algebra::matrix_t>(
-//					new stream::filters::GyroToAVMatrix(p.gyro_gen()),
-//					(lin_algebra::matrix_t)lin_algebra::identity_matrix<float>(3),
-//					update_matrix
-//				)
-//			),
-			p.gyro_gen(),
-			"simulator_gyro"
-	);
-	simulator::Plane::SensorGenerator::vector_t vec;
-	vec[0] = 1; vec[1] = 1; vec[2] = 0;
-	exporter.register_stream(
-//		new stream::filters::MatrixToEulerFilter(
-//			new stream::filters::AccCompassRotation(p.acc_gen(), p.compass_gen(), vec)
-//		),
-		p.acc_gen(),
-		"simulator_acc"
-	);
-
-	exporter.register_stream(
-//		new stream::filters::MatrixToEulerFilter(
-//			new stream::filters::AccCompassRotation(p.acc_gen(), p.compass_gen(), vec)
-//		),
-		p.compass_gen(),
-		"simulator_compass"
-	);
-
+	exporter.register_stream(p.gyro_gen(), "simulator_gyro");
 	exporter.register_stream(p.acc_gen(), "simulator_acc");
 	exporter.register_stream(p.compass_gen(), "simulator_compass");
-
-
 	boost::thread t(&stream::StreamExporter::run, &exporter);
 
     // add terrain scene node
