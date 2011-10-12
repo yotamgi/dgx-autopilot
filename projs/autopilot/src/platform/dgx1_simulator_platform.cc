@@ -1,16 +1,12 @@
 #include "dgx1_simulator_platform.h"
-#include <stream/stream_importer.h>
-
 
 namespace autopilot {
 
-DGX1SimulatorPlatform::DGX1SimulatorPlatform(std::string address)
+DGX1SimulatorPlatform::DGX1SimulatorPlatform(std::string address):m_importer(address)
 {
-	stream::StreamImporter importer(address);
-
-	m_gyro = importer.import_stream<stream::VecGenerator<float,3> >("simulator_gyro");
-	m_acc = importer.import_stream<stream::VecGenerator<float,3> >("simulator_acc");
-	m_compass = importer.import_stream<stream::VecGenerator<float,3> >("simulator_compass");
+	m_gyro = m_importer.import_stream<stream::VecGenerator<float,3> >("simulator_gyro");
+	m_acc = m_importer.import_stream<stream::VecGenerator<float,3> >("simulator_acc");
+	m_compass = m_importer.import_stream<stream::VecGenerator<float,3> >("simulator_compass");
 }
 
 boost::shared_ptr<stream::VecGenerator<float,3> > DGX1SimulatorPlatform::acc_sensor() {

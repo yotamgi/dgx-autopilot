@@ -2,6 +2,7 @@
 #define DGX1_SIMULATOR_PLATFORM_H_
 
 #include "interfaces/plain_platform.h"
+#include <stream/stream_importer.h>
 #include <boost/shared_ptr.hpp>
 
 namespace autopilot {
@@ -30,6 +31,8 @@ private:
 	boost::shared_ptr<stream::VecGenerator<float,3 > > m_acc;
 	boost::shared_ptr<stream::VecGenerator<float,3 > > m_gyro;
 	boost::shared_ptr<stream::VecGenerator<float,3 > > m_compass;
+
+	stream::StreamImporter m_importer;
 
 };
 
