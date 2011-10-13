@@ -101,7 +101,7 @@ void Plane::update_sensors(float time_delta) {
 	SensorGenerator::vector_t acc_data;
 	irr::core::vector3df g(0, -10., 0);
 	trans.rotateVect(g);
-	g.normalize();
+	g.normalize(); g*=10.;
 	irr::core::vector3df acc = g + 4.*(m_priv_dir - dir)/time_delta;
 	acc_data[0] = acc.X;
 	acc_data[1] = acc.Y;
