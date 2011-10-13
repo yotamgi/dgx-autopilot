@@ -70,25 +70,6 @@ private:
 	bool KeyIsDown[KEY_KEY_CODES_COUNT];
 };
 
-lin_algebra::matrix_t update_matrix(const lin_algebra::matrix_t& m1, const lin_algebra::matrix_t& m2) {
-
-	lin_algebra::matrix_t rot = m1 + m1 * m2;
-
-	// maintain the matrix ortho-normal
-	lin_algebra::mat_col col0 = lin_algebra::mat_col(rot, 0);
-	lin_algebra::mat_col col1 = lin_algebra::mat_col(rot, 1);
-	lin_algebra::mat_col col2 = lin_algebra::mat_col(rot, 2);
-
-	col2 = lin_algebra::cross_product(col0, col1);
-	col0 = lin_algebra::cross_product(col1, col2);
-
-	lin_algebra::normalize(col0);
-	lin_algebra::normalize(col1);
-	lin_algebra::normalize(col2);
-
-	return rot;
-}
-
 /*
 The event receiver for keeping the pressed keys is ready, the actual responses
 will be made inside the render loop, right before drawing the scene. So lets

@@ -92,6 +92,9 @@ public:
 
 private:
 
+	void update_sensors(float time_delta);
+	irr::core::vector3df calc_angle_vel() const;
+
 	boost::shared_ptr<SensorGenerator> m_gyro;
 	boost::shared_ptr<SensorGenerator> m_acc;
 	boost::shared_ptr<SensorGenerator> m_compass;
@@ -101,7 +104,6 @@ private:
 	 * It uses the data from the servos and various other things.
 	 * It is responsible to make it realistic.
 	 */
-	irr::core::vector3df calc_angle_vel() const;
 
 	irr::core::vector3df m_direction;
 	irr::core::vector3df m_priv_dir;

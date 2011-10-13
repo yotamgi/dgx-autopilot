@@ -69,10 +69,26 @@ void Plane::update(float time_delta) {
 	transformation *= rot_mat;
 
 	// update the direction by the rotation values
-	irr::core::vector3df rot = transformation.getRotationDegrees();
-	dir.rotateYZBy(rot.X);
-	dir.rotateXZBy(-1.*rot.Y);
-	dir.rotateXYBy(rot.Z);
+	transformation.rotateVect(dir);
+	dir.normalize();
+
+	// update the position by the dirction value
+	pos  += dir*time_delta*m_params.get_speed();
+
+	// Update the object with the new data
+	m_object->setRotation(transformation.getRotationDegrees());
+	m_object->setPosition(pos);
+
+	update_sensors(time_delta);
+}
+
+void Plane::update_sensors(float time_delta) {
+
+	// calculate some data
+	irr::core::vector3df angle_vel = calc_angle_vel();
+	irr::core::matrix4 trans = m_object->getAbsoluteTransformation();
+	irr::core::vector3df dir;
+	trans.rotateVect(dir, m_direction);
 
 	// update the gyro
 	SensorGenerator::vector_t gyro_data;
@@ -84,9 +100,8 @@ void Plane::update(float time_delta) {
 	// update the accelerometer
 	SensorGenerator::vector_t acc_data;
 	irr::core::vector3df g(0, -10., 0);
-	g.rotateYZBy(rot.X);
-	g.rotateXZBy(-1.*rot.Y);
-	g.rotateXYBy(rot.Z);
+	trans.rotateVect(g);
+	g.normalize();
 	irr::core::vector3df acc = g + 4.*(m_priv_dir - dir)/time_delta;
 	acc_data[0] = acc.X;
 	acc_data[1] = acc.Y;
@@ -96,24 +111,15 @@ void Plane::update(float time_delta) {
 	// update the compass
 	SensorGenerator::vector_t compass_data;
 	irr::core::vector3df north(1., 1., 0);
+	trans.rotateVect(north);
 	north.normalize();
-	north.rotateYZBy(rot.X);
-	north.rotateXZBy(-1.*rot.Y);
-	north.rotateXYBy(rot.Z);
 	compass_data[0] = north.X;
 	compass_data[1] = north.Y;
 	compass_data[2] = north.Z;
 	m_compass->set_data(compass_data);
 
-	// update the position by the dirction value
-	pos  += dir*time_delta*m_params.get_speed();
-
 	m_priv_dir = dir;
 
-	// tell the object all the info
-	m_object->setRotation(transformation.getRotationDegrees());
-	m_object->setPosition(pos);
-	m_object->setRotation(rot);
 }
 
 void Plane::set_pitch_servo(float percentage) {
