@@ -41,12 +41,15 @@ public:
 	/* Extending Fcuntions */
 	boost::shared_ptr<stream::VecGenerator<float,3> > orientation_gyro();
 	boost::shared_ptr<stream::VecGenerator<float,3> > orientation_rest();
+	boost::shared_ptr<stream::DataGenerator<float> > rest_reliablity();
 
 private:
 	boost::shared_ptr<NormalPlainPlatform> m_platform;
 
 	boost::shared_ptr<stream::DataGenerator<lin_algebra::matrix_t> > m_gyro_orientation;
 	boost::shared_ptr<stream::DataGenerator<lin_algebra::matrix_t> > m_rest_orientation;
+
+	boost::shared_ptr<stream::DataGenerator<float> > m_rest_reliability;
 
 };
 
