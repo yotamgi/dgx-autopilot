@@ -17,8 +17,8 @@ public:
 	StreamPresenter();
 	~StreamPresenter();
 
-	void addAngleStream(stream3ptr angle_stream);
-	void addVecStream(stream3ptr vec_stream);
+	void addAngleStream(stream3ptr angle_stream, irr::core::vector3df pos = irr::core::vector3df(0., 0., 0.));
+	void addVecStream(stream3ptr vec_stream, irr::core::vector3df pos = irr::core::vector3df(0., 0., 0.));
 
 	void run(bool open_thread=true);
 

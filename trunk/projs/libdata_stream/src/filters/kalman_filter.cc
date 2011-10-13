@@ -19,7 +19,7 @@ data_t KalmanFilter<data_t>::get_data() {
 	data_t observed  = m_obserbed->get_data();
 	float  reliable  = m_reliable->get_data();
 
-	m_state = (1.-reliable)*predicted + reliable*observed;
+	m_state = (1.-reliable)*predicted + reliable*(m_state - observed);
 
 	return m_state;
 }

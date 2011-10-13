@@ -57,15 +57,10 @@ int main(int argc, char** argv) {
 
 	if (present_local) {
 		StreamPresenter presenter;
-		char c;
-		std::cout << "gyro(g) or rest(r)? ";
-		std::cin >> &c;
-		if (c == 'g') {
-			presenter.addAngleStream(cockpit.orientation_gyro());
-		} else if (c == 'r') {
-			presenter.addAngleStream(cockpit.orientation_rest());
-		}
-		std::cout << std::endl;
+		presenter.addAngleStream(cockpit.orientation_gyro(), irr::core::vector3df(-10., 0., 0.));
+		presenter.addAngleStream(cockpit.orientation_rest(), irr::core::vector3df(10., 0., 0.));
+		presenter.addVecStream(platform->acc_sensor(), irr::core::vector3df(10., 0., 0.));
+		presenter.addVecStream(platform->compass_sensor(), irr::core::vector3df(10., 0., 0.));
 		presenter.run(false);
 	} else {
 		stream::StreamExporter exp;

@@ -20,15 +20,15 @@ StreamPresenter::StreamPresenter():
 {
 }
 
-void StreamPresenter::addAngleStream(stream3ptr angle_stream) {
+void StreamPresenter::addAngleStream(stream3ptr angle_stream, irr::core::vector3df pos) {
 	m_angles.push_back(boost::shared_ptr<AnglePresenter>(
-			new AnglePresenter(angle_stream, core::vector3df(0.f, 0.f, 30.f))
+			new AnglePresenter(angle_stream, pos)
 	));
 }
 
-void StreamPresenter::addVecStream(stream3ptr vec_stream) {
+void StreamPresenter::addVecStream(stream3ptr vec_stream, irr::core::vector3df pos) {
 	m_vecs.push_back(boost::shared_ptr<VecPresenter>(
-			new VecPresenter(vec_stream, core::vector3df(0.f, 0.f, 30.f))
+			new VecPresenter(vec_stream, pos)
 	));
 }
 
@@ -88,7 +88,8 @@ void StreamPresenter::run(bool open_thread) {
 		To be able to look at and move around in this scene, we create a first
 		person shooter style camera and make the mouse cursor invisible.
 		*/
-		smgr->addCameraSceneNodeFPS();
+		irr::scene::ISceneNode* camera = smgr->addCameraSceneNodeFPS();
+		camera->setPosition(irr::core::vector3df(0., 0., -30.));
 		m_device->getCursorControl()->setVisible(false);
 
 
@@ -100,11 +101,11 @@ void StreamPresenter::run(bool open_thread) {
 
 			m_device->getVideoDriver()->beginScene(true, true, video::SColor(255,113,113,133));
 
-			BOOST_FOREACH(boost::shared_ptr<AnglePresenter> angle, m_angles) {
-				angle->draw(m_device);
-			}
 			BOOST_FOREACH(boost::shared_ptr<VecPresenter> vec, m_vecs) {
 				vec->draw(m_device);
+			}
+			BOOST_FOREACH(boost::shared_ptr<AnglePresenter> angle, m_angles) {
+				angle->draw(m_device);
 			}
 
 			m_device->getSceneManager()->drawAll(); // draw the 3d scene
@@ -197,6 +198,7 @@ void StreamPresenter::VecPresenter::draw(irr::IrrlichtDevice* m_device) {
 //
 //	m_object->setRotation(angles);
 //	m_object->setScale(irr::core::vector3df(m_scale.X, m_scale.Y*vec_len, m_scale.Z));
+	m_device->getVideoDriver()->setTransform(video::ETS_WORLD, core::IdentityMatrix);
 	m_device->getVideoDriver()->draw3DLine(m_pos, m_pos + vec*10.);
 }
 
