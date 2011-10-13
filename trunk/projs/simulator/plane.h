@@ -119,6 +119,7 @@ private:
 	servo_states m_servos;
 
 	PlainParams m_params;
+	irr::core::vector3df m_gyro_drift;
 
 };
 
