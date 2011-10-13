@@ -61,9 +61,9 @@ int main(int argc, char** argv) {
 		std::cout << "gyro(g) or rest(r)? ";
 		std::cin >> &c;
 		if (c == 'g') {
-			presenter.setAngleStream(cockpit.orientation_gyro());
+			presenter.addAngleStream(cockpit.orientation_gyro());
 		} else if (c == 'r') {
-			presenter.setAngleStream(cockpit.orientation_rest());
+			presenter.addAngleStream(cockpit.orientation_rest());
 		}
 		std::cout << std::endl;
 		presenter.run(false);

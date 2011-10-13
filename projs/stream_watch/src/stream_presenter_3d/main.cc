@@ -34,9 +34,9 @@ int main(int argc, char** argv) {
 	//std::cout << chosen->get_data() << std::endl;
 
 	if (c == 'a') {
-		presenter.setAngleStream(chosen);
+		presenter.addAngleStream(chosen);
 	} else if (c == 'v') {
-		presenter.setVecStream(chosen);
+		presenter.addVecStream(chosen);
 	}
 
 	presenter.run(false);

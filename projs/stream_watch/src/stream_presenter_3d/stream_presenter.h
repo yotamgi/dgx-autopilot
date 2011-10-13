@@ -7,14 +7,18 @@
 #include <boost/thread.hpp>
 #include <stdexcept>
 #include <iostream>
+#include <vector>
 
 class StreamPresenter {
 public:
+	typedef stream::VecGenerator<float,3> stream3;
+	typedef boost::shared_ptr<stream::VecGenerator<float,3> > stream3ptr;
+
 	StreamPresenter();
 	~StreamPresenter();
 
-	void setAngleStream(boost::shared_ptr<stream::VecGenerator<float,3> > angle_stream);
-	void setVecStream(boost::shared_ptr<stream::VecGenerator<float,3> > vec_stream);
+	void addAngleStream(stream3ptr angle_stream);
+	void addVecStream(stream3ptr vec_stream);
 
 	void run(bool open_thread=true);
 
@@ -22,14 +26,40 @@ public:
 
 private:
 
-	irr::IrrlichtDevice* m_device;
+	class AnglePresenter {
+	public:
+		AnglePresenter(stream3ptr angle_stream, irr::core::vector3df pos);
 
-	irr::scene::ISceneNode * m_object;
+		void initalize(irr::IrrlichtDevice* m_device);
+		void draw(irr::IrrlichtDevice* m_device);
+
+	private:
+		stream3ptr m_angle_stream;
+		irr::core::vector3df m_pos;
+		irr::scene::ISceneNode * m_object;
+	};
+
+	class VecPresenter {
+	public:
+		VecPresenter(stream3ptr vec_stream, irr::core::vector3df pos);
+
+		void initalize(irr::IrrlichtDevice* m_device);
+		void draw(irr::IrrlichtDevice* m_device);
+
+	private:
+		stream3ptr m_vec_stream;
+		irr::core::vector3df m_pos;
+		irr::scene::ISceneNode * m_object;
+		irr::core::vector3df m_scale;
+	};
+
+
+	irr::IrrlichtDevice* m_device;
 
 	boost::shared_ptr<boost::thread> m_thread;
 
-	boost::shared_ptr<stream::VecGenerator<float,3> > m_angle;
-	boost::shared_ptr<stream::VecGenerator<float,3> > m_vec;
+	std::vector<boost::shared_ptr<AnglePresenter> > m_angles;
+	std::vector<boost::shared_ptr<VecPresenter> > m_vecs;
 
 	volatile bool m_running;
 };

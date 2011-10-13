@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
 
 	if (argc == 1) {
 		StreamPresenter s;
-		s.setAngleStream(gen);
+		s.addAngleStream(gen);
 		s.run(false);
 	} else if (argc == 2 && std::string(argv[1]) == std::string("--net")) {
 		stream::StreamExporter exp;
