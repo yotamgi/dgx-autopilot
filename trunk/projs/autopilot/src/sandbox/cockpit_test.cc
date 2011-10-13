@@ -58,12 +58,15 @@ int main(int argc, char** argv) {
 	if (present_local) {
 		StreamPresenter presenter;
 		// the left one
-		presenter.addAngleStream(cockpit.orientation_gyro(), irr::core::vector3df(-10., 0., 0.));
+		presenter.addAngleStream(cockpit.orientation_gyro(), irr::core::vector3df(-20., 0., 0.));
+
+		// the mid one
+		presenter.addAngleStream(cockpit.orientation_rest(), irr::core::vector3df(0., 0., 0.));
+		presenter.addVecStream(platform->acc_sensor(), irr::core::vector3df(0., 0., 0.));
+		presenter.addVecStream(platform->compass_sensor(), irr::core::vector3df(0., 0., 0.));
 
 		// the right one
-		presenter.addAngleStream(cockpit.orientation_rest(), irr::core::vector3df(10., 0., 0.));
-		presenter.addVecStream(platform->acc_sensor(), irr::core::vector3df(10., 0., 0.));
-		presenter.addVecStream(platform->compass_sensor(), irr::core::vector3df(10., 0., 0.));
+		presenter.addAngleStream(cockpit.orientation(), irr::core::vector3df(20., 0., 0.));
 
 		// the reliable stream
 		presenter.addSizeStream(cockpit.rest_reliablity());

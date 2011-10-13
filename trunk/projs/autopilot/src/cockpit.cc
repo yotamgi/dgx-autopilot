@@ -4,6 +4,7 @@
 #include <stream/filters/matrix_to_euler_filter.h>
 #include <stream/filters/acc_compass_rot.h>
 #include <stream/filters/gyro_to_av_matrix.h>
+#include <stream/filters/kalman_filter.h>
 #include <boost/make_shared.hpp>
 
 namespace autopilot {
@@ -50,9 +51,18 @@ Cockpit::Cockpit(boost::shared_ptr<NormalPlainPlatform> platform):
 		m_platform->compass_sensor(),
 		expected_north
 	);
-
 	m_rest_orientation = acc_compass;
 	m_rest_reliability = acc_compass->reliable_stream();
+
+	m_orientation = boost::make_shared<filter::KalmanFilter<lin_algebra::matrix_t> >(
+			boost::make_shared<filter::GyroToAVMatrix>(
+				m_platform->gyro_sensor()
+			),
+			m_rest_orientation,
+			m_rest_reliability,
+			(lin_algebra::matrix_t)lin_algebra::identity_matrix<float>(3),
+			update_matrix
+	);
 }
 
 boost::shared_ptr<stream::VecGenerator<float,3> > Cockpit::orientation_gyro() {
@@ -67,8 +77,9 @@ boost::shared_ptr<stream::VecGenerator<float,3> > Cockpit::orientation_rest() {
 }
 
 boost::shared_ptr<stream::VecGenerator<float,3> > Cockpit::orientation() {
-	throw std::logic_error("orientation not implemented yet on Cockpit");
-	return boost::shared_ptr<stream::VecGenerator<float,3> >();
+	return boost::shared_ptr<stream::VecGenerator<float,3> >(
+			(stream::VecGenerator<float,3>*)new stream::filters::MatrixToEulerFilter(m_orientation)
+	);
 }
 
 boost::shared_ptr<stream::DataGenerator<float> > Cockpit::rest_reliablity() {
