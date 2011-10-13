@@ -32,6 +32,16 @@ void StreamPresenter::addVecStream(stream3ptr vec_stream, irr::core::vector3df p
 	));
 }
 
+void StreamPresenter::addSizeStream(streamfptr size_stream,
+		irr::core::vector2df scale,
+		irr::core::vector2df pos)
+{
+	m_sizes.push_back(boost::shared_ptr<SizePresenter>(
+			new SizePresenter(size_stream, pos, scale)
+	));
+}
+
+
 
 void StreamPresenter::run(bool open_thread) {
 
@@ -79,9 +89,11 @@ void StreamPresenter::run(bool open_thread) {
 		BOOST_FOREACH(boost::shared_ptr<AnglePresenter> angle, m_angles) {
 			angle->initalize(m_device);
 		}
-
 		BOOST_FOREACH(boost::shared_ptr<VecPresenter> vec, m_vecs) {
 			vec->initalize(m_device);
+		}
+		BOOST_FOREACH(boost::shared_ptr<SizePresenter> size, m_sizes) {
+			size->initalize(m_device);
 		}
 
 		/*
@@ -101,16 +113,18 @@ void StreamPresenter::run(bool open_thread) {
 
 			m_device->getVideoDriver()->beginScene(true, true, video::SColor(255,113,113,133));
 
+			m_device->getSceneManager()->drawAll(); // draw the 3d scene
+			m_device->getGUIEnvironment()->drawAll(); // draw the gui environment (the logo)
+
 			BOOST_FOREACH(boost::shared_ptr<VecPresenter> vec, m_vecs) {
 				vec->draw(m_device);
 			}
 			BOOST_FOREACH(boost::shared_ptr<AnglePresenter> angle, m_angles) {
 				angle->draw(m_device);
 			}
-
-			m_device->getSceneManager()->drawAll(); // draw the 3d scene
-			m_device->getGUIEnvironment()->drawAll(); // draw the gui environment (the logo)
-
+			BOOST_FOREACH(boost::shared_ptr<SizePresenter> size, m_sizes) {
+				size->draw(m_device);
+			}
 
 
 			m_device->getVideoDriver()->endScene();
@@ -202,3 +216,22 @@ void StreamPresenter::VecPresenter::draw(irr::IrrlichtDevice* m_device) {
 	m_device->getVideoDriver()->draw3DLine(m_pos, m_pos + vec*10.);
 }
 
+StreamPresenter::SizePresenter::SizePresenter(StreamPresenter::streamfptr size_stream,
+		irr::core::vector2df pos,
+		irr::core::vector2df scale):
+	m_size_stream(size_stream),
+	m_pos(pos),
+	m_scale(scale.X * 25., scale.Y * 100.)
+{}
+
+void StreamPresenter::SizePresenter::initalize(irr::IrrlichtDevice* m_device) {
+}
+
+void StreamPresenter::SizePresenter::draw(irr::IrrlichtDevice* m_device) {
+	float size = m_size_stream->get_data();
+
+	m_device->getVideoDriver()->draw2DRectangle(video::SColor( 255, 0, 100, 150 ),
+			irr::core::rect<int32_t>(m_pos.X, 470 - (m_pos.Y + size*m_scale.Y),
+					(m_pos.X + m_scale.X), 470 - m_pos.Y)
+	);
+}
