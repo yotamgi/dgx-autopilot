@@ -1,5 +1,6 @@
 #include "stream_presenter.h"
 #include <iostream>
+#include <boost/foreach.hpp>
 
 #ifndef MEDIA_DIR
 #error "MEDIA_DIR macro must be defined and contain the media dir path"
@@ -19,12 +20,16 @@ StreamPresenter::StreamPresenter():
 {
 }
 
-void StreamPresenter::setAngleStream(boost::shared_ptr<stream::VecGenerator<float,3> > angle_stream) {
-	m_angle = angle_stream;
+void StreamPresenter::addAngleStream(stream3ptr angle_stream) {
+	m_angles.push_back(boost::shared_ptr<AnglePresenter>(
+			new AnglePresenter(angle_stream, core::vector3df(0.f, 0.f, 30.f))
+	));
 }
 
-void StreamPresenter::setVecStream(boost::shared_ptr<stream::VecGenerator<float,3> > vec_stream) {
-	m_vec = vec_stream;
+void StreamPresenter::addVecStream(stream3ptr vec_stream) {
+	m_vecs.push_back(boost::shared_ptr<VecPresenter>(
+			new VecPresenter(vec_stream, core::vector3df(0.f, 0.f, 30.f))
+	));
 }
 
 
@@ -44,17 +49,6 @@ void StreamPresenter::run(bool open_thread) {
 
 		video::IVideoDriver* driver = m_device->getVideoDriver();
 		scene::ISceneManager* smgr = m_device->getSceneManager();
-
-		// initalize the meshs
-		m_object = smgr->addMeshSceneNode(smgr->getMesh(MEDIA_DIR "/F16_Thuderbirds.x"));
-		if (!m_object) {
-			throw std::runtime_error("Could not load the plane mesh");
-		}
-
-		m_object->setPosition(core::vector3df(0.f, 0.f, 30.f));
-		m_object->setScale(irr::core::vector3df(10.0f, 10.0f, 10.0f));
-		m_object->setMaterialTexture(0, m_device->getVideoDriver()->getTexture(MEDIA_DIR "/F16_Thuderbirds.bmp"));
-		m_object->setMaterialFlag(irr::video::EMF_LIGHTING, false);
 
 		// add terrain scene node
 		scene::ITerrainSceneNode* terrain = smgr->addTerrainSceneNode(
@@ -81,6 +75,14 @@ void StreamPresenter::run(bool open_thread) {
 
 		terrain->scaleTexture(1.0f, 20.0f);
 
+		// Initalize the presenters
+		BOOST_FOREACH(boost::shared_ptr<AnglePresenter> angle, m_angles) {
+			angle->initalize(m_device);
+		}
+
+		BOOST_FOREACH(boost::shared_ptr<VecPresenter> vec, m_vecs) {
+			vec->initalize(m_device);
+		}
 
 		/*
 		To be able to look at and move around in this scene, we create a first
@@ -95,34 +97,20 @@ void StreamPresenter::run(bool open_thread) {
 
 		while(m_device->run() && m_running)
 		{
-			// draw the angle
-			if (m_angle) {
-				// set the rotation object
-				irr::core::matrix4 rotx, roty, rotz;
-				stream::VecGenerator<float,3>::vector_t curr_angle = m_angle->get_data();
-				rotx.setRotationDegrees(core::vector3df(curr_angle[0], 0., 0.));
-				roty.setRotationDegrees(core::vector3df(0., curr_angle[1], 0.));
-				rotz.setRotationDegrees(core::vector3df(0., 0., curr_angle[2]));
-
-				irr::core::matrix4 trans = roty * rotx * rotz;
-				m_object->setRotation(trans.getRotationDegrees());
-
-				m_object->setVisible(true);
-			} else {
-				m_object->setVisible(false);
-			}
 
 			m_device->getVideoDriver()->beginScene(true, true, video::SColor(255,113,113,133));
+
+			BOOST_FOREACH(boost::shared_ptr<AnglePresenter> angle, m_angles) {
+				angle->draw(m_device);
+			}
+			BOOST_FOREACH(boost::shared_ptr<VecPresenter> vec, m_vecs) {
+				vec->draw(m_device);
+			}
 
 			m_device->getSceneManager()->drawAll(); // draw the 3d scene
 			m_device->getGUIEnvironment()->drawAll(); // draw the gui environment (the logo)
 
-			// draw the line
-			if (m_vec) {
-				stream::VecGenerator<float,3>::vector_t curr_vec = m_vec->get_data();
-				driver->draw3DLine(core::vector3df(0., 0., 30.),
-						core::vector3df(0., 0., 30.) + core::vector3df(curr_vec[0], curr_vec[1], curr_vec[2]));
-			}
+
 
 			m_device->getVideoDriver()->endScene();
 
@@ -143,3 +131,72 @@ void StreamPresenter::run(bool open_thread) {
 		m_device->drop();
 	}
 }
+
+StreamPresenter::AnglePresenter::AnglePresenter(StreamPresenter::stream3ptr angle_stream, irr::core::vector3df pos):
+	m_angle_stream(angle_stream),
+	m_pos(pos)
+{}
+
+void StreamPresenter::AnglePresenter::initalize(irr::IrrlichtDevice* m_device) {
+	scene::ISceneManager* smgr = m_device->getSceneManager();
+
+	// initalize the meshs
+	m_object = smgr->addMeshSceneNode(smgr->getMesh(MEDIA_DIR "/F16_Thuderbirds.x"));
+	if (!m_object) {
+		throw std::runtime_error("Could not load the plane mesh");
+	}
+
+	m_object->setPosition(m_pos);
+	m_object->setScale(irr::core::vector3df(10.0f, 10.0f, 10.0f));
+	m_object->setMaterialTexture(0, m_device->getVideoDriver()->getTexture(MEDIA_DIR "/F16_Thuderbirds.bmp"));
+	m_object->setMaterialFlag(irr::video::EMF_LIGHTING, false);
+
+	m_object->setVisible(true);
+}
+
+void StreamPresenter::AnglePresenter::draw(irr::IrrlichtDevice* m_device) {
+	irr::core::matrix4 rotx, roty, rotz;
+	stream3::vector_t curr_angle = m_angle_stream->get_data();
+	rotx.setRotationDegrees(core::vector3df(curr_angle[0], 0., 0.));
+	roty.setRotationDegrees(core::vector3df(0., curr_angle[1], 0.));
+	rotz.setRotationDegrees(core::vector3df(0., 0., curr_angle[2]));
+
+	irr::core::matrix4 trans = roty * rotx * rotz;
+	m_object->setRotation(trans.getRotationDegrees());
+}
+
+StreamPresenter::VecPresenter::VecPresenter(StreamPresenter::stream3ptr Vec_stream, irr::core::vector3df pos):
+	m_vec_stream(Vec_stream),
+	m_pos(pos),
+	m_scale(10.0f, 10.0f, 10.0f)
+{}
+
+void StreamPresenter::VecPresenter::initalize(irr::IrrlichtDevice* m_device) {
+//	scene::ISceneManager* smgr = m_device->getSceneManager();
+//
+//	// initalize the meshs
+//	m_object = smgr->addMeshSceneNode(smgr->addArrowMesh("arrow"));
+//	if (!m_object) {
+//		throw std::runtime_error("Could not load the plane mesh");
+//	}
+//
+//	m_object->setPosition(m_pos);
+//	m_object->setMaterialFlag(irr::video::EMF_COLOR_MATERIAL, false);
+//
+//	m_object->setVisible(true);
+}
+
+void StreamPresenter::VecPresenter::draw(irr::IrrlichtDevice* m_device) {
+	stream3::vector_t vec_raw = m_vec_stream->get_data();
+	irr::core::vector3df vec(vec_raw[0], vec_raw[1], vec_raw[2]);
+//
+//	float vec_len = vec.getLength();
+//	vec.normalize();
+//
+//	irr::core::vector3df angles = vec.getSphericalCoordinateAngles();
+//
+//	m_object->setRotation(angles);
+//	m_object->setScale(irr::core::vector3df(m_scale.X, m_scale.Y*vec_len, m_scale.Z));
+	m_device->getVideoDriver()->draw3DLine(m_pos, m_pos + vec*10.);
+}
+
