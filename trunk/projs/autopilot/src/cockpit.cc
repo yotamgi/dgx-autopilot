@@ -45,11 +45,14 @@ Cockpit::Cockpit(boost::shared_ptr<NormalPlainPlatform> platform):
 		update_matrix
 	);
 
-	m_rest_orientation = boost::make_shared<filter::AccCompassRotation>(
+	boost::shared_ptr<filter::AccCompassRotation> acc_compass = boost::make_shared<filter::AccCompassRotation>(
 		m_platform->acc_sensor(),
 		m_platform->compass_sensor(),
 		expected_north
 	);
+
+	m_rest_orientation = acc_compass;
+	m_rest_reliability = acc_compass->reliable_stream();
 }
 
 boost::shared_ptr<stream::VecGenerator<float,3> > Cockpit::orientation_gyro() {
@@ -66,6 +69,10 @@ boost::shared_ptr<stream::VecGenerator<float,3> > Cockpit::orientation_rest() {
 boost::shared_ptr<stream::VecGenerator<float,3> > Cockpit::orientation() {
 	throw std::logic_error("orientation not implemented yet on Cockpit");
 	return boost::shared_ptr<stream::VecGenerator<float,3> >();
+}
+
+boost::shared_ptr<stream::DataGenerator<float> > Cockpit::rest_reliablity() {
+	return m_rest_reliability;
 }
 
 stream::DataGenerator<float>* Cockpit::speed() {
