@@ -2,6 +2,12 @@
 
 namespace simulator {
 
+/**
+ * Retunrs random float between -0.5 to 0.5
+ */
+static float frand() {
+	return (float)rand()/(float)RAND_MAX - 0.5;
+}
 
 PlainParams::PlainParams(const std::string& mesh_file,
 		const std::string& texture_file,
@@ -27,7 +33,8 @@ Plane::Plane(irr::IrrlichtDevice* device,
 		m_acc(new SensorGenerator),
 		m_compass(new SensorGenerator),
 		m_direction(irr::core::vector3df(0.0f, 0.0f, -1.0f)),
-		m_params(plane_params)
+		m_params(plane_params),
+		m_gyro_drift(frand()*10., frand()*10., frand()*10.)
 {
 	m_servos.yaw_percentage = 50.0f;
 	m_servos.pitch_percentage = 50.0f;
@@ -92,9 +99,9 @@ void Plane::update_sensors(float time_delta) {
 
 	// update the gyro
 	SensorGenerator::vector_t gyro_data;
-	gyro_data[0] = angle_vel.X;
-	gyro_data[1] = angle_vel.Y;
-	gyro_data[2] = angle_vel.Z;
+	gyro_data[0] = angle_vel.X + frand()*10. + m_gyro_drift.X;
+	gyro_data[1] = angle_vel.Y + frand()*10. + m_gyro_drift.Y;
+	gyro_data[2] = angle_vel.Z + frand()*10. + m_gyro_drift.Z;
 	m_gyro->set_data(gyro_data);
 
 	// update the accelerometer
@@ -103,9 +110,9 @@ void Plane::update_sensors(float time_delta) {
 	trans.rotateVect(g);
 	g.normalize(); g*=10.;
 	irr::core::vector3df acc = g + 4.*(m_priv_dir - dir)/time_delta;
-	acc_data[0] = acc.X;
-	acc_data[1] = acc.Y;
-	acc_data[2] = acc.Z;
+	acc_data[0] = acc.X + frand()*0.5;
+	acc_data[1] = acc.Y + frand()*0.5;
+	acc_data[2] = acc.Z + frand()*0.5;
 	m_acc->set_data(acc_data);
 
 	// update the compass
