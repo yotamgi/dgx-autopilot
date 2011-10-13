@@ -3,6 +3,10 @@
 namespace stream {
 namespace filters {
 
+static float lim(float a, float down, float up) {
+	return std::max(std::min(a, up), down);
+}
+
 AccCompassRotation::AccCompassRotation(
 		boost::shared_ptr<VecGenerator<float,3> > acc,
 		boost::shared_ptr<VecGenerator<float,3> > compass):
@@ -59,7 +63,10 @@ lin_algebra::matrix_t AccCompassRotation::get_data() {
 	float angle = lin_algebra::angle_between(ground, north);
 	float angle_closeness = fabs((m_north_pitch_angle+90.0 - angle)/(m_north_pitch_angle+90.0));
 
-	m_reliable_stream->reliability = 1. - (acc_len_closeness + compass_len_closeness + angle_closeness)*20.;
+	m_reliable_stream->reliability = lim(
+			1. - (acc_len_closeness + compass_len_closeness + angle_closeness)*3.,
+			0., 1.
+	);
 
 	// create the rotation matrix and fill its components
 	lin_algebra::matrix_t rot(3,3);
