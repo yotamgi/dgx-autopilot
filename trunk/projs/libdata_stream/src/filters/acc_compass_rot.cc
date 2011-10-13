@@ -67,12 +67,10 @@ lin_algebra::matrix_t AccCompassRotation::get_data() {
 	// calculating the x using the north
 	north += ground * std::sin(m_north_pitch_angle / 180.*lin_algebra::PI);
 	lin_algebra::normalize(north);
-	std::cout << north << std::endl;
 	lin_algebra::mat_col(rot, 0) = -north;
 
 	// calculate z as the vector orthogonal to x and y
 	lin_algebra::mat_col(rot, 2) = lin_algebra::cross_product(north, ground);
-	std::cout << rot << std::endl;
 
 	return rot;
 }
