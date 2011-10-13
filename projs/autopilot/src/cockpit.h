@@ -23,6 +23,7 @@ class Cockpit : public NormalPlainCockpit {
 public:
 
 	Cockpit(boost::shared_ptr<NormalPlainPlatform> platform);
+	virtual ~Cockpit() {}
 
 	/* NormalPlainCockpit Implementation */
 
@@ -48,6 +49,7 @@ private:
 
 	boost::shared_ptr<stream::DataGenerator<lin_algebra::matrix_t> > m_gyro_orientation;
 	boost::shared_ptr<stream::DataGenerator<lin_algebra::matrix_t> > m_rest_orientation;
+	boost::shared_ptr<stream::DataGenerator<lin_algebra::matrix_t> > m_orientation;
 
 	boost::shared_ptr<stream::DataGenerator<float> > m_rest_reliability;
 
