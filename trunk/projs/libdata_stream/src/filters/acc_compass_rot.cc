@@ -7,7 +7,8 @@ AccCompassRotation::AccCompassRotation(
 		boost::shared_ptr<VecGenerator<float,3> > acc,
 		boost::shared_ptr<VecGenerator<float,3> > compass):
 	m_acc(acc),
-	m_compass(compass)
+	m_compass(compass),
+	m_reliable_stream(new AccCompassReliable)
 {
 	VecGenerator<float,3>::vector_t expected_north = m_compass->get_data();
 	m_north_pitch_angle = std::asin(expected_north[1]/lin_algebra::vec_len(expected_north));
@@ -18,7 +19,9 @@ AccCompassRotation::AccCompassRotation(
 		boost::shared_ptr<VecGenerator<float,3> > compass,
 		VecGenerator<float,3>::vector_t expected_north):
 	m_acc(acc),
-	m_compass(compass)
+	m_compass(compass),
+	m_reliable_stream(new AccCompassReliable)
+
 {
 	m_north_pitch_angle = std::asin(expected_north[1]/lin_algebra::vec_len(expected_north)) * 180./lin_algebra::PI;
 }
@@ -30,7 +33,8 @@ AccCompassRotation::AccCompassRotation(
 		float north_pitch_angle):
 	m_acc(acc),
 	m_compass(compass),
-	m_north_pitch_angle(north_pitch_angle)
+	m_north_pitch_angle(north_pitch_angle),
+	m_reliable_stream(new AccCompassReliable)
 {}
 
 
@@ -55,7 +59,7 @@ lin_algebra::matrix_t AccCompassRotation::get_data() {
 	float angle = lin_algebra::angle_between(ground, north);
 	float angle_closeness = abs((m_north_pitch_angle+90.0 - angle)/(m_north_pitch_angle+90.0));
 
-	m_reliable_stream.reliability = 1. - (acc_len_closeness + compass_len_closeness + angle_closeness)*20.;
+	m_reliable_stream->reliability = 1. - (acc_len_closeness + compass_len_closeness + angle_closeness)*20.;
 
 
 	// create the rotation matrix and fill its components

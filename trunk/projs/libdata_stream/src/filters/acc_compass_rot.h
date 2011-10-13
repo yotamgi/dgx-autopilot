@@ -28,7 +28,7 @@ public:
 
 	lin_algebra::matrix_t get_data();
 
-	DataGenerator<lin_algebra::matrix_t>* reliable_stream();
+	boost::shared_ptr<DataGenerator<float> > reliable_stream() { return m_reliable_stream; }
 
 private:
 
@@ -48,7 +48,7 @@ private:
 
 	float m_north_pitch_angle;
 
-	AccCompassReliable m_reliable_stream;
+	boost::shared_ptr<AccCompassReliable> m_reliable_stream;
 };
 
 } // namespace filters
