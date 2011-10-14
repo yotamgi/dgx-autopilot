@@ -26,6 +26,8 @@ public:
 			boost::shared_ptr<VecGenerator<float,3> > compass,
 			float north_pitch_angle);
 
+	virtual ~AccCompassRotation() {}
+
 	lin_algebra::matrix_t get_data();
 
 	boost::shared_ptr<DataGenerator<float> > reliable_stream() { return m_reliable_stream; }
