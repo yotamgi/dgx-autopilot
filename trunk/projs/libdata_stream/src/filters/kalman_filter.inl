@@ -27,7 +27,8 @@ inline data_t KalmanFilter<data_t>::get_data() {
 	float time_delta = m_timer.passed();
 	m_timer.reset();
 
-	m_state = (1-reliable)*m_apply(m_state, time_delta * predicted);// + reliable * (m_state - observed);
+	m_state = m_state + reliable * (observed - m_state);
+	m_state = (1-reliable)*m_apply(m_state, time_delta * predicted);
 
 	return m_state;
 }
