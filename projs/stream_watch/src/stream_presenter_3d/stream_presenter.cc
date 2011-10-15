@@ -100,7 +100,7 @@ void StreamPresenter::run(bool open_thread) {
 		To be able to look at and move around in this scene, we create a first
 		person shooter style camera and make the mouse cursor invisible.
 		*/
-		irr::scene::ISceneNode* camera = smgr->addCameraSceneNodeFPS();
+		irr::scene::ISceneNode* camera = smgr->addCameraSceneNodeFPS(0, 70, 0.05);
 		camera->setPosition(irr::core::vector3df(0., 0., -30.));
 		m_device->getCursorControl()->setVisible(false);
 
