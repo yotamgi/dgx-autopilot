@@ -32,13 +32,9 @@ Hmc5843Compass::vector_t Hmc5843Compass::get_data() {
 
 	// read the data
 	vector_t fans;
-	fans[0] = (float)m_i2c.read_num<int16_t>(X_READ_ADDRES)*(100./1620.);
+	fans[0] = (float)m_i2c.read_num<int16_t>(Z_READ_ADDRES)*(100./1620.);
 	fans[1] = (float)m_i2c.read_num<int16_t>(Y_READ_ADDRES)*(100./1620.);
-	fans[2] = (float)m_i2c.read_num<int16_t>(Z_READ_ADDRES)*(100./1620.);
+	fans[2] = (float)m_i2c.read_num<int16_t>(X_READ_ADDRES)*(100./1620.);
 	
-	//std::cout << ans[0] << std::endl;
-	//std::cout << (ans[0] << 8) + (ans[0] >> 8) << std::endl;
-
-	std::cout << fans << std::endl;
 	return fans;
 }
