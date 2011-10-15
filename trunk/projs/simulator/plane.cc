@@ -109,8 +109,9 @@ void Plane::update_sensors(float time_delta) {
 	SensorGenerator::vector_t acc_data;
 	irr::core::vector3df g(0, -10., 0);
 	irr::core::vector3df acc = g + 4.*(m_priv_dir - dir)/time_delta;
+	float acc_len = acc.getLength();
 	trans.rotateVect(acc);
-	acc /= 10.; // wierd, but works
+	acc = acc.normalize()*acc_len; // rotateVect doesn't maintain vec size...
 	acc_data[0] = acc.X + frand()*0.5;
 	acc_data[1] = acc.Y + frand()*0.5;
 	acc_data[2] = acc.Z + frand()*0.5;
