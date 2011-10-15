@@ -5,6 +5,7 @@
 #include <stream/filters/acc_compass_rot.h>
 #include <stream/filters/gyro_to_av_matrix.h>
 #include <stream/filters/kalman_filter.h>
+#include <stream/filters/low_pass_filter.h>
 #include <boost/make_shared.hpp>
 
 namespace autopilot {
@@ -47,7 +48,10 @@ Cockpit::Cockpit(boost::shared_ptr<NormalPlainPlatform> platform):
 	);
 
 	boost::shared_ptr<filter::AccCompassRotation> acc_compass = boost::make_shared<filter::AccCompassRotation>(
-		m_platform->acc_sensor(),
+		boost::make_shared<stream::filters::LowPassVecFilter<float,3> >(
+				m_platform->acc_sensor(),
+				20
+		),
 		m_platform->compass_sensor(),
 		expected_north
 	);
