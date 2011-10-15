@@ -208,11 +208,7 @@ void StreamPresenter::VecPresenter::draw(irr::IrrlichtDevice* m_device) {
 	float vec_len = vec.getLength();
 	vec.normalize();
 
-	irr::core::matrix4 trans;
-	trans.buildCameraLookAtMatrixLH(irr::core::vector3df(0.,0.,0.), vec, irr::core::vector3df(0., 0., 0.));
-	irr::core::vector3df angles = vec.getSphericalCoordinateAngles();
-
-	m_object->setRotation(angles);
+	m_object->setRotation(vec.getSphericalCoordinateAngles());
 	m_object->setScale(irr::core::vector3df(m_scale.X, m_scale.Y*vec_len, m_scale.Z));
 //	m_device->getVideoDriver()->setTransform(video::ETS_WORLD, core::IdentityMatrix);
 //	m_device->getVideoDriver()->draw3DLine(m_pos, m_pos + vec*10.);
