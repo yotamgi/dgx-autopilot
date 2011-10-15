@@ -11,7 +11,7 @@ public:
 	virtual ~Hmc5843Compass() {}
 
 	/**
-	 * Return the angular velocity
+	 * Returns the north vector in Mili-Tesla units.
 	 */
 	vector_t get_data();
 	
