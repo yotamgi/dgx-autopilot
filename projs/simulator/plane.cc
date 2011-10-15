@@ -107,21 +107,21 @@ void Plane::update_sensors(float time_delta) {
 
 	// update the accelerometer
 	SensorGenerator::vector_t acc_data;
-	irr::core::vector3df g(0, -10., 0);
+	irr::core::vector3df g(0, -1., 0);
 	irr::core::vector3df acc = g + 4.*(m_priv_dir - dir)/time_delta;
 	float acc_len = acc.getLength();
 	trans.rotateVect(acc);
 	acc = acc.normalize()*acc_len; // rotateVect doesn't maintain vec size...
-	acc_data[0] = acc.X + frand()*0.5;
-	acc_data[1] = acc.Y + frand()*0.5;
-	acc_data[2] = acc.Z + frand()*0.5;
+	acc_data[0] = acc.X + frand()*0.05;
+	acc_data[1] = acc.Y + frand()*0.05;
+	acc_data[2] = acc.Z + frand()*0.05;
 	m_acc->set_data(acc_data);
 
 	// update the compass
 	SensorGenerator::vector_t compass_data;
-	irr::core::vector3df north(1., 1., 0);
+	irr::core::vector3df north(1., -1., 0);
 	trans.rotateVect(north);
-	north.normalize();
+	north = north.normalize() * 32.;
 	compass_data[0] = north.X;
 	compass_data[1] = north.Y;
 	compass_data[2] = north.Z;
