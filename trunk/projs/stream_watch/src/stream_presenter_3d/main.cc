@@ -16,27 +16,30 @@ int main(int argc, char** argv) {
 	StreamPresenter presenter;
 
 	// some ui
-	std::cout << "The available streams are: ";
-	std::copy(avail.begin(), avail.end(), std::ostream_iterator<std::string>(std::cout, " "));
-	std::cout << std::endl << "Which one do you want? ";
-	std::cout.flush();
-	int which;
-	std::cin >> which;
+	while(true) {
+		std::cout << "The available streams are: ";
+		std::copy(avail.begin(), avail.end(), std::ostream_iterator<std::string>(std::cout, " "));
+		std::cout << std::endl << "Which one do you want (or 0 to exit)? ";
+		std::cout.flush();
+		int which;
+		std::cin >> which;
+		if (which == 0) break;
 
-	std::cout << "Do you want it as angle (a) or vec (v)? ";
-	std::cout.flush();
-	char c;
-	std::cin >> c;
+		std::cout << "Do you want it as angle (a) or vec (v)? ";
+		std::cout.flush();
+		char c;
+		std::cin >> c;
 
-	boost::shared_ptr<stream::VecGenerator<float,3> > chosen =
-			imp.import_stream<stream::VecGenerator<float,3> >(avail.at(which));
+		boost::shared_ptr<stream::VecGenerator<float,3> > chosen =
+				imp.import_stream<stream::VecGenerator<float,3> >(avail.at(which-1));
 
-	//std::cout << chosen->get_data() << std::endl;
+		//std::cout << chosen->get_data() << std::endl;
 
-	if (c == 'a') {
-		presenter.addAngleStream(chosen);
-	} else if (c == 'v') {
-		presenter.addVecStream(chosen);
+		if (c == 'a') {
+			presenter.addAngleStream(chosen);
+		} else if (c == 'v') {
+			presenter.addVecStream(chosen);
+		}
 	}
 
 	presenter.run(false);

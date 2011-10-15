@@ -23,7 +23,7 @@ public:
 			boost::shared_ptr<DataGenerator<data_t> > obserbed,
 			boost::shared_ptr<DataGenerator<float> > reliable,
 			data_t inital_val,
-			boost::function<data_t(data_t, data_t)> apply =  std::plus<float>());
+			boost::function<data_t(data_t, data_t)> apply =  std::plus<data_t>());
 
 	data_t get_data();
 

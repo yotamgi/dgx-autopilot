@@ -61,7 +61,6 @@ lin_algebra::matrix_t AccCompassRotation::get_data() {
 	lin_algebra::normalize(north);
 	lin_algebra::normalize(ground);
 	float angle = lin_algebra::angle_between(ground, north);
-	std::cout << angle << std::endl;
 	float angle_closeness = fabs((90.-m_north_pitch_angle - angle)/(90.-m_north_pitch_angle));
 
 	m_reliable_stream->reliability = lim(
