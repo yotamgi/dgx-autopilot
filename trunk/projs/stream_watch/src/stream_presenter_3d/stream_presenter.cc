@@ -187,33 +187,35 @@ StreamPresenter::VecPresenter::VecPresenter(StreamPresenter::stream3ptr Vec_stre
 {}
 
 void StreamPresenter::VecPresenter::initalize(irr::IrrlichtDevice* m_device) {
-//	scene::ISceneManager* smgr = m_device->getSceneManager();
-//
-//	// initalize the meshs
-//	m_object = smgr->addMeshSceneNode(smgr->addArrowMesh("arrow"));
-//	if (!m_object) {
-//		throw std::runtime_error("Could not load the plane mesh");
-//	}
-//
-//	m_object->setPosition(m_pos);
-//	m_object->setMaterialFlag(irr::video::EMF_COLOR_MATERIAL, false);
-//
-//	m_object->setVisible(true);
+	scene::ISceneManager* smgr = m_device->getSceneManager();
+
+	// initalize the meshs
+	m_object = smgr->addMeshSceneNode(smgr->addArrowMesh("arrow"));
+	if (!m_object) {
+		throw std::runtime_error("Could not load the plane mesh");
+	}
+
+	m_object->setPosition(m_pos);
+	m_object->setMaterialTexture(0, m_device->getVideoDriver()->getTexture(MEDIA_DIR "/F16_Thuderbirds.bmp"));
+	m_object->setMaterialFlag(irr::video::EMF_LIGHTING, false);
+	m_object->setVisible(true);
 }
 
 void StreamPresenter::VecPresenter::draw(irr::IrrlichtDevice* m_device) {
 	stream3::vector_t vec_raw = m_vec_stream->get_data();
-	irr::core::vector3df vec(vec_raw[0], vec_raw[1], vec_raw[2]);
-//
-//	float vec_len = vec.getLength();
-//	vec.normalize();
-//
-//	irr::core::vector3df angles = vec.getSphericalCoordinateAngles();
-//
-//	m_object->setRotation(angles);
-//	m_object->setScale(irr::core::vector3df(m_scale.X, m_scale.Y*vec_len, m_scale.Z));
-	m_device->getVideoDriver()->setTransform(video::ETS_WORLD, core::IdentityMatrix);
-	m_device->getVideoDriver()->draw3DLine(m_pos, m_pos + vec*10.);
+	irr::core::vector3df vec(vec_raw[2], vec_raw[1], vec_raw[0]);
+
+	float vec_len = vec.getLength();
+	vec.normalize();
+
+	irr::core::matrix4 trans;
+	trans.buildCameraLookAtMatrixLH(irr::core::vector3df(0.,0.,0.), vec, irr::core::vector3df(0., 0., 0.));
+	irr::core::vector3df angles = vec.getSphericalCoordinateAngles();
+
+	m_object->setRotation(angles);
+	m_object->setScale(irr::core::vector3df(m_scale.X, m_scale.Y*vec_len, m_scale.Z));
+//	m_device->getVideoDriver()->setTransform(video::ETS_WORLD, core::IdentityMatrix);
+//	m_device->getVideoDriver()->draw3DLine(m_pos, m_pos + vec*10.);
 }
 
 StreamPresenter::SizePresenter::SizePresenter(StreamPresenter::streamfptr size_stream,
