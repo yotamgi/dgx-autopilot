@@ -30,13 +30,13 @@ public:
 	I2C_Interface(std::string device_filename, uint8_t device_i2c_add);
 	I2C_Interface(int device_fd):m_i2c_device_fd(device_fd){}
 
-	void write_buff(const std::string& data, uint8_t reg) const {
+	void write_buff(uint8_t reg, const std::string& data) const {
 		std::string packet = std::string(1, char(reg)) + data;
 		raw_write(packet.c_str(), packet.size());
 	}
 
 	template <typename T>
-	void write_num(const T& num, uint8_t reg) {
+	void write_num(uint8_t reg, const T& num) {
 		char packet[sizeof(T)+1];
 		const char* pnum = reinterpret_cast<const char*>(&num);
 
