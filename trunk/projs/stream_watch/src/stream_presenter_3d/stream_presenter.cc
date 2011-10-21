@@ -104,6 +104,9 @@ void StreamPresenter::run(bool open_thread) {
 		camera->setPosition(irr::core::vector3df(0., 0., -30.));
 		m_device->getCursorControl()->setVisible(false);
 
+		// Set the light
+		smgr->setAmbientLight(video::SColorf(0.3,0.3,0.3,1));
+		smgr->addLightSceneNode( 0, core::vector3df(-5,-5,-5), video::SColorf(1.f, 1., 1.f), 100.0f, 1 );
 
 		int lastFPS = -1;
 		m_running = true;
@@ -196,8 +199,7 @@ void StreamPresenter::VecPresenter::initalize(irr::IrrlichtDevice* m_device) {
 	}
 
 	m_object->setPosition(m_pos);
-	m_object->setMaterialTexture(0, m_device->getVideoDriver()->getTexture(MEDIA_DIR "/F16_Thuderbirds.bmp"));
-	m_object->setMaterialFlag(irr::video::EMF_LIGHTING, false);
+	m_object->setMaterialFlag(irr::video::EMF_LIGHTING, true);
 	m_object->setVisible(true);
 }
 
