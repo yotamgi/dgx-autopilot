@@ -21,7 +21,7 @@ AUTOPILIT_OBJS =  $(SRCDIR)/platform/hw/i2c_interface.o	\
 		$(SRCDIR)/platform/dgx1_simulator_platform.o	\
 		$(SRCDIR)/cockpit.o
 
-GTESTS_OBJS=	
+GTESTS_OBJS= 
 
 ###############################################################################
 ## TARGETS 
@@ -54,7 +54,7 @@ $(LIBDIR)/libautopilot.a: $(AUTOPILIT_OBJS)
 	$(ARCHIVE) cr  $(LIBDIR)/libautopilot.a $(AUTOPILIT_OBJS)
 
 gtest: $(GTESTS_OBJS) $(LIBDIR) $(LIBDIR)/libautopilot.a
-	$(CXX) $(LDFLAGS) $(GTESTS_OBJS) -lautopilot -lgtest_main -o gtest
+	$(CXX) $(GTESTS_OBJS) $(LDFLAGS) -lgtest -lgtest_main -lpthread -lautopilot -o gtest
 
 .PHONY:
 test: gtest

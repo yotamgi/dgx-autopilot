@@ -31,7 +31,7 @@ $(LIBDIR)/libdata_stream.so: $(LIBDIR) $(DATA_STREAM_OBJS)
 	$(CXX)  $(DATA_STREAM_OBJS) -fPIC -shared -o $(LIBDIR)/libdata_stream.so
 	
 gtest: $(GTEST_OBJS) $(LIBDIR) $(LIBDIR)/libdata_stream.so
-	$(CXX) $(LDFLAGS) $(GTEST_OBJS) -Llib -ldata_stream -lpthread -lgtest_main -lboost_thread \
+	$(CXX) $(LDFLAGS) $(GTEST_OBJS) -Llib -ldata_stream -lpthread -lgtest -lgtest_main -lboost_thread \
 			 -Wl,--rpath,./lib -o  gtest 
 
 	  
