@@ -38,6 +38,9 @@ private:
 
 	//float m_prev_time;
 	Timer m_timer;
+	Timer m_fps_timer;
+	
+	size_t m_fps;
 };
 
 } // namespace filters
