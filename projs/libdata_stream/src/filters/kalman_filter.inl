@@ -14,7 +14,8 @@ inline KalmanFilter<data_t>::KalmanFilter(boost::shared_ptr<DataGenerator<data_t
 	m_obserbed(obserbed),
 	m_reliable(reliable),
 	m_apply(apply),
-	m_state(inital_val)
+	m_state(inital_val),
+	m_fps(0)
 {}
 
 template <typename data_t>
@@ -29,6 +30,15 @@ inline data_t KalmanFilter<data_t>::get_data() {
 
 	m_state = (1-reliable)*m_state + reliable * (observed - m_state);
 	m_state = m_apply(m_state, time_delta * predicted);
+
+	// print fps
+	if (m_fps_timer.passed() > 1.0) {
+		std::cout << "FPS: " << m_fps << std::endl; 
+		m_fps = 0;
+		m_fps_timer.reset();
+	} else {
+		m_fps++;
+	}
 
 	return m_state;
 }

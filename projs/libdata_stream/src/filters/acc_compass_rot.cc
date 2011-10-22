@@ -56,17 +56,18 @@ lin_algebra::matrix_t AccCompassRotation::get_data() {
 	ground[0] = ground_data[0]; ground[1] = ground_data[1]; ground[2] = ground_data[2];
 
 	// understand the reliability, and normalize the vectors
-	float acc_len_closeness = fabs(1. - lin_algebra::vec_len(ground));
-	float compass_len_closeness = fabs(32. - lin_algebra::vec_len(north));
+	float acc_len_closeness = fabs(0.5 - lin_algebra::vec_len(ground))/0.5;
+	float compass_len_closeness = fabs(20. - lin_algebra::vec_len(north))/20.;
 	lin_algebra::normalize(north);
 	lin_algebra::normalize(ground);
 	float angle = lin_algebra::angle_between(ground, north);
-	float angle_closeness = fabs((90.-m_north_pitch_angle - angle)/(90.-m_north_pitch_angle));
+	float angle_closeness = fabs((m_north_pitch_angle - angle)/(m_north_pitch_angle));
 
 	m_reliable_stream->reliability = lim(
-			0.3 - (acc_len_closeness + compass_len_closeness + angle_closeness)*3.,
+			0.4  - (acc_len_closeness*2. + compass_len_closeness/5. + angle_closeness/5.),
 			0., 1.
 	);
+	//std::cout << acc_len_closeness << ", " <<  compass_len_closeness << ", " << angle_closeness << " = " << m_reliable_stream->reliability << std::endl;
 
 	// create the rotation matrix and fill its components
 	lin_algebra::matrix_t rot(3,3);
