@@ -34,9 +34,6 @@ static lin_algebra::matrix_t update_matrix(const lin_algebra::matrix_t& m1,
 Cockpit::Cockpit(boost::shared_ptr<NormalPlainPlatform> platform):
 		m_platform(platform)
 {
-	stream::VecGenerator<float,3>::vector_t expected_north;
-	expected_north[0] = 1; expected_north[1] = 1; expected_north[2] = 0;
-
 	namespace filter = stream::filters;
 
 	m_gyro_orientation = boost::make_shared<filter::IntegralFilter<lin_algebra::matrix_t> >(
@@ -50,10 +47,10 @@ Cockpit::Cockpit(boost::shared_ptr<NormalPlainPlatform> platform):
 	boost::shared_ptr<filter::AccCompassRotation> acc_compass = boost::make_shared<filter::AccCompassRotation>(
 		boost::make_shared<stream::filters::LowPassVecFilter<float,3> >(
 				m_platform->acc_sensor(),
-				20
+				1
 		),
 		m_platform->compass_sensor(),
-		expected_north
+		20. // the north explected angle
 	);
 	m_rest_orientation = acc_compass;
 	m_rest_reliability = acc_compass->reliable_stream();
