@@ -211,7 +211,7 @@ void StreamPresenter::VecPresenter::draw(irr::IrrlichtDevice* m_device) {
 	vec.normalize();
 
 	m_object->setRotation(vec.getSphericalCoordinateAngles());
-	m_object->setScale(irr::core::vector3df(m_scale.X*vec_len/2., m_scale.Y*vec_len, m_scale.Z*vec_len/2.));
+	m_object->setScale(irr::core::vector3df(m_scale.X/2., m_scale.Y*vec_len, m_scale.Z/2.));
 //	m_device->getVideoDriver()->setTransform(video::ETS_WORLD, core::IdentityMatrix);
 //	m_device->getVideoDriver()->draw3DLine(m_pos, m_pos + vec*10.);
 }
