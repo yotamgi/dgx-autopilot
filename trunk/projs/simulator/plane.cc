@@ -110,21 +110,21 @@ void Plane::update_sensors(float time_delta) {
 	irr::core::vector3df g(0, -1., 0);
 	irr::core::vector3df acc = g + 4.*(m_priv_dir - dir)/time_delta;
 	float acc_len = acc.getLength();
-	trans.rotateVect(acc);
+	trans.getTransposed().rotateVect(acc);
 	acc = acc.normalize()*acc_len; // rotateVect doesn't maintain vec size...
-	acc_data[0] = acc.X + frand()*0.05;
-	acc_data[1] = acc.Y + frand()*0.05;
-	acc_data[2] = acc.Z + frand()*0.05;
+	acc_data[0] = -acc.X + frand()*0.05;
+	acc_data[1] =  acc.Y + frand()*0.05;
+	acc_data[2] = -acc.Z + frand()*0.05;
 	m_acc->set_data(acc_data);
 
 	// update the compass
 	SensorGenerator::vector_t compass_data;
 	irr::core::vector3df north(1., -1., 0);
-	trans.rotateVect(north);
+	trans.getTransposed().rotateVect(north);
 	north = north.normalize() * 20.;
-	compass_data[0] = north.X;
-	compass_data[1] = north.Y;
-	compass_data[2] = north.Z;
+	compass_data[0] = -north.X;
+	compass_data[1] =  north.Y;
+	compass_data[2] = -north.Z;
 	m_compass->set_data(compass_data);
 
 	m_priv_dir = dir;
