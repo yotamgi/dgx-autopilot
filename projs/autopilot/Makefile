@@ -18,9 +18,8 @@ AUTOPILIT_OBJS =  $(SRCDIR)/platform/hw/i2c_interface.o	\
 		$(SRCDIR)/platform/hw/hmc5843_compass.o		 	\
 		$(SRCDIR)/platform/hw/maestro_servo_controller.o \
 		$(SRCDIR)/platform/dgx1_platform.o				\
-		$(SRCDIR)/platform/dgx1_simulator_platform.o	\
-		$(SRCDIR)/cockpit.o
-
+		$(SRCDIR)/platform/dgx1_simulator_platform.o	
+		
 GTESTS_OBJS= 
 
 ###############################################################################

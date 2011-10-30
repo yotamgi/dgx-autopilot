@@ -57,4 +57,6 @@ private:
 
 }  // namespace autopilot
 
+#include "cockpit.inl"
+
 #endif /* COCKPIT_H_ */
