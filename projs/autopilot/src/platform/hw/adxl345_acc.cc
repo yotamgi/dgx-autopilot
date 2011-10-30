@@ -39,8 +39,8 @@ Adxl345Acc::vector_t Adxl345Acc::get_data() {
 	//std::cout << ans[0] << std::endl;
 	//std::cout << (ans[0] << 8) + (ans[0] >> 8) << std::endl;
 
-	fans[0] = float((int16_t)((ans[0]<<8)&0xff00) + (ans[0]>>8))*-0.004;
-	fans[1] = float((int16_t)((ans[1]<<8)&0xff00) + (ans[1]>>8))*-0.004;
-	fans[2] = float((int16_t)((ans[2]<<8)&0xff00) + (ans[2]>>8))*-0.004;
+	fans[0] =  float((int16_t)((ans[0]<<8)&0xff00) + (ans[0]>>8))*0.004;
+	fans[1] = -float((int16_t)((ans[1]<<8)&0xff00) + (ans[1]>>8))*0.004;
+	fans[2] =  float((int16_t)((ans[2]<<8)&0xff00) + (ans[2]>>8))*0.004;
 	return fans;
 }
