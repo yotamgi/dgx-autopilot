@@ -121,7 +121,7 @@ void Plane::update_sensors(float time_delta) {
 	SensorGenerator::vector_t compass_data;
 	irr::core::vector3df north(1., -1., 0);
 	trans.rotateVect(north);
-	north = north.normalize() * 32.;
+	north = north.normalize() * 20.;
 	compass_data[0] = north.X;
 	compass_data[1] = north.Y;
 	compass_data[2] = north.Z;
