@@ -31,7 +31,7 @@ static lin_algebra::matrix_t update_matrix(const lin_algebra::matrix_t& m1,
 	return rot;
 }
 
-Cockpit::Cockpit(boost::shared_ptr<NormalPlainPlatform> platform):
+inline Cockpit::Cockpit(boost::shared_ptr<NormalPlainPlatform> platform):
 		m_platform(platform)
 {
 	namespace filter = stream::filters;
@@ -66,45 +66,45 @@ Cockpit::Cockpit(boost::shared_ptr<NormalPlainPlatform> platform):
 	);
 }
 
-boost::shared_ptr<stream::VecGenerator<float,3> > Cockpit::orientation_gyro() {
+inline boost::shared_ptr<stream::VecGenerator<float,3> > Cockpit::orientation_gyro() {
 	return boost::shared_ptr<stream::VecGenerator<float,3> >(
 			(stream::VecGenerator<float,3>*)new stream::filters::MatrixToEulerFilter(m_gyro_orientation)
 	);
 }
-boost::shared_ptr<stream::VecGenerator<float,3> > Cockpit::orientation_rest() {
+inline boost::shared_ptr<stream::VecGenerator<float,3> > Cockpit::orientation_rest() {
 	return boost::shared_ptr<stream::VecGenerator<float,3> >(
 			(stream::VecGenerator<float,3>*)new stream::filters::MatrixToEulerFilter(m_rest_orientation)
 	);
 }
 
-boost::shared_ptr<stream::VecGenerator<float,3> > Cockpit::orientation() {
+inline boost::shared_ptr<stream::VecGenerator<float,3> > Cockpit::orientation() {
 	return boost::shared_ptr<stream::VecGenerator<float,3> >(
 			(stream::VecGenerator<float,3>*)new stream::filters::MatrixToEulerFilter(m_orientation)
 	);
 }
 
-boost::shared_ptr<stream::DataGenerator<float> > Cockpit::rest_reliablity() {
+inline boost::shared_ptr<stream::DataGenerator<float> > Cockpit::rest_reliablity() {
 	return m_rest_reliability;
 }
 
-stream::DataGenerator<float>* Cockpit::speed() {
+inline stream::DataGenerator<float>* Cockpit::speed() {
 	throw std::logic_error("speed not implemented yet on Cockpit");
 	return NULL;
 }
 
-Servo* Cockpit::tilt_servo() {
+inline Servo* Cockpit::tilt_servo() {
 	return m_platform->tilt_servo();
 }
 
-Servo* Cockpit::yaw_servo() {
+inline Servo* Cockpit::yaw_servo() {
 	return m_platform->yaw_servo();
 }
 
-Servo* Cockpit::pitch_servo(){
+inline Servo* Cockpit::pitch_servo(){
 	return m_platform->pitch_servo();
 }
 
-Servo* Cockpit::gas_servo() {
+inline Servo* Cockpit::gas_servo() {
 	return m_platform->gas_servo();
 }
 
