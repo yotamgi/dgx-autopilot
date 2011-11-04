@@ -53,7 +53,7 @@ $(LIBDIR)/libautopilot.a: $(AUTOPILIT_OBJS)
 	$(ARCHIVE) cr  $(LIBDIR)/libautopilot.a $(AUTOPILIT_OBJS)
 
 gtest: $(GTESTS_OBJS) $(LIBDIR) $(LIBDIR)/libautopilot.a
-	$(CXX) $(GTESTS_OBJS) $(LDFLAGS) -lgtest -lgtest_main -lpthread -lautopilot -o gtest
+	$(CXX) $(GTESTS_OBJS) $(LDFLAGS) -lgtest_main -lgtest -lpthread -lautopilot -o gtest
 
 .PHONY:
 test: gtest
