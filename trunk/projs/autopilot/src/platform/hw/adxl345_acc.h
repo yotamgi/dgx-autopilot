@@ -6,7 +6,7 @@
 #include <stream/generators.h>
 #include "platform/hw/i2c_interface.h"
 
-class Adxl345Acc : public stream::DataGenerator<lin_algebra::vector_t> {
+class Adxl345Acc : public stream::DataGenerator<lin_algebra::vec3f> {
 public:
 	Adxl345Acc(size_t device_i2c_num);
 	virtual ~Adxl345Acc() {}
@@ -14,7 +14,7 @@ public:
 	/**
 	 * Return the angular velocity
 	 */
-	lin_algebra::vector_t get_data();
+	lin_algebra::vec3f get_data();
 	
 	virtual bool is_data_losed() { return false; };
 

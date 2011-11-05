@@ -7,12 +7,12 @@
 #include <stream/util/lin_algebra.h>
 #include <stream/generators.h>
 
-typedef stream::DataGenerator<lin_algebra::vector_t> vec_stream_t ;
+typedef stream::DataGenerator<lin_algebra::vec3f> vec_stream_t ;
 
 namespace stream {
 namespace filters {
 
-class AccCompassRotation : public DataGenerator<lin_algebra::matrix_t> {
+class AccCompassRotation : public DataGenerator<lin_algebra::mat3f> {
 public:
 	AccCompassRotation(
 			boost::shared_ptr<vec_stream_t> acc,
@@ -21,7 +21,7 @@ public:
 	AccCompassRotation(
 			boost::shared_ptr<vec_stream_t> acc,
 			boost::shared_ptr<vec_stream_t> compass,
-			lin_algebra::vector_t expected_north);
+			lin_algebra::vec3f expected_north);
 
 	AccCompassRotation(
 			boost::shared_ptr<vec_stream_t> acc,
@@ -30,7 +30,7 @@ public:
 
 	virtual ~AccCompassRotation() {}
 
-	lin_algebra::matrix_t get_data();
+	lin_algebra::mat3f get_data();
 
 	boost::shared_ptr<DataGenerator<float> > reliable_stream() { return m_reliable_stream; }
 

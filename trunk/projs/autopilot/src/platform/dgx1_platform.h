@@ -6,14 +6,14 @@
 
 namespace autopilot {
 
-typedef boost::shared_ptr<stream::DataGenerator<lin_algebra::vector_t> > vec_stream_ptr;
+typedef boost::shared_ptr<stream::DataGenerator<lin_algebra::vec3f> > vec_stream_ptr;
 
 class DGX1Platform : public NormalPlainPlatform {
 public:
 	DGX1Platform();
 	~DGX1Platform(){}
 
-	typedef boost::shared_ptr<stream::DataGenerator<lin_algebra::vector_t> > vec_stream_ptr;
+	typedef boost::shared_ptr<stream::DataGenerator<lin_algebra::vec3f> > vec_stream_ptr;
 
 	vec_stream_ptr acc_sensor();
 

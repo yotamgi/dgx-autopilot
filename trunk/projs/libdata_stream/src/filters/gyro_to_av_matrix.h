@@ -10,14 +10,14 @@ namespace filters {
 
 
 class GyroToAVMatrix :
-	public DataFilter<lin_algebra::vector_t, lin_algebra::matrix_t>
+	public DataFilter<lin_algebra::vec3f, lin_algebra::mat3f>
 {
 public:
 
-	GyroToAVMatrix(boost::shared_ptr<DataGenerator<lin_algebra::vector_t> > data_gen);
+	GyroToAVMatrix(boost::shared_ptr<DataGenerator<lin_algebra::vec3f> > data_gen);
 	virtual ~GyroToAVMatrix();
 
-	lin_algebra::matrix_t get_data();
+	lin_algebra::mat3f get_data();
 };
 
 } // namespace filters

@@ -7,7 +7,7 @@
 
 namespace autopilot {
 
-typedef stream::DataGenerator<lin_algebra::vector_t> vec_stream;
+typedef stream::DataGenerator<lin_algebra::vec3f> vec_stream;
 typedef boost::shared_ptr<vec_stream> 				 vec_stream_ptr;
 
 class DGX1SimulatorPlatform : public NormalPlainPlatform {

@@ -14,7 +14,7 @@ class StreamPresenter {
 public:
 	typedef stream::DataGenerator<float> streamf;
 	typedef boost::shared_ptr<stream::DataGenerator<float> > streamfptr;
-	typedef stream::DataGenerator<lin_algebra::vector_t> stream3;
+	typedef stream::DataGenerator<lin_algebra::vec3f> stream3;
 	typedef boost::shared_ptr<stream3> stream3ptr;
 
 	StreamPresenter();
