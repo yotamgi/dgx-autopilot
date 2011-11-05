@@ -2,11 +2,17 @@
 #include <armadillo>
 #include <sstream>
 
-template <size_t N>
 std::ostream&
-operator<< (std::ostream& o, const typename arma::Col<float>::template fixed<N>& X)
+operator<< (std::ostream& o, const typename arma::Col<float>::fixed<3>& X)
 {
-	o << X[0] << ", " << X[1] << ", " << X[2];
+	X.save(o, arma::arma_ascii);
+	return o;
+}
+
+std::istream&
+operator>> (std::istream& o, typename arma::Col<float>::fixed<3>& X)
+{
+	X.load(o, arma::arma_ascii);
 	return o;
 }
 
@@ -21,18 +27,21 @@ void simple() {
 	std::cout << b << std::endl;
 }
 
-template <typename mat>
-mat func(const mat& m) {
-	return m/2.;
-}
-
 void ident() {
 	arma::fmat::fixed<3,3> a;
 	a.eye(3, 3);
 	std::cout << a << std::endl;
-	a.col(0) = func(a.col(0));
-	std::cout << a << std::endl;
 }
+
+void serialie() {
+	std::stringstream ss;
+	arma::fvec::fixed<3> a, b;
+	a << 1. << 2. << 3.;
+	ss<<a;
+	ss>>b;
+	std::cout << b;
+}
+
 
 
 void matrix() {
@@ -47,5 +56,5 @@ void matrix() {
 	std::cout << m << std::endl;
 }
 int main() {
-	ident();
+	serialie();
 }
