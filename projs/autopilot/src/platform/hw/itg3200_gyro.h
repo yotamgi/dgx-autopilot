@@ -6,7 +6,7 @@
 #include <stream/generators.h>
 #include "platform/hw/i2c_interface.h"
 
-class Itg3200Gyro : public stream::DataGenerator<lin_algebra::vector_t> {
+class Itg3200Gyro : public stream::DataGenerator<lin_algebra::vec3f> {
 public:
 	Itg3200Gyro(size_t device_i2c_num);
 	virtual ~Itg3200Gyro() {}
@@ -14,7 +14,7 @@ public:
 	/**
 	 * Return the angular velocity
 	 */
-	lin_algebra::vector_t get_data();
+	lin_algebra::vec3f get_data();
 	
 	virtual bool is_data_losed() { return false; };
 

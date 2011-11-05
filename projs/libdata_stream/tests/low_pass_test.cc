@@ -26,15 +26,15 @@ private:
 	size_t m_counter;
 };
 
-class JitterVecGen : public stream::DataGenerator<lin_algebra::vector_t> {
+class JitterVecGen : public stream::DataGenerator<lin_algebra::vec3f> {
 public:
 	JitterVecGen(float a, float b):
 		m_a(a), m_b(b), m_counter(0)
 	{}
 	~JitterVecGen() {}
 
-	lin_algebra::vector_t get_data() {
-		lin_algebra::vector_t ans;
+	lin_algebra::vec3f get_data() {
+		lin_algebra::vec3f ans;
 		for (size_t i=0; i<3; i++) {
 			ans[i] = (m_counter == i)?m_b:m_a;
 		}
@@ -61,9 +61,9 @@ TEST(low_pass_filter, functional) {
 TEST(low_pass_filter, vec_functional) {
 	boost::shared_ptr<JitterVecGen> a(new JitterVecGen(0., 3.));
 
-	stream::filters::LowPassFilter<lin_algebra::vector_t> lp(a, 3);
+	stream::filters::LowPassFilter<lin_algebra::vec3f> lp(a, 3);
 	for (int i=0; i<100000; i++) {
-		lin_algebra::vector_t dat = lp.get_data();
+		lin_algebra::vec3f dat = lp.get_data();
 		for (int i=0; i<3; i++)
 			ASSERT_NEAR(dat[i], 1.0f, 0.0001f);
 	}

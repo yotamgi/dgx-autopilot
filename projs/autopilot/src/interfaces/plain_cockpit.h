@@ -17,7 +17,7 @@ public:
 
 	~NormalPlainCockpit() {}
 
-	virtual boost::shared_ptr<stream::DataGenerator<lin_algebra::vector_t> > orientation() = 0;
+	virtual boost::shared_ptr<stream::DataGenerator<lin_algebra::vec3f> > orientation() = 0;
 
 	virtual stream::DataGenerator<float>* speed() = 0;
 

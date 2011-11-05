@@ -27,10 +27,10 @@ Adxl345Acc::Adxl345Acc(size_t device_i2c_num):
 	m_i2c.write_num<uint8_t>(DATA_FORMAT, 1); // +-4G
 }
 
-lin_algebra::vector_t Adxl345Acc::get_data() {
+lin_algebra::vec3f Adxl345Acc::get_data() {
 
 	// read the data
-	lin_algebra::vector_t fans;
+	lin_algebra::vec3f fans;
 	uint16_t ans[3];
 	ans[0] = m_i2c.read_num<uint16_t>(X_READ_ADDRES);
 	ans[1] = m_i2c.read_num<uint16_t>(Z_READ_ADDRES);

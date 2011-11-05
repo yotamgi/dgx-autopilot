@@ -18,13 +18,13 @@ public:
 	}
 
 	StaticFilter(boost::shared_ptr<DataGenerator<T> > gen,
-			const typename lin_algebra::vector_t& add):
+			const typename lin_algebra::vec3f& add):
 		DataFilter<T>(gen),
 		m_add(add)
 	{}
 
-	lin_algebra::vector_t get_data(){
-		lin_algebra::vector_t data = DataFilter<T>::m_generator->get_data();
+	lin_algebra::vec3f get_data(){
+		lin_algebra::vec3f data = DataFilter<T>::m_generator->get_data();
 
 		data = data + m_add;
 
@@ -33,7 +33,7 @@ public:
 
 private:
 
-	lin_algebra::vector_t m_add;
+	lin_algebra::vec3f m_add;
 };
 
 } // namespace filters

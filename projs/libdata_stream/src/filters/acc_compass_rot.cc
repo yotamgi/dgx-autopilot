@@ -14,14 +14,14 @@ AccCompassRotation::AccCompassRotation(
 	m_compass(compass),
 	m_reliable_stream(new AccCompassReliable)
 {
-	lin_algebra::vector_t expected_north = m_compass->get_data();
+	lin_algebra::vec3f expected_north = m_compass->get_data();
 	m_north_pitch_angle = std::asin(expected_north[1]/lin_algebra::vec_len(expected_north));
 }
 
 AccCompassRotation::AccCompassRotation(
 		boost::shared_ptr<vec_stream_t> acc,
 		boost::shared_ptr<vec_stream_t> compass,
-		lin_algebra::vector_t expected_north):
+		lin_algebra::vec3f expected_north):
 	m_acc(acc),
 	m_compass(compass),
 	m_reliable_stream(new AccCompassReliable)
@@ -42,7 +42,7 @@ AccCompassRotation::AccCompassRotation(
 {}
 
 
-lin_algebra::matrix_t AccCompassRotation::get_data() {
+lin_algebra::mat3f AccCompassRotation::get_data() {
 
 	// get the sensor data
 	lin_algebra::rowvec3f ground(m_acc->get_data().mem),
@@ -63,7 +63,7 @@ lin_algebra::matrix_t AccCompassRotation::get_data() {
 	//std::cout << acc_len_closeness << ", " <<  compass_len_closeness << ", " << angle_closeness << " = " << m_reliable_stream->reliability << std::endl;
 
 	// create the rotation matrix and fill its components
-	lin_algebra::matrix_t rot;
+	lin_algebra::mat3f rot;
 
 	// the y we know, so just set it
 	rot.row(1) = -ground;

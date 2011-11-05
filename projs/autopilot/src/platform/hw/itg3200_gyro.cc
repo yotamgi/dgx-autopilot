@@ -27,10 +27,10 @@ Itg3200Gyro::Itg3200Gyro(size_t device_i2c_num):
 	m_i2c.write_num<uint8_t>(SAMPLING_CONF, (0x3<<3) | 0x0); // FS_SEL=0x3, DLFP_CFG=0x0
 }
 
-lin_algebra::vector_t Itg3200Gyro::get_data() {
+lin_algebra::vec3f Itg3200Gyro::get_data() {
 
 	// read the data
-	lin_algebra::vector_t ans;
+	lin_algebra::vec3f ans;
 	ans[0] = (float)m_i2c.read_num<int16_t>(X_READ_ADDRES)/14.375;
 	ans[1] = (float)m_i2c.read_num<int16_t>(Z_READ_ADDRES)/14.375;
 	ans[2] = (float)m_i2c.read_num<int16_t>(Y_READ_ADDRES)/14.375;

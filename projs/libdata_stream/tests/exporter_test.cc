@@ -23,13 +23,13 @@ private:
 	int m_counter;
 };
 
-class DummyVecStream : public DataGenerator<lin_algebra::vector_t> {
+class DummyVecStream : public DataGenerator<lin_algebra::vec3f> {
 public:
 	DummyVecStream():m_counter(0){}
 	virtual ~DummyVecStream() {}
 
-	lin_algebra::vector_t get_data() {
-		lin_algebra::vector_t v;
+	lin_algebra::vec3f get_data() {
+		lin_algebra::vec3f v;
 		v[0] = (float)m_counter;
 		v[1] = (float)m_counter+1.;
 		v[2] = (float)m_counter+2.;
@@ -71,7 +71,7 @@ TEST(stream_export_import, int_stream) {
 TEST(stream_export_import, vec_stream) {
 
 	// the stream we are about to send
-	boost::shared_ptr<DataGenerator<lin_algebra::vector_t> > vs(new DummyVecStream);
+	boost::shared_ptr<DataGenerator<lin_algebra::vec3f> > vs(new DummyVecStream);
 
 	// exporting the stream
 	StreamExporter exporter;
@@ -82,7 +82,7 @@ TEST(stream_export_import, vec_stream) {
 	StreamImporter importer("localhost");
 
 	// checking that the data is correct
-	boost::shared_ptr< DataGenerator<lin_algebra::vector_t> > a =
+	boost::shared_ptr< DataGenerator<lin_algebra::vec3f> > a =
 			importer.import_stream<DummyVecStream>("dummy_vec");
 
 	ASSERT_NEAR(a->get_data()[2], 2, 0.01);
@@ -99,7 +99,7 @@ TEST(stream_export_import, vec_stream) {
 TEST(stream_export_import, list) {
 
 	// the stream we are about to send
-	boost::shared_ptr<DataGenerator<lin_algebra::vector_t> > vs(new DummyVecStream);
+	boost::shared_ptr<DataGenerator<lin_algebra::vec3f> > vs(new DummyVecStream);
 
 	// exporting the stream
 	StreamExporter exporter;

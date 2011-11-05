@@ -17,7 +17,7 @@ namespace autopilot {
  */
 class NormalPlainPlatform {
 public:
-	typedef boost::shared_ptr<stream::DataGenerator<lin_algebra::vector_t> > vec_stream_ptr;
+	typedef boost::shared_ptr<stream::DataGenerator<lin_algebra::vec3f> > vec_stream_ptr;
 
 	virtual ~NormalPlainPlatform() {}
 

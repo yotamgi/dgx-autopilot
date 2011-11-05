@@ -6,7 +6,7 @@
 #include <stream/util/lin_algebra.h>
 #include "platform/hw/i2c_interface.h"
 
-class Hmc5843Compass : public stream::DataGenerator<lin_algebra::vector_t> {
+class Hmc5843Compass : public stream::DataGenerator<lin_algebra::vec3f> {
 public:
 	Hmc5843Compass(size_t device_i2c_num);
 	virtual ~Hmc5843Compass() {}
@@ -14,7 +14,7 @@ public:
 	/**
 	 * Returns the north vector in Mili-Tesla units.
 	 */
-	lin_algebra::vector_t get_data();
+	lin_algebra::vec3f get_data();
 	
 	virtual bool is_data_losed() { return false; };
 
