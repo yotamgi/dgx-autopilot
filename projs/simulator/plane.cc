@@ -99,14 +99,14 @@ void Plane::update_sensors(float time_delta) {
 	trans.rotateVect(dir, m_direction);
 
 	// update the gyro
-	SensorGenerator::vector_t gyro_data;
+	SensorGenerator::type gyro_data;
 	gyro_data[0] = angle_vel.X + frand()*10. + m_gyro_drift.X;
 	gyro_data[1] = angle_vel.Y + frand()*10. + m_gyro_drift.Y;
 	gyro_data[2] = angle_vel.Z + frand()*10. + m_gyro_drift.Z;
 	m_gyro->set_data(gyro_data);
 
 	// update the accelerometer
-	SensorGenerator::vector_t acc_data;
+	SensorGenerator::type acc_data;
 	irr::core::vector3df g(0, -1., 0);
 	irr::core::vector3df acc = g + 4.*(m_priv_dir - dir)/time_delta;
 	float acc_len = acc.getLength();
@@ -118,7 +118,7 @@ void Plane::update_sensors(float time_delta) {
 	m_acc->set_data(acc_data);
 
 	// update the compass
-	SensorGenerator::vector_t compass_data;
+	SensorGenerator::type compass_data;
 	irr::core::vector3df north(1., -1., 0);
 	trans.getTransposed().rotateVect(north);
 	north = north.normalize() * 20.;

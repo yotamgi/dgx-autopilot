@@ -11,7 +11,8 @@
 #include <boost/shared_ptr.hpp>
 #include <stdexcept>
 
-#include "stream/generators.h"
+#include <stream/generators.h>
+#include <stream/util/lin_algebra.h>
 #include "flying_object.h"
 
 namespace simulator {
@@ -74,21 +75,19 @@ public:
 	 * The plane class will calculate the sensor data and tell every sensor
 	 * what is its data.
 	 */
-	class SensorGenerator : public stream::VecGenerator<float,3> {
+	class SensorGenerator : public stream::DataGenerator<lin_algebra::vector_t> {
 	public:
-		vector_t get_data() {return m_data; }
+		lin_algebra::vector_t get_data() {return m_data; }
 
-		bool is_data_losed() { return false; }
-
-		void set_data(vector_t data) { m_data = data; }
+		void set_data(lin_algebra::vector_t data) { m_data = data; }
 
 	private:
-		vector_t m_data;
+		lin_algebra::vector_t m_data;
 	};
 
-	boost::shared_ptr<stream::VecGenerator<float,3> > gyro_gen() { return m_gyro; }
-	boost::shared_ptr<stream::VecGenerator<float,3> > acc_gen() { return m_acc; }
-	boost::shared_ptr<stream::VecGenerator<float,3> > compass_gen() { return m_compass; }
+	boost::shared_ptr<stream::DataGenerator<lin_algebra::vector_t> > gyro_gen() { return m_gyro; }
+	boost::shared_ptr<stream::DataGenerator<lin_algebra::vector_t> > acc_gen() { return m_acc; }
+	boost::shared_ptr<stream::DataGenerator<lin_algebra::vector_t> > compass_gen() { return m_compass; }
 
 private:
 

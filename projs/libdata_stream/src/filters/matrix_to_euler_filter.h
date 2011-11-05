@@ -15,12 +15,13 @@ namespace stream {
 namespace filters {
 
 class MatrixToEulerFilter :
-	public DataFilter<lin_algebra::matrix_t, typename VecGenerator<float,3>::vector_t>
+	public DataFilter<lin_algebra::matrix_t, lin_algebra::vector_t>
 {
 public:
 	MatrixToEulerFilter(boost::shared_ptr<DataGenerator<lin_algebra::matrix_t> > gen);
+	virtual ~MatrixToEulerFilter() {}
 
-	typename VecGenerator<float,3>::vector_t get_data();
+	lin_algebra::vector_t get_data();
 };
 
 

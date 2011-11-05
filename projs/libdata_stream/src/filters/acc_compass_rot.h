@@ -7,23 +7,25 @@
 #include <stream/util/lin_algebra.h>
 #include <stream/generators.h>
 
+typedef stream::DataGenerator<lin_algebra::vector_t> vec_stream_t ;
+
 namespace stream {
 namespace filters {
 
 class AccCompassRotation : public DataGenerator<lin_algebra::matrix_t> {
 public:
 	AccCompassRotation(
-			boost::shared_ptr<VecGenerator<float,3> > acc,
-			boost::shared_ptr<VecGenerator<float,3> > compass);
+			boost::shared_ptr<vec_stream_t> acc,
+			boost::shared_ptr<vec_stream_t> compass);
 
 	AccCompassRotation(
-			boost::shared_ptr<VecGenerator<float,3> > acc,
-			boost::shared_ptr<VecGenerator<float,3> > compass,
-			VecGenerator<float,3>::vector_t expected_north);
+			boost::shared_ptr<vec_stream_t> acc,
+			boost::shared_ptr<vec_stream_t> compass,
+			lin_algebra::vector_t expected_north);
 
 	AccCompassRotation(
-			boost::shared_ptr<VecGenerator<float,3> > acc,
-			boost::shared_ptr<VecGenerator<float,3> > compass,
+			boost::shared_ptr<vec_stream_t> acc,
+			boost::shared_ptr<vec_stream_t> compass,
 			float north_pitch_angle);
 
 	virtual ~AccCompassRotation() {}
@@ -45,8 +47,8 @@ private:
 		friend class AccCompassRotation;
 	};
 
-	boost::shared_ptr<VecGenerator<float,3> > m_acc;
-	boost::shared_ptr<VecGenerator<float,3> > m_compass;
+	boost::shared_ptr<vec_stream_t> m_acc;
+	boost::shared_ptr<vec_stream_t> m_compass;
 
 	float m_north_pitch_angle;
 

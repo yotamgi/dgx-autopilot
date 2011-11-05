@@ -2,22 +2,26 @@
 #define DGX1_PLATFORM_H_
 
 #include "interfaces/plain_platform.h"
-#include <boost/shared_ptr.hpp>
 #include <stdexcept>
 
 namespace autopilot {
 
+typedef boost::shared_ptr<stream::DataGenerator<lin_algebra::vector_t> > vec_stream_ptr;
+
 class DGX1Platform : public NormalPlainPlatform {
 public:
 	DGX1Platform();
+	~DGX1Platform(){}
 
-	boost::shared_ptr<stream::VecGenerator<float,3> > acc_sensor();
+	typedef boost::shared_ptr<stream::DataGenerator<lin_algebra::vector_t> > vec_stream_ptr;
 
-	boost::shared_ptr<stream::VecGenerator<float,3> > gyro_sensor();
+	vec_stream_ptr acc_sensor();
 
-	boost::shared_ptr<stream::VecGenerator<float,3> > compass_sensor();
+	vec_stream_ptr gyro_sensor();
 
-	boost::shared_ptr<stream::VecGenerator<float,3> > gps_sensor();
+	vec_stream_ptr compass_sensor();
+
+	vec_stream_ptr gps_sensor();
 
 	Servo* tilt_servo();
 
@@ -28,9 +32,9 @@ public:
 	Servo* gas_servo();
 
 private:
-	boost::shared_ptr<stream::VecGenerator<float,3> > m_acc;
-	boost::shared_ptr<stream::VecGenerator<float,3> > m_gyro;
-	boost::shared_ptr<stream::VecGenerator<float,3> > m_compass;
+	vec_stream_ptr m_acc;
+	vec_stream_ptr m_gyro;
+	vec_stream_ptr m_compass;
 };
 
 } //namespace autopilot

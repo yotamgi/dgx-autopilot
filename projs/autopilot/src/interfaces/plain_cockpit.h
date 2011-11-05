@@ -2,6 +2,7 @@
 #define PLAIN_COCKPIT_H
 
 #include <stream/generators.h>
+#include <stream/util/lin_algebra.h>
 #include "interfaces/servo.h"
 
 namespace autopilot {
@@ -16,7 +17,7 @@ public:
 
 	~NormalPlainCockpit() {}
 
-	virtual boost::shared_ptr<stream::VecGenerator<float,3> > orientation() = 0;
+	virtual boost::shared_ptr<stream::DataGenerator<lin_algebra::vector_t> > orientation() = 0;
 
 	virtual stream::DataGenerator<float>* speed() = 0;
 

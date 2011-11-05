@@ -1,6 +1,7 @@
 #include <iostream>
 #include "stream_presenter.h"
 #include <stream/stream_importer.h>
+#include <stream/util/lin_algebra.h>
 
 int main(int argc, char** argv) {
 
@@ -30,8 +31,8 @@ int main(int argc, char** argv) {
 		char c;
 		std::cin >> c;
 
-		boost::shared_ptr<stream::VecGenerator<float,3> > chosen =
-				imp.import_stream<stream::VecGenerator<float,3> >(avail.at(which-1));
+		boost::shared_ptr<stream::DataGenerator<lin_algebra::vector_t> > chosen =
+				imp.import_stream<stream::DataGenerator<lin_algebra::vector_t> >(avail.at(which-1));
 
 		//std::cout << chosen->get_data() << std::endl;
 

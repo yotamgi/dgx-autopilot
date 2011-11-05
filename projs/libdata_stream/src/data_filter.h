@@ -28,22 +28,6 @@ protected:
 	boost::shared_ptr<DataGenerator<data_source_t> > m_generator;
 };
 
-/**
- * Specific filter for VecGenerators.
- */
-template <typename T, size_t N, typename SourceT=T, size_t SourceN=N>
-class VecFilter : public VecGenerator< T,N >
-{
-public:
-	typedef typename VecGenerator< T,N >::vector_t vector_t;
-
-	VecFilter(boost::shared_ptr<VecGenerator<SourceT,SourceN> > generator):m_generator(generator) {}
-
-protected:
-
-	boost::shared_ptr<VecGenerator<SourceT,SourceN> > m_generator;
-};
-
 } // namespace stream
 
 #endif /* DATA_FILTER_H_ */

@@ -8,20 +8,20 @@ static float lim(float a, float down, float up) {
 }
 
 AccCompassRotation::AccCompassRotation(
-		boost::shared_ptr<VecGenerator<float,3> > acc,
-		boost::shared_ptr<VecGenerator<float,3> > compass):
+		boost::shared_ptr<vec_stream_t> acc,
+		boost::shared_ptr<vec_stream_t> compass):
 	m_acc(acc),
 	m_compass(compass),
 	m_reliable_stream(new AccCompassReliable)
 {
-	VecGenerator<float,3>::vector_t expected_north = m_compass->get_data();
+	lin_algebra::vector_t expected_north = m_compass->get_data();
 	m_north_pitch_angle = std::asin(expected_north[1]/lin_algebra::vec_len(expected_north));
 }
 
 AccCompassRotation::AccCompassRotation(
-		boost::shared_ptr<VecGenerator<float,3> > acc,
-		boost::shared_ptr<VecGenerator<float,3> > compass,
-		VecGenerator<float,3>::vector_t expected_north):
+		boost::shared_ptr<vec_stream_t> acc,
+		boost::shared_ptr<vec_stream_t> compass,
+		lin_algebra::vector_t expected_north):
 	m_acc(acc),
 	m_compass(compass),
 	m_reliable_stream(new AccCompassReliable)
@@ -32,8 +32,8 @@ AccCompassRotation::AccCompassRotation(
 
 
 AccCompassRotation::AccCompassRotation(
-		boost::shared_ptr<VecGenerator<float,3> > acc,
-		boost::shared_ptr<VecGenerator<float,3> > compass,
+		boost::shared_ptr<vec_stream_t> acc,
+		boost::shared_ptr<vec_stream_t> compass,
 		float north_pitch_angle):
 	m_acc(acc),
 	m_compass(compass),
@@ -45,21 +45,14 @@ AccCompassRotation::AccCompassRotation(
 lin_algebra::matrix_t AccCompassRotation::get_data() {
 
 	// get the sensor data
-	typename VecGenerator<float,3>::vector_t ground_data, north_data;
-	north_data = m_compass->get_data();
-	ground_data = m_acc->get_data();
-
-
-	// convert it to comfortable vectors
-	lin_algebra::vector_t ground(3), north(3);
-	north[0] = north_data[0]; 	north[1] = north_data[1]; 	north[2] = north_data[2];
-	ground[0] = ground_data[0]; ground[1] = ground_data[1]; ground[2] = ground_data[2];
+	lin_algebra::rowvec3f ground(m_acc->get_data().mem),
+			north(m_compass->get_data().mem);
 
 	// understand the reliability, and normalize the vectors
 	float acc_len_closeness = fabs(1. - lin_algebra::vec_len(ground));
 	float compass_len_closeness = fabs(20. - lin_algebra::vec_len(north))/20.;
-	lin_algebra::normalize(north);
-	lin_algebra::normalize(ground);
+	north = lin_algebra::normalize(north);
+	ground = lin_algebra::normalize(ground);
 	float angle = lin_algebra::angle_between(ground, north);
 	float angle_closeness = fabs((m_north_pitch_angle - angle)/(m_north_pitch_angle));
 
@@ -70,17 +63,17 @@ lin_algebra::matrix_t AccCompassRotation::get_data() {
 	//std::cout << acc_len_closeness << ", " <<  compass_len_closeness << ", " << angle_closeness << " = " << m_reliable_stream->reliability << std::endl;
 
 	// create the rotation matrix and fill its components
-	lin_algebra::matrix_t rot(3,3);
+	lin_algebra::matrix_t rot;
 
 	// the y we know, so just set it
-	lin_algebra::mat_row(rot, 1) = -ground;
+	rot.row(1) = -ground;
 
 	// calculate z as the vector orthogonal to x and y
-	lin_algebra::vector_t plane_z = lin_algebra::cross_product(north, ground);
-	lin_algebra::mat_row(rot, 2) = plane_z;
+	lin_algebra::rowvec3f plane_z = lin_algebra::cross_product(north, ground);
+	rot.row(2) = plane_z;
 
 	// calculating the x using the north
-	lin_algebra::mat_row(rot, 0) = lin_algebra::cross_product(plane_z, ground);
+	rot.row(0) = lin_algebra::cross_product(plane_z, ground);
 
 
 	return rot;

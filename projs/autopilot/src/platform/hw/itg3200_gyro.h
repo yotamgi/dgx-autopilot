@@ -2,10 +2,11 @@
 #ifndef ITG3200_GYRO_H_
 #define ITG3200_GYRO_H_
 
-#include "stream/generators.h"
+#include <stream/util/lin_algebra.h>
+#include <stream/generators.h>
 #include "platform/hw/i2c_interface.h"
 
-class Itg3200Gyro : public stream::VecGenerator<float,3> {
+class Itg3200Gyro : public stream::DataGenerator<lin_algebra::vector_t> {
 public:
 	Itg3200Gyro(size_t device_i2c_num);
 	virtual ~Itg3200Gyro() {}
@@ -13,7 +14,7 @@ public:
 	/**
 	 * Return the angular velocity
 	 */
-	vector_t get_data();
+	lin_algebra::vector_t get_data();
 	
 	virtual bool is_data_losed() { return false; };
 

@@ -2,6 +2,8 @@
 #define PLAIN_PLATFORM_H_
 
 #include <stream/generators.h>
+#include <boost/shared_ptr.hpp>
+#include <stream/util/lin_algebra.h>
 #include "interfaces/servo.h"
 
 namespace autopilot {
@@ -15,16 +17,17 @@ namespace autopilot {
  */
 class NormalPlainPlatform {
 public:
+	typedef boost::shared_ptr<stream::DataGenerator<lin_algebra::vector_t> > vec_stream_ptr;
 
 	virtual ~NormalPlainPlatform() {}
 
-	virtual boost::shared_ptr<stream::VecGenerator<float,3> > acc_sensor() = 0;
+	virtual vec_stream_ptr acc_sensor() = 0;
 
-	virtual boost::shared_ptr<stream::VecGenerator<float,3> > gyro_sensor() = 0;
+	virtual vec_stream_ptr gyro_sensor() = 0;
 
-	virtual boost::shared_ptr<stream::VecGenerator<float,3> > compass_sensor() = 0;
+	virtual vec_stream_ptr compass_sensor() = 0;
 
-	virtual boost::shared_ptr<stream::VecGenerator<float,3> > gps_sensor() = 0;
+	virtual vec_stream_ptr gps_sensor() = 0;
 
 	virtual Servo* tilt_servo() = 0;
 

@@ -4,26 +4,26 @@ namespace autopilot {
 
 DGX1SimulatorPlatform::DGX1SimulatorPlatform(std::string address):m_importer(address)
 {
-	m_gyro = m_importer.import_stream<stream::VecGenerator<float,3> >("simulator_gyro");
-	m_acc = m_importer.import_stream<stream::VecGenerator<float,3> >("simulator_acc");
-	m_compass = m_importer.import_stream<stream::VecGenerator<float,3> >("simulator_compass");
+	m_gyro = m_importer.import_stream<vec_stream>("simulator_gyro");
+	m_acc = m_importer.import_stream<vec_stream>("simulator_acc");
+	m_compass = m_importer.import_stream<vec_stream>("simulator_compass");
 }
 
-boost::shared_ptr<stream::VecGenerator<float,3> > DGX1SimulatorPlatform::acc_sensor() {
+vec_stream_ptr DGX1SimulatorPlatform::acc_sensor() {
 	return m_acc;
 }
 
-boost::shared_ptr<stream::VecGenerator<float,3> > DGX1SimulatorPlatform::gyro_sensor() {
+vec_stream_ptr DGX1SimulatorPlatform::gyro_sensor() {
 	return m_gyro;
 }
 
-boost::shared_ptr<stream::VecGenerator<float,3> > DGX1SimulatorPlatform::compass_sensor() {
+vec_stream_ptr DGX1SimulatorPlatform::compass_sensor() {
 	return m_compass;
 }
 
-boost::shared_ptr<stream::VecGenerator<float,3> > DGX1SimulatorPlatform::gps_sensor() {
+vec_stream_ptr DGX1SimulatorPlatform::gps_sensor() {
 	throw std::logic_error("GPS not implemented yet on dgx1 platform");
-	return boost::shared_ptr<stream::VecGenerator<float,3> >();
+	return vec_stream_ptr();
 }
 
 Servo* DGX1SimulatorPlatform::tilt_servo() {

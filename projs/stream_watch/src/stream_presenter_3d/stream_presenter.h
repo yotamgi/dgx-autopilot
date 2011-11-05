@@ -3,6 +3,7 @@
 #define DIRECTIONPRESENTER_H_
 
 #include <stream/generators.h>
+#include <stream/util/lin_algebra.h>
 #include <irrlicht/irrlicht.h>
 #include <boost/thread.hpp>
 #include <stdexcept>
@@ -13,8 +14,8 @@ class StreamPresenter {
 public:
 	typedef stream::DataGenerator<float> streamf;
 	typedef boost::shared_ptr<stream::DataGenerator<float> > streamfptr;
-	typedef stream::VecGenerator<float,3> stream3;
-	typedef boost::shared_ptr<stream::VecGenerator<float,3> > stream3ptr;
+	typedef stream::DataGenerator<lin_algebra::vector_t> stream3;
+	typedef boost::shared_ptr<stream3> stream3ptr;
 
 	StreamPresenter();
 	~StreamPresenter();
