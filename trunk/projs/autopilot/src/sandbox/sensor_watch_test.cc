@@ -9,14 +9,14 @@
 
 #include <boost/make_shared.hpp>
 
-typedef typename stream::VecGenerator<float,3>::vector_t vector_t;
+typedef typename lin_algebra::vector_t vector_t;
 
-vector_t calibrate_(stream::VecGenerator<float,3>* gen) {
+vector_t calibrate_(stream::DataGenerator<lin_algebra::vector_t>* gen) {
 	vector_t sum;
 	sum[0]= 0.; sum[1]=0.; sum[2]=0.;
 	size_t num =0;
 	while (true) {
-		typename stream::VecGenerator<float,3>::vector_t a = gen->get_data();
+		typename lin_algebra::vector_t a = gen->get_data();
 		for (size_t i=0; i<3; i++) {
 			sum[i] += a[i];
 		}
@@ -39,16 +39,15 @@ int main(int argc, char** argv) {
 	stream::StreamExporter exporter;
 
 	// gyro
-	typename stream::filters::StaticFilter<float, 3>::vector_t a, b;
+	lin_algebra::vector_t a;
 	a[0] = -1.217; a[1] = -3.966; a[2] = 2.614;
-	b[0] = 1.; b[1] = 1.; b[2] = 1.;
 
 	using namespace stream;
 	using namespace stream::filters;
 	using namespace boost;
 
 	shared_ptr<Itg3200Gyro> gyro = make_shared<Itg3200Gyro>(2);
-	shared_ptr<StaticFilter<float,3> > s = make_shared<StaticFilter<float,3> >(gyro, a, b);
+	shared_ptr<StaticFilter<lin_algebra::vector_t> > s = make_shared<StaticFilter<lin_algebra::vector_t> >(gyro, a);
 	shared_ptr<GyroToAVMatrix> gyro_rot = make_shared<GyroToAVMatrix>(s);
 	shared_ptr<MatrixToEulerFilter> gyro_rot_euler = make_shared<MatrixToEulerFilter>(gyro_rot);
 

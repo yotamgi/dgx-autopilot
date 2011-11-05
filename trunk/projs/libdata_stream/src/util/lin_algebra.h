@@ -8,76 +8,109 @@
 #ifndef LIN_ALGEBRA_H_
 #define LIN_ALGEBRA_H_
 
-#include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/matrix_proxy.hpp>
-#include <boost/numeric/ublas/io.hpp>
+#include <armadillo>
+#include <iterator>
 
 
 namespace lin_algebra {
 
-using namespace boost::numeric::ublas;
+	using namespace arma;
 
-/////////////////////////////////////////////////////////////////////
-// Types
-//////////////////////////
-typedef boost::numeric::ublas::vector<float> vector_t;
-typedef boost::numeric::ublas::matrix<float> matrix_t;
+	/////////////////////////////////////////////////////////////////////
+	// Types
+	//////////////////////////
+	typedef arma::fvec::fixed<3>   	  vector_t;
+	typedef arma::frowvec::fixed<3>   rowvec3f;
 
-/////////////////////////////////////////////////////////////////////
-// Constants
-//////////////////////////
-const float PI = 3.14159265;
+	typedef arma::fmat::fixed<3,3> 	  matrix_t;
 
 
-/////////////////////////////////////////////////////////////////////
-// Methods
-//////////////////////////
-typedef boost::numeric::ublas::matrix_row<matrix_t> mat_row;
-typedef boost::numeric::ublas::matrix_column<matrix_t> mat_col;
+	/////////////////////////////////////////////////////////////////////
+	// Constants
+	//////////////////////////
+	const float PI = 3.14159265f;
 
-/**
- * Expects two normalized vectors
- */
-inline float angle_between(const vector_t& a, const vector_t& b) {
+	/////////////////////////////////////////////////////////////////////
+	// Methods
+	//////////////////////////
+	//typedef boost::numeric::ublas::matrix_row<matrix_t> mat_row;
+	//typedef boost::numeric::ublas::matrix_column<matrix_t> mat_col;
 
-	return std::acos(a[0]*b[0] + a[1]*b[1] + a[2]*b[2]) * 180. / PI;
-}
+	template <typename Mat>
+	Mat identity_matrix(size_t x, size_t y) {
+		Mat m;
+		m.eye(x,y);
+		return m;
+	}
 
-template <typename Vector>
-inline float vec_len(const Vector& vec) {
-	return std::sqrt(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2]);
-}
+	/**
+	 * Expects two normalized vectors
+	 */
+	template <typename vec>
+	inline float angle_between(const vec& a, const vec& b) {
 
-template <typename vec>
-inline void normalize(vec& v) {
-	v /= vec_len(v);
-}
+		return std::acos(a[0]*b[0] + a[1]*b[1] + a[2]*b[2]) * 180. / PI;
+	}
 
-inline float sign(float num) {
-	return (num>0.)?1.:-1.;
-}
+	template <typename Vector>
+	inline float vec_len(const Vector& vec) {
+		return std::sqrt(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2]);
+	}
 
-inline vector_t cross_product(vector_t a, vector_t b) {
-	vector_t ans(3);
-	ans[0] = a[1]*b[2] - a[2]*b[1];
-	ans[1] = a[2]*b[0] - a[0]*b[2];
-	ans[2] = a[0]*b[1] - a[1]*b[0];
-	return ans;
-}
+	template <typename vec>
+	inline vec normalize(const vec& v) {
+		return v / vec_len(v);
+	}
+
+	inline float sign(float num) {
+		return (num>0.)?1.:-1.;
+	}
+
+	template <typename Vector>
+	inline Vector cross_product(Vector a, Vector b) {
+		Vector ans;
+		ans[0] = a[1]*b[2] - a[2]*b[1];
+		ans[1] = a[2]*b[0] - a[0]*b[2];
+		ans[2] = a[0]*b[1] - a[1]*b[0];
+		return ans;
+	}
 
 } // namepsace lin_algebra
 
-inline lin_algebra::vector_t operator * (lin_algebra::matrix_t M, lin_algebra::vector_t v) {
-	return lin_algebra::prod(M, v);
+/**
+ * Global vector operators
+ */
+inline std::ostream& operator << (std::ostream& os, const lin_algebra::vector_t &v) {
+	os << '[';
+	std::copy(v.begin(), v.end()-1, std::ostream_iterator<lin_algebra::vector_t::value_type>(os, ", "));
+	os << v[2] << "]";
+	return os;
 }
 
-inline lin_algebra::vector_t operator * (lin_algebra::vector_t v, lin_algebra::matrix_t M) {
-	return lin_algebra::prod(v, M);
+inline std::istream& operator >> (std::istream &is, lin_algebra::vector_t &v) {
+
+    char ch;
+    if (is >> ch && ch != '[') {
+        is.putback (ch);
+        is.setstate (std::ios_base::failbit);
+    };
+    for (size_t i=0; i<2; i++) {
+    	is >> v[i] >> ch;
+    	if (ch != ',') {
+    		is.putback (ch);
+    		is.setstate (std::ios_base::failbit);
+    		break;
+    	}
+    }
+	is >> v[2] >> ch;
+	if (ch != ']') {
+		is.putback (ch);
+		is.setstate (std::ios_base::failbit);
+	}
+
+    return is;
 }
 
-inline lin_algebra::matrix_t operator * (lin_algebra::matrix_t M1, lin_algebra::matrix_t M2) {
-	return lin_algebra::prod(M1, M2);
-}
 
 
 #endif /* LIN_ALGEBRA_H_ */

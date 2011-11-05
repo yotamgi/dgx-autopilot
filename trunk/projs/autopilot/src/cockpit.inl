@@ -16,17 +16,14 @@ static lin_algebra::matrix_t update_matrix(const lin_algebra::matrix_t& m1,
 
 	lin_algebra::matrix_t rot = m1 + m1 * m2;
 
-	// maintain the matrix ortho-normal
-	lin_algebra::mat_col col0 = lin_algebra::mat_col(rot, 0);
-	lin_algebra::mat_col col1 = lin_algebra::mat_col(rot, 1);
-	lin_algebra::mat_col col2 = lin_algebra::mat_col(rot, 2);
+	// maintain the matrix orthogonal
+	rot.col(2) = lin_algebra::cross_product(rot.col(0), rot.col(1));
+	rot.col(0) = lin_algebra::cross_product(rot.col(1), rot.col(2));
 
-	col2 = lin_algebra::cross_product(col0, col1);
-	col0 = lin_algebra::cross_product(col1, col2);
-
-	lin_algebra::normalize(col0);
-	lin_algebra::normalize(col1);
-	lin_algebra::normalize(col2);
+	// maintain the mtrix normal
+	rot.col(0) /= lin_algebra::vec_len(rot.col(0));
+	rot.col(1) /= lin_algebra::vec_len(rot.col(1));
+	rot.col(2) /= lin_algebra::vec_len(rot.col(2));
 
 	return rot;
 }
@@ -40,12 +37,12 @@ inline Cockpit::Cockpit(boost::shared_ptr<NormalPlainPlatform> platform):
 		boost::make_shared<filter::GyroToAVMatrix>(
 			m_platform->gyro_sensor()
 		),
-		(lin_algebra::matrix_t)lin_algebra::identity_matrix<float>(3),
+		lin_algebra::identity_matrix<lin_algebra::matrix_t>(3u, 3u),
 		update_matrix
 	);
 
 	boost::shared_ptr<filter::AccCompassRotation> acc_compass = boost::make_shared<filter::AccCompassRotation>(
-		boost::make_shared<stream::filters::LowPassVecFilter<float,3> >(
+		boost::make_shared<stream::filters::LowPassFilter<lin_algebra::vector_t> >(
 				m_platform->acc_sensor(),
 				1
 		),
@@ -61,25 +58,25 @@ inline Cockpit::Cockpit(boost::shared_ptr<NormalPlainPlatform> platform):
 			),
 			m_rest_orientation,
 			m_rest_reliability,
-			(lin_algebra::matrix_t)lin_algebra::identity_matrix<float>(3),
+			lin_algebra::identity_matrix<lin_algebra::matrix_t>(3, 3),
 			update_matrix
 	);
 }
 
-inline boost::shared_ptr<stream::VecGenerator<float,3> > Cockpit::orientation_gyro() {
-	return boost::shared_ptr<stream::VecGenerator<float,3> >(
-			(stream::VecGenerator<float,3>*)new stream::filters::MatrixToEulerFilter(m_gyro_orientation)
+inline boost::shared_ptr<stream::DataGenerator<lin_algebra::vector_t> > Cockpit::orientation_gyro() {
+	return boost::shared_ptr<stream::DataGenerator<lin_algebra::vector_t> >(
+			(stream::DataGenerator<lin_algebra::vector_t>*)new stream::filters::MatrixToEulerFilter(m_gyro_orientation)
 	);
 }
-inline boost::shared_ptr<stream::VecGenerator<float,3> > Cockpit::orientation_rest() {
-	return boost::shared_ptr<stream::VecGenerator<float,3> >(
-			(stream::VecGenerator<float,3>*)new stream::filters::MatrixToEulerFilter(m_rest_orientation)
+inline boost::shared_ptr<stream::DataGenerator<lin_algebra::vector_t> > Cockpit::orientation_rest() {
+	return boost::shared_ptr<stream::DataGenerator<lin_algebra::vector_t> >(
+			(stream::DataGenerator<lin_algebra::vector_t>*)new stream::filters::MatrixToEulerFilter(m_rest_orientation)
 	);
 }
 
-inline boost::shared_ptr<stream::VecGenerator<float,3> > Cockpit::orientation() {
-	return boost::shared_ptr<stream::VecGenerator<float,3> >(
-			(stream::VecGenerator<float,3>*)new stream::filters::MatrixToEulerFilter(m_orientation)
+inline boost::shared_ptr<stream::DataGenerator<lin_algebra::vector_t> > Cockpit::orientation() {
+	return boost::shared_ptr<stream::DataGenerator<lin_algebra::vector_t> >(
+			(stream::DataGenerator<lin_algebra::vector_t>*)new stream::filters::MatrixToEulerFilter(m_orientation)
 	);
 }
 

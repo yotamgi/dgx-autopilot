@@ -7,17 +7,20 @@
 
 namespace autopilot {
 
+typedef stream::DataGenerator<lin_algebra::vector_t> vec_stream;
+typedef boost::shared_ptr<vec_stream> 				 vec_stream_ptr;
+
 class DGX1SimulatorPlatform : public NormalPlainPlatform {
 public:
 	DGX1SimulatorPlatform(std::string address);
 
-	boost::shared_ptr<stream::VecGenerator<float,3> > acc_sensor();
+	vec_stream_ptr acc_sensor();
 
-	boost::shared_ptr<stream::VecGenerator<float,3> > gyro_sensor();
+	vec_stream_ptr gyro_sensor();
 
-	boost::shared_ptr<stream::VecGenerator<float,3> > compass_sensor();
+	vec_stream_ptr compass_sensor();
 
-	boost::shared_ptr<stream::VecGenerator<float,3> > gps_sensor();
+	vec_stream_ptr gps_sensor();
 
 	Servo* tilt_servo();
 
@@ -28,9 +31,9 @@ public:
 	Servo* gas_servo();
 
 private:
-	boost::shared_ptr<stream::VecGenerator<float,3 > > m_acc;
-	boost::shared_ptr<stream::VecGenerator<float,3 > > m_gyro;
-	boost::shared_ptr<stream::VecGenerator<float,3 > > m_compass;
+	vec_stream_ptr m_acc;
+	vec_stream_ptr m_gyro;
+	vec_stream_ptr m_compass;
 
 	stream::StreamImporter m_importer;
 

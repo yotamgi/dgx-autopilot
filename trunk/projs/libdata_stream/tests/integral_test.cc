@@ -6,6 +6,7 @@
 #include "generators.h"
 #include "filters/integral_filter.h"
 #include "util/time.h"
+#include "util/lin_algebra.h"
 
 
 /**
@@ -36,17 +37,17 @@ private:
  *  - y: time since creation
  *  - z: constant 1.0
  */
-class DummyVecGen : public stream::VecGenerator<float,3> {
+class DummyVecGen : public stream::DataGenerator<lin_algebra::vector_t> {
 public:
 	DummyVecGen() {
 		gettimeofday(&m_start_time, NULL);
 	}
 
-	vector_t get_data() {
+	lin_algebra::vector_t get_data() {
 		timeval curr;
 		gettimeofday(&curr, NULL);
 
-		vector_t ans;
+		lin_algebra::vector_t ans;
 		ans[0] = 1.f;
 		ans[1] = (curr.tv_usec - m_start_time.tv_usec)/1000000. + curr.tv_sec - m_start_time.tv_sec;
 		ans[2] = 1.f;
@@ -62,8 +63,10 @@ private:
 
 TEST(IntegralTest, vec_stress_test) {
 
-	boost::shared_ptr<DummyVecGen> a(new DummyVecGen);
-	stream::filters::VecIntegralFilter<float,3> integ(a);
+	boost::shared_ptr<stream::DataGenerator<lin_algebra::vector_t> > a(new DummyVecGen);
+	lin_algebra::vector_t zeros;
+	zeros << 0. << 0. << 0.;
+	stream::filters::IntegralFilter<lin_algebra::vector_t> integ(a, zeros);
 
 	Timer t;
 
@@ -83,7 +86,9 @@ TEST(IntegralTest, vec_stress_test) {
 TEST(IntegralTest, vec_random_test) {
 
 	boost::shared_ptr<DummyVecGen> a(new DummyVecGen);
-	stream::filters::VecIntegralFilter<float,3> integ(a);
+	lin_algebra::vector_t zeros;
+	zeros << 0. << 0. << 0.;
+	stream::filters::IntegralFilter<lin_algebra::vector_t> integ(a, zeros);
 
 
 	Timer t;

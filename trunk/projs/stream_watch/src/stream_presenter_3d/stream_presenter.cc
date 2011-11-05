@@ -174,7 +174,7 @@ void StreamPresenter::AnglePresenter::initalize(irr::IrrlichtDevice* m_device) {
 
 void StreamPresenter::AnglePresenter::draw(irr::IrrlichtDevice* m_device) {
 	irr::core::matrix4 rotx, roty, rotz;
-	stream3::vector_t curr_angle = m_angle_stream->get_data();
+	lin_algebra::vector_t curr_angle = m_angle_stream->get_data();
 	rotx.setRotationDegrees(core::vector3df(curr_angle[0], 0., 0.));
 	roty.setRotationDegrees(core::vector3df(0., curr_angle[1], 0.));
 	rotz.setRotationDegrees(core::vector3df(0., 0., curr_angle[2]));
@@ -204,7 +204,7 @@ void StreamPresenter::VecPresenter::initalize(irr::IrrlichtDevice* m_device) {
 }
 
 void StreamPresenter::VecPresenter::draw(irr::IrrlichtDevice* m_device) {
-	stream3::vector_t vec_raw = m_vec_stream->get_data();
+	lin_algebra::vector_t vec_raw = m_vec_stream->get_data();
 	irr::core::vector3df vec(vec_raw[2], vec_raw[1], vec_raw[0]);
 
 	float vec_len = vec.getLength();

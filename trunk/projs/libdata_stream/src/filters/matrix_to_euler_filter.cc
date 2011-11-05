@@ -5,12 +5,12 @@ namespace filters {
 
 MatrixToEulerFilter::MatrixToEulerFilter(
 		boost::shared_ptr<DataGenerator<lin_algebra::matrix_t> > gen):
-	DataFilter<lin_algebra::matrix_t, typename VecGenerator<float,3>::vector_t>(gen)
+	DataFilter<lin_algebra::matrix_t, lin_algebra::vector_t>(gen)
 {}
 
-typename VecGenerator<float,3>::vector_t MatrixToEulerFilter::get_data() {
+lin_algebra::vector_t MatrixToEulerFilter::get_data() {
 	lin_algebra::matrix_t rot_mat =  m_generator->get_data();
-	typename VecGenerator<float,3>::vector_t ans;
+	lin_algebra::vector_t ans;
 
 //	const lin_algebra::mat_col plan_x = lin_algebra::mat_col(rot_mat, 0);
 //	const lin_algebra::mat_col plan_y = lin_algebra::mat_col(rot_mat, 1);

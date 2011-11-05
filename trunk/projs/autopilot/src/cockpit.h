@@ -16,6 +16,8 @@
 
 namespace autopilot {
 
+typedef boost::shared_ptr<stream::DataGenerator<lin_algebra::vector_t> > vec_stream_ptr;
+
 /**
  * Specific cockpit for normal plains.
  */
@@ -27,7 +29,7 @@ public:
 
 	/* NormalPlainCockpit Implementation */
 
-	boost::shared_ptr<stream::VecGenerator<float,3> > orientation();
+	vec_stream_ptr orientation();
 
 	stream::DataGenerator<float>* speed();
 
@@ -40,8 +42,8 @@ public:
 	Servo* gas_servo();
 
 	/* Extending Fcuntions */
-	boost::shared_ptr<stream::VecGenerator<float,3> > orientation_gyro();
-	boost::shared_ptr<stream::VecGenerator<float,3> > orientation_rest();
+	vec_stream_ptr orientation_gyro();
+	vec_stream_ptr orientation_rest();
 	boost::shared_ptr<stream::DataGenerator<float> > rest_reliablity();
 
 private:

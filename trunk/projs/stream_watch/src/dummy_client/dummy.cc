@@ -4,7 +4,7 @@
 #include <stream/stream_exporter.h>
 #include "stream_watch/stream_presenter_3d.h"
 
-class SimpleGen : public stream::VecGenerator<float,3> {
+class SimpleGen : public stream::DataGenerator<lin_algebra::vector_t> {
 public:
 
 	SimpleGen():m_a(0.0f) {}
@@ -13,8 +13,8 @@ public:
 	/**
 	 * Return the angular velocity
 	 */
-	vector_t get_data() {
-		vector_t ans;
+	lin_algebra::vector_t get_data() {
+		lin_algebra::vector_t ans;
 		ans[0] = m_a; ans[1] = m_a+1.0f; ans[2] = m_a+2.0f;
 		m_a+=0.01f;
 		return ans;
