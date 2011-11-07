@@ -12,7 +12,8 @@ DATA_STREAM_OBJS = src/stream_exporter.o \
 GTEST_OBJS = tests/exporter_test.o  \
 			 tests/integral_test.o \
 			 tests/static_filter_test.o \
-			 tests/low_pass_test.o
+			 tests/low_pass_test.o \
+			 tests/watch_test.o
 
 all: host device 
 host: $(LIBDIR)/libdata_stream.so gtest
