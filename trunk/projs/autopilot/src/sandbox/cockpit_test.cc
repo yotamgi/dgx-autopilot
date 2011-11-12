@@ -40,6 +40,7 @@ int main(int argc, char** argv) {
 					exit(2);
 				} else {
 					present_addr = argv[i+1];
+					i++;
 				}
 				continue;
 			}
@@ -54,34 +55,9 @@ int main(int argc, char** argv) {
 		exit(1);
 	}
 
-
-	boost::shared_ptr<autopilot::NormalPlainPlatform> platform(
-		sim?
-			(autopilot::NormalPlainPlatform*)new autopilot::DGX1SimulatorPlatform(sim_addr) :
-			(autopilot::NormalPlainPlatform*)new autopilot::DGX1Platform()
-	);
-
-	autopilot::Cockpit cockpit(platform);
 	StreamPresenter presenter;
 
-	if (present_local) {
-		std::cout << "Presenting locally" << std::endl;
-		// the left one
-		presenter.addAngleStream(cockpit.watch_gyro_orientation(), irr::core::vector3df(-20., 0., 0.));
-
-		// the mid one
-		presenter.addAngleStream(cockpit.watch_rest_orientation(), irr::core::vector3df(0., 0., 0.));
-		presenter.addVecStream(platform->acc_sensor()->get_watch_stream(), irr::core::vector3df(0., 0., 0.));
-		presenter.addVecStream(platform->compass_sensor()->get_watch_stream(), irr::core::vector3df(0., 0., 0.));
-
-		// the right one
-		presenter.addAngleStream(cockpit.orientation()->get_watch_stream(), irr::core::vector3df(20., 0., 0.));
-
-		// the reliable stream
-		presenter.addSizeStream(cockpit.watch_rest_reliability());
-
-		presenter.run(true);
-	} else if (present_addr != "")  {
+	if (present_addr != "")  {
 		std::cout << "Presenting from addr " << present_addr << std::endl;
 		stream::StreamImporter imp(present_addr);
 
@@ -102,25 +78,53 @@ int main(int argc, char** argv) {
 		// the reliable stream
 		presenter.addSizeStream(imp.import_stream<fs>("reliability"));
 
-		presenter.run(true);
+		presenter.run(false);
 
 	} else {
-		std::cout << "Exporting all data" << std::endl;
-		stream::StreamExporter exp;
-		exp.register_stream(cockpit.watch_gyro_orientation(), "gyro_watch_orientation");
-		exp.register_stream(cockpit.watch_rest_orientation(), "watch_rest_orientation");
-		exp.register_stream(platform->acc_sensor()->get_watch_stream(), "watch_acc_sensor");
-		exp.register_stream(platform->compass_sensor()->get_watch_stream(), "watch_compass_sensor");
-		exp.register_stream(cockpit.orientation(), "orientation");
-		exp.register_stream(cockpit.watch_rest_reliability(), "reliability");
-		exp.run();
-	}
 
-	// to apply the watches
-	while (true) {
-		cockpit.orientation()->get_data();
-	}
 
+		boost::shared_ptr<autopilot::NormalPlainPlatform> platform(
+			sim?
+				(autopilot::NormalPlainPlatform*)new autopilot::DGX1SimulatorPlatform(sim_addr) :
+				(autopilot::NormalPlainPlatform*)new autopilot::DGX1Platform()
+		);
+
+		autopilot::Cockpit cockpit(platform);
+
+		if (present_local) {
+			std::cout << "Presenting locally" << std::endl;
+			// the left one
+			presenter.addAngleStream(cockpit.watch_gyro_orientation(), irr::core::vector3df(-20., 0., 0.));
+
+			// the mid one
+			presenter.addAngleStream(cockpit.watch_rest_orientation(), irr::core::vector3df(0., 0., 0.));
+			presenter.addVecStream(platform->acc_sensor()->get_watch_stream(), irr::core::vector3df(0., 0., 0.));
+			presenter.addVecStream(platform->compass_sensor()->get_watch_stream(), irr::core::vector3df(0., 0., 0.));
+
+			// the right one
+			presenter.addAngleStream(cockpit.orientation()->get_watch_stream(), irr::core::vector3df(20., 0., 0.));
+
+			// the reliable stream
+			presenter.addSizeStream(cockpit.watch_rest_reliability());
+
+			presenter.run(true);
+		}  else {
+			std::cout << "Exporting all data" << std::endl;
+			stream::StreamExporter exp;
+			exp.register_stream(cockpit.watch_gyro_orientation(), "gyro_watch_orientation");
+			exp.register_stream(cockpit.watch_rest_orientation(), "watch_rest_orientation");
+			exp.register_stream(platform->acc_sensor()->get_watch_stream(), "watch_acc_sensor");
+			exp.register_stream(platform->compass_sensor()->get_watch_stream(), "watch_compass_sensor");
+			exp.register_stream(cockpit.orientation(), "orientation");
+			exp.register_stream(cockpit.watch_rest_reliability(), "reliability");
+			exp.run();
+		}
+
+		// to apply the watches
+		while (true) {
+			cockpit.orientation()->get_data();
+		}
+	}
 	return 0;
 
 }
