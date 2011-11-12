@@ -2,10 +2,15 @@
 #define PLAIN_COCKPIT_H
 
 #include <stream/generators.h>
+#include <stream/filters/watch_filter.h>
 #include <stream/util/lin_algebra.h>
 #include "interfaces/servo.h"
 
 namespace autopilot {
+
+typedef stream::DataGenerator<lin_algebra::vec3f> 			vec_stream;
+typedef stream::filters::WatchFilter<lin_algebra::vec3f> 	vec_watch_stream;
+typedef stream::DataGenerator<float> 						float_stream;
 
 /**
  * Normal Plain Cockpit.
@@ -17,7 +22,7 @@ public:
 
 	~NormalPlainCockpit() {}
 
-	virtual boost::shared_ptr<stream::DataGenerator<lin_algebra::vec3f> > orientation() = 0;
+	virtual boost::shared_ptr<vec_watch_stream> orientation() = 0;
 
 	virtual stream::DataGenerator<float>* speed() = 0;
 

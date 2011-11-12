@@ -2,11 +2,14 @@
 #define PLAIN_PLATFORM_H_
 
 #include <stream/generators.h>
+#include <stream/filters/watch_filter.h>
 #include <boost/shared_ptr.hpp>
 #include <stream/util/lin_algebra.h>
 #include "interfaces/servo.h"
 
 namespace autopilot {
+
+typedef stream::filters::WatchFilter<lin_algebra::vec3f> 	vec_watch_stream;
 
 /**
  * Normal Plain Platform.
@@ -21,13 +24,13 @@ public:
 
 	virtual ~NormalPlainPlatform() {}
 
-	virtual vec_stream_ptr acc_sensor() = 0;
+	virtual boost::shared_ptr<vec_watch_stream> acc_sensor() = 0;
 
-	virtual vec_stream_ptr gyro_sensor() = 0;
+	virtual boost::shared_ptr<vec_watch_stream> gyro_sensor() = 0;
 
-	virtual vec_stream_ptr compass_sensor() = 0;
+	virtual boost::shared_ptr<vec_watch_stream> compass_sensor() = 0;
 
-	virtual vec_stream_ptr gps_sensor() = 0;
+	virtual boost::shared_ptr<vec_watch_stream> gps_sensor() = 0;
 
 	virtual Servo* tilt_servo() = 0;
 

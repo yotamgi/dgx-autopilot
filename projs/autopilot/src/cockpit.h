@@ -16,7 +16,9 @@
 
 namespace autopilot {
 
-typedef boost::shared_ptr<stream::DataGenerator<lin_algebra::vec3f> > vec_stream_ptr;
+typedef stream::DataGenerator<lin_algebra::vec3f> 			vec_stream;
+typedef stream::filters::WatchFilter<lin_algebra::vec3f> 	vec_watch_stream;
+typedef stream::DataGenerator<float> 						float_stream;
 
 /**
  * Specific cockpit for normal plains.
@@ -29,8 +31,8 @@ public:
 
 	/* NormalPlainCockpit Implementation */
 
-	vec_stream_ptr orientation();
 
+	boost::shared_ptr<vec_watch_stream> orientation();
 	stream::DataGenerator<float>* speed();
 
 	Servo* tilt_servo();
@@ -41,19 +43,18 @@ public:
 
 	Servo* gas_servo();
 
-	/* Extending Fcuntions */
-	vec_stream_ptr orientation_gyro();
-	vec_stream_ptr orientation_rest();
-	boost::shared_ptr<stream::DataGenerator<float> > rest_reliablity();
+	/* Extending function */
+	boost::shared_ptr<vec_stream> 		watch_gyro_orientation();
+	boost::shared_ptr<vec_stream> 		watch_rest_orientation();
+	boost::shared_ptr<float_stream> 	watch_rest_reliability();
 
 private:
 	boost::shared_ptr<NormalPlainPlatform> m_platform;
 
-	boost::shared_ptr<stream::DataGenerator<lin_algebra::mat3f> > m_gyro_orientation;
-	boost::shared_ptr<stream::DataGenerator<lin_algebra::mat3f> > m_rest_orientation;
-	boost::shared_ptr<stream::DataGenerator<lin_algebra::mat3f> > m_orientation;
-
-	boost::shared_ptr<stream::DataGenerator<float> > m_rest_reliability;
+	boost::shared_ptr<vec_watch_stream> m_orientation;
+	boost::shared_ptr<vec_stream> 		m_gyro_orientation;
+	boost::shared_ptr<vec_stream> 		m_rest_orientation;
+	boost::shared_ptr<float_stream> 	m_rest_reliability;
 
 };
 
