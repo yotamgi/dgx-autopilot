@@ -57,10 +57,11 @@ lin_algebra::mat3f AccCompassRotation::get_data() {
 	float angle_closeness = fabs((m_north_pitch_angle - angle)/(m_north_pitch_angle));
 
 	m_reliable_stream->reliability = lim(
-			0.4  - (acc_len_closeness*2. + compass_len_closeness/5. + angle_closeness/5.),
+			0.4  - (acc_len_closeness*6. + compass_len_closeness/5. + angle_closeness/50.),
 			0., 1.
 	);
 	//std::cout << acc_len_closeness << ", " <<  compass_len_closeness << ", " << angle_closeness << " = " << m_reliable_stream->reliability << std::endl;
+	//std::cout << angle << std::endl;
 
 	// create the rotation matrix and fill its components
 	lin_algebra::mat3f rot;
