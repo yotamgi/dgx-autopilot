@@ -46,7 +46,6 @@ int main(int argc, char** argv) {
 		exit(1);
 	}
 
-
 	boost::shared_ptr<autopilot::NormalPlainPlatform> platform(
 		sim?
 			(autopilot::NormalPlainPlatform*)new autopilot::DGX1SimulatorPlatform(sim_addr) :
@@ -54,33 +53,36 @@ int main(int argc, char** argv) {
 	);
 
 	autopilot::Cockpit cockpit(platform);
+	StreamPresenter presenter;
 
 	if (present_local) {
-		StreamPresenter presenter;
 		// the left one
-		presenter.addAngleStream(cockpit.orientation_gyro(), irr::core::vector3df(-20., 0., 0.));
+		presenter.addAngleStream(cockpit.watch_gyro_orientation(), irr::core::vector3df(-20., 0., 0.));
 
 		// the mid one
-		presenter.addAngleStream(cockpit.orientation_rest(), irr::core::vector3df(0., 0., 0.));
-		presenter.addVecStream(platform->acc_sensor(), irr::core::vector3df(0., 0., 0.));
-		presenter.addVecStream(platform->compass_sensor(), irr::core::vector3df(0., 0., 0.));
+		presenter.addAngleStream(cockpit.watch_rest_orientation(), irr::core::vector3df(0., 0., 0.));
+		presenter.addVecStream(platform->acc_sensor()->get_watch_stream(), irr::core::vector3df(0., 0., 0.));
+		presenter.addVecStream(platform->compass_sensor()->get_watch_stream(), irr::core::vector3df(0., 0., 0.));
 
 		// the right one
-		presenter.addAngleStream(cockpit.orientation(), irr::core::vector3df(20., 0., 0.));
+		presenter.addAngleStream(cockpit.orientation()->get_watch_stream(), irr::core::vector3df(20., 0., 0.));
 
 		// the reliable stream
-		presenter.addSizeStream(cockpit.rest_reliablity());
+		presenter.addSizeStream(cockpit.watch_rest_reliability());
 
-		presenter.run(false);
+		presenter.run(true);
 	} else {
 		stream::StreamExporter exp;
-		exp.register_stream(cockpit.orientation_gyro(), "cockpit_gyro");
-		exp.register_stream(cockpit.orientation_rest(), "cockpit_rest");
+		exp.register_stream(cockpit.watch_gyro_orientation(), "cockpit_gyro");
+		exp.register_stream(cockpit.watch_rest_orientation(), "cockpit_rest");
 		exp.register_stream(cockpit.orientation(), "cockpit_orientation");
 		exp.run();
 	}
 
-	while (true);
+	// to apply the watches
+	while (true) {
+		cockpit.orientation()->get_data();
+	}
 
 	return 0;
 

@@ -31,14 +31,30 @@ static lin_algebra::mat3f update_matrix(const lin_algebra::mat3f& m1,
 inline Cockpit::Cockpit(boost::shared_ptr<NormalPlainPlatform> platform):
 		m_platform(platform)
 {
+	// This is the stream schematics:
+	//
+	//				  +----GyroToAv----IntegralFilter----MatrixToEulerFilter---- m_gyro_orientation
+	//         (watch)|
+	// gyro ----------+--------------------GyroToAv-------+
+	//			    				   				      |
+	// acc --------+       orientation+----WatchFilter----+ KalmanFilter----MatrixToEulerFilter----WatchFilter----m_orientation
+	//			   | AccCompassRot    |		  +			  |
+	// compass ----+	   reliability+----WatchFilter----+
+	//                                        |    +
+	//                                        |    +------------ m_rest_orientation
+	//								          +----------------- m_rest_reliability
+	//
+
 	namespace filter = stream::filters;
 
-	m_gyro_orientation = boost::make_shared<filter::IntegralFilter<lin_algebra::mat3f> >(
-		boost::make_shared<filter::GyroToAVMatrix>(
-			m_platform->gyro_sensor()
-		),
-		lin_algebra::identity_matrix<lin_algebra::mat3f>(3u, 3u),
-		update_matrix
+	m_gyro_orientation = boost::make_shared<filter::MatrixToEulerFilter>(
+		boost::make_shared<filter::IntegralFilter<lin_algebra::mat3f> >(
+			boost::make_shared<filter::GyroToAVMatrix>(
+				m_platform->gyro_sensor()->get_watch_stream()
+			),
+			lin_algebra::identity_matrix<lin_algebra::mat3f>(3u, 3u),
+			update_matrix
+		)
 	);
 
 	boost::shared_ptr<filter::AccCompassRotation> acc_compass = boost::make_shared<filter::AccCompassRotation>(
@@ -49,38 +65,43 @@ inline Cockpit::Cockpit(boost::shared_ptr<NormalPlainPlatform> platform):
 		m_platform->compass_sensor(),
 		20. // the north explected angle
 	);
-	m_rest_orientation = acc_compass;
-	m_rest_reliability = acc_compass->reliable_stream();
 
-	m_orientation = boost::make_shared<filter::KalmanFilter<lin_algebra::mat3f> >(
-			boost::make_shared<filter::GyroToAVMatrix>(
-				m_platform->gyro_sensor()
-			),
-			m_rest_orientation,
-			m_rest_reliability,
-			lin_algebra::identity_matrix<lin_algebra::mat3f>(3, 3),
-			update_matrix
+	boost::shared_ptr<filter::WatchFilter<lin_algebra::mat3f> > ro(
+			new filter::WatchFilter<lin_algebra::mat3f>(acc_compass));
+
+	boost::shared_ptr<filter::WatchFilter<float> > rr(
+			new filter::WatchFilter<float>(acc_compass->reliable_stream()));
+
+	m_orientation = boost::make_shared<filter::WatchFilter<lin_algebra::vec3f> >(
+		boost::make_shared<filter::MatrixToEulerFilter>(
+			boost::make_shared<filter::KalmanFilter<lin_algebra::mat3f> >(
+				boost::make_shared<filter::GyroToAVMatrix>(
+					m_platform->gyro_sensor()
+				),
+				ro,
+				rr,
+				lin_algebra::identity_matrix<lin_algebra::mat3f>(3, 3),
+				update_matrix
+			)
+		)
 	);
+
+	m_rest_orientation = boost::make_shared<filter::MatrixToEulerFilter>(ro->get_watch_stream());
+	m_rest_reliability = rr->get_watch_stream();
 }
 
-inline boost::shared_ptr<stream::DataGenerator<lin_algebra::vec3f> > Cockpit::orientation_gyro() {
-	return boost::shared_ptr<stream::DataGenerator<lin_algebra::vec3f> >(
-			(stream::DataGenerator<lin_algebra::vec3f>*)new stream::filters::MatrixToEulerFilter(m_gyro_orientation)
-	);
+inline boost::shared_ptr<vec_stream> Cockpit::watch_gyro_orientation() {
+	return m_gyro_orientation;
 }
-inline boost::shared_ptr<stream::DataGenerator<lin_algebra::vec3f> > Cockpit::orientation_rest() {
-	return boost::shared_ptr<stream::DataGenerator<lin_algebra::vec3f> >(
-			(stream::DataGenerator<lin_algebra::vec3f>*)new stream::filters::MatrixToEulerFilter(m_rest_orientation)
-	);
+inline boost::shared_ptr<vec_stream> Cockpit::watch_rest_orientation() {
+	return m_rest_orientation;
 }
 
-inline boost::shared_ptr<stream::DataGenerator<lin_algebra::vec3f> > Cockpit::orientation() {
-	return boost::shared_ptr<stream::DataGenerator<lin_algebra::vec3f> >(
-			(stream::DataGenerator<lin_algebra::vec3f>*)new stream::filters::MatrixToEulerFilter(m_orientation)
-	);
+inline boost::shared_ptr<vec_watch_stream> Cockpit::orientation() {
+	return m_orientation;
 }
 
-inline boost::shared_ptr<stream::DataGenerator<float> > Cockpit::rest_reliablity() {
+inline boost::shared_ptr<float_stream> Cockpit::watch_rest_reliability() {
 	return m_rest_reliability;
 }
 
