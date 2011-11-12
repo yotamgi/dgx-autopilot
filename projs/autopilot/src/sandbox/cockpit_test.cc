@@ -8,23 +8,23 @@
 #include <iostream>
 
 void usage(std::string arg0) {
-	std::cout << arg0 << " [--sensor-sim <address> ]  [--present-local]  [--help]" << std::endl;
+	std::cout << arg0 << " [--sensor-sim <address> ]  [--present-from <address> ] [--present-local]  [--help]" << std::endl;
 }
 
 int main(int argc, char** argv) {
 	bool sim = false;
 	std::string sim_addr;
+	std::string present_addr;
 	bool present_local = false;
 	if (argc > 2) {
 		for (size_t i=1; i<(size_t)argc; i++) {
 
 			if (std::string(argv[i]) == "--sensor-sim") {
 				if ((size_t)argc < i+1) {
-					std::cout << "2" << std::endl;
 					usage(argv[0]);
 					exit(1);
 				} else {
-					sim_addr = argv[2];
+					sim_addr = argv[i+1];
 					i++;
 				}
 				sim = true;
@@ -34,8 +34,16 @@ int main(int argc, char** argv) {
 				present_local = true;
 				continue;
 			}
+			else if (std::string(argv[i]) == "--present-from") {
+				if ((size_t)argc < i+1) {
+					usage(argv[0]);
+					exit(2);
+				} else {
+					present_addr = argv[i+1];
+				}
+				continue;
+			}
 			else {
-				std::cout << "1" << std::endl;
 				usage(argv[0]);
 				exit(1);
 			}
@@ -45,6 +53,7 @@ int main(int argc, char** argv) {
 		usage(argv[0]);
 		exit(1);
 	}
+
 
 	boost::shared_ptr<autopilot::NormalPlainPlatform> platform(
 		sim?
@@ -56,6 +65,7 @@ int main(int argc, char** argv) {
 	StreamPresenter presenter;
 
 	if (present_local) {
+		std::cout << "Presenting locally" << std::endl;
 		// the left one
 		presenter.addAngleStream(cockpit.watch_gyro_orientation(), irr::core::vector3df(-20., 0., 0.));
 
@@ -71,11 +81,38 @@ int main(int argc, char** argv) {
 		presenter.addSizeStream(cockpit.watch_rest_reliability());
 
 		presenter.run(true);
+	} else if (present_addr != "")  {
+		std::cout << "Presenting from addr " << present_addr << std::endl;
+		stream::StreamImporter imp(present_addr);
+
+		typedef stream::DataGenerator<lin_algebra::vec3f> vs;
+		typedef stream::DataGenerator<float> fs;
+
+		// the left one
+		presenter.addAngleStream(imp.import_stream<vs>("gyro_watch_orientation"), irr::core::vector3df(-20., 0., 0.));
+
+		// the mid one
+		presenter.addAngleStream(imp.import_stream<vs>("watch_rest_orientation"), irr::core::vector3df(0., 0., 0.));
+		presenter.addVecStream(imp.import_stream<vs>("watch_acc_sensor"), irr::core::vector3df(0., 0., 0.));
+		presenter.addVecStream(imp.import_stream<vs>("watch_compass_sensor"), irr::core::vector3df(0., 0., 0.));
+
+		// the right one
+		presenter.addAngleStream(imp.import_stream<vs>("orientation"), irr::core::vector3df(20., 0., 0.));
+
+		// the reliable stream
+		presenter.addSizeStream(imp.import_stream<fs>("reliability"));
+
+		presenter.run(true);
+
 	} else {
+		std::cout << "Exporting all data" << std::endl;
 		stream::StreamExporter exp;
-		exp.register_stream(cockpit.watch_gyro_orientation(), "cockpit_gyro");
-		exp.register_stream(cockpit.watch_rest_orientation(), "cockpit_rest");
-		exp.register_stream(cockpit.orientation(), "cockpit_orientation");
+		exp.register_stream(cockpit.watch_gyro_orientation(), "gyro_watch_orientation");
+		exp.register_stream(cockpit.watch_rest_orientation(), "watch_rest_orientation");
+		exp.register_stream(platform->acc_sensor()->get_watch_stream(), "watch_acc_sensor");
+		exp.register_stream(platform->compass_sensor()->get_watch_stream(), "watch_compass_sensor");
+		exp.register_stream(cockpit.orientation(), "orientation");
+		exp.register_stream(cockpit.watch_rest_reliability(), "reliability");
 		exp.run();
 	}
 
