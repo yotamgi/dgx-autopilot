@@ -2,6 +2,7 @@
 #include <sstream>
 #include <iostream>
 #include <boost/make_shared.hpp>
+#include <boost/lexical_cast.hpp>
 
 // socket includes
 #include <stdio.h>
@@ -27,24 +28,20 @@ std::string TcpipConnection::read() {
 	char n;
 	do {
 		if (::read(m_sock_fd, &n, 1) != 1) {
-//			close(m_sock_fd);
 			throw ConnectionExceptioin("Could not read from socket");
 		}
-		str_size += std::string(n,1);
+		str_size += std::string(&n,1);
 	} while (n != ';');
 
 	// understand the size
-	std::stringstream ss(str_size);
-	size_t size;
-	ss >> size;
+	size_t size = boost::lexical_cast<size_t>(str_size.substr(0, str_size.size()-1));
 
 	// read the data
 	char buff[size];
 	if (::read(m_sock_fd, buff, size) != (int)size) {
-//		close(m_sock_fd);
 		throw ConnectionExceptioin("Could not read from socket");
 	}
-	return std::string(buff);
+	return std::string(buff, size);
 }
 
 void TcpipConnection::write(std::string data) {
