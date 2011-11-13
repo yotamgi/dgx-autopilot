@@ -8,9 +8,8 @@ class TestHelper {
 public:
 	TestHelper() {}
 	void connect() {
-		TcpipClient client("localhost", 0x6667);
+		TcpipClient client("localhost", 0x6666);
 		m_conn = client.connect();
-		std::cout << "Client ready!" << std::endl;
 	}
 
 	void send(std::string s) { m_conn->write(s); }
@@ -20,18 +19,37 @@ private:
 };
 
 TEST(tcpip, functional) {
-	TcpipServer server("localhost", 0x6667);
+	TcpipServer server("localhost", 0x6666);
 	TestHelper right;
 
 	boost::thread t(&TestHelper::connect, &right);
 	boost::shared_ptr<TcpipConnection> left = server.wait_for_connection(0.0);
-	std::cout << "Server finished" << std::endl;
 	t.join();
 
 	std::cout << "Two connections are ready!" << std::endl;
 
-	left->write("Hello");
-	std::string s = right.recv();
-	std::cout << s << std::endl;
-	ASSERT_EQ(std::string("Hello"), s);
+	std::string test_str = "Hello";
+	left->write(test_str);
+	ASSERT_EQ(test_str, right.recv());
+
+	test_str = "Hello to you too!";
+	right.send(test_str);
+	ASSERT_EQ(test_str, left->read());
+
+	right.send(test_str);
+	right.send(test_str);
+	ASSERT_EQ(test_str, left->read());
+	ASSERT_EQ(test_str, left->read());
 }
+
+TEST(tcpip, reconnect) {
+	TcpipServer server("localhost", 0x6666);
+	TestHelper right;
+
+	boost::thread t(&TestHelper::connect, &right);
+	boost::shared_ptr<TcpipConnection> left = server.wait_for_connection(0.0);
+	t.join();
+
+	std::cout << "Two connections are ready!" << std::endl;
+}
+
