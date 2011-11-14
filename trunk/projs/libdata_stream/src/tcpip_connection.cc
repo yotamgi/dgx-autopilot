@@ -55,7 +55,8 @@ void TcpipConnection::write(std::string data) {
 
 TcpipConnection::~TcpipConnection() {
 	std::cout << "Closing connection" << std::endl;
-	close(m_sock_fd);
+	if (close(m_sock_fd) != 0)
+		std::cout << "Couldn't close socket" << std::endl;
 }
 
 TcpipServer::TcpipServer(std::string listen_address, size_t port) {
@@ -65,6 +66,11 @@ TcpipServer::TcpipServer(std::string listen_address, size_t port) {
     if ((m_server_sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
     	throw std::runtime_error("Failed to create socket");
     }
+
+	// set the reuse address option
+    int opt = 1;
+    setsockopt(m_server_sock, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+
 
     // Construct the server sockaddr_in structure
     memset(&server_add, 0, sizeof(server_add));       // Clear struct
@@ -101,7 +107,9 @@ boost::shared_ptr<TcpipConnection> TcpipServer::wait_for_connection(float max_ti
 }
 
 TcpipServer::~TcpipServer() {
-	close(m_server_sock);
+	std::cout << "Closing server socket" << std::endl;
+	if (close(m_server_sock) != 0)
+		std::cout << "Couldn't close socket" << std::endl;
 }
 
 
