@@ -90,7 +90,7 @@ TcpipServer::TcpipServer(std::string listen_address, size_t port) {
     }
 }
 
-boost::shared_ptr<TcpipConnection> TcpipServer::wait_for_connection(float max_time){
+boost::shared_ptr<Connection> TcpipServer::get_connection(){
 	struct sockaddr_in client_add;
 
 	unsigned int clientlen = sizeof(client_add);
@@ -117,7 +117,7 @@ TcpipClient::TcpipClient(std::string host_address, size_t host_port):
 		m_host_address(host_address),
 		m_host_port(host_port) {}
 
-boost::shared_ptr<TcpipConnection> TcpipClient::connect() {
+boost::shared_ptr<Connection> TcpipClient::get_connection() {
 	// init the connection
     struct sockaddr_in serv_addr;
     struct hostent *server;

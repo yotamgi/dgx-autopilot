@@ -1,4 +1,4 @@
-#include <stream/tcpip_connection.h>
+#include <stream/util/tcpip_connection.h>
 #include <gtest/gtest.h>
 #include <boost/thread.hpp>
 
@@ -9,7 +9,7 @@ public:
 	TestHelper() {}
 	void connect() {
 		TcpipClient client("localhost", 0x6666);
-		m_conn = client.connect();
+		m_conn = client.get_connection();
 	}
 
 	void send(std::string s) { m_conn->write(s); }
@@ -23,7 +23,7 @@ TEST(tcpip, functional) {
 	TestHelper right;
 
 	boost::thread t(&TestHelper::connect, &right);
-	boost::shared_ptr<TcpipConnection> left = server.wait_for_connection(0.0);
+	boost::shared_ptr<Connection> left = server.get_connection();
 	t.join();
 
 	std::cout << "Two connections are ready!" << std::endl;
@@ -47,7 +47,7 @@ TEST(tcpip, reconnect) {
 	TestHelper right;
 
 	boost::thread t(&TestHelper::connect, &right);
-	boost::shared_ptr<TcpipConnection> left = server.wait_for_connection(0.0);
+	boost::shared_ptr<Connection> left = server.get_connection();
 	t.join();
 
 	std::cout << "Two connections are ready!" << std::endl;
