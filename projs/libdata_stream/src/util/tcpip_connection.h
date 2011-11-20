@@ -14,26 +14,28 @@ public:
 	void write(std::string data);
 	std::string read();
 
+	int fd() { return m_sock_fd; }
+
 private:
 	int m_sock_fd;
 };
 
-class TcpipServer {
+class TcpipServer : public ConnectionFactory {
 public:
 	TcpipServer(std::string listen_address, size_t port);
 	~TcpipServer();
 
-	boost::shared_ptr<TcpipConnection> wait_for_connection(float max_time);
+	boost::shared_ptr<Connection> get_connection();
 
 private:
 	int m_server_sock;
 };
 
-class TcpipClient {
+class TcpipClient : public ConnectionFactory {
 public:
 	TcpipClient(std::string host_address, size_t host_port);
 
-	boost::shared_ptr<TcpipConnection> connect();
+	boost::shared_ptr<Connection> get_connection();
 private:
 	std::string m_host_address;
 	size_t m_host_port;

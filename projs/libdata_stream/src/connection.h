@@ -3,6 +3,7 @@
 
 #include <string>
 #include <stdexcept>
+#include <boost/shared_ptr.hpp>
 
 namespace stream {
 
@@ -19,7 +20,15 @@ public:
 	virtual void write(std::string) = 0;
 	virtual std::string read() = 0;
 
+	virtual int fd() = 0;
+
 };
+
+class ConnectionFactory {
+public:
+	virtual boost::shared_ptr<Connection> get_connection() = 0;
+};
+
 
 
 }  // namespace stream
