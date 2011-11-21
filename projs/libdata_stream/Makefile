@@ -5,6 +5,7 @@ LIBDIR = ./lib
 
 DATA_STREAM_OBJS = src/stream_exporter.o \
 				   src/stream_importer.o \
+                   src/stream_connection.o \
 				   src/util/tcpip_connection.o \
 				   src/filters/gyro_to_av_matrix.o \
 				   src/filters/matrix_to_euler_filter.o \
@@ -15,7 +16,8 @@ GTEST_OBJS = tests/exporter_test.o  \
 			 tests/static_filter_test.o \
 			 tests/low_pass_test.o \
 			 tests/watch_test.o \
-			 tests/tcpip_conn_test.o
+			 tests/tcpip_conn_test.o \
+			 tests/stream_conn_test.o
 
 all: host device 
 host: $(LIBDIR)/libdata_stream.so gtest
