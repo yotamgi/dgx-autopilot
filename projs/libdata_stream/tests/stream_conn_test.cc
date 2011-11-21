@@ -21,11 +21,12 @@ void BasicHelper() {
 	strcon.run();
 
 	boost::shared_ptr<stream::DataGenerator<int> > s = strcon.import_stream<int>("stam2");
-
-	strcon.export_stream<int>(boost::make_shared<SimpleStream>(), "stam1");
-
 	EXPECT_EQ(s->get_data(), 0);
 	EXPECT_EQ(s->get_data(), 1);
+
+	usleep(1000000);
+	strcon.export_stream<int>(boost::make_shared<SimpleStream>(), "stam1");
+
 
 	usleep(100000);
 	strcon.stop();
@@ -44,6 +45,7 @@ TEST(stream_conn, basic) {
 
 	// export stream
 	strcon.export_stream<int>(boost::make_shared<SimpleStream>(), "stam2");
+	usleep(1000000);
 
 
 	// import stream

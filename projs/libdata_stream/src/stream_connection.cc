@@ -80,23 +80,32 @@ void StreamConnection::run(bool open_thread) {
 }
 
 void StreamConnection::wait_for_connections() {
-	while (m_running) {
+ 	while (m_running) {
 		// should be blocking
 		boost::shared_ptr<Connection> conn = m_factory->get_connection();
+		conn->write("OK");
 
 		std::string header = conn->read();
-		if (header[0] == protocol::DATA_CONN) {
-			std::cout << "Ha - StreamConnection got itself a connection" << std::endl;
-			std::string stream_name = header.substr(1, header.size()-1);
-
-			m_opened_stream_mutex.lock();
-			m_open_streams[conn] = m_exported_streams.at(stream_name);
-			m_opened_stream_mutex.unlock();
+		if (header != "OK") {
+			add_connection(conn, header);
 		} else {
-			std::cout << "This is a wierd connection..." << std::endl;
+			usleep(500000);
 		}
 	}
 }
 
+void StreamConnection::add_connection(boost::shared_ptr<Connection> conn, std::string header) {
+	if (header[0] == protocol::DATA_CONN) {
+		std::cout << "Ha - StreamConnection got itself a connection" << std::endl;
+		std::string stream_name = header.substr(1, header.size()-1);
+
+		m_opened_stream_mutex.lock();
+		m_open_streams[conn] = m_exported_streams.at(stream_name);
+		m_opened_stream_mutex.unlock();
+	} else {
+		std::cout << "Got header " << header << std::endl;
+		std::cout << "This is a wierd connection..." << std::endl;
+	}
+}
 
 }  // namespace stream

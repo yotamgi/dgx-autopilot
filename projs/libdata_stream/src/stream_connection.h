@@ -35,6 +35,7 @@ public:
 private:
 
 	void wait_for_connections();
+	void add_connection(boost::shared_ptr<Connection> conn, std::string header);
 
 	/**
 	 * The StreamProxy class.
@@ -81,7 +82,7 @@ private:
 
 	boost::shared_ptr<ConnectionFactory> m_factory;
 
-	boost::mutex m_opened_stream_mutex;
+	boost::shared_mutex m_opened_stream_mutex;
 
 	volatile bool m_running;
 };
