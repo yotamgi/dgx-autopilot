@@ -103,7 +103,13 @@ boost::shared_ptr<Connection> TcpipServer::get_connection(){
 
 	std::cout << "Client connected: " << inet_ntoa(client_add.sin_addr) << std::endl;
 
-	return boost::make_shared<TcpipConnection>(client_sock);
+	boost::shared_ptr<Connection> conn = boost::make_shared<TcpipConnection>(client_sock);
+
+	// some handshake
+	conn->read();
+	conn->write("Hello");
+
+	return conn;
 }
 
 TcpipServer::~TcpipServer() {
@@ -145,7 +151,13 @@ boost::shared_ptr<Connection> TcpipClient::get_connection() {
 		sleep(1);
     }
 
-    return boost::make_shared<TcpipConnection>(sock_fd);
+    boost::shared_ptr<Connection> conn = boost::make_shared<TcpipConnection>(sock_fd);
+
+    // some handshake
+    conn->write("Hello");
+    std::string ans = conn->read();
+
+    return conn;
 }
 
 }  // namespace stream
