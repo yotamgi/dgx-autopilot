@@ -12,6 +12,14 @@ inline StreamConnection::StreamConnection(boost::shared_ptr<ConnectionFactory> f
 template <typename T>
 inline boost::shared_ptr<DataGenerator<T> > StreamConnection::import_stream(std::string name) {
 	boost::shared_ptr<Connection> conn = m_factory->get_connection();
+	std::string header = conn->read();
+	while (header != "OK") {
+		std::cout << "Got header" << header << std::endl;
+		add_connection(conn, header);
+		boost::shared_ptr<Connection> conn = m_factory->get_connection();
+		header = conn->read();
+	}
+	conn->write("SABABA");
 	conn->write(std::string(&protocol::DATA_CONN, 1) + name);
 	return boost::make_shared<StreamProxy<T> >(conn);
 }
