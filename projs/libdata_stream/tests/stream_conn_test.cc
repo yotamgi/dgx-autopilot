@@ -18,6 +18,8 @@ void BasicHelper() {
 	boost::shared_ptr<stream::ConnectionFactory> client =
 				boost::make_shared<stream::TcpipClient>("localhost", 0x6666);
 	stream::StreamConnection strcon(client);
+
+	strcon.export_stream<int>(boost::make_shared<SimpleStream>(), "stam1");
 	strcon.run();
 
 	boost::shared_ptr<stream::DataGenerator<int> > s = strcon.import_stream<int>("stam2");
@@ -25,10 +27,6 @@ void BasicHelper() {
 	EXPECT_EQ(s->get_data(), 1);
 
 	usleep(1000000);
-	strcon.export_stream<int>(boost::make_shared<SimpleStream>(), "stam1");
-
-
-	usleep(100000);
 	strcon.stop();
 }
 
@@ -41,12 +39,10 @@ TEST(stream_conn, basic) {
 	boost::shared_ptr<stream::ConnectionFactory> server =
 			boost::make_shared<stream::TcpipServer>("localhost", 0x6666);
 	stream::StreamConnection strcon(server);
-	strcon.run();
 
 	// export stream
 	strcon.export_stream<int>(boost::make_shared<SimpleStream>(), "stam2");
-	usleep(1000000);
-
+	strcon.run();
 
 	// import stream
 	boost::shared_ptr<stream::DataGenerator<int> > s = strcon.import_stream<int>("stam1");
@@ -54,5 +50,6 @@ TEST(stream_conn, basic) {
 	EXPECT_EQ(s->get_data(), 1);
 
 	usleep(100000);
+	t.join();
 	strcon.stop();
 }
