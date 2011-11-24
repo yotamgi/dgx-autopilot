@@ -10,6 +10,13 @@ inline boost::shared_ptr<DataGenerator<T> > StreamConnection::import_stream(std:
 	m_control->write("NEW_STREAM");
 	boost::shared_ptr<Connection> conn = m_factory->get_connection();
 	conn->write(std::string(&protocol::DATA_CONN, 1) + name);
+
+	// again - in order to get out of the spit we wait a bit of random
+	// TODO - fix this.
+	timeval tv;
+	gettimeofday(&tv, NULL);
+	std::srand(tv.tv_usec);
+
 	return boost::make_shared<StreamProxy<T> >(conn);
 }
 

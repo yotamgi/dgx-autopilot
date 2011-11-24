@@ -43,15 +43,19 @@ void StreamConnection::run(bool open_thread) {
 			fd_set fds;
 			FD_ZERO(&fds);
 			FD_SET(m_control->fd(), &fds);
+			int max_fds = m_control->fd();
 			for (stream_conn_map_t::iterator iter = m_open_streams.begin(); iter != m_open_streams.end(); iter++) {
 				FD_SET(iter->first->fd(), &fds);
+				if (iter->first->fd() > max_fds) {
+					max_fds = iter->first->fd();
+				}
 			}
 
 			// define the timeout to be 0.1 secs
 			timeval tv; tv.tv_sec = 0; tv.tv_usec = 100000;
 
 			// select
-			int ret = select(sizeof(fds) * 8, &fds, NULL, NULL, &tv);
+			int ret = select(max_fds+1, &fds, NULL, NULL, &tv);
 			if (ret < 0) {
 				throw ConnectionExceptioin("Select failed");
 			} else if (ret == 0) {

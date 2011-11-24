@@ -4,7 +4,9 @@
 #include <gtest/gtest.h>
 #include <boost/make_shared.hpp>
 #include <boost/thread.hpp>
+#include <boost/format.hpp>
 #include <iostream>
+#include <vector>
 
 class SimpleStream : public stream::DataGenerator<int> {
 public:
@@ -53,3 +55,76 @@ TEST(stream_conn, basic) {
 	t.join();
 	strcon.stop();
 }
+
+void StressHelper(size_t howmany) {
+	// create connection
+	boost::shared_ptr<stream::ConnectionFactory> client =
+				boost::make_shared<stream::TcpipClient>("localhost", 0x6666);
+	stream::StreamConnection strcon(client);
+
+	// export 100 streams
+	for (size_t i=0; i<howmany; i++) {
+		strcon.export_stream<int>(boost::make_shared<SimpleStream>(), (boost::format("stream%d") % i).str());
+	}
+	strcon.run();
+
+	// import all streams
+	std::vector<boost::shared_ptr<stream::DataGenerator<int> > > streams;
+	for (size_t i=0; i<howmany; i++) {
+		streams.push_back(
+				strcon.import_stream<int>((boost::format("stream%d") % i).str())
+		);
+	}
+
+	// Read from them and validate output
+	for (int i=0; i<1000; i++) {
+		for (size_t stream=0; stream < howmany; stream++) {
+			EXPECT_EQ(streams[stream]->get_data(), (int)i);
+		}
+	}
+	usleep(100000);
+	strcon.stop();
+	usleep(100000);
+}
+
+
+TEST(stream_conn, stress) {
+
+	const size_t NUM_OF_STREAMS = 10;
+
+	// run the helper
+	boost::thread t(StressHelper, NUM_OF_STREAMS);
+
+	// create connection
+	boost::shared_ptr<stream::ConnectionFactory> server =
+			boost::make_shared<stream::TcpipServer>("localhost", 0x6666);
+	stream::StreamConnection strcon(server);
+
+	// export 100 streams
+	for (size_t i=0; i<NUM_OF_STREAMS; i++) {
+		strcon.export_stream<int>(boost::make_shared<SimpleStream>(), (boost::format("stream%d") % i).str());
+	}
+	strcon.run();
+
+	// import all streams
+	std::vector<boost::shared_ptr<stream::DataGenerator<int> > > streams;
+	for (size_t i=0; i<NUM_OF_STREAMS; i++) {
+
+		streams.push_back(
+				strcon.import_stream<int>((boost::format("stream%d") % i).str())
+		);
+	}
+
+	// Read from them and validate output
+	for (int i=0; i<1000; i++) {
+		for (size_t stream=0; stream < NUM_OF_STREAMS; stream++) {
+			EXPECT_EQ(streams[stream]->get_data(), (int)i);
+		}
+	}
+
+	usleep(100000);
+	t.join();
+	strcon.stop();
+
+}
+
