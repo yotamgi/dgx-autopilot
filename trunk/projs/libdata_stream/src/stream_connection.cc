@@ -27,9 +27,12 @@ StreamConnection::~StreamConnection() {
 }
 
 void StreamConnection::run(bool open_thread) {
+	if (m_running) {
+		return;
+	}
 	if (open_thread) {
-		boost::thread t(&StreamConnection::run, this, false);
-		size_t time = std::rand()%400000;
+		m_thread.reset(new boost::thread(&StreamConnection::run, this, false));
+		size_t time = std::rand()%800000;
 
 		// get out of sync with other clients
 		// TODO: find a better solution
@@ -57,6 +60,7 @@ void StreamConnection::run(bool open_thread) {
 			// select
 			int ret = select(max_fds+1, &fds, NULL, NULL, &tv);
 			if (ret < 0) {
+				std::cout << "Select failed: " << errno << std::endl;
 				throw ConnectionExceptioin("Select failed");
 			} else if (ret == 0) {
 				continue;
@@ -69,7 +73,7 @@ void StreamConnection::run(bool open_thread) {
 					boost::shared_ptr<Connection> conn = m_factory->get_connection();
 					add_connection(conn);
 				} else if (command.at(0) == protocol::END) {
-					std::cout << "Got end command" << std::endl;
+					std::cout << "Closing Connection" << std::endl;
 					m_running = false;
 					break;
 				} else {
@@ -103,7 +107,6 @@ void StreamConnection::run(bool open_thread) {
 void StreamConnection::add_connection(boost::shared_ptr<Connection> conn) {
 	std::string header = conn->read();
 	if (header[0] == protocol::DATA_CONN) {
-		std::cout << "Ha - StreamConnection got itself a connection" << std::endl;
 		std::string stream_name = header.substr(1, header.size()-1);
 
 		m_open_streams[conn] = m_exported_streams.at(stream_name);
