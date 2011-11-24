@@ -30,7 +30,7 @@ public:
 
 	void run(bool open_thread = true);
 
-	void stop() {m_running = false;}
+	void stop() {m_running = false; m_thread->join(); }
 
 private:
 
@@ -84,6 +84,7 @@ private:
 	boost::shared_ptr<Connection> m_control;
 
 	volatile bool m_running;
+	boost::shared_ptr<boost::thread> m_thread;
 };
 
 } // namespace stream
