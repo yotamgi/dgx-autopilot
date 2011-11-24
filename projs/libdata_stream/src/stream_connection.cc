@@ -1,6 +1,7 @@
 #include "stream_connection.h"
 #include <iostream>
 #include <vector>
+#include <sys/time.h>
 
 #include <stdio.h>
 #include <sys/time.h>
@@ -14,6 +15,11 @@ StreamConnection::StreamConnection(boost::shared_ptr<ConnectionFactory> factory)
 		m_running(false)
 {
 	m_control = m_factory->get_connection();
+
+	// srand
+	timeval tv;
+	gettimeofday(&tv, NULL);
+	std::srand(tv.tv_usec);
 }
 
 StreamConnection::~StreamConnection() {
@@ -23,6 +29,11 @@ StreamConnection::~StreamConnection() {
 void StreamConnection::run(bool open_thread) {
 	if (open_thread) {
 		boost::thread t(&StreamConnection::run, this, false);
+		size_t time = std::rand()%400000;
+
+		// get out of sync with other clients
+		// TODO: find a better solution
+		usleep(time);
 	} else {
 		m_running = true;
 
