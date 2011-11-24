@@ -105,8 +105,6 @@ boost::shared_ptr<Connection> TcpipServer::get_connection(){
 		throw ConnectionExceptioin("Server's accept function failed");
 	}
 
-	std::cout << "Client connected: " << inet_ntoa(client_add.sin_addr) << std::endl;
-
 	boost::shared_ptr<Connection> conn = boost::make_shared<TcpipConnection>(client_sock);
 
 	// some handshake
