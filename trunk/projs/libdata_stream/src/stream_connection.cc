@@ -32,10 +32,10 @@ void StreamConnection::run(bool open_thread) {
 	}
 	if (open_thread) {
 		m_thread.reset(new boost::thread(&StreamConnection::run, this, false));
-		size_t time = std::rand()%800000;
 
-		// get out of sync with other clients
+		// get out of sync with the other client
 		// TODO: find a better solution
+		size_t time = std::rand()%800000;
 		usleep(time);
 	} else {
 		m_running = true;
