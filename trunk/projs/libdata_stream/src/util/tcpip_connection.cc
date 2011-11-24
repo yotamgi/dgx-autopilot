@@ -21,6 +21,10 @@ namespace stream {
 TcpipConnection::TcpipConnection(int sock_fd):m_sock_fd(sock_fd)
 {}
 
+int TcpipConnection::fd() {
+	return m_sock_fd;
+}
+
 std::string TcpipConnection::read() {
 
 	// first, read the size of the data

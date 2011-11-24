@@ -14,7 +14,7 @@ public:
 	void write(std::string data);
 	std::string read();
 
-	int fd() { return m_sock_fd; }
+	int fd();
 
 private:
 	int m_sock_fd;
