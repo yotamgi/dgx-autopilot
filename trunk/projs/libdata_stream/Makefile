@@ -1,6 +1,6 @@
 CXX = g++
 CXXFLAGS += -g -Wall -O3 -Isrc -Iinclude -fPIC
-LDFLAGS = 
+LDFLAGS = -lboost_thread
 LIBDIR = ./lib
 
 DATA_STREAM_OBJS = src/stream_exporter.o \
@@ -33,7 +33,7 @@ $(LIBDIR):
 	
 
 $(LIBDIR)/libdata_stream.so: $(LIBDIR) $(DATA_STREAM_OBJS)
-	$(CXX)  $(DATA_STREAM_OBJS) -fPIC -shared -o $(LIBDIR)/libdata_stream.so
+	$(CXX)  $(DATA_STREAM_OBJS) -fPIC -shared -o $(LIBDIR)/libdata_stream.so $(LDFLAGS)
 	
 gtest: $(GTEST_OBJS) $(LIBDIR) $(LIBDIR)/libdata_stream.so
 	$(CXX) $(LDFLAGS) $(GTEST_OBJS) -Llib -ldata_stream -lpthread -lgtest -lgtest_main -lboost_thread \
