@@ -25,7 +25,11 @@ StreamConnection::StreamProxy<T>::StreamProxy(boost::shared_ptr<Connection> conn
 
 template <typename T>
 StreamConnection::StreamProxy<T>::~StreamProxy() {
-	m_conn->write(std::string(&protocol::END_STREAM, 1));
+	try {
+		m_conn->write(std::string(&protocol::END_STREAM, 1));
+	} catch (ConnectionExceptioin e) {
+		// do nothing - it might already be closed
+	}
 }
 
 template <typename T>

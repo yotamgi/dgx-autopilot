@@ -82,7 +82,9 @@ void StressHelper(size_t howmany) {
 			EXPECT_EQ(streams[stream]->get_data(), (int)i);
 		}
 	}
-	usleep(100000);
+
+	usleep(300000);
+	std::cout << "Closing" << std::endl;
 	strcon.stop();
 	usleep(100000);
 }
@@ -122,7 +124,8 @@ TEST(stream_conn, stress) {
 		}
 	}
 
-	usleep(100000);
+	usleep(300000);
+	std::cout << "Closing" << std::endl;
 	t.join();
 	strcon.stop();
 
