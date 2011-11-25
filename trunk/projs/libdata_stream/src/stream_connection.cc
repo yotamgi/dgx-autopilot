@@ -106,6 +106,9 @@ void StreamConnection::run(bool open_thread) {
 		if (first_to_close) {
 			m_control->write(std::string(&protocol::END, 1));
 		}
+
+		// free all the opened connections
+		m_open_streams.clear();
 	}
 }
 
