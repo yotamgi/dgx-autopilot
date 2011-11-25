@@ -23,7 +23,7 @@ StreamConnection::StreamConnection(boost::shared_ptr<ConnectionFactory> factory)
 }
 
 StreamConnection::~StreamConnection() {
-	m_control->write(std::string(&protocol::END, 1));
+	m_control->write(protocol::control::END_COMMAND);
 }
 
 void StreamConnection::run(bool open_thread) {
@@ -32,11 +32,6 @@ void StreamConnection::run(bool open_thread) {
 	}
 	if (open_thread) {
 		m_thread.reset(new boost::thread(&StreamConnection::run, this, false));
-
-		// get out of sync with the other client
-		// TODO: find a better solution
-		size_t time = std::rand()%800000;
-		usleep(time);
 	} else {
 		m_running = true;
 		bool first_to_close = true;
@@ -70,10 +65,15 @@ void StreamConnection::run(bool open_thread) {
 			// check who returned and write back
 			if (FD_ISSET(m_control->fd(), &fds)) {
 				std::string command = m_control->read();
-				if (command == "NEW_STREAM") {
+				if (command == protocol::control::NEW_STREAM) {
 					boost::shared_ptr<Connection> conn = m_factory->get_connection();
-					add_connection(conn);
-				} else if (command.at(0) == protocol::END) {
+
+					// negotiate a bit
+					conn->write("RUN");
+					if (conn->read() != "RUN") {
+						add_connection(conn);
+					}
+				} else if (command == protocol::control::END_COMMAND) {
 					std::cout << "Closing Connection" << std::endl;
 					m_running = false;
 					first_to_close = false;
@@ -104,7 +104,7 @@ void StreamConnection::run(bool open_thread) {
 			}
 		}
 		if (first_to_close) {
-			m_control->write(std::string(&protocol::END, 1));
+			m_control->write(protocol::control::END_COMMAND);
 		}
 
 		// free all the opened connections

@@ -14,7 +14,13 @@ namespace stream {
 
 namespace protocol {
 
-	const char CONTROL_CONN = 'C';
+	namespace control {
+
+		const std::string NEW_STREAM = "NEW_STREAM";
+		const std::string END_COMMAND = "END";
+
+	}  // namespace control
+
 	const char DATA_CONN 	= 'D';
 
 	const size_t PORT = 0x6666;
@@ -23,7 +29,6 @@ namespace protocol {
 
 	const char LIST_COMMAND = 'L';
 
-	const char END = 'E';
 
 	const char END_STREAM = 'S';
 
