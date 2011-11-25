@@ -39,6 +39,7 @@ void StreamConnection::run(bool open_thread) {
 		usleep(time);
 	} else {
 		m_running = true;
+		bool first_to_close = true;
 
 		while (m_running) {
 
@@ -75,6 +76,7 @@ void StreamConnection::run(bool open_thread) {
 				} else if (command.at(0) == protocol::END) {
 					std::cout << "Closing Connection" << std::endl;
 					m_running = false;
+					first_to_close = false;
 					break;
 				} else {
 					throw ConnectionExceptioin("unknown protocol");
@@ -100,6 +102,9 @@ void StreamConnection::run(bool open_thread) {
 			for (size_t i=0; i<to_be_cleaned.size(); i++) {
 				m_open_streams.erase(to_be_cleaned[i]);
 			}
+		}
+		if (first_to_close) {
+			m_control->write(std::string(&protocol::END, 1));
 		}
 	}
 }

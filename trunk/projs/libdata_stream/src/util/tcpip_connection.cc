@@ -51,14 +51,14 @@ std::string TcpipConnection::read() {
 void TcpipConnection::write(std::string data) {
 	std::stringstream packet;
 	packet << data.size() << ";" << data;
-	if (::write(m_sock_fd, packet.str().c_str(), packet.str().size()) != (int)packet.str().size()) {
+	if (::send(m_sock_fd, packet.str().c_str(), packet.str().size(), MSG_NOSIGNAL) != (int)packet.str().size()) {
 		close(m_sock_fd);
 		throw ConnectionExceptioin("Could not write to socket");
 	}
 }
 
 TcpipConnection::~TcpipConnection() {
-	std::cout << "Closing connection" << std::endl;
+	//std::cout << "Closing connection" << std::endl;
 	if (close(m_sock_fd) != 0)
 		std::cout << "Couldn't close socket" << std::endl;
 }
