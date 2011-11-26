@@ -3,7 +3,7 @@
 #define DATA_FILTER_H_
 
 #include "data_pop_stream.h"
-#include "collector.h"
+#include "data_push_stream.h"
 #include <boost/shared_ptr.hpp>
 
 namespace stream {
