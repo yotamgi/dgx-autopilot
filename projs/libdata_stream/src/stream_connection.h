@@ -3,6 +3,7 @@
 
 #include "connection.h"
 #include "data_pop_stream.h"
+#include "data_push_stream.h"
 #include "protocol.h"
 #include <string>
 #include <vector>
@@ -24,10 +25,14 @@ public:
 	~StreamConnection();
 
 	template <typename T>
-	void export_stream(boost::shared_ptr<DataPopStream<T> > stream, std::string name);
+	void export_pop_stream(boost::shared_ptr<DataPopStream<T> > stream, std::string name);
 
 	template <typename T>
-	boost::shared_ptr<DataPopStream<T> > import_stream(std::string name);
+	void export_push_stream(boost::shared_ptr<DataPushStream<T> > stream, std::string name);
+
+
+	template <typename T>
+	boost::shared_ptr<DataPopStream<T> > import_pop_stream(std::string name);
 
 	std::vector<std::string> list_avail();
 
@@ -59,15 +64,15 @@ private:
 	/**
 	 * Classes for getting reed of the bloody template arguments in the streams
 	 */
-	class AnyStream {
+	class AnyPopStream {
 	public:
 		virtual void serialize(std::ostream&) = 0;
 		virtual std::string get_name() = 0;
 	};
 	template <typename T>
-	class SpecificStream : public AnyStream {
+	class SpecificPopStream : public AnyPopStream {
 	public:
-		SpecificStream(boost::shared_ptr<DataPopStream<T> > gen, std::string name):m_gen(gen), m_name(name) {}
+		SpecificPopStream(boost::shared_ptr<DataPopStream<T> > gen, std::string name):m_gen(gen), m_name(name) {}
 
 		void serialize(std::ostream& os) {
 			os << m_gen->get_data();
@@ -80,8 +85,8 @@ private:
 	};
 
 
-	typedef std::map<std::string, boost::shared_ptr<AnyStream> >      stream_name_map_t;
-	typedef std::map<boost::shared_ptr<Connection>, boost::shared_ptr<AnyStream> >  stream_conn_map_t;
+	typedef std::map<std::string, boost::shared_ptr<AnyPopStream> >      stream_name_map_t;
+	typedef std::map<boost::shared_ptr<Connection>, boost::shared_ptr<AnyPopStream> >  stream_conn_map_t;
 
 	stream_name_map_t m_exported_streams;
 	stream_conn_map_t m_open_streams;
