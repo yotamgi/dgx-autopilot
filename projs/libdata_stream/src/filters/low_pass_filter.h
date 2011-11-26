@@ -9,7 +9,7 @@ namespace stream {
 namespace filters {
 
 template <typename data_t>
-class LowPassFilter : public DataFilter<data_t> {
+class LowPassFilter : public DataGenFilter<data_t> {
 public:
 	LowPassFilter(boost::shared_ptr<DataGenerator<data_t> > data_gen, size_t filt);
 

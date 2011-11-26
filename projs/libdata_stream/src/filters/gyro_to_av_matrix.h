@@ -10,7 +10,7 @@ namespace filters {
 
 
 class GyroToAVMatrix :
-	public DataFilter<lin_algebra::vec3f, lin_algebra::mat3f>
+	public DataGenFilter<lin_algebra::vec3f, lin_algebra::mat3f>
 {
 public:
 

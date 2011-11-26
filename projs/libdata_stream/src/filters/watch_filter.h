@@ -22,10 +22,10 @@ namespace filters {
  * Apart for that, this class is a normal bypass filter.
  */
 template <class T>
-class WatchFilter : public DataFilter<T> {
+class WatchFilter : public DataGenFilter<T> {
 public:
 	WatchFilter(boost::shared_ptr< DataGenerator<T> > gen):
-		DataFilter<T>(gen),
+		DataGenFilter<T>(gen),
 		m_watch_stream(new WatchStream(this))
 	{}
 	~WatchFilter() {}
@@ -34,7 +34,7 @@ public:
 	 * The normal bypass filter get_data function.
 	 */
 	T get_data() {
-		m_watched = DataFilter<T>::m_generator->get_data();
+		m_watched = DataGenFilter<T>::m_generator->get_data();
 		return m_watched;
 	}
 

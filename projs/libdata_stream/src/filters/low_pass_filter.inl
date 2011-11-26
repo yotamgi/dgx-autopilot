@@ -9,19 +9,19 @@ template <typename data_t>
 LowPassFilter<data_t>::LowPassFilter(
 		boost::shared_ptr<DataGenerator<data_t> > data_gen,
 		size_t filt):
-	DataFilter<data_t>(data_gen),
+	DataGenFilter<data_t>(data_gen),
 	m_samples(filt),
 	m_size(filt),
 	m_max(1000),
 	m_left_to_reset(m_max)
 {
 	// start everythig with initial value
-	data_t dat = DataFilter<data_t>::m_generator->get_data();
+	data_t dat = DataGenFilter<data_t>::m_generator->get_data();
 	m_samples.push_back(dat);
 	m_sum = dat;
 
 	for (size_t i=0; i<m_size-1; i++) {
-		data_t dat = DataFilter<data_t>::m_generator->get_data();
+		data_t dat = DataGenFilter<data_t>::m_generator->get_data();
 		m_sum += dat;
 		m_samples.push_back(dat);
 	}
@@ -29,7 +29,7 @@ LowPassFilter<data_t>::LowPassFilter(
 
 template <typename data_t>
 data_t LowPassFilter<data_t>::get_data() {
-	data_t dat = DataFilter<data_t>::m_generator->get_data();
+	data_t dat = DataGenFilter<data_t>::m_generator->get_data();
 	m_sum += dat;
 	m_sum -= m_samples.front();
 	m_samples.push_back(dat);

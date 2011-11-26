@@ -22,12 +22,12 @@ namespace stream {
 namespace filters {
 
 template <typename data_t>
-class IntegralFilter : public DataFilter<data_t> {
+class IntegralFilter : public DataGenFilter<data_t> {
 public:
 	IntegralFilter(boost::shared_ptr<DataGenerator<data_t> > data_gen,
 			data_t start_val,
 			boost::function<data_t(data_t, data_t)> apply =  std::plus<data_t>()):
-		DataFilter<data_t>(data_gen),
+		DataGenFilter<data_t>(data_gen),
 		m_state(start_val),
 		m_apply(apply),
 		m_prev_time(get_curr_time())
@@ -40,7 +40,7 @@ public:
 		double time_delta = curr_time - m_prev_time;
 		m_prev_time = curr_time;
 
-		data_t change = DataFilter<data_t>::m_generator->get_data();
+		data_t change = DataGenFilter<data_t>::m_generator->get_data();
 		m_state = m_apply(m_state, time_delta * change);
 		return m_state;
 	}

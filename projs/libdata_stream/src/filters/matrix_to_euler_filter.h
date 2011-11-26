@@ -15,7 +15,7 @@ namespace stream {
 namespace filters {
 
 class MatrixToEulerFilter :
-	public DataFilter<lin_algebra::mat3f, lin_algebra::vec3f>
+	public DataGenFilter<lin_algebra::mat3f, lin_algebra::vec3f>
 {
 public:
 	MatrixToEulerFilter(boost::shared_ptr<DataGenerator<lin_algebra::mat3f> > gen);
