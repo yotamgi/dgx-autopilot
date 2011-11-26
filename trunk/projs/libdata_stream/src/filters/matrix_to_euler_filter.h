@@ -15,10 +15,10 @@ namespace stream {
 namespace filters {
 
 class MatrixToEulerFilter :
-	public DataGenFilter<lin_algebra::mat3f, lin_algebra::vec3f>
+	public StreamPopFilter<lin_algebra::mat3f, lin_algebra::vec3f>
 {
 public:
-	MatrixToEulerFilter(boost::shared_ptr<DataGenerator<lin_algebra::mat3f> > gen);
+	MatrixToEulerFilter(boost::shared_ptr<DataPopStream<lin_algebra::mat3f> > gen);
 	virtual ~MatrixToEulerFilter() {}
 
 	lin_algebra::vec3f get_data();

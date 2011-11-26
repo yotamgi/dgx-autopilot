@@ -11,7 +11,7 @@
 
 typedef typename lin_algebra::vec3f vector_t;
 
-vector_t calibrate_(stream::DataGenerator<lin_algebra::vec3f>* gen) {
+vector_t calibrate_(stream::DataPopStream<lin_algebra::vec3f>* gen) {
 	vector_t sum;
 	sum[0]= 0.; sum[1]=0.; sum[2]=0.;
 	size_t num =0;

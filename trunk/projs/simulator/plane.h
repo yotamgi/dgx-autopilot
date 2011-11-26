@@ -11,7 +11,7 @@
 #include <boost/shared_ptr.hpp>
 #include <stdexcept>
 
-#include <stream/generators.h>
+#include <stream/data_pop_stream.h>
 #include <stream/util/lin_algebra.h>
 #include "flying_object.h"
 
@@ -75,7 +75,7 @@ public:
 	 * The plane class will calculate the sensor data and tell every sensor
 	 * what is its data.
 	 */
-	class SensorGenerator : public stream::DataGenerator<lin_algebra::vec3f> {
+	class SensorGenerator : public stream::DataPopStream<lin_algebra::vec3f> {
 	public:
 		lin_algebra::vec3f get_data() {return m_data; }
 
@@ -85,9 +85,9 @@ public:
 		lin_algebra::vec3f m_data;
 	};
 
-	boost::shared_ptr<stream::DataGenerator<lin_algebra::vec3f> > gyro_gen() { return m_gyro; }
-	boost::shared_ptr<stream::DataGenerator<lin_algebra::vec3f> > acc_gen() { return m_acc; }
-	boost::shared_ptr<stream::DataGenerator<lin_algebra::vec3f> > compass_gen() { return m_compass; }
+	boost::shared_ptr<stream::DataPopStream<lin_algebra::vec3f> > gyro_gen() { return m_gyro; }
+	boost::shared_ptr<stream::DataPopStream<lin_algebra::vec3f> > acc_gen() { return m_acc; }
+	boost::shared_ptr<stream::DataPopStream<lin_algebra::vec3f> > compass_gen() { return m_compass; }
 
 private:
 

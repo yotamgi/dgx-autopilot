@@ -6,7 +6,7 @@
 #include <stdexcept>
 #include <vector>
 #include <boost/numeric/ublas/io.hpp>
-#include "generators.h"
+#include "data_pop_stream.h"
 #include "protocol.h"
 
 namespace stream {

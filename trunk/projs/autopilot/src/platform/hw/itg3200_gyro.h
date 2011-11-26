@@ -3,10 +3,10 @@
 #define ITG3200_GYRO_H_
 
 #include <stream/util/lin_algebra.h>
-#include <stream/generators.h>
+#include <stream/data_pop_stream.h>
 #include "platform/hw/i2c_interface.h"
 
-class Itg3200Gyro : public stream::DataGenerator<lin_algebra::vec3f> {
+class Itg3200Gyro : public stream::DataPopStream<lin_algebra::vec3f> {
 public:
 	Itg3200Gyro(size_t device_i2c_num);
 	virtual ~Itg3200Gyro() {}

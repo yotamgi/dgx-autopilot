@@ -22,10 +22,10 @@ namespace filters {
  * Apart for that, this class is a normal bypass filter.
  */
 template <class T>
-class WatchFilter : public DataGenFilter<T> {
+class WatchFilter : public StreamPopFilter<T> {
 public:
-	WatchFilter(boost::shared_ptr< DataGenerator<T> > gen):
-		DataGenFilter<T>(gen),
+	WatchFilter(boost::shared_ptr< DataPopStream<T> > gen):
+		StreamPopFilter<T>(gen),
 		m_watch_stream(new WatchStream(this))
 	{}
 	~WatchFilter() {}
@@ -34,7 +34,7 @@ public:
 	 * The normal bypass filter get_data function.
 	 */
 	T get_data() {
-		m_watched = DataGenFilter<T>::m_generator->get_data();
+		m_watched = StreamPopFilter<T>::m_generator->get_data();
 		return m_watched;
 	}
 
@@ -42,7 +42,7 @@ public:
 	 * Returns the watch stream - the actuall stream that will show you the strean data without
 	 * generating new data in the original stream.
 	 */
-	boost::shared_ptr< DataGenerator<T> > get_watch_stream() const {
+	boost::shared_ptr< DataPopStream<T> > get_watch_stream() const {
 		return m_watch_stream;
 	}
 
@@ -53,7 +53,7 @@ private:
 	 * A dummy stream that gets a WatchFilter and returns allways its m_watched data.
 	 * returned by WatchFilter::get_watch_stream method.s
 	 */
-	class WatchStream : public DataGenerator<T> {
+	class WatchStream : public DataPopStream<T> {
 	public:
 		WatchStream(WatchFilter* father):m_father(father){}
 
@@ -69,7 +69,7 @@ private:
 	T m_watched;
 
 	/** the watch stream - the stream that is returned by get_watch_stream */
-	boost::shared_ptr< DataGenerator<T> > m_watch_stream;
+	boost::shared_ptr< DataPopStream<T> > m_watch_stream;
 };
 
 

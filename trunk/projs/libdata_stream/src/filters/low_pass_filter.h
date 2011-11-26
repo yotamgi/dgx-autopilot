@@ -9,9 +9,9 @@ namespace stream {
 namespace filters {
 
 template <typename data_t>
-class LowPassFilter : public DataGenFilter<data_t> {
+class LowPassFilter : public StreamPopFilter<data_t> {
 public:
-	LowPassFilter(boost::shared_ptr<DataGenerator<data_t> > data_gen, size_t filt);
+	LowPassFilter(boost::shared_ptr<DataPopStream<data_t> > data_gen, size_t filt);
 
 	data_t get_data();
 

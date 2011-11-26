@@ -2,13 +2,13 @@
 #include <gtest/gtest.h>
 #include <boost/thread.hpp>
 #include "util/lin_algebra.h"
-#include "generators.h"
+#include "data_pop_stream.h"
 #include "stream_exporter.h"
 #include "stream_importer.h"
 
 using namespace stream;
 
-class DummyIntStream : public DataGenerator<int> {
+class DummyIntStream : public DataPopStream<int> {
 public:
 	DummyIntStream():m_counter(0){}
 	virtual ~DummyIntStream() {}
@@ -23,7 +23,7 @@ private:
 	int m_counter;
 };
 
-class DummyVecStream : public DataGenerator<lin_algebra::vec3f> {
+class DummyVecStream : public DataPopStream<lin_algebra::vec3f> {
 public:
 	DummyVecStream():m_counter(0){}
 	virtual ~DummyVecStream() {}
@@ -47,7 +47,7 @@ private:
 TEST(stream_export_import, int_stream) {
 
 	// the stream we are about to send
-	boost::shared_ptr<DataGenerator<int> > is(new DummyIntStream);
+	boost::shared_ptr<DataPopStream<int> > is(new DummyIntStream);
 
 	// exporting the stream
 	StreamExporter exporter;
@@ -58,7 +58,7 @@ TEST(stream_export_import, int_stream) {
 	StreamImporter importer("localhost");
 
 	// checking that the data is correct
-	boost::shared_ptr< DataGenerator<int> > a = importer.import_stream< DataGenerator<int> >("dummy_int");
+	boost::shared_ptr< DataPopStream<int> > a = importer.import_stream< DataPopStream<int> >("dummy_int");
 	ASSERT_EQ(a->get_data(), 0);
 	ASSERT_EQ(a->get_data(), 1);
 	ASSERT_EQ(a->get_data(), 2);
@@ -71,7 +71,7 @@ TEST(stream_export_import, int_stream) {
 TEST(stream_export_import, vec_stream) {
 
 	// the stream we are about to send
-	boost::shared_ptr<DataGenerator<lin_algebra::vec3f> > vs(new DummyVecStream);
+	boost::shared_ptr<DataPopStream<lin_algebra::vec3f> > vs(new DummyVecStream);
 
 	// exporting the stream
 	StreamExporter exporter;
@@ -82,7 +82,7 @@ TEST(stream_export_import, vec_stream) {
 	StreamImporter importer("localhost");
 
 	// checking that the data is correct
-	boost::shared_ptr< DataGenerator<lin_algebra::vec3f> > a =
+	boost::shared_ptr< DataPopStream<lin_algebra::vec3f> > a =
 			importer.import_stream<DummyVecStream>("dummy_vec");
 
 	ASSERT_NEAR(a->get_data()[2], 2, 0.01);
@@ -99,7 +99,7 @@ TEST(stream_export_import, vec_stream) {
 TEST(stream_export_import, list) {
 
 	// the stream we are about to send
-	boost::shared_ptr<DataGenerator<lin_algebra::vec3f> > vs(new DummyVecStream);
+	boost::shared_ptr<DataPopStream<lin_algebra::vec3f> > vs(new DummyVecStream);
 
 	// exporting the stream
 	StreamExporter exporter;

@@ -3,10 +3,10 @@
 #define ADXL345_ACC_H_ 
 
 #include <stream/util/lin_algebra.h>
-#include <stream/generators.h>
+#include <stream/data_pop_stream.h>
 #include "platform/hw/i2c_interface.h"
 
-class Adxl345Acc : public stream::DataGenerator<lin_algebra::vec3f> {
+class Adxl345Acc : public stream::DataPopStream<lin_algebra::vec3f> {
 public:
 	Adxl345Acc(size_t device_i2c_num);
 	virtual ~Adxl345Acc() {}

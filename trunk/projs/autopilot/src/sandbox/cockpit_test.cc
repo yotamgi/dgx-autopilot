@@ -61,8 +61,8 @@ int main(int argc, char** argv) {
 		std::cout << "Presenting from addr " << present_addr << std::endl;
 		stream::StreamImporter imp(present_addr);
 
-		typedef stream::DataGenerator<lin_algebra::vec3f> vs;
-		typedef stream::DataGenerator<float> fs;
+		typedef stream::DataPopStream<lin_algebra::vec3f> vs;
+		typedef stream::DataPopStream<float> fs;
 
 		// the left one
 		presenter.addAngleStream(imp.import_stream<vs>("gyro_watch_orientation"), irr::core::vector3df(-20., 0., 0.));

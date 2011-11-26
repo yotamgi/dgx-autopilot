@@ -8,7 +8,7 @@
 #ifndef KALMAN_FILTER_H_
 #define KALMAN_FILTER_H_
 
-#include <stream/generators.h>
+#include <stream/data_pop_stream.h>
 #include <stream/util/time.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
@@ -17,20 +17,20 @@ namespace stream {
 namespace filters {
 
 template <typename data_t>
-class KalmanFilter : public DataGenerator<data_t> {
+class KalmanFilter : public DataPopStream<data_t> {
 public:
-	KalmanFilter(boost::shared_ptr<DataGenerator<data_t> > predict,
-			boost::shared_ptr<DataGenerator<data_t> > obserbed,
-			boost::shared_ptr<DataGenerator<float> > reliable,
+	KalmanFilter(boost::shared_ptr<DataPopStream<data_t> > predict,
+			boost::shared_ptr<DataPopStream<data_t> > obserbed,
+			boost::shared_ptr<DataPopStream<float> > reliable,
 			data_t inital_val,
 			boost::function<data_t(data_t, data_t)> apply =  std::plus<data_t>());
 
 	data_t get_data();
 
 private:
-	boost::shared_ptr<DataGenerator<data_t> > m_predict;
-	boost::shared_ptr<DataGenerator<data_t> > m_obserbed;
-	boost::shared_ptr<DataGenerator<float> >  m_reliable;
+	boost::shared_ptr<DataPopStream<data_t> > m_predict;
+	boost::shared_ptr<DataPopStream<data_t> > m_obserbed;
+	boost::shared_ptr<DataPopStream<float> >  m_reliable;
 
 	boost::function<data_t(data_t, data_t)> m_apply;
 

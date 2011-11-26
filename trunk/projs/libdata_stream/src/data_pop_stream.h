@@ -12,12 +12,12 @@ namespace stream {
  * of some.
  */
 template <typename T>
-class DataGenerator {
+class DataPopStream {
 public:
 
 	typedef T type;
 
-	virtual ~DataGenerator() {}
+	virtual ~DataPopStream() {}
 
 	/**
 	 * Suppose to return the current value/sample of the data.

@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
 #include <iostream>
-#include <stream/generators.h>
+#include <stream/data_pop_stream.h>
 #include <stream/filters/low_pass_filter.h>
 #include <stream/util/lin_algebra.h>
 
-class JitterGen : public stream::DataGenerator<float> {
+class JitterGen : public stream::DataPopStream<float> {
 public:
 	JitterGen(float a, float b, size_t interval):
 		m_a(a), m_b(b), m_times(interval), m_counter(0)
@@ -26,7 +26,7 @@ private:
 	size_t m_counter;
 };
 
-class JitterVecGen : public stream::DataGenerator<lin_algebra::vec3f> {
+class JitterVecGen : public stream::DataPopStream<lin_algebra::vec3f> {
 public:
 	JitterVecGen(float a, float b):
 		m_a(a), m_b(b), m_counter(0)

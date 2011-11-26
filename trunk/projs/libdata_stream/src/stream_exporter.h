@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include <map>
 #include <boost/shared_ptr.hpp>
-#include "generators.h"
+#include "data_pop_stream.h"
 #include "protocol.h"
 
 namespace stream {
@@ -48,13 +48,13 @@ private:
 	template <typename T>
 	class SpecificStream : public AnyStream {
 	public:
-		SpecificStream(boost::shared_ptr<DataGenerator<T> > gen):m_gen(gen) {}
+		SpecificStream(boost::shared_ptr<DataPopStream<T> > gen):m_gen(gen) {}
 
 		void serialize(std::ostream& os) {
 			os << m_gen->get_data();
 		}
 	private:
-		boost::shared_ptr<DataGenerator<T> > m_gen;
+		boost::shared_ptr<DataPopStream<T> > m_gen;
 	};
 
 	typedef std::map<std::string, boost::shared_ptr<AnyStream> > stream_map_t;
