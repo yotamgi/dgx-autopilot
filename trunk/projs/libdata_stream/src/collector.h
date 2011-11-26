@@ -5,9 +5,9 @@
  * A class for push kind streams
  */
 template <typename T>
-class DataCollector {
+class DataPushStream {
 public:
-	virtual ~DataCollector() {}
+	virtual ~DataPushStream() {}
 
 	typedef T data_t;
 
