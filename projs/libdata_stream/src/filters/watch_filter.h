@@ -22,10 +22,14 @@ namespace filters {
  * Apart for that, this class is a normal bypass filter.
  */
 template <class T>
-class WatchFilter : public StreamPopFilter<T> {
+class WatchFilter : public StreamFilter<T> {
 public:
 	WatchFilter(boost::shared_ptr< DataPopStream<T> > gen):
-		StreamPopFilter<T>(gen),
+		StreamFilter<T>(gen),
+		m_watch_stream(new WatchStream(this))
+	{}
+	WatchFilter(boost::shared_ptr< DataPushStream<T> > col):
+		StreamFilter<T>(col),
 		m_watch_stream(new WatchStream(this))
 	{}
 	~WatchFilter() {}
@@ -37,6 +41,12 @@ public:
 		m_watched = StreamPopFilter<T>::m_generator->get_data();
 		return m_watched;
 	}
+
+	void set_data(T data) {
+		m_watched = data;
+		StreamPushFilter<T>::m_collector->set_data(data);
+	}
+
 
 	/**
 	 * Returns the watch stream - the actuall stream that will show you the strean data without

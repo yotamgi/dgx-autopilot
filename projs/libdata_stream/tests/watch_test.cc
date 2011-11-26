@@ -1,10 +1,3 @@
-/*
- * watch_test.cc
- *
- *  Created on: Nov 8, 2011
- *      Author: yotam
- */
-
 #ifndef WATCH_TEST_CC_
 #define WATCH_TEST_CC_
 
