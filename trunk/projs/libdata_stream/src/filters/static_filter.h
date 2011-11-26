@@ -8,32 +8,37 @@ namespace stream {
 namespace filters {
 
 template <typename T>
-class StaticFilter : public StreamPopFilter<T> {
+class StaticFilter : public StreamFilter<T> {
 public:
 
-	StaticFilter(boost::shared_ptr<DataPopStream<T> > gen):
-		StreamPopFilter<T>(gen)
-	{
-		m_add[0] = 0.; m_add[1] = 0.; m_add[2]=0.;
-	}
-
 	StaticFilter(boost::shared_ptr<DataPopStream<T> > gen,
-			const typename lin_algebra::vec3f& add):
-		StreamPopFilter<T>(gen),
+			const T& add):
+		StreamFilter<T>(gen),
 		m_add(add)
 	{}
 
-	lin_algebra::vec3f get_data(){
-		lin_algebra::vec3f data = StreamPopFilter<T>::m_generator->get_data();
+	StaticFilter(boost::shared_ptr<DataPushStream<T> > col,
+			const T& add):
+		StreamFilter<T>(col),
+		m_add(add)
+	{}
 
-		data = data + m_add;
 
-		return data;
+	T get_data(){
+		return filter(StreamPopFilter<T>::m_generator->get_data());
+	}
+
+	void set_data(T data) {
+		StreamPushFilter<T>::m_collector->set_data(filter(data));
 	}
 
 private:
 
-	lin_algebra::vec3f m_add;
+	T filter(T data) {
+		return data + m_add;
+	}
+
+	T m_add;
 };
 
 } // namespace filters
