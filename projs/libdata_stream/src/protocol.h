@@ -18,6 +18,7 @@ namespace protocol {
 
 		const std::string NEW_STREAM = "NEW_STREAM";
 		const std::string END_COMMAND = "END";
+		const std::string LIST_COMMAND = "LIST";
 
 	}  // namespace control
 
@@ -31,6 +32,8 @@ namespace protocol {
 
 
 	const char END_STREAM = 'S';
+
+	const char END = 'E';
 
 	const std::string NOT_EXIST_COMMAND = "NOT_EXIST";
 

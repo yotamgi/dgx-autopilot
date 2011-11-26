@@ -49,6 +49,7 @@ std::string TcpipConnection::read() {
 }
 
 void TcpipConnection::write(std::string data) {
+
 	std::stringstream packet;
 	packet << data.size() << ";" << data;
 	if (::send(m_sock_fd, packet.str().c_str(), packet.str().size(), MSG_NOSIGNAL) != (int)packet.str().size()) {

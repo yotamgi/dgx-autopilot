@@ -1,6 +1,7 @@
 #include "stream_connection.h"
 #include <iostream>
 #include <vector>
+#include <boost/lexical_cast.hpp>
 #include <sys/time.h>
 
 #include <stdio.h>
@@ -12,7 +13,8 @@ namespace stream {
 
 StreamConnection::StreamConnection(boost::shared_ptr<ConnectionFactory> factory):
 		m_factory(factory),
-		m_running(false)
+		m_running(false),
+		m_list(false)
 {
 	m_control = m_factory->get_connection();
 
@@ -37,6 +39,15 @@ void StreamConnection::run(bool open_thread) {
 		bool first_to_close = true;
 
 		while (m_running) {
+
+			if (m_list) {
+				m_control->write(protocol::control::LIST_COMMAND);
+				size_t num = boost::lexical_cast<size_t>(m_control->read());
+				for (size_t i=0; i<num; i++) {
+					m_list_data.push_back(m_control->read());
+				}
+				m_list = false;
+			}
 
 			// add all the streams to the fd_set
 			fd_set fds;
@@ -78,7 +89,14 @@ void StreamConnection::run(bool open_thread) {
 					m_running = false;
 					first_to_close = false;
 					break;
+				} else if (command == protocol::control::LIST_COMMAND) {
+					std::cout << "Got LIST_COMMAND" << std::endl;
+					m_control->write(boost::lexical_cast<std::string>(m_exported_streams.size()));
+					for (stream_name_map_t::iterator iter = m_exported_streams.begin(); iter != m_exported_streams.end(); iter++) {
+						m_control->write(iter->second->get_name());
+					}
 				} else {
+					std::cout << "Got " << command << std::endl;
 					throw ConnectionExceptioin("unknown protocol");
 				}
 			}
@@ -110,6 +128,13 @@ void StreamConnection::run(bool open_thread) {
 		// free all the opened connections
 		m_open_streams.clear();
 	}
+}
+
+std::vector<std::string> StreamConnection::list_avail() {
+	m_list = true;
+	while (m_list != false);
+
+	return m_list_data;
 }
 
 void StreamConnection::add_connection(boost::shared_ptr<Connection> conn) {

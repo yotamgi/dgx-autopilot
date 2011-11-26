@@ -5,6 +5,7 @@
 #include "generators.h"
 #include "protocol.h"
 #include <string>
+#include <vector>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/thread/thread.hpp>
@@ -27,6 +28,8 @@ public:
 
 	template <typename T>
 	boost::shared_ptr<DataGenerator<T> > import_stream(std::string name);
+
+	std::vector<std::string> list_avail();
 
 	void run(bool open_thread = true);
 
@@ -59,17 +62,21 @@ private:
 	class AnyStream {
 	public:
 		virtual void serialize(std::ostream&) = 0;
+		virtual std::string get_name() = 0;
 	};
 	template <typename T>
 	class SpecificStream : public AnyStream {
 	public:
-		SpecificStream(boost::shared_ptr<DataGenerator<T> > gen):m_gen(gen) {}
+		SpecificStream(boost::shared_ptr<DataGenerator<T> > gen, std::string name):m_gen(gen), m_name(name) {}
 
 		void serialize(std::ostream& os) {
 			os << m_gen->get_data();
 		}
+
+		std::string get_name() { return m_name; }
 	private:
 		boost::shared_ptr<DataGenerator<T> > m_gen;
+		std::string m_name;
 	};
 
 
@@ -85,6 +92,9 @@ private:
 
 	volatile bool m_running;
 	boost::shared_ptr<boost::thread> m_thread;
+
+	volatile bool m_list;
+	std::vector<std::string> m_list_data;
 };
 
 } // namespace stream
