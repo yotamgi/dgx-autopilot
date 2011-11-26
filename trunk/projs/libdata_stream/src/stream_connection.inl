@@ -27,7 +27,7 @@ inline boost::shared_ptr<DataGenerator<T> > StreamConnection::import_stream(std:
 
 template <typename T>
 inline void StreamConnection::export_stream(boost::shared_ptr<DataGenerator<T> > stream, std::string name) {
-	m_exported_streams[name] = boost::make_shared<SpecificStream<T> >(stream);
+	m_exported_streams[name] = boost::make_shared<SpecificStream<T> >(stream, name);
 }
 
 template <typename T>

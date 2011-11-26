@@ -84,7 +84,6 @@ void StressHelper(size_t howmany) {
 	}
 
 	usleep(300000);
-	std::cout << "Closing" << std::endl;
 	strcon.stop();
 	usleep(100000);
 }
@@ -125,9 +124,55 @@ TEST(stream_conn, stress) {
 	}
 
 	usleep(300000);
-	std::cout << "Closing" << std::endl;
 	t.join();
 	strcon.stop();
 
+}
+
+void ListHelper(size_t howmany) {
+	// create connection
+	boost::shared_ptr<stream::ConnectionFactory> client =
+				boost::make_shared<stream::TcpipClient>("localhost", 0x6666);
+	stream::StreamConnection strcon(client);
+
+	// export some streams
+	for (size_t i=0; i<howmany; i++) {
+		strcon.export_stream<int>(boost::make_shared<SimpleStream>(), (boost::format("stream%d") % i).str());
+	}
+	strcon.run();
+
+	usleep(300000);
+	strcon.stop();
+	usleep(100000);
+}
+
+
+TEST(stream_conn, list) {
+
+	const size_t NUM_STREAMS = 100;
+
+	// run the helper
+	boost::thread t(ListHelper, NUM_STREAMS);
+
+	// create connection
+	boost::shared_ptr<stream::ConnectionFactory> server =
+			boost::make_shared<stream::TcpipServer>("localhost", 0x6666);
+	stream::StreamConnection strcon(server);
+
+	strcon.run();
+
+	usleep(100000);
+
+	std::vector<std::string> avail = strcon.list_avail();
+
+	for (size_t i=0; i<NUM_STREAMS; i++) {
+		bool flag = false;
+		for (size_t i=0; i<NUM_STREAMS; i++) {
+			flag |= (avail[i] == (boost::format("stream%d") % i).str());
+		}
+		ASSERT_EQ(flag, true);
+	}
+	strcon.stop();
+	t.join();
 }
 
