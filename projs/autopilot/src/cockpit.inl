@@ -105,7 +105,7 @@ inline boost::shared_ptr<float_stream> Cockpit::watch_rest_reliability() {
 	return m_rest_reliability;
 }
 
-inline stream::DataGenerator<float>* Cockpit::speed() {
+inline stream::DataPopStream<float>* Cockpit::speed() {
 	throw std::logic_error("speed not implemented yet on Cockpit");
 	return NULL;
 }

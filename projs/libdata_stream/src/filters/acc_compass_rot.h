@@ -5,14 +5,14 @@
 #include <boost/shared_ptr.hpp>
 
 #include <stream/util/lin_algebra.h>
-#include <stream/generators.h>
+#include <stream/data_pop_stream.h>
 
-typedef stream::DataGenerator<lin_algebra::vec3f> vec_stream_t ;
+typedef stream::DataPopStream<lin_algebra::vec3f> vec_stream_t ;
 
 namespace stream {
 namespace filters {
 
-class AccCompassRotation : public DataGenerator<lin_algebra::mat3f> {
+class AccCompassRotation : public DataPopStream<lin_algebra::mat3f> {
 public:
 	AccCompassRotation(
 			boost::shared_ptr<vec_stream_t> acc,
@@ -32,11 +32,11 @@ public:
 
 	lin_algebra::mat3f get_data();
 
-	boost::shared_ptr<DataGenerator<float> > reliable_stream() { return m_reliable_stream; }
+	boost::shared_ptr<DataPopStream<float> > reliable_stream() { return m_reliable_stream; }
 
 private:
 
-	class AccCompassReliable : public DataGenerator<float> {
+	class AccCompassReliable : public DataPopStream<float> {
 	public:
 		AccCompassReliable(){}
 

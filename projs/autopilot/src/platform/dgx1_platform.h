@@ -13,7 +13,7 @@ public:
 	DGX1Platform();
 	~DGX1Platform(){}
 
-	typedef boost::shared_ptr<stream::DataGenerator<lin_algebra::vec3f> > vec_stream_ptr;
+	typedef boost::shared_ptr<stream::DataPopStream<lin_algebra::vec3f> > vec_stream_ptr;
 
 	boost::shared_ptr<vec_watch_stream> acc_sensor();
 

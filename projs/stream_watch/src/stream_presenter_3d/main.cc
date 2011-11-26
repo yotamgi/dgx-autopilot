@@ -31,8 +31,8 @@ int main(int argc, char** argv) {
 		char c;
 		std::cin >> c;
 
-		boost::shared_ptr<stream::DataGenerator<lin_algebra::vec3f> > chosen =
-				imp.import_stream<stream::DataGenerator<lin_algebra::vec3f> >(avail.at(which-1));
+		boost::shared_ptr<stream::DataPopStream<lin_algebra::vec3f> > chosen =
+				imp.import_stream<stream::DataPopStream<lin_algebra::vec3f> >(avail.at(which-1));
 
 		//std::cout << chosen->get_data() << std::endl;
 

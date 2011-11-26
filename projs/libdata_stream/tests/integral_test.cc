@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 #include <sys/time.h>
 #include <cstdlib>
-#include "generators.h"
+#include "data_pop_stream.h"
 #include "filters/integral_filter.h"
 #include "util/time.h"
 #include "util/lin_algebra.h"
@@ -13,7 +13,7 @@
  * Dummy generator for testing the integral.
  * Returns the time since creation in seconds
  */
-class DummyGen : public stream::DataGenerator<float> {
+class DummyGen : public stream::DataPopStream<float> {
 public:
 	DummyGen() {
 		gettimeofday(&m_start_time, NULL);
@@ -37,7 +37,7 @@ private:
  *  - y: time since creation
  *  - z: constant 1.0
  */
-class DummyVecGen : public stream::DataGenerator<lin_algebra::vec3f> {
+class DummyVecGen : public stream::DataPopStream<lin_algebra::vec3f> {
 public:
 	DummyVecGen() {
 		gettimeofday(&m_start_time, NULL);
@@ -63,7 +63,7 @@ private:
 
 TEST(IntegralTest, vec_stress_test) {
 
-	boost::shared_ptr<stream::DataGenerator<lin_algebra::vec3f> > a(new DummyVecGen);
+	boost::shared_ptr<stream::DataPopStream<lin_algebra::vec3f> > a(new DummyVecGen);
 	lin_algebra::vec3f zeros;
 	zeros << 0. << 0. << 0.;
 	stream::filters::IntegralFilter<lin_algebra::vec3f> integ(a, zeros);

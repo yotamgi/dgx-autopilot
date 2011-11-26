@@ -16,9 +16,9 @@
 
 namespace autopilot {
 
-typedef stream::DataGenerator<lin_algebra::vec3f> 			vec_stream;
+typedef stream::DataPopStream<lin_algebra::vec3f> 			vec_stream;
 typedef stream::filters::WatchFilter<lin_algebra::vec3f> 	vec_watch_stream;
-typedef stream::DataGenerator<float> 						float_stream;
+typedef stream::DataPopStream<float> 						float_stream;
 
 /**
  * Specific cockpit for normal plains.
@@ -33,7 +33,7 @@ public:
 
 
 	boost::shared_ptr<vec_watch_stream> orientation();
-	stream::DataGenerator<float>* speed();
+	stream::DataPopStream<float>* speed();
 
 	Servo* tilt_servo();
 

@@ -7,7 +7,7 @@ namespace stream {
 
 
 template <typename T>
-inline boost::shared_ptr<DataGenerator<T> > StreamConnection::import_stream(std::string name) {
+inline boost::shared_ptr<DataPopStream<T> > StreamConnection::import_stream(std::string name) {
 	m_control->write(protocol::control::NEW_STREAM);
 	boost::shared_ptr<Connection> conn = m_factory->get_connection();
 
@@ -26,7 +26,7 @@ inline boost::shared_ptr<DataGenerator<T> > StreamConnection::import_stream(std:
 }
 
 template <typename T>
-inline void StreamConnection::export_stream(boost::shared_ptr<DataGenerator<T> > stream, std::string name) {
+inline void StreamConnection::export_stream(boost::shared_ptr<DataPopStream<T> > stream, std::string name) {
 	m_exported_streams[name] = boost::make_shared<SpecificStream<T> >(stream, name);
 }
 

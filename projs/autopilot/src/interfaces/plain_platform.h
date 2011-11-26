@@ -1,7 +1,7 @@
 #ifndef PLAIN_PLATFORM_H_
 #define PLAIN_PLATFORM_H_
 
-#include <stream/generators.h>
+#include <stream/data_pop_stream.h>
 #include <stream/filters/watch_filter.h>
 #include <boost/shared_ptr.hpp>
 #include <stream/util/lin_algebra.h>
@@ -20,7 +20,7 @@ typedef stream::filters::WatchFilter<lin_algebra::vec3f> 	vec_watch_stream;
  */
 class NormalPlainPlatform {
 public:
-	typedef boost::shared_ptr<stream::DataGenerator<lin_algebra::vec3f> > vec_stream_ptr;
+	typedef boost::shared_ptr<stream::DataPopStream<lin_algebra::vec3f> > vec_stream_ptr;
 
 	virtual ~NormalPlainPlatform() {}
 

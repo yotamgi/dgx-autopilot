@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 #include "filters/static_filter.h"
-#include "generators.h"
+#include "data_pop_stream.h"
 
-class StaticDummyGen : public stream::DataGenerator<lin_algebra::vec3f> {
+class StaticDummyGen : public stream::DataPopStream<lin_algebra::vec3f> {
 public:
 
 	lin_algebra::vec3f get_data() {

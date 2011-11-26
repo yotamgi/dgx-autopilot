@@ -1,4 +1,4 @@
-#include <stream/generators.h>
+#include <stream/data_pop_stream.h>
 #include <stream/stream_connection.h>
 #include <stream/util/tcpip_connection.h>
 #include <gtest/gtest.h>
@@ -8,7 +8,7 @@
 #include <iostream>
 #include <vector>
 
-class SimpleStream : public stream::DataGenerator<int> {
+class SimpleStream : public stream::DataPopStream<int> {
 public:
 	SimpleStream(): m_num(0) {}
 	int get_data() {return m_num++;}
@@ -24,7 +24,7 @@ void BasicHelper() {
 	strcon.export_stream<int>(boost::make_shared<SimpleStream>(), "stam1");
 	strcon.run();
 
-	boost::shared_ptr<stream::DataGenerator<int> > s = strcon.import_stream<int>("stam2");
+	boost::shared_ptr<stream::DataPopStream<int> > s = strcon.import_stream<int>("stam2");
 	EXPECT_EQ(s->get_data(), 0);
 	EXPECT_EQ(s->get_data(), 1);
 
@@ -47,7 +47,7 @@ TEST(stream_conn, basic) {
 	strcon.run();
 
 	// import stream
-	boost::shared_ptr<stream::DataGenerator<int> > s = strcon.import_stream<int>("stam1");
+	boost::shared_ptr<stream::DataPopStream<int> > s = strcon.import_stream<int>("stam1");
 	EXPECT_EQ(s->get_data(), 0);
 	EXPECT_EQ(s->get_data(), 1);
 
@@ -69,7 +69,7 @@ void StressHelper(size_t howmany) {
 	strcon.run();
 
 	// import all streams
-	std::vector<boost::shared_ptr<stream::DataGenerator<int> > > streams;
+	std::vector<boost::shared_ptr<stream::DataPopStream<int> > > streams;
 	for (size_t i=0; i<howmany; i++) {
 		streams.push_back(
 				strcon.import_stream<int>((boost::format("stream%d") % i).str())
@@ -108,7 +108,7 @@ TEST(stream_conn, stress) {
 	strcon.run();
 
 	// import all streams
-	std::vector<boost::shared_ptr<stream::DataGenerator<int> > > streams;
+	std::vector<boost::shared_ptr<stream::DataPopStream<int> > > streams;
 	for (size_t i=0; i<NUM_OF_STREAMS; i++) {
 
 		streams.push_back(

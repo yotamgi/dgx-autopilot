@@ -7,7 +7,7 @@
 
 namespace autopilot {
 
-typedef stream::DataGenerator<lin_algebra::vec3f>			vec_stream;
+typedef stream::DataPopStream<lin_algebra::vec3f>			vec_stream;
 typedef boost::shared_ptr<vec_stream> 						vec_stream_ptr;
 typedef stream::filters::WatchFilter<lin_algebra::vec3f> 	vec_watch_stream;
 

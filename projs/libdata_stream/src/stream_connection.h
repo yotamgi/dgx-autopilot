@@ -2,7 +2,7 @@
 #define STREAM_CONNECTION_H_
 
 #include "connection.h"
-#include "generators.h"
+#include "data_pop_stream.h"
 #include "protocol.h"
 #include <string>
 #include <vector>
@@ -24,10 +24,10 @@ public:
 	~StreamConnection();
 
 	template <typename T>
-	void export_stream(boost::shared_ptr<DataGenerator<T> > stream, std::string name);
+	void export_stream(boost::shared_ptr<DataPopStream<T> > stream, std::string name);
 
 	template <typename T>
-	boost::shared_ptr<DataGenerator<T> > import_stream(std::string name);
+	boost::shared_ptr<DataPopStream<T> > import_stream(std::string name);
 
 	std::vector<std::string> list_avail();
 
@@ -44,7 +44,7 @@ private:
 	 * Proxies a stream through the conn object
 	 */
 	template <typename T>
-	class StreamProxy : public DataGenerator<T> {
+	class StreamProxy : public DataPopStream<T> {
 	public:
 		StreamProxy(boost::shared_ptr<Connection> conn);
 		~StreamProxy();
@@ -67,7 +67,7 @@ private:
 	template <typename T>
 	class SpecificStream : public AnyStream {
 	public:
-		SpecificStream(boost::shared_ptr<DataGenerator<T> > gen, std::string name):m_gen(gen), m_name(name) {}
+		SpecificStream(boost::shared_ptr<DataPopStream<T> > gen, std::string name):m_gen(gen), m_name(name) {}
 
 		void serialize(std::ostream& os) {
 			os << m_gen->get_data();
@@ -75,7 +75,7 @@ private:
 
 		std::string get_name() { return m_name; }
 	private:
-		boost::shared_ptr<DataGenerator<T> > m_gen;
+		boost::shared_ptr<DataPopStream<T> > m_gen;
 		std::string m_name;
 	};
 

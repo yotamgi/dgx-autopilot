@@ -2,11 +2,11 @@
 #ifndef HMC5843_COMPASS_H
 #define HMC5843_COMPASS_H
 
-#include <stream/generators.h>
+#include <stream/data_pop_stream.h>
 #include <stream/util/lin_algebra.h>
 #include "platform/hw/i2c_interface.h"
 
-class Hmc5843Compass : public stream::DataGenerator<lin_algebra::vec3f> {
+class Hmc5843Compass : public stream::DataPopStream<lin_algebra::vec3f> {
 public:
 	Hmc5843Compass(size_t device_i2c_num);
 	virtual ~Hmc5843Compass() {}

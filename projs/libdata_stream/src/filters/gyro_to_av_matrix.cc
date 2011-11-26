@@ -6,8 +6,8 @@
 namespace stream {
 namespace filters {
 
-GyroToAVMatrix::GyroToAVMatrix(boost::shared_ptr<DataGenerator<lin_algebra::vec3f> > data_gen):
-	DataGenFilter<lin_algebra::vec3f, lin_algebra::mat3f>(data_gen)
+GyroToAVMatrix::GyroToAVMatrix(boost::shared_ptr<DataPopStream<lin_algebra::vec3f> > data_gen):
+	StreamPopFilter<lin_algebra::vec3f, lin_algebra::mat3f>(data_gen)
 {}
 
 GyroToAVMatrix::~GyroToAVMatrix() {}
@@ -15,7 +15,7 @@ GyroToAVMatrix::~GyroToAVMatrix() {}
 
 lin_algebra::mat3f GyroToAVMatrix::get_data() {
 	lin_algebra::vec3f data =
-		DataGenFilter<lin_algebra::vec3f, lin_algebra::mat3f>::m_generator->get_data();
+		StreamPopFilter<lin_algebra::vec3f, lin_algebra::mat3f>::m_generator->get_data();
 
 	float wx = -data[0] / 180. * lin_algebra::PI;
 	float wy = -data[1] / 180. * lin_algebra::PI;

@@ -4,8 +4,8 @@ namespace stream {
 namespace filters {
 
 MatrixToEulerFilter::MatrixToEulerFilter(
-		boost::shared_ptr<DataGenerator<lin_algebra::mat3f> > gen):
-	DataGenFilter<lin_algebra::mat3f, lin_algebra::vec3f>(gen)
+		boost::shared_ptr<DataPopStream<lin_algebra::mat3f> > gen):
+	StreamPopFilter<lin_algebra::mat3f, lin_algebra::vec3f>(gen)
 {}
 
 lin_algebra::vec3f MatrixToEulerFilter::get_data() {

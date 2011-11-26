@@ -1,10 +1,10 @@
 #include <iostream>
 
-#include <stream/generators.h>
+#include <stream/data_pop_stream.h>
 #include <stream/stream_exporter.h>
 #include "stream_watch/stream_presenter_3d.h"
 
-class SimpleGen : public stream::DataGenerator<lin_algebra::vec3f> {
+class SimpleGen : public stream::DataPopStream<lin_algebra::vec3f> {
 public:
 
 	SimpleGen():m_a(0.0f) {}

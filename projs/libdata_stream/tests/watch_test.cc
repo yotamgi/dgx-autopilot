@@ -16,7 +16,7 @@
  * Dummy generator for testing the integral.
  * Returns the time since creation in seconds
  */
-class DummyWatchedGen : public stream::DataGenerator<int> {
+class DummyWatchedGen : public stream::DataPopStream<int> {
 public:
 	DummyWatchedGen():m_counter(0) {}
 
@@ -35,7 +35,7 @@ private:
  *  - y: time since creation
  *  - z: constant 1.0
  */
-class DummyWatchedVecGen : public stream::DataGenerator<lin_algebra::vec3f> {
+class DummyWatchedVecGen : public stream::DataPopStream<lin_algebra::vec3f> {
 public:
 	DummyWatchedVecGen():m_counter(0) {}
 
@@ -53,9 +53,9 @@ private:
 
 TEST(WatchTest, int_test) {
 
-	boost::shared_ptr< stream::DataGenerator<int> > a(new DummyWatchedGen);
+	boost::shared_ptr< stream::DataPopStream<int> > a(new DummyWatchedGen);
 	stream::filters::WatchFilter<int> watch(a);
-	boost::shared_ptr<stream::DataGenerator<int> > w = watch.get_watch_stream();
+	boost::shared_ptr<stream::DataPopStream<int> > w = watch.get_watch_stream();
 
 	for (size_t i=0; i<100; i++) {
 		int ans = watch.get_data();
@@ -68,9 +68,9 @@ TEST(WatchTest, int_test) {
 
 TEST(WatchTest, vec_test) {
 
-	boost::shared_ptr<stream::DataGenerator<lin_algebra::vec3f> > a(new DummyWatchedVecGen);
+	boost::shared_ptr<stream::DataPopStream<lin_algebra::vec3f> > a(new DummyWatchedVecGen);
 	stream::filters::WatchFilter<lin_algebra::vec3f> watch(a);
-	boost::shared_ptr<stream::DataGenerator<lin_algebra::vec3f> > w = watch.get_watch_stream();
+	boost::shared_ptr<stream::DataPopStream<lin_algebra::vec3f> > w = watch.get_watch_stream();
 
 	for (size_t i=0; i<100; i++) {
 		lin_algebra::vec3f ans = watch.get_data();
