@@ -5,7 +5,7 @@ namespace filters {
 
 MatrixToEulerFilter::MatrixToEulerFilter(
 		boost::shared_ptr<DataGenerator<lin_algebra::mat3f> > gen):
-	DataFilter<lin_algebra::mat3f, lin_algebra::vec3f>(gen)
+	DataGenFilter<lin_algebra::mat3f, lin_algebra::vec3f>(gen)
 {}
 
 lin_algebra::vec3f MatrixToEulerFilter::get_data() {

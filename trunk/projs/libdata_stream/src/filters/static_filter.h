@@ -8,23 +8,23 @@ namespace stream {
 namespace filters {
 
 template <typename T>
-class StaticFilter : public DataFilter<T> {
+class StaticFilter : public DataGenFilter<T> {
 public:
 
 	StaticFilter(boost::shared_ptr<DataGenerator<T> > gen):
-		DataFilter<T>(gen)
+		DataGenFilter<T>(gen)
 	{
 		m_add[0] = 0.; m_add[1] = 0.; m_add[2]=0.;
 	}
 
 	StaticFilter(boost::shared_ptr<DataGenerator<T> > gen,
 			const typename lin_algebra::vec3f& add):
-		DataFilter<T>(gen),
+		DataGenFilter<T>(gen),
 		m_add(add)
 	{}
 
 	lin_algebra::vec3f get_data(){
-		lin_algebra::vec3f data = DataFilter<T>::m_generator->get_data();
+		lin_algebra::vec3f data = DataGenFilter<T>::m_generator->get_data();
 
 		data = data + m_add;
 

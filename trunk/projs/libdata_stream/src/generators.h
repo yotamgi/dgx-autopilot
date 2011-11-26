@@ -11,18 +11,18 @@ namespace stream {
  * Represents a any type of data generator. It may be a sensor, or a combination
  * of some.
  */
-template <typename data_t>
+template <typename T>
 class DataGenerator {
 public:
 
-	typedef data_t type;
+	typedef T type;
 
 	virtual ~DataGenerator() {}
 
 	/**
 	 * Suppose to return the current value/sample of the data.
 	 */
-	virtual data_t get_data() = 0;
+	virtual T get_data() = 0;
 
 };
 
