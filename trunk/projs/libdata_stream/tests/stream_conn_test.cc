@@ -21,10 +21,10 @@ void BasicHelper() {
 				boost::make_shared<stream::TcpipClient>("localhost", 0x6666);
 	stream::StreamConnection strcon(client);
 
-	strcon.export_stream<int>(boost::make_shared<SimpleStream>(), "stam1");
+	strcon.export_pop_stream<int>(boost::make_shared<SimpleStream>(), "stam1");
 	strcon.run();
 
-	boost::shared_ptr<stream::DataPopStream<int> > s = strcon.import_stream<int>("stam2");
+	boost::shared_ptr<stream::DataPopStream<int> > s = strcon.import_pop_stream<int>("stam2");
 	EXPECT_EQ(s->get_data(), 0);
 	EXPECT_EQ(s->get_data(), 1);
 
@@ -43,11 +43,11 @@ TEST(stream_conn, basic) {
 	stream::StreamConnection strcon(server);
 
 	// export stream
-	strcon.export_stream<int>(boost::make_shared<SimpleStream>(), "stam2");
+	strcon.export_pop_stream<int>(boost::make_shared<SimpleStream>(), "stam2");
 	strcon.run();
 
 	// import stream
-	boost::shared_ptr<stream::DataPopStream<int> > s = strcon.import_stream<int>("stam1");
+	boost::shared_ptr<stream::DataPopStream<int> > s = strcon.import_pop_stream<int>("stam1");
 	EXPECT_EQ(s->get_data(), 0);
 	EXPECT_EQ(s->get_data(), 1);
 
@@ -64,7 +64,7 @@ void StressHelper(size_t howmany) {
 
 	// export 100 streams
 	for (size_t i=0; i<howmany; i++) {
-		strcon.export_stream<int>(boost::make_shared<SimpleStream>(), (boost::format("stream%d") % i).str());
+		strcon.export_pop_stream<int>(boost::make_shared<SimpleStream>(), (boost::format("stream%d") % i).str());
 	}
 	strcon.run();
 
@@ -72,7 +72,7 @@ void StressHelper(size_t howmany) {
 	std::vector<boost::shared_ptr<stream::DataPopStream<int> > > streams;
 	for (size_t i=0; i<howmany; i++) {
 		streams.push_back(
-				strcon.import_stream<int>((boost::format("stream%d") % i).str())
+				strcon.import_pop_stream<int>((boost::format("stream%d") % i).str())
 		);
 	}
 
@@ -103,7 +103,7 @@ TEST(stream_conn, stress) {
 
 	// export 100 streams
 	for (size_t i=0; i<NUM_OF_STREAMS; i++) {
-		strcon.export_stream<int>(boost::make_shared<SimpleStream>(), (boost::format("stream%d") % i).str());
+		strcon.export_pop_stream<int>(boost::make_shared<SimpleStream>(), (boost::format("stream%d") % i).str());
 	}
 	strcon.run();
 
@@ -112,7 +112,7 @@ TEST(stream_conn, stress) {
 	for (size_t i=0; i<NUM_OF_STREAMS; i++) {
 
 		streams.push_back(
-				strcon.import_stream<int>((boost::format("stream%d") % i).str())
+				strcon.import_pop_stream<int>((boost::format("stream%d") % i).str())
 		);
 	}
 
@@ -137,7 +137,7 @@ void ListHelper(size_t howmany) {
 
 	// export some streams
 	for (size_t i=0; i<howmany; i++) {
-		strcon.export_stream<int>(boost::make_shared<SimpleStream>(), (boost::format("stream%d") % i).str());
+		strcon.export_pop_stream<int>(boost::make_shared<SimpleStream>(), (boost::format("stream%d") % i).str());
 	}
 	strcon.run();
 
