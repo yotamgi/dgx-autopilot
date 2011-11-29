@@ -109,6 +109,11 @@ void StreamConnection::run(bool open_thread) {
 					if (command.at(0) == protocol::GET_COMMAND) {
 						iter->second->serialize(ss);
 						iter->first->write(ss.str());
+					} else if (command.at(0) == protocol::SET_COMMAND) {
+						ss << command;
+						char c;
+						ss >> c; // remove the command
+						iter->second->deserialize(ss);
 					} else if (command.at(0) == protocol::END_STREAM) {
 						to_be_cleaned.push_back(iter->first);
 					} else {

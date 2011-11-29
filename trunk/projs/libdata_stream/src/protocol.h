@@ -27,6 +27,8 @@ namespace protocol {
 	const size_t PORT = 0x6666;
 
 	const char GET_COMMAND = 'G';
+	const char SET_COMMAND = 'P';
+
 
 	const char LIST_COMMAND = 'L';
 
