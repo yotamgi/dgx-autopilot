@@ -1,6 +1,8 @@
 #ifndef DATA_COLLECTOR_H_
 #define DATA_COLLECTOR_H_
 
+namespace stream {
+
 /**
  * A class for push kind streams
  */
@@ -17,5 +19,7 @@ public:
 	virtual void set_data(T data) = 0;
 };
 
+
+}  // namespace stream
 
 #endif /* DATA_COLLECTOR_H_ */

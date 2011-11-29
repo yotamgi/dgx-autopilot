@@ -34,6 +34,9 @@ public:
 	template <typename T>
 	boost::shared_ptr<DataPopStream<T> > import_pop_stream(std::string name);
 
+	template <typename T>
+	boost::shared_ptr<DataPushStream<T> > import_push_stream(std::string name);
+
 	std::vector<std::string> list_avail();
 
 	void run(bool open_thread = true);
@@ -45,14 +48,14 @@ private:
 	void add_connection(boost::shared_ptr<Connection> conn);
 
 	/**
-	 * The StreamProxy class.
-	 * Proxies a stream through the conn object
+	 * The PopStreamProxy class.
+	 * Proxies a pop stream through the conn object
 	 */
 	template <typename T>
-	class StreamProxy : public DataPopStream<T> {
+	class PopStreamProxy : public DataPopStream<T> {
 	public:
-		StreamProxy(boost::shared_ptr<Connection> conn);
-		~StreamProxy();
+		PopStreamProxy(boost::shared_ptr<Connection> conn);
+		~PopStreamProxy();
 
 		T get_data();
 
@@ -61,32 +64,60 @@ private:
 		boost::shared_ptr<Connection> m_conn;
 	};
 
+
+	/**
+	 * The PushStreamProxy class.
+	 * Proxies a push stream through the conn object
+	 */
+	template <typename T>
+	class PushStreamProxy : public DataPushStream<T> {
+	public:
+		PushStreamProxy(boost::shared_ptr<Connection> conn);
+		~PushStreamProxy();
+
+		void set_data(T);
+
+	private:
+
+		boost::shared_ptr<Connection> m_conn;
+	};
+
+
 	/**
 	 * Classes for getting reed of the bloody template arguments in the streams
 	 */
-	class AnyPopStream {
+	class AnyStream {
 	public:
 		virtual void serialize(std::ostream&) = 0;
+		virtual void deserialize(std::istream&) = 0;
 		virtual std::string get_name() = 0;
 	};
 	template <typename T>
-	class SpecificPopStream : public AnyPopStream {
+	class SpecificStream : public AnyStream {
 	public:
-		SpecificPopStream(boost::shared_ptr<DataPopStream<T> > gen, std::string name):m_gen(gen), m_name(name) {}
+		SpecificStream(boost::shared_ptr<DataPopStream<T> > gen, std::string name):m_gen(gen), m_name(name) {}
+		SpecificStream(boost::shared_ptr<DataPushStream<T> > col, std::string name):m_col(col), m_name(name) {}
+		SpecificStream(boost::shared_ptr<DataPopStream<T> > gen, boost::shared_ptr<DataPushStream<T> > col, std::string name):
+			m_gen(gen), m_col(col), m_name(name) {}
 
 		void serialize(std::ostream& os) {
 			os << m_gen->get_data();
+		}
+		void deserialize(std::istream& is) {
+			T data; is >> data;
+			m_col->set_data(data);
 		}
 
 		std::string get_name() { return m_name; }
 	private:
 		boost::shared_ptr<DataPopStream<T> > m_gen;
+		boost::shared_ptr<DataPushStream<T> > m_col;
 		std::string m_name;
 	};
 
 
-	typedef std::map<std::string, boost::shared_ptr<AnyPopStream> >      stream_name_map_t;
-	typedef std::map<boost::shared_ptr<Connection>, boost::shared_ptr<AnyPopStream> >  stream_conn_map_t;
+	typedef std::map<std::string, boost::shared_ptr<AnyStream> >      stream_name_map_t;
+	typedef std::map<boost::shared_ptr<Connection>, boost::shared_ptr<AnyStream> >  stream_conn_map_t;
 
 	stream_name_map_t m_exported_streams;
 	stream_conn_map_t m_open_streams;

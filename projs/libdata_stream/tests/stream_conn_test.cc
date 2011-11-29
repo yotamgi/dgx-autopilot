@@ -1,4 +1,5 @@
 #include <stream/data_pop_stream.h>
+#include <stream/data_push_stream.h>
 #include <stream/stream_connection.h>
 #include <stream/util/tcpip_connection.h>
 #include <gtest/gtest.h>
@@ -8,20 +9,32 @@
 #include <iostream>
 #include <vector>
 
-class SimpleStream : public stream::DataPopStream<int> {
+class SimplePopStream : public stream::DataPopStream<int> {
 public:
-	SimpleStream(): m_num(0) {}
+	SimplePopStream(): m_num(0) {}
 	int get_data() {return m_num++;}
 private:
 	int m_num;
 };
 
-void BasicHelper() {
+class SimplePushStream : public stream::DataPushStream<int> {
+public:
+	SimplePushStream(): m_num(0) {}
+	void set_data(int data) {
+		EXPECT_EQ(m_num, data);
+		m_num++;
+	}
+private:
+	int m_num;
+};
+
+
+void BasicPopHelper() {
 	boost::shared_ptr<stream::ConnectionFactory> client =
 				boost::make_shared<stream::TcpipClient>("localhost", 0x6666);
 	stream::StreamConnection strcon(client);
 
-	strcon.export_pop_stream<int>(boost::make_shared<SimpleStream>(), "stam1");
+	strcon.export_pop_stream<int>(boost::make_shared<SimplePopStream>(), "stam1");
 	strcon.run();
 
 	boost::shared_ptr<stream::DataPopStream<int> > s = strcon.import_pop_stream<int>("stam2");
@@ -32,10 +45,10 @@ void BasicHelper() {
 	strcon.stop();
 }
 
-TEST(stream_conn, basic) {
+TEST(stream_conn, pop_basic) {
 
 	// run the helper
-	boost::thread t(BasicHelper);
+	boost::thread t(BasicPopHelper);
 
 	// create connection
 	boost::shared_ptr<stream::ConnectionFactory> server =
@@ -43,7 +56,7 @@ TEST(stream_conn, basic) {
 	stream::StreamConnection strcon(server);
 
 	// export stream
-	strcon.export_pop_stream<int>(boost::make_shared<SimpleStream>(), "stam2");
+	strcon.export_pop_stream<int>(boost::make_shared<SimplePopStream>(), "stam2");
 	strcon.run();
 
 	// import stream
@@ -56,6 +69,47 @@ TEST(stream_conn, basic) {
 	strcon.stop();
 }
 
+void BasicPushHelper() {
+	boost::shared_ptr<stream::ConnectionFactory> client =
+				boost::make_shared<stream::TcpipClient>("localhost", 0x6666);
+	stream::StreamConnection strcon(client);
+
+	strcon.export_push_stream<int>(boost::make_shared<SimplePushStream>(), "stam");
+	strcon.run();
+
+	boost::shared_ptr<stream::DataPushStream<int> > s = strcon.import_push_stream<int>("stam");
+	s->set_data(0);
+	s->set_data(1);
+
+	usleep(1000000);
+	strcon.stop();
+}
+
+TEST(stream_conn, push_basic) {
+
+	// run the helper
+	boost::thread t(BasicPushHelper);
+
+	// create connection
+	boost::shared_ptr<stream::ConnectionFactory> server =
+			boost::make_shared<stream::TcpipServer>("localhost", 0x6666);
+	stream::StreamConnection strcon(server);
+
+	// export stream
+	strcon.export_push_stream<int>(boost::make_shared<SimplePushStream>(), "stam");
+	strcon.run();
+
+	// import stream
+	boost::shared_ptr<stream::DataPushStream<int> > s = strcon.import_push_stream<int>("stam");
+	s->set_data(0);
+	s->set_data(1);
+
+	usleep(100000);
+	t.join();
+	strcon.stop();
+}
+
+
 void StressHelper(size_t howmany) {
 	// create connection
 	boost::shared_ptr<stream::ConnectionFactory> client =
@@ -64,7 +118,7 @@ void StressHelper(size_t howmany) {
 
 	// export 100 streams
 	for (size_t i=0; i<howmany; i++) {
-		strcon.export_pop_stream<int>(boost::make_shared<SimpleStream>(), (boost::format("stream%d") % i).str());
+		strcon.export_pop_stream<int>(boost::make_shared<SimplePopStream>(), (boost::format("stream%d") % i).str());
 	}
 	strcon.run();
 
@@ -103,7 +157,7 @@ TEST(stream_conn, stress) {
 
 	// export 100 streams
 	for (size_t i=0; i<NUM_OF_STREAMS; i++) {
-		strcon.export_pop_stream<int>(boost::make_shared<SimpleStream>(), (boost::format("stream%d") % i).str());
+		strcon.export_pop_stream<int>(boost::make_shared<SimplePopStream>(), (boost::format("stream%d") % i).str());
 	}
 	strcon.run();
 
@@ -137,7 +191,7 @@ void ListHelper(size_t howmany) {
 
 	// export some streams
 	for (size_t i=0; i<howmany; i++) {
-		strcon.export_pop_stream<int>(boost::make_shared<SimpleStream>(), (boost::format("stream%d") % i).str());
+		strcon.export_pop_stream<int>(boost::make_shared<SimplePopStream>(), (boost::format("stream%d") % i).str());
 	}
 	strcon.run();
 
