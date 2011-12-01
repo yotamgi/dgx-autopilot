@@ -118,26 +118,32 @@ void StressHelper(size_t howmany) {
 
 	// export 100 streams
 	for (size_t i=0; i<howmany; i++) {
-		strcon.export_pop_stream<int>(boost::make_shared<SimplePopStream>(), (boost::format("stream%d") % i).str());
+		strcon.export_pop_stream<int>(boost::make_shared<SimplePopStream>(), (boost::format("pop-stream%d") % i).str());
+		strcon.export_push_stream<int>(boost::make_shared<SimplePushStream>(), (boost::format("push-stream%d") % i).str());
 	}
 	strcon.run();
+	sleep(1);
 
 	// import all streams
-	std::vector<boost::shared_ptr<stream::DataPopStream<int> > > streams;
+	std::vector<boost::shared_ptr<stream::DataPopStream<int> > > pop_streams;
+	std::vector<boost::shared_ptr<stream::DataPushStream<int> > > push_streams;
 	for (size_t i=0; i<howmany; i++) {
-		streams.push_back(
-				strcon.import_pop_stream<int>((boost::format("stream%d") % i).str())
+		pop_streams.push_back(
+				strcon.import_pop_stream<int>((boost::format("pop-stream%d") % i).str())
+		);
+		push_streams.push_back(
+				strcon.import_push_stream<int>((boost::format("push-stream%d") % i).str())
 		);
 	}
 
 	// Read from them and validate output
 	for (int i=0; i<1000; i++) {
 		for (size_t stream=0; stream < howmany; stream++) {
-			EXPECT_EQ(streams[stream]->get_data(), (int)i);
+			push_streams[stream]->set_data(pop_streams[stream]->get_data());
 		}
 	}
 
-	usleep(300000);
+	usleep(1000000);
 	strcon.stop();
 	usleep(100000);
 }
@@ -157,27 +163,33 @@ TEST(stream_conn, stress) {
 
 	// export 100 streams
 	for (size_t i=0; i<NUM_OF_STREAMS; i++) {
-		strcon.export_pop_stream<int>(boost::make_shared<SimplePopStream>(), (boost::format("stream%d") % i).str());
+		strcon.export_pop_stream<int>(boost::make_shared<SimplePopStream>(), (boost::format("pop-stream%d") % i).str());
+		strcon.export_push_stream<int>(boost::make_shared<SimplePushStream>(), (boost::format("push-stream%d") % i).str());
 	}
 	strcon.run();
+	sleep(1);
 
 	// import all streams
-	std::vector<boost::shared_ptr<stream::DataPopStream<int> > > streams;
+	std::vector<boost::shared_ptr<stream::DataPopStream<int> > > pop_streams;
+	std::vector<boost::shared_ptr<stream::DataPushStream<int> > > push_streams;
 	for (size_t i=0; i<NUM_OF_STREAMS; i++) {
 
-		streams.push_back(
-				strcon.import_pop_stream<int>((boost::format("stream%d") % i).str())
+		pop_streams.push_back(
+				strcon.import_pop_stream<int>((boost::format("pop-stream%d") % i).str())
+		);
+		push_streams.push_back(
+				strcon.import_push_stream<int>((boost::format("push-stream%d") % i).str())
 		);
 	}
 
 	// Read from them and validate output
 	for (int i=0; i<1000; i++) {
 		for (size_t stream=0; stream < NUM_OF_STREAMS; stream++) {
-			EXPECT_EQ(streams[stream]->get_data(), (int)i);
+			push_streams[stream]->set_data(pop_streams[stream]->get_data());
 		}
 	}
 
-	usleep(300000);
+	usleep(1000000);
 	t.join();
 	strcon.stop();
 
@@ -195,7 +207,7 @@ void ListHelper(size_t howmany) {
 	}
 	strcon.run();
 
-	usleep(300000);
+	usleep(1000000);
 	strcon.stop();
 	usleep(100000);
 }
