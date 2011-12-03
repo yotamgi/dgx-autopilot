@@ -19,7 +19,7 @@ Adxl345Acc::Adxl345Acc(size_t device_i2c_num):
 		std::stringstream ss;
 		ss << "The value of the who am i value of the adxl345 accelerometer was " <<
 				std::hex << (int)who_am_i << "and not " << (int)WHO_AM_I_VALUE;
-		throw HwExcetion(ss.str());
+		throw SensorException(ss.str());
 	}
 
 	// configuration

@@ -20,7 +20,7 @@ Hmc5843Compass::Hmc5843Compass(size_t device_i2c_num):
 		std::stringstream ss;
 		ss << "The value of the who am i value of the hmc5843 compass was " <<
 				std::hex << (int)who_am_i << "and not " << (int)WHO_AM_I_VALUE;
-		throw HwExcetion(ss.str());
+		throw SensorException(ss.str());
 	}
 
 	// configuration

@@ -1,12 +1,13 @@
 #ifndef EXCEPTIONS_H_
 #define EXCEPTIONS_H_
 
-#include <stdexcept>
+#include <stream/data_pop_stream.h>
 #include <string>
 
-class HwExcetion : public std::runtime_error {
+class SensorException : public stream::StreamException {
 public:
-	HwExcetion(std::string _what): runtime_error(_what) {}
+	SensorException(std::string what): stream::StreamException(what) {}
+	~SensorException() throw() {}
 };
 
 #endif /* EXCEPTIONS_H_ */

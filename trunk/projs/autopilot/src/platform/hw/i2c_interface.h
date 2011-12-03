@@ -78,7 +78,7 @@ private:
 
 		if (count != size) {
 			std::cout << count << ", " << size << std::endl;
-			throw HwExcetion("Could not write to i2c device");
+			throw SensorException("Could not write to i2c device");
 		}
 	}
 
@@ -94,7 +94,7 @@ private:
 		// read from it
 		size_t count = read(m_i2c_device_fd, data, size);
 		if (count != size) {
-			throw HwExcetion("Could not read from i2c device");
+			throw SensorException("Could not read from i2c device");
 		}
 	}
 
