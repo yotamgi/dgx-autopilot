@@ -1,10 +1,3 @@
-/*
- * plane.h
- *
- *  Created on: Aug 20, 2011
- *      Author: yotam
- */
-
 #ifndef PLANE_H_
 #define PLANE_H_
 
@@ -13,7 +6,7 @@
 
 #include <stream/data_pop_stream.h>
 #include <stream/data_push_stream.h>
-#include <stream/stream_converters.h>
+#include <stream/stream_utils.h>
 #include <stream/util/lin_algebra.h>
 #include "flying_object.h"
 

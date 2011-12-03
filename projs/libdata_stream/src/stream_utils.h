@@ -1,5 +1,5 @@
-#ifndef STREAM_CONVERTERS_H_
-#define STREAM_CONVERTERS_H_
+#ifndef STREAM_UTILS_H_
+#define STREAM_UTILS_H_
 
 #include "data_pop_stream.h"
 #include "data_push_stream.h"
@@ -26,4 +26,4 @@ private:
 
 } // namespace stream
 
-#endif /* STREAM_CONVERTERS_H_ */
+#endif /* STREAM_UTILS_H_ */

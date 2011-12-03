@@ -12,7 +12,7 @@ MaestroServoController::MaestroServoController(std::string port_name):m_port_nam
 	m_device_fd = open(m_port_name.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
 
 	if (m_device_fd == -1) {  // Could not open the port
-		throw(HwExcetion("Could not open port " + m_port_name + ". is device connected?"));
+		throw(SensorException("Could not open port " + m_port_name + ". is device connected?"));
 	}
 	std::cout << "Opened port " << m_port_name << std::endl;
 
@@ -57,7 +57,7 @@ void MaestroServoController::configure_port() {
 MaestroServoController::~MaestroServoController() {
 	   // Close the serial port
 	if (close(m_device_fd) == -1) {
-		throw(HwExcetion(std::string("Could not close port ") + m_port_name));
+		throw(SensorException(std::string("Could not close port ") + m_port_name));
 	}
 	std::cout << "Closed port " << m_port_name << std::endl;
 }
