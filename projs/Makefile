@@ -1,4 +1,5 @@
 CXXFLAGS += -Wall
+CXXFLAGS += -I/home/yotam/stuff/armadillo-2.2.4/include/
 ifneq ($(shell grep ARM /proc/cpuinfo),)
 	CXXFLAGS += -march=cortex-a8 -mfpu=neon -ftree-vectorize -mfloat-abi=hard -ffast-math -fsingle-precision-constant
 endif

@@ -1,6 +1,6 @@
-#include <stream/stream_exporter.h>
+#include <stream/stream_connection.h>
+#include <stream/util/tcpip_connection.h>
 #include <platform/dgx1_platform.h>
-#include <platform/dgx1_simulator_platform.h>
 #include <cockpit.h>
 #include <stream_watch/stream_presenter_3d.h>
 
@@ -59,24 +59,25 @@ int main(int argc, char** argv) {
 
 	if (present_addr != "")  {
 		std::cout << "Presenting from addr " << present_addr << std::endl;
-		stream::StreamImporter imp(present_addr);
+		boost::shared_ptr<stream::TcpipServer> server = boost::make_shared<stream::TcpipServer>(present_addr, 0x6060);
+		stream::StreamConnection conn(server);
 
 		typedef stream::DataPopStream<lin_algebra::vec3f> vs;
 		typedef stream::DataPopStream<float> fs;
 
 		// the left one
-		presenter.addAngleStream(imp.import_stream<vs>("gyro_watch_orientation"), irr::core::vector3df(-20., 0., 0.));
+		presenter.addAngleStream(conn.import_pop_stream<vs::type>("gyro_watch_orientation"), irr::core::vector3df(-20., 0., 0.));
 
 		// the mid one
-		presenter.addAngleStream(imp.import_stream<vs>("watch_rest_orientation"), irr::core::vector3df(0., 0., 0.));
-		presenter.addVecStream(imp.import_stream<vs>("watch_acc_sensor"), irr::core::vector3df(0., 0., 0.));
-		presenter.addVecStream(imp.import_stream<vs>("watch_compass_sensor"), irr::core::vector3df(0., 0., 0.));
+		presenter.addAngleStream(conn.import_pop_stream<vs::type>("watch_rest_orientation"), irr::core::vector3df(0., 0., 0.));
+		presenter.addVecStream(conn.import_pop_stream<vs::type>("watch_acc_sensor"), irr::core::vector3df(0., 0., 0.));
+		presenter.addVecStream(conn.import_pop_stream<vs::type>("watch_compass_sensor"), irr::core::vector3df(0., 0., 0.));
 
 		// the right one
-		presenter.addAngleStream(imp.import_stream<vs>("orientation"), irr::core::vector3df(20., 0., 0.));
+		presenter.addAngleStream(conn.import_pop_stream<vs::type>("orientation"), irr::core::vector3df(20., 0., 0.));
 
 		// the reliable stream
-		presenter.addSizeStream(imp.import_stream<fs>("reliability"));
+		presenter.addSizeStream(conn.import_pop_stream<fs::type>("reliability"));
 
 		presenter.run(false);
 
@@ -85,7 +86,7 @@ int main(int argc, char** argv) {
 
 		boost::shared_ptr<autopilot::NormalPlainPlatform> platform(
 			sim?
-				(autopilot::NormalPlainPlatform*)new autopilot::DGX1SimulatorPlatform(sim_addr) :
+				(autopilot::NormalPlainPlatform*)new autopilot::DGX1SimulatorPlatform(boost::make_shared<stream::TcpipServer>(sim_addr, 0x6060)) :
 				(autopilot::NormalPlainPlatform*)new autopilot::DGX1Platform()
 		);
 
@@ -110,14 +111,15 @@ int main(int argc, char** argv) {
 			presenter.run(true);
 		}  else {
 			std::cout << "Exporting all data" << std::endl;
-			stream::StreamExporter exp;
-			exp.register_stream(cockpit.watch_gyro_orientation(), "gyro_watch_orientation");
-			exp.register_stream(cockpit.watch_rest_orientation(), "watch_rest_orientation");
-			exp.register_stream(platform->acc_sensor()->get_watch_stream(), "watch_acc_sensor");
-			exp.register_stream(platform->compass_sensor()->get_watch_stream(), "watch_compass_sensor");
-			exp.register_stream(cockpit.orientation(), "orientation");
-			exp.register_stream(cockpit.watch_rest_reliability(), "reliability");
-			exp.run();
+			boost::shared_ptr<stream::TcpipClient> client = boost::make_shared<stream::TcpipClient>(present_addr, 0x6060);
+			stream::StreamConnection conn(client);
+			conn.export_pop_stream<lin_algebra::vec3f>(cockpit.watch_gyro_orientation(), "gyro_watch_orientation");
+			conn.export_pop_stream<lin_algebra::vec3f>(cockpit.watch_rest_orientation(), "watch_rest_orientation");
+			conn.export_pop_stream<lin_algebra::vec3f>(platform->acc_sensor()->get_watch_stream(), "watch_acc_sensor");
+			conn.export_pop_stream<lin_algebra::vec3f>(platform->compass_sensor()->get_watch_stream(), "watch_compass_sensor");
+			conn.export_pop_stream<lin_algebra::vec3f>(cockpit.orientation(), "orientation");
+			conn.export_pop_stream<float>(cockpit.watch_rest_reliability(), "reliability");
+			conn.run();
 		}
 
 		// to apply the watches

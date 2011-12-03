@@ -17,12 +17,14 @@ and tell the linker to link with the .lib file.
 #pragma comment(lib, "Irrlicht.lib")
 #endif
 
-#include <irrlicht/irrlicht.h>
-#include <cmath>
 #include "plane.h"
 #include "camera.h"
+#include <irrlicht/irrlicht.h>
+#include <cmath>
+#include <boost/make_shared.hpp>
 
-#include <stream/stream_exporter.h>
+#include <stream/stream_connection.h>
+#include <stream/util/tcpip_connection.h>
 #include <stream/filters/integral_filter.h>
 #include <stream/filters/gyro_to_av_matrix.h>
 #include <stream/filters/acc_compass_rot.h>
@@ -70,6 +72,23 @@ private:
 	bool KeyIsDown[KEY_KEY_CODES_COUNT];
 };
 
+void export_import(simulator::Plane& p) {
+
+	while (true) {
+		try {
+			boost::shared_ptr<stream::TcpipClient> client =
+					boost::make_shared<stream::TcpipClient>("localhost", 0x6060);
+			stream::StreamConnection conn(client);
+			conn.export_pop_stream<lin_algebra::vec3f>(p.gyro_gen(), "simulator_gyro");
+			conn.export_pop_stream<lin_algebra::vec3f>(p.acc_gen(), "simulator_acc");
+			conn.export_pop_stream<lin_algebra::vec3f>(p.compass_gen(), "simulator_compass");
+			conn.run(false);
+		} catch (stream::ConnectionExceptioin& e) {
+			std::cout << "Connection died" << std::endl;
+		}
+	}
+}
+
 /*
 The event receiver for keeping the pressed keys is ready, the actual responses
 will be made inside the render loop, right before drawing the scene. So lets
@@ -104,11 +123,7 @@ int main()
 	simulator::Plane p(device, core::vector3df(0.0f, 0.0f, 0.0f), plane_params);
 
 	// export all the sensors
-	stream::StreamExporter exporter;
-	exporter.register_stream(p.gyro_gen(), "simulator_gyro");
-	exporter.register_stream(p.acc_gen(), "simulator_acc");
-	exporter.register_stream(p.compass_gen(), "simulator_compass");
-	boost::thread t(&stream::StreamExporter::run, &exporter);
+	boost::thread t(export_import, p);
 
     // add terrain scene node
     scene::ITerrainSceneNode* terrain = smgr->addTerrainSceneNode(
@@ -205,7 +220,7 @@ int main()
 	*/
 	device->drop();
 	
-	//t.interrupt();
+	t.detach();
 
 	return 0;
 }

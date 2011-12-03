@@ -2,7 +2,7 @@
 #define TCPIP_CONNECTION_H_
 
 #include <boost/shared_ptr.hpp>
-#include "connection.h"
+#include <stream/connection.h>
 
 namespace stream {
 

@@ -1,4 +1,5 @@
-#include "stream/stream_exporter.h"
+#include <stream/util/tcpip_connection.h>
+#include <stream/stream_connection.h>
 #include <stream/filters/gyro_to_av_matrix.h>
 #include <stream/filters/static_filter.h>
 #include <stream/filters/matrix_to_euler_filter.h>
@@ -36,7 +37,8 @@ int main(int argc, char** argv) {
 		exit(1);
 	}
 
-	stream::StreamExporter exporter;
+	boost::shared_ptr<stream::TcpipClient> client = boost::make_shared<stream::TcpipClient>(argv[1], 0x6060);
+	stream::StreamConnection conn(client);
 
 	// gyro
 	lin_algebra::vec3f a;
@@ -51,18 +53,18 @@ int main(int argc, char** argv) {
 	shared_ptr<GyroToAVMatrix> gyro_rot = make_shared<GyroToAVMatrix>(s);
 	shared_ptr<MatrixToEulerFilter> gyro_rot_euler = make_shared<MatrixToEulerFilter>(gyro_rot);
 
-	exporter.register_stream(gyro_rot_euler, std::string("gyro_test"));
+	conn.export_pop_stream<lin_algebra::vec3f>(gyro_rot_euler, std::string("gyro_test"));
 
 	// accelerometer
 	shared_ptr<Adxl345Acc> acc(new Adxl345Acc(2));
-	exporter.register_stream(acc, std::string("acc_test"));
+	conn.export_pop_stream<lin_algebra::vec3f>(acc, std::string("acc_test"));
 
 	// compass
 	shared_ptr<Hmc5843Compass> c(new Hmc5843Compass(2));
-	exporter.register_stream(c, std::string("compass_test"));
+	conn.export_pop_stream<lin_algebra::vec3f>(c, std::string("compass_test"));
 
 	std::cout << "Waiting for connections. " << std::endl;
-	exporter.run();
+	conn.run(false);
 
 	return 0;
 }
