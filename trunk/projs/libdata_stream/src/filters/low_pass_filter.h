@@ -15,7 +15,7 @@ public:
 	LowPassFilter(boost::shared_ptr<DataPushStream<data_t> > data_gen, size_t filt);
 
 	data_t get_data();
-	void set_data(data_t data);
+	void set_data(const data_t& data);
 
 private:
 

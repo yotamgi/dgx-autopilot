@@ -2,6 +2,8 @@
 #define DGX1_PLATFORM_H_
 
 #include "interfaces/plain_platform.h"
+#include <stream/data_pop_stream.h>
+#include <stream/data_push_stream.h>
 #include <stream/connection.h>
 #include <stream/stream_connection.h>
 #include <stdexcept>
@@ -28,13 +30,13 @@ public:
 
 	boost::shared_ptr<vec_watch_stream> gps_sensor();
 
-	Servo* tilt_servo();
+	boost::shared_ptr<stream::DataPushStream<float> > tilt_servo();
 
-	Servo* yaw_servo();
+	boost::shared_ptr<stream::DataPushStream<float> > yaw_servo();
 
-	Servo* pitch_servo();
+	boost::shared_ptr<stream::DataPushStream<float> > pitch_servo();
 
-	Servo* gas_servo();
+	boost::shared_ptr<stream::DataPushStream<float> > gas_servo();
 
 private:
 	boost::shared_ptr<vec_watch_stream> m_acc;
@@ -56,13 +58,13 @@ public:
 
 	boost::shared_ptr<vec_watch_stream> gps_sensor();
 
-	Servo* tilt_servo();
+	boost::shared_ptr<stream::DataPushStream<float> > tilt_servo();
 
-	Servo* yaw_servo();
+	boost::shared_ptr<stream::DataPushStream<float> > yaw_servo();
 
-	Servo* pitch_servo();
+	boost::shared_ptr<stream::DataPushStream<float> > pitch_servo();
 
-	Servo* gas_servo();
+	boost::shared_ptr<stream::DataPushStream<float> > gas_servo();
 
 private:
 	boost::shared_ptr<vec_watch_stream> m_acc;

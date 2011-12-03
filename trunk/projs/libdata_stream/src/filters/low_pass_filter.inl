@@ -53,7 +53,7 @@ data_t LowPassFilter<data_t>::get_data() {
 }
 
 template <typename data_t>
-void LowPassFilter<data_t>::set_data(data_t data) {
+void LowPassFilter<data_t>::set_data(const data_t& data) {
 	StreamPushFilter<data_t>::m_collector->set_data(filter(data));
 }
 

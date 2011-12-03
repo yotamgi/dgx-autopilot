@@ -30,17 +30,16 @@ Plane::Plane(irr::IrrlichtDevice* device,
 		irr::core::vector3df start_pos,
 		const PlainParams plane_params):
 		FlyingObject(device),
-		m_gyro(new SensorGenerator),
-		m_acc(new SensorGenerator),
-		m_compass(new SensorGenerator),
+		m_gyro(new stream::PushToPopConv<lin_algebra::vec3f>(lin_algebra::vec3f())),
+		m_acc(new stream::PushToPopConv<lin_algebra::vec3f>(lin_algebra::vec3f())),
+		m_compass(new stream::PushToPopConv<lin_algebra::vec3f>(lin_algebra::vec3f())),
+		m_tilt_servo(new stream::PushToPopConv<float>(50.)),
+		m_pitch_servo(new stream::PushToPopConv<float>(50.)),
+		m_yaw_servo(new stream::PushToPopConv<float>(50.)),
 		m_direction(irr::core::vector3df(0.0f, 0.0f, -1.0f)),
 		m_params(plane_params),
 		m_gyro_drift(frand()*10., frand()*10., frand()*10.)
 {
-	m_servos.yaw_percentage = 50.0f;
-	m_servos.pitch_percentage = 50.0f;
-	m_servos.ailron_percentage = 50.0f;
-
 	irr::scene::ISceneManager* smgr = m_device->getSceneManager();
 
 	m_object = smgr->addMeshSceneNode(smgr->getMesh(m_params.get_mesh_file().c_str()));
@@ -56,9 +55,9 @@ Plane::Plane(irr::IrrlichtDevice* device,
 
 irr::core::vector3df Plane::calc_angle_vel() const {
 	return irr::core::vector3df(
-				((m_servos.pitch_percentage   - 50.0f)/50.0f)*m_params.get_pitch_speed(),
-				((m_servos.yaw_percentage 	  - 50.0f)/50.0f)*m_params.get_yaw_speed(),
-				((m_servos.ailron_percentage  - 50.0f)/50.0f)*m_params.get_ailron_speed()
+				((m_pitch_servo->get_data() - 50.)/50.)*m_params.get_pitch_speed(),
+				((m_yaw_servo->get_data()   - 50.)/50.)*m_params.get_yaw_speed(),
+				((m_tilt_servo->get_data()  - 50.)/50.)*m_params.get_ailron_speed()
 	);
 }
 
@@ -99,14 +98,14 @@ void Plane::update_sensors(float time_delta) {
 	trans.rotateVect(dir, m_direction);
 
 	// update the gyro
-	SensorGenerator::type gyro_data;
+	lin_algebra::vec3f gyro_data;
 	gyro_data[0] = angle_vel.X + frand()*10. + m_gyro_drift.X;
 	gyro_data[1] = angle_vel.Y + frand()*10. + m_gyro_drift.Y;
 	gyro_data[2] = angle_vel.Z + frand()*10. + m_gyro_drift.Z;
 	m_gyro->set_data(gyro_data);
 
 	// update the accelerometer
-	SensorGenerator::type acc_data;
+	lin_algebra::vec3f acc_data;
 	irr::core::vector3df g(0, -1., 0);
 	irr::core::vector3df acc = g + 4.*(m_priv_dir - dir)/time_delta;
 	float acc_len = acc.getLength();
@@ -118,7 +117,7 @@ void Plane::update_sensors(float time_delta) {
 	m_acc->set_data(acc_data);
 
 	// update the compass
-	SensorGenerator::type compass_data;
+	lin_algebra::vec3f compass_data;
 	irr::core::vector3df north(1., -1., 0);
 	trans.getTransposed().rotateVect(north);
 	north = north.normalize() * 20.;
@@ -130,17 +129,6 @@ void Plane::update_sensors(float time_delta) {
 	m_priv_dir = dir;
 
 }
-
-void Plane::set_pitch_servo(float percentage) {
-	m_servos.pitch_percentage = percentage;
-}
-void Plane::set_yaw_servo(float percentage) {
-	m_servos.yaw_percentage = percentage;
-}
-void Plane::set_ailron_servo(float percentage) {
-	m_servos.ailron_percentage = percentage;
-}
-
 
 }  // namespace simulator
 

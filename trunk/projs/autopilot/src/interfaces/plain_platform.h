@@ -2,10 +2,10 @@
 #define PLAIN_PLATFORM_H_
 
 #include <stream/data_pop_stream.h>
+#include <stream/data_push_stream.h>
 #include <stream/filters/watch_filter.h>
 #include <boost/shared_ptr.hpp>
 #include <stream/util/lin_algebra.h>
-#include "interfaces/servo.h"
 
 namespace autopilot {
 
@@ -32,13 +32,13 @@ public:
 
 	virtual boost::shared_ptr<vec_watch_stream> gps_sensor() = 0;
 
-	virtual Servo* tilt_servo() = 0;
+	virtual boost::shared_ptr<stream::DataPushStream<float> > tilt_servo() = 0;
 
-	virtual Servo* yaw_servo() = 0;
+	virtual boost::shared_ptr<stream::DataPushStream<float> > yaw_servo() = 0;
 
-	virtual Servo* pitch_servo() = 0;
+	virtual boost::shared_ptr<stream::DataPushStream<float> > pitch_servo() = 0;
 
-	virtual Servo* gas_servo() = 0;
+	virtual boost::shared_ptr<stream::DataPushStream<float> > gas_servo() = 0;
 };
 
 } //namespace autopilot

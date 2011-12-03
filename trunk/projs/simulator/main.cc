@@ -198,13 +198,13 @@ int main()
 		///////////////////////////////////////
 		// Update the plane according to the keys
 		//////////////
-		if (receiver.IsKeyDown(KEY_UP)) p.set_pitch_servo(10.);
-		else if (receiver.IsKeyDown(KEY_DOWN)) p.set_pitch_servo(90.);
-		else p.set_pitch_servo(50.f);
+		if (receiver.IsKeyDown(KEY_UP)) p.get_pitch_servo()->set_data(10.);
+		else if (receiver.IsKeyDown(KEY_DOWN)) p.get_pitch_servo()->set_data(90.);
+		else p.get_pitch_servo()->set_data(50.f);
 
-		if (receiver.IsKeyDown(KEY_LEFT))  p.set_ailron_servo(10.);
-		else if (receiver.IsKeyDown(KEY_RIGHT)) p.set_ailron_servo(90.);
-		else p.set_ailron_servo(50.f);
+		if (receiver.IsKeyDown(KEY_LEFT))  p.get_tilt_servo()->set_data(10.);
+		else if (receiver.IsKeyDown(KEY_RIGHT)) p.get_tilt_servo()->set_data(90.);
+		else p.get_tilt_servo()->set_data(50.f);
 
 		if (receiver.IsKeyDown(KEY_KEY_Z)) c.setType(simulator::Camera::FPS);
 		if (receiver.IsKeyDown(KEY_KEY_X)) c.setType(simulator::Camera::TRACK_BEHIND);

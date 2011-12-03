@@ -12,6 +12,8 @@
 #include <stdexcept>
 
 #include <stream/data_pop_stream.h>
+#include <stream/data_push_stream.h>
+#include <stream/stream_converters.h>
 #include <stream/util/lin_algebra.h>
 #include "flying_object.h"
 
@@ -51,6 +53,8 @@ private:
 	float m_ailron_speed;
 };
 
+typedef boost::shared_ptr<stream::DataPushStream<float> > servo_stream_ptr_t;
+typedef boost::shared_ptr<stream::DataPopStream<lin_algebra::vec3f> > sensor_stream_ptr_t;
 
 /**
  * The plane class - gets a plane param and creates a plane in the field.
@@ -66,56 +70,35 @@ public:
 	virtual irr::core::vector3df get_pos() const { return m_object->getPosition(); }
 
 	// controlling the plane
-	void set_pitch_servo(float percentage);
-	void set_yaw_servo(float percentage);
-	void set_ailron_servo(float percentage);
+	servo_stream_ptr_t get_pitch_servo() { return m_pitch_servo; }
+	servo_stream_ptr_t get_yaw_servo()   { return m_yaw_servo; }
+	servo_stream_ptr_t get_tilt_servo()  { return m_tilt_servo; }
 
-	/**
-	 * Our generic sensor generator.
-	 * The plane class will calculate the sensor data and tell every sensor
-	 * what is its data.
-	 */
-	class SensorGenerator : public stream::DataPopStream<lin_algebra::vec3f> {
-	public:
-		lin_algebra::vec3f get_data() {return m_data; }
-
-		void set_data(lin_algebra::vec3f data) { m_data = data; }
-
-	private:
-		lin_algebra::vec3f m_data;
-	};
-
-	boost::shared_ptr<stream::DataPopStream<lin_algebra::vec3f> > gyro_gen() { return m_gyro; }
-	boost::shared_ptr<stream::DataPopStream<lin_algebra::vec3f> > acc_gen() { return m_acc; }
-	boost::shared_ptr<stream::DataPopStream<lin_algebra::vec3f> > compass_gen() { return m_compass; }
+	// getting data from sensors
+	sensor_stream_ptr_t gyro_gen() { return m_gyro; }
+	sensor_stream_ptr_t acc_gen() { return m_acc; }
+	sensor_stream_ptr_t compass_gen() { return m_compass; }
 
 private:
 
 	void update_sensors(float time_delta);
 	irr::core::vector3df calc_angle_vel() const;
 
-	boost::shared_ptr<SensorGenerator> m_gyro;
-	boost::shared_ptr<SensorGenerator> m_acc;
-	boost::shared_ptr<SensorGenerator> m_compass;
-
 	/**
-	 * Returns the angle_diff for this frame
-	 * It uses the data from the servos and various other things.
-	 * It is responsible to make it realistic.
+	 * all the streams that the plane simulates.
 	 */
+	boost::shared_ptr<stream::PushToPopConv<lin_algebra::vec3f> > m_gyro;
+	boost::shared_ptr<stream::PushToPopConv<lin_algebra::vec3f> > m_acc;
+	boost::shared_ptr<stream::PushToPopConv<lin_algebra::vec3f> > m_compass;
+
+	boost::shared_ptr<stream::PushToPopConv<float> > m_tilt_servo;
+	boost::shared_ptr<stream::PushToPopConv<float> > m_pitch_servo;
+	boost::shared_ptr<stream::PushToPopConv<float> > m_yaw_servo;
 
 	irr::core::vector3df m_direction;
 	irr::core::vector3df m_priv_dir;
 
 	irr::scene::ISceneNode * m_object;
-
-	struct servo_states {
-		float yaw_percentage;
-		float pitch_percentage;
-		float ailron_percentage;
-	};
-
-	servo_states m_servos;
 
 	PlainParams m_params;
 	irr::core::vector3df m_gyro_drift;

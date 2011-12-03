@@ -20,7 +20,7 @@ private:
 class SimplePushStream : public stream::DataPushStream<int> {
 public:
 	SimplePushStream(): m_num(0) {}
-	void set_data(int data) {
+	void set_data(const int& data) {
 		EXPECT_EQ(m_num, data);
 		m_num++;
 	}
