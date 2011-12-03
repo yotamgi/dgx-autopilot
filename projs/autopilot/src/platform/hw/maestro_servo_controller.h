@@ -1,17 +1,23 @@
 #ifndef __MAESTRO_H__
 #define __MAESTRO_H__
 
+#include <stream/data_push_stream.h>
 #include <stdint.h>
 #include <iostream>
 #include <vector>
 #include <string>
-#include <interfaces/servo.h>
 #include <common/exceptions.h>
 #include <boost/shared_ptr.hpp>
 
+class ServoException: public stream::PushStreamException {
+public:
+	ServoException(std::string what): stream::PushStreamException(what) {}
+	virtual ~ServoException() throw() {}
+};
+
 /**
  * Class representing the Pololu MaestroServoController 6 channel USB servo controller, and
- * contains 6 servo channels that implement the Servo interface.
+ * contains 6 servo channels that implement the DataPushStream interface.
  */
 class MaestroServoController {
 public:
@@ -26,10 +32,10 @@ public:
 	/**
 	 * The servo channel class, that implements the Servo interface.
 	 */
-	class MaestroServoChannel : public Servo {
+	class MaestroServoChannel : public stream::DataPushStream<float> {
 	public:
 		MaestroServoChannel(size_t channel, MaestroServoController& father);
-		void set_state(float statePercentage);
+		void set_data(const float& statePercentage);
 	private:
 		size_t m_channel;
 		MaestroServoController& m_father;

@@ -42,7 +42,7 @@ public:
 		return m_watched;
 	}
 
-	void set_data(T data) {
+	void set_data(const T& data) {
 		m_watched = data;
 		StreamPushFilter<T>::m_collector->set_data(data);
 	}

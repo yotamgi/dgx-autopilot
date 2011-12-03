@@ -32,24 +32,24 @@ boost::shared_ptr<vec_watch_stream> DGX1Platform::gps_sensor() {
 	return boost::shared_ptr<vec_watch_stream>();
 }
 
-Servo* DGX1Platform::tilt_servo() {
+boost::shared_ptr<stream::DataPushStream<float> > DGX1Platform::tilt_servo() {
 	throw std::logic_error("Servos not implemented yet on dgx1 platform");
-	return NULL;
+	return boost::shared_ptr<stream::DataPushStream<float> >();
 }
 
-Servo* DGX1Platform::yaw_servo() {
+boost::shared_ptr<stream::DataPushStream<float> > DGX1Platform::yaw_servo() {
 	throw std::logic_error("Servos not implemented yet on dgx1 platform");
-	return NULL;
+	return boost::shared_ptr<stream::DataPushStream<float> >();
 }
 
-Servo* DGX1Platform::pitch_servo() {
+boost::shared_ptr<stream::DataPushStream<float> > DGX1Platform::pitch_servo() {
 	throw std::logic_error("Servos not implemented yet on dgx1 platform");
-	return NULL;
+	return boost::shared_ptr<stream::DataPushStream<float> >();
 }
 
-Servo* DGX1Platform::gas_servo() {
+boost::shared_ptr<stream::DataPushStream<float> > DGX1Platform::gas_servo() {
 	throw std::logic_error("Servos not implemented yet on dgx1 platform");
-	return NULL;
+	return boost::shared_ptr<stream::DataPushStream<float> >();
 }
 
 
@@ -81,26 +81,25 @@ boost::shared_ptr<vec_watch_stream> DGX1SimulatorPlatform::gps_sensor() {
 	return boost::shared_ptr<vec_watch_stream>();
 }
 
-Servo* DGX1SimulatorPlatform::tilt_servo() {
+boost::shared_ptr<stream::DataPushStream<float> > DGX1SimulatorPlatform::tilt_servo() {
 	throw std::logic_error("Servos not implemented yet on dgx1 platform");
-	return NULL;
+	return boost::shared_ptr<stream::DataPushStream<float> >();
 }
 
-Servo* DGX1SimulatorPlatform::yaw_servo() {
+boost::shared_ptr<stream::DataPushStream<float> > DGX1SimulatorPlatform::yaw_servo() {
 	throw std::logic_error("Servos not implemented yet on dgx1 platform");
-	return NULL;
+	return boost::shared_ptr<stream::DataPushStream<float> >();
 }
 
-Servo* DGX1SimulatorPlatform::pitch_servo() {
+boost::shared_ptr<stream::DataPushStream<float> > DGX1SimulatorPlatform::pitch_servo() {
 	throw std::logic_error("Servos not implemented yet on dgx1 platform");
-	return NULL;
+	return boost::shared_ptr<stream::DataPushStream<float> >();
 }
 
-Servo* DGX1SimulatorPlatform::gas_servo() {
+boost::shared_ptr<stream::DataPushStream<float> > DGX1SimulatorPlatform::gas_servo() {
 	throw std::logic_error("Servos not implemented yet on dgx1 platform");
-	return NULL;
+	return boost::shared_ptr<stream::DataPushStream<float> >();
 }
-
 
 
 } //namespace autopilot

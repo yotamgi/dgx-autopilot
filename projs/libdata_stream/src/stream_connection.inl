@@ -102,7 +102,7 @@ StreamConnection::PushStreamProxy<T>::~PushStreamProxy() {
 }
 
 template <typename T>
-inline void StreamConnection::PushStreamProxy<T>::set_data(T data)  {
+inline void StreamConnection::PushStreamProxy<T>::set_data(const T& data)  {
 	// prepare the data and serialize it
 	std::stringstream ss;
 	ss << data;

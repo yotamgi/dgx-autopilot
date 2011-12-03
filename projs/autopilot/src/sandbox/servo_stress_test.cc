@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
 				int shaked_target = target + (((i*13)%500) - 250);
 
                 try {
-				m.getServoChannel(5)->set_state(float(target-4000)/40); // in percentage
+				m.getServoChannel(5)->set_data(float(target-4000)/40); // in percentage
                 } catch (...) {
                 }
 			}

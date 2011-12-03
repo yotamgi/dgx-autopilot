@@ -110,19 +110,19 @@ inline stream::DataPopStream<float>* Cockpit::speed() {
 	return NULL;
 }
 
-inline Servo* Cockpit::tilt_servo() {
+inline servo_stream_ptr Cockpit::tilt_servo() {
 	return m_platform->tilt_servo();
 }
 
-inline Servo* Cockpit::yaw_servo() {
+inline servo_stream_ptr Cockpit::yaw_servo() {
 	return m_platform->yaw_servo();
 }
 
-inline Servo* Cockpit::pitch_servo(){
+inline servo_stream_ptr Cockpit::pitch_servo(){
 	return m_platform->pitch_servo();
 }
 
-inline Servo* Cockpit::gas_servo() {
+inline servo_stream_ptr Cockpit::gas_servo() {
 	return m_platform->gas_servo();
 }
 

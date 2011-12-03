@@ -75,7 +75,7 @@ private:
 		PushStreamProxy(boost::shared_ptr<Connection> conn);
 		~PushStreamProxy();
 
-		void set_data(T);
+		void set_data(const T&);
 
 	private:
 

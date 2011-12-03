@@ -94,7 +94,7 @@ MaestroServoController::MaestroServoChannel::MaestroServoChannel(size_t channel,
 	SERVO_MAX(8000)
 {}
 
-void MaestroServoController::MaestroServoChannel::set_state(float statePercentage) {
+void MaestroServoController::MaestroServoChannel::set_data(const float& statePercentage) {
 
 	if ((statePercentage < 0.0f) || (statePercentage > 100.0f)) {
 		throw ServoException("You asked for illegal servo percentage");

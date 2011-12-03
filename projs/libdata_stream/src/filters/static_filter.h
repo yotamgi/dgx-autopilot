@@ -28,7 +28,7 @@ public:
 		return filter(StreamPopFilter<T>::m_generator->get_data());
 	}
 
-	void set_data(T data) {
+	void set_data(const T& data) {
 		StreamPushFilter<T>::m_collector->set_data(filter(data));
 	}
 
