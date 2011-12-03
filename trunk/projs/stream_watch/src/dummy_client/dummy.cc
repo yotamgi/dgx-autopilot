@@ -1,7 +1,8 @@
 #include <iostream>
 
 #include <stream/data_pop_stream.h>
-#include <stream/stream_exporter.h>
+#include <stream/stream_connection.h>
+#include <stream/util/tcpip_connection.h>
 #include "stream_watch/stream_presenter_3d.h"
 
 class SimpleGen : public stream::DataPopStream<lin_algebra::vec3f> {
@@ -35,10 +36,12 @@ int main(int argc, char** argv) {
 		s.addAngleStream(gen);
 		s.run(false);
 	} else if (argc == 2 && std::string(argv[1]) == std::string("--net")) {
-		stream::StreamExporter exp;
-		exp.register_stream(gen, "dummy");
+		boost::shared_ptr<stream::TcpipClient> client =
+				boost::make_shared<stream::TcpipClient>("localhost", 0x6060);
+		stream::StreamConnection conn(client);
+		conn.export_pop_stream<lin_algebra::vec3f>(gen, "dummy");
 		std::cout << "Running..." << std::endl;
-		exp.run();
+		conn.run(false);
 	} else {
 		std::cout <<"usage: " << argv[0] << " [--net] " << std::endl;
 		exit(1);
