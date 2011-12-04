@@ -38,7 +38,8 @@ Plane::Plane(irr::IrrlichtDevice* device,
 		m_yaw_servo(new stream::PushToPopConv<float>(50.)),
 		m_direction(irr::core::vector3df(0.0f, 0.0f, -1.0f)),
 		m_params(plane_params),
-		m_gyro_drift(frand()*10., frand()*10., frand()*10.)
+		m_gyro_drift(frand()*10., frand()*10., frand()*10.),
+		m_gps_thread(&Plane::gps_update, this)
 {
 	irr::scene::ISceneManager* smgr = m_device->getSceneManager();
 
@@ -128,6 +129,29 @@ void Plane::update_sensors(float time_delta) {
 
 	m_priv_dir = dir;
 
+}
+
+void Plane::gps_update() {
+
+	while (true) {
+		if (m_gps_listener) {
+			irr::core::vector3df irrpos = m_object->getPosition();
+			lin_algebra::vec3f pos;
+			pos[0] = irrpos.X;
+			pos[1] = irrpos.Y;
+			pos[2] = irrpos.Z;
+
+			lin_algebra::vec3f rand;
+			rand.randu(3);
+
+			m_gps_listener->set_data(pos/10. + rand*3.);
+		}
+		sleep(1);
+	}
+}
+
+void Plane::set_gps_listener(boost::shared_ptr<stream::DataPushStream<lin_algebra::vec3f> > listenr) {
+	m_gps_listener = listenr;
 }
 
 }  // namespace simulator

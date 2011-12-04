@@ -1,14 +1,16 @@
 #ifndef PLANE_H_
 #define PLANE_H_
 
-#include <boost/shared_ptr.hpp>
-#include <stdexcept>
 
 #include <stream/data_pop_stream.h>
 #include <stream/data_push_stream.h>
 #include <stream/stream_utils.h>
 #include <stream/util/lin_algebra.h>
 #include "flying_object.h"
+
+#include <boost/shared_ptr.hpp>
+#include <boost/thread.hpp>
+#include <stdexcept>
 
 namespace simulator {
 
@@ -71,11 +73,13 @@ public:
 	sensor_stream_ptr_t gyro_gen() { return m_gyro; }
 	sensor_stream_ptr_t acc_gen() { return m_acc; }
 	sensor_stream_ptr_t compass_gen() { return m_compass; }
+	void set_gps_listener(boost::shared_ptr<stream::DataPushStream<lin_algebra::vec3f> > listenr);
 
 private:
 
 	void update_sensors(float time_delta);
 	irr::core::vector3df calc_angle_vel() const;
+	void gps_update(); // blocking
 
 	/**
 	 * all the streams that the plane simulates.
@@ -88,6 +92,8 @@ private:
 	boost::shared_ptr<stream::PushToPopConv<float> > m_pitch_servo;
 	boost::shared_ptr<stream::PushToPopConv<float> > m_yaw_servo;
 
+	boost::shared_ptr<stream::DataPushStream<lin_algebra::vec3f> > m_gps_listener;
+
 	irr::core::vector3df m_direction;
 	irr::core::vector3df m_priv_dir;
 
@@ -95,6 +101,8 @@ private:
 
 	PlainParams m_params;
 	irr::core::vector3df m_gyro_drift;
+
+	boost::thread m_gps_thread;
 
 };
 
