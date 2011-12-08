@@ -10,6 +10,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
+#include <boost/noncopyable.hpp>
 #include <stdexcept>
 
 namespace simulator {
@@ -54,7 +55,7 @@ typedef boost::shared_ptr<stream::DataPopStream<lin_algebra::vec3f> > sensor_str
 /**
  * The plane class - gets a plane param and creates a plane in the field.
  */
-class Plane : public FlyingObject {
+class Plane : public FlyingObject, private boost::noncopyable {
 public:
 	Plane(irr::IrrlichtDevice* device,
 			irr::core::vector3df start_pos,
