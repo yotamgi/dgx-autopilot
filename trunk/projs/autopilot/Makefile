@@ -18,7 +18,9 @@ AUTOPILIT_OBJS =  $(SRCDIR)/platform/hw/i2c_interface.o	\
 		$(SRCDIR)/platform/hw/hmc5843_compass.o		 	\
 		$(SRCDIR)/platform/hw/maestro_servo_controller.o \
 		$(SRCDIR)/platform/dgx1_platform.o \
-		$(SRCDIR)/gps_filter.o			
+		$(SRCDIR)/gps_filter.o \
+		$(SRCDIR)/waypoint_pilot.o
+		
 		
 GTESTS_OBJS= $(SRCDIR)/tests/test_gps_filter.o
 
@@ -32,10 +34,10 @@ GTESTS_OBJS= $(SRCDIR)/tests/test_gps_filter.o
 all: host device
 
 .PHONY:
-host: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.a sensor_watch_test cockpit_test gtest  
+host: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.a sensor_watch_test cockpit_test waypoint_pilot_test gtest  
 
 .PHONY:
-device: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.a sensor_watch_test cockpit_test gtest 
+device: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.a sensor_watch_test cockpit_test waypoint_pilot_test gtest 
 
 .PHONY:
 clean:
@@ -64,3 +66,7 @@ sensor_watch_test: $(SRCDIR)/sandbox/sensor_watch_test.o $(LIBDIR) $(LIBDIR)/lib
 	
 cockpit_test: $(SRCDIR)/sandbox/cockpit_test.o $(LIBDIR) $(LIBDIR)/libautopilot.a
 	$(CXX) $(SRCDIR)/sandbox/cockpit_test.o $(LDFLAGS) -lautopilot -o cockpit_test
+
+waypoint_pilot_test: $(SRCDIR)/sandbox/waypoint_pilot_test.o $(LIBDIR) $(LIBDIR)/libautopilot.a
+	$(CXX) $(SRCDIR)/sandbox/waypoint_pilot_test.o $(LDFLAGS) -lautopilot -o waypoint_pilot_test
+	
