@@ -22,6 +22,8 @@ namespace lin_algebra {
 	typedef arma::fvec::fixed<3>   	  vec3f;
 	typedef arma::frowvec::fixed<3>   rowvec3f;
 	typedef arma::fmat::fixed<3,3> 	  mat3f;
+	typedef arma::fvec::fixed<2>   	  vec2f;
+	typedef arma::frowvec::fixed<2>   rowvec2f;
 
 
 	/////////////////////////////////////////////////////////////////////
