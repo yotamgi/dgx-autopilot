@@ -62,6 +62,9 @@ DGX1SimulatorPlatform::DGX1SimulatorPlatform(boost::shared_ptr<stream::Connectio
 	m_gyro = boost::make_shared<vec_watch_stream>(m_stream_conn.import_pop_stream<lin_algebra::vec3f>("simulator_gyro"));
 	m_acc = boost::make_shared<vec_watch_stream>(m_stream_conn.import_pop_stream<lin_algebra::vec3f>("simulator_acc"));
 	m_compass = boost::make_shared<vec_watch_stream>(m_stream_conn.import_pop_stream<lin_algebra::vec3f>("simulator_compass"));
+
+	m_pitch = m_stream_conn.import_push_stream<float>("simulator_pitch_servo");
+	m_tilt = m_stream_conn.import_push_stream<float>("simulator_tilt_servo");
 }
 
 boost::shared_ptr<vec_watch_stream> DGX1SimulatorPlatform::acc_sensor() {
@@ -82,23 +85,19 @@ boost::shared_ptr<vec_watch_stream> DGX1SimulatorPlatform::gps_sensor() {
 }
 
 boost::shared_ptr<stream::DataPushStream<float> > DGX1SimulatorPlatform::tilt_servo() {
-	throw std::logic_error("Servos not implemented yet on dgx1 platform");
-	return boost::shared_ptr<stream::DataPushStream<float> >();
+	return m_tilt;
 }
 
 boost::shared_ptr<stream::DataPushStream<float> > DGX1SimulatorPlatform::yaw_servo() {
-	throw std::logic_error("Servos not implemented yet on dgx1 platform");
-	return boost::shared_ptr<stream::DataPushStream<float> >();
+	return m_yaw;
 }
 
 boost::shared_ptr<stream::DataPushStream<float> > DGX1SimulatorPlatform::pitch_servo() {
-	throw std::logic_error("Servos not implemented yet on dgx1 platform");
-	return boost::shared_ptr<stream::DataPushStream<float> >();
+	return m_pitch;
 }
 
 boost::shared_ptr<stream::DataPushStream<float> > DGX1SimulatorPlatform::gas_servo() {
-	throw std::logic_error("Servos not implemented yet on dgx1 platform");
-	return boost::shared_ptr<stream::DataPushStream<float> >();
+	return m_gas;
 }
 
 

@@ -13,6 +13,7 @@ namespace autopilot {
 typedef stream::filters::WatchFilter<lin_algebra::vec3f> 	vec_watch_stream;
 typedef stream::DataPopStream<lin_algebra::vec3f>			vec_stream;
 typedef boost::shared_ptr<vec_stream> 						vec_stream_ptr;
+typedef stream::DataPushStream<float> 						servo_stream;
 
 
 class DGX1Platform : public NormalPlainPlatform {
@@ -45,7 +46,6 @@ private:
 };
 
 
-
 class DGX1SimulatorPlatform : public NormalPlainPlatform {
 public:
 	DGX1SimulatorPlatform(boost::shared_ptr<stream::ConnectionFactory> conn);
@@ -58,21 +58,25 @@ public:
 
 	boost::shared_ptr<vec_watch_stream> gps_sensor();
 
-	boost::shared_ptr<stream::DataPushStream<float> > tilt_servo();
+	boost::shared_ptr<servo_stream> tilt_servo();
 
-	boost::shared_ptr<stream::DataPushStream<float> > yaw_servo();
+	boost::shared_ptr<servo_stream> yaw_servo();
 
-	boost::shared_ptr<stream::DataPushStream<float> > pitch_servo();
+	boost::shared_ptr<servo_stream> pitch_servo();
 
-	boost::shared_ptr<stream::DataPushStream<float> > gas_servo();
+	boost::shared_ptr<servo_stream> gas_servo();
 
 private:
 	boost::shared_ptr<vec_watch_stream> m_acc;
 	boost::shared_ptr<vec_watch_stream> m_gyro;
 	boost::shared_ptr<vec_watch_stream> m_compass;
 
-	stream::StreamConnection m_stream_conn;
+	boost::shared_ptr<servo_stream> m_gas;
+	boost::shared_ptr<servo_stream> m_pitch;
+	boost::shared_ptr<servo_stream> m_tilt;
+	boost::shared_ptr<servo_stream> m_yaw;
 
+	stream::StreamConnection m_stream_conn;
 };
 
 

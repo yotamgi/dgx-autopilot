@@ -1,10 +1,3 @@
-/*
- * Cockpit.h
- *
- *  Created on: Oct 9, 2011
- *      Author: yotam
- */
-
 #ifndef COCKPIT_H_
 #define COCKPIT_H_
 
@@ -17,6 +10,7 @@
 namespace autopilot {
 
 typedef stream::DataPopStream<lin_algebra::vec3f> 			vec_stream;
+typedef boost::shared_ptr<vec_stream> 						vec_stream_ptr;
 typedef stream::filters::WatchFilter<lin_algebra::vec3f> 	vec_watch_stream;
 typedef stream::DataPopStream<float> 						float_stream;
 typedef boost::shared_ptr<stream::DataPushStream<float> >   servo_stream_ptr;
