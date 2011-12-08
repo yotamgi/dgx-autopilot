@@ -82,6 +82,9 @@ void export_import(simulator::Plane& p) {
 			conn.export_pop_stream<lin_algebra::vec3f>(p.gyro_gen(), "simulator_gyro");
 			conn.export_pop_stream<lin_algebra::vec3f>(p.acc_gen(), "simulator_acc");
 			conn.export_pop_stream<lin_algebra::vec3f>(p.compass_gen(), "simulator_compass");
+
+			conn.export_push_stream<float>(p.get_pitch_servo(), "simulator_pitch_servo");
+			conn.export_push_stream<float>(p.get_tilt_servo(), "simulator_tilt_servo");
 			conn.run(false);
 		} catch (stream::ConnectionExceptioin& e) {
 			std::cout << "Connection died" << std::endl;
@@ -123,7 +126,7 @@ int main()
 	simulator::Plane p(device, core::vector3df(0.0f, 0.0f, 0.0f), plane_params);
 
 	// export all the sensors
-	boost::thread t(export_import, p);
+	boost::thread t(export_import, boost::ref(p));
 
     // add terrain scene node
     scene::ITerrainSceneNode* terrain = smgr->addTerrainSceneNode(
