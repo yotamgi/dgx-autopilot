@@ -4,7 +4,7 @@ LIBDS_PATH = ../libdata_stream
 include $(LIBDS_PATH)/Makefile.include
 
 CXX = g++
-CXXFLAGS +=  -I/usr/X11R6/include  -g -fPIC  $(LIBDS_CXXFLAGS) -Iinclude
+CXXFLAGS +=  -I/usr/X11R6/include  -g -fPIC  $(LIBDS_CXXFLAGS) -Iinclude -O3
 LDFLAGS += -L/usr/X11R6/lib -lGL -lXxf86vm -lXext -lX11 -lIrrlicht -lboost_thread -fPIC $(LIBDS_LDFLAGS)
 
 LIBDIR=./lib
