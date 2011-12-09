@@ -10,7 +10,7 @@ SRCDIR = ./src
 CXX = g++
 ARCHIVE = ar
 CXXFLAGS += -g -I$(SRCDIR) -Wall  $(LIBDS_CXXFLAGS) $(STREAM_WATCH_CXXFLAGS) -O3
-LDFLAGS += -lboost_thread -llapack -L./lib $(LIBDS_LDFLAGS) $(STREAM_WATCH_LDFLAGS) -Wl,--rpath,$(LIBDS_LIBDIRS):$(STREAM_WATCH_LIBDIRS)
+LDFLAGS += -lboost_thread -L./lib $(LIBDS_LDFLAGS) $(STREAM_WATCH_LDFLAGS) -Wl,--rpath,$(LIBDS_LIBDIRS):$(STREAM_WATCH_LIBDIRS)
 
 AUTOPILIT_OBJS =  $(SRCDIR)/platform/hw/i2c_interface.o	\
 		$(SRCDIR)/platform/hw/itg3200_gyro.o				\
@@ -37,11 +37,11 @@ all: host device
 host: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.a sensor_watch_test cockpit_test waypoint_pilot_test gtest  
 
 .PHONY:
-device: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.a sensor_watch_test cockpit_test waypoint_pilot_test gtest 
+device: $(OBJDIR) $(LIBDIR) $(GTEST_OBJS) $(LIBDIR)/libautopilot.a sensor_watch_test cockpit_test waypoint_pilot_test gtest 
 
 .PHONY:
 clean:
-	rm -fr $(AUTOPILIT_OBJS) */*/*.o */*.o *.o $(LIBDIR) gtest sensor_watch_test watch_test cockpit_test
+	rm -fr $(AUTOPILIT_OBJS) */*/*.o */*.o *.o $(LIBDIR) gtest sensor_watch_test watch_test cockpit_test waypoint_pilot_test
 
 $(LIBDIR):
 	mkdir $(LIBDIR)
