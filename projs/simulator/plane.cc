@@ -41,7 +41,8 @@ Plane::Plane(irr::IrrlichtDevice* device,
 		m_gyro_drift(frand()*10., frand()*10., frand()*10.),
 		m_gps_thread(&Plane::gps_update, this),
 		m_forced_tilt(-1.),
-		m_forced_pitch(-1.)
+		m_forced_pitch(-1.),
+		m_data_ready(false)
 {
 	irr::scene::ISceneManager* smgr = m_device->getSceneManager();
 
@@ -136,6 +137,7 @@ void Plane::update_sensors(float time_delta) {
 
 	m_priv_dir = dir;
 
+	m_data_ready = true;
 }
 
 void Plane::gps_update() {
