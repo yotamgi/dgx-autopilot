@@ -24,6 +24,14 @@ int main(int argc, char** argv) {
 		usage_and_exit(argv[0]);
 	}
 
+	// configure the pilot
+	autopilot::WaypointPilotParams pilot_params;
+	pilot_params.avg_climbing_angle = (1./8.) * lin_algebra::PI;
+	pilot_params.max_climbing_angle = (1./8.) * lin_algebra::PI;
+	pilot_params.avg_decending_angle = (1./8.) * lin_algebra::PI;
+	pilot_params.max_decending_angle = (1./8.) * lin_algebra::PI;
+	pilot_params.max_tilt_angle = (1./4.) * lin_algebra::PI;
+
 	// create the platform according to the args
 	boost::shared_ptr<autopilot::NormalPlainPlatform> platform(
 		(sim_address == "") ?
@@ -32,11 +40,13 @@ int main(int argc, char** argv) {
 	);
 
 	boost::shared_ptr<autopilot::Cockpit> cockpit(boost::make_shared<autopilot::Cockpit>(platform));
-	autopilot::WaypointPilot pilot(cockpit);
+	autopilot::WaypointPilot pilot(pilot_params, cockpit);
 
 	lin_algebra::vec2f waypoint;
-	waypoint.zeros();
+	waypoint[0] = 100.; waypoint[1] = 101.;
 	pilot.to_waypoint(waypoint, 60.);
 
 	pilot.start(false);
+
+	return 0;
 }
