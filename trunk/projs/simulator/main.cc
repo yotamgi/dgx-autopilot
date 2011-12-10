@@ -86,6 +86,8 @@ void export_import(simulator::Plane& p) {
 			conn.export_push_stream<float>(p.get_pitch_servo(), "simulator_pitch_servo");
 			conn.export_push_stream<float>(p.get_tilt_servo(), "simulator_tilt_servo");
 			conn.run(false);
+
+			p.set_gps_listener(conn.import_push_stream<lin_algebra::vec3f>("gps_reciever"));
 		} catch (stream::ConnectionExceptioin& e) {
 			std::cout << "Connection died" << std::endl;
 		}
