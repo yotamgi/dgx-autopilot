@@ -33,7 +33,6 @@ void WaypointPilot::fly() {
 
 		// calculate the planes position, altitude and orientation
 		lin_algebra::vec3f plain_orientation = oreintation->get_data();
-		std::cout << "Orientation " << plain_orientation << std::endl;
 		lin_algebra::vec3f plain_pos_and_alt = position->get_data();
 		lin_algebra::vec2f plain_pos;
 		plain_pos[0] = plain_pos_and_alt[0]; plain_pos[1] = plain_pos_and_alt[2];
@@ -53,9 +52,6 @@ void WaypointPilot::fly() {
 		float expected_tilt = std::tan(wanted_diretion[1]/wanted_diretion[0])/lin_algebra::PI;
 		expected_tilt = std::max(expected_tilt,  std::sin(m_params.max_tilt_angle));
 		expected_tilt = std::min(expected_tilt, -std::sin(m_params.max_tilt_angle));
-
-		std::cout << "The pitch angle is " << plain_orientation[0] << "And the expected one is " << expected_pitch << std::endl;
-		std::cout << "The tilt angle is  " << plain_orientation[2] << "And the expected one is " << expected_tilt << std::endl;
 
 		// control the stick to achieve the speed vector we calculated
 		float pitch_data = plain_orientation[0]/180. - expected_pitch;
