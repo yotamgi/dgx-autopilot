@@ -10,6 +10,7 @@
 namespace autopilot {
 
 typedef stream::filters::WatchFilter<lin_algebra::vec3f> 	vec_watch_stream;
+typedef boost::shared_ptr<stream::DataPushStream<lin_algebra::vec3f> > gps_reciever_ptr;
 
 /**
  * Normal Plain Platform.
@@ -30,7 +31,7 @@ public:
 
 	virtual boost::shared_ptr<vec_watch_stream> compass_sensor() = 0;
 
-	virtual boost::shared_ptr<vec_watch_stream> gps_sensor() = 0;
+	virtual void register_gps_reciever(gps_reciever_ptr reciever) = 0;
 
 	virtual boost::shared_ptr<stream::DataPushStream<float> > tilt_servo() = 0;
 

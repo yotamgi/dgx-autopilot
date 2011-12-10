@@ -10,6 +10,7 @@ namespace autopilot {
 typedef stream::DataPopStream<lin_algebra::vec3f> 			vec_stream;
 typedef stream::filters::WatchFilter<lin_algebra::vec3f> 	vec_watch_stream;
 typedef stream::DataPopStream<float> 						float_stream;
+typedef stream::filters::WatchFilter<float_stream>			float_watch_stream;
 typedef boost::shared_ptr<stream::DataPushStream<float> >   servo_stream_ptr;
 
 /**
@@ -24,7 +25,9 @@ public:
 
 	virtual boost::shared_ptr<vec_watch_stream> orientation() = 0;
 
-	virtual stream::DataPopStream<float>* speed() = 0;
+	virtual boost::shared_ptr<vec_watch_stream> speed() = 0;
+
+	virtual boost::shared_ptr<vec_watch_stream> position() = 0;
 
 	virtual servo_stream_ptr tilt_servo() = 0;
 

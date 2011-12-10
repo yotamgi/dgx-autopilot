@@ -27,9 +27,8 @@ boost::shared_ptr<vec_watch_stream> DGX1Platform::compass_sensor() {
 	return m_compass;
 }
 
-boost::shared_ptr<vec_watch_stream> DGX1Platform::gps_sensor() {
+void DGX1Platform::register_gps_reciever(gps_reciever_ptr reciever) {
 	throw std::logic_error("GPS not implemented yet on dgx1 platform");
-	return boost::shared_ptr<vec_watch_stream>();
 }
 
 boost::shared_ptr<stream::DataPushStream<float> > DGX1Platform::tilt_servo() {
@@ -57,12 +56,18 @@ boost::shared_ptr<stream::DataPushStream<float> > DGX1Platform::gas_servo() {
 // The simulator platform methods
 //
 
-DGX1SimulatorPlatform::DGX1SimulatorPlatform(boost::shared_ptr<stream::ConnectionFactory> conn):m_stream_conn(conn)
+DGX1SimulatorPlatform::DGX1SimulatorPlatform(boost::shared_ptr<stream::ConnectionFactory> conn):
+		m_gps_forwarder(boost::make_shared<GpsForwarder>()),
+		m_stream_conn(conn)
 {
+	// export streams
+	m_stream_conn.export_push_stream<lin_algebra::vec3f>(m_gps_forwarder, std::string("gps_reciever"));
+	m_stream_conn.run();
+
+	// import streams
 	m_gyro = boost::make_shared<vec_watch_stream>(m_stream_conn.import_pop_stream<lin_algebra::vec3f>("simulator_gyro"));
 	m_acc = boost::make_shared<vec_watch_stream>(m_stream_conn.import_pop_stream<lin_algebra::vec3f>("simulator_acc"));
 	m_compass = boost::make_shared<vec_watch_stream>(m_stream_conn.import_pop_stream<lin_algebra::vec3f>("simulator_compass"));
-
 	m_pitch = m_stream_conn.import_push_stream<float>("simulator_pitch_servo");
 	m_tilt = m_stream_conn.import_push_stream<float>("simulator_tilt_servo");
 }
@@ -79,9 +84,8 @@ boost::shared_ptr<vec_watch_stream> DGX1SimulatorPlatform::compass_sensor() {
 	return m_compass;
 }
 
-boost::shared_ptr<vec_watch_stream> DGX1SimulatorPlatform::gps_sensor() {
-	throw std::logic_error("GPS not implemented yet on dgx1 platform");
-	return boost::shared_ptr<vec_watch_stream>();
+void DGX1SimulatorPlatform::register_gps_reciever(gps_reciever_ptr reciever) {
+	m_gps_forwarder->set_reciever(reciever);
 }
 
 boost::shared_ptr<stream::DataPushStream<float> > DGX1SimulatorPlatform::tilt_servo() {

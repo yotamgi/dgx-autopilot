@@ -29,7 +29,8 @@ static lin_algebra::mat3f update_matrix(const lin_algebra::mat3f& m1,
 }
 
 inline Cockpit::Cockpit(boost::shared_ptr<NormalPlainPlatform> platform):
-		m_platform(platform)
+		m_platform(platform),
+		m_gps_filter(boost::make_shared<SimpleGpsFilter>(5))
 {
 	// This is the stream schematics:
 	//
@@ -46,6 +47,8 @@ inline Cockpit::Cockpit(boost::shared_ptr<NormalPlainPlatform> platform):
 	//
 
 	namespace filter = stream::filters;
+
+	m_platform->register_gps_reciever(m_gps_filter);
 
 	m_gyro_orientation = boost::make_shared<filter::MatrixToEulerFilter>(
 		boost::make_shared<filter::IntegralFilter<lin_algebra::mat3f> >(
@@ -105,9 +108,12 @@ inline boost::shared_ptr<float_stream> Cockpit::watch_rest_reliability() {
 	return m_rest_reliability;
 }
 
-inline stream::DataPopStream<float>* Cockpit::speed() {
-	throw std::logic_error("speed not implemented yet on Cockpit");
-	return NULL;
+inline boost::shared_ptr<vec_watch_stream> Cockpit::speed() {
+	return boost::make_shared<vec_watch_stream>(m_gps_filter->get_speed_stream());
+}
+
+inline boost::shared_ptr<vec_watch_stream> Cockpit::position() {
+	return boost::make_shared<vec_watch_stream>(m_gps_filter->get_position_stream());
 }
 
 inline servo_stream_ptr Cockpit::tilt_servo() {
