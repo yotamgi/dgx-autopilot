@@ -76,6 +76,12 @@ public:
 	sensor_stream_ptr_t compass_gen() { return m_compass; }
 	void set_gps_listener(boost::shared_ptr<stream::DataPushStream<lin_algebra::vec3f> > listenr);
 
+	// forcing servos methods
+	void force_tilt(float howmuch) 		{ m_forced_tilt = howmuch; 	}
+	void unforce_tilt() 				{ m_forced_tilt = -1.; 		}
+	void force_pitch(float howmuch) 	{ m_forced_pitch = howmuch; }
+	void unforce_pitch()				{ m_forced_pitch = -1.; 	}
+
 private:
 
 	void update_sensors(float time_delta);
@@ -104,6 +110,9 @@ private:
 	irr::core::vector3df m_gyro_drift;
 
 	boost::thread m_gps_thread;
+
+	float m_forced_tilt;
+	float m_forced_pitch;
 
 };
 
