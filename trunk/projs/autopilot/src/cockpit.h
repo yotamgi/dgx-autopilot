@@ -10,13 +10,6 @@
 
 namespace autopilot {
 
-typedef stream::DataPopStream<lin_algebra::vec3f> 			vec_stream;
-typedef boost::shared_ptr<vec_stream> 						vec_stream_ptr;
-typedef stream::filters::WatchFilter<lin_algebra::vec3f> 	vec_watch_stream;
-typedef stream::DataPopStream<float> 						float_stream;
-typedef stream::filters::WatchFilter<float_stream>			float_watch_stream;
-typedef boost::shared_ptr<stream::DataPushStream<float> >   servo_stream_ptr;
-
 /**
  * Specific cockpit for normal plains.
  */
@@ -26,11 +19,13 @@ public:
 	Cockpit(boost::shared_ptr<NormalPlainPlatform> platform);
 	virtual ~Cockpit() {}
 
+
 	/* NormalPlainCockpit Implementation */
 
-
 	boost::shared_ptr<vec_watch_stream> orientation();
+
 	boost::shared_ptr<vec_watch_stream> speed();
+
 	boost::shared_ptr<vec_watch_stream> position();
 
 	servo_stream_ptr tilt_servo();
@@ -41,9 +36,13 @@ public:
 
 	servo_stream_ptr gas_servo();
 
+
 	/* Extending function */
+
 	boost::shared_ptr<vec_stream> 		watch_gyro_orientation();
+
 	boost::shared_ptr<vec_stream> 		watch_rest_orientation();
+
 	boost::shared_ptr<float_stream> 	watch_rest_reliability();
 
 private:

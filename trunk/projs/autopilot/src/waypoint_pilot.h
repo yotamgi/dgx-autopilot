@@ -1,16 +1,27 @@
 #ifndef WAYPOINT_PILOT_H_
 #define WAYPOINT_PILOT_H_
 
-#include "cockpit.h"
+#include "interfaces/plain_cockpit.h"
 #include <stream/util/lin_algebra.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
 
 namespace autopilot {
 
+struct WaypointPilotParams {
+
+	float avg_climbing_angle;
+	float max_climbing_angle;
+
+	float avg_decending_angle;
+	float max_decending_angle;
+
+	float max_tilt_angle;
+};
+
 class WaypointPilot {
 public:
-	WaypointPilot(boost::shared_ptr<Cockpit> cockpit);
+	WaypointPilot(const WaypointPilotParams& params, boost::shared_ptr<NormalPlainCockpit> cockpit);
 
 	void start(bool open_thread=true);
 	void stop();
@@ -22,13 +33,14 @@ private:
 
 	void fly();
 
-	boost::shared_ptr<Cockpit> m_cockpit;
+	boost::shared_ptr<NormalPlainCockpit> m_cockpit;
 
 	lin_algebra::vec2f m_target;
 	float m_altitude;
 
 	bool m_running;
 	boost::thread m_running_thread;
+	WaypointPilotParams m_params;
 };
 
 
