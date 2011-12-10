@@ -65,6 +65,8 @@ public:
 
 	virtual irr::core::vector3df get_pos() const { return m_object->getPosition(); }
 
+	bool data_ready() { return m_data_ready; }
+
 	// controlling the plane
 	servo_stream_ptr_t get_pitch_servo() { return m_pitch_servo; }
 	servo_stream_ptr_t get_yaw_servo()   { return m_yaw_servo; }
@@ -114,6 +116,7 @@ private:
 	float m_forced_tilt;
 	float m_forced_pitch;
 
+	volatile bool m_data_ready;
 };
 
 }  // namespace simulator

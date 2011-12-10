@@ -75,6 +75,7 @@ private:
 void export_import(simulator::Plane& p) {
 
 	while (true) {
+		while (!p.data_ready());
 		try {
 			boost::shared_ptr<stream::TcpipClient> client =
 					boost::make_shared<stream::TcpipClient>("localhost", 0x6060);
