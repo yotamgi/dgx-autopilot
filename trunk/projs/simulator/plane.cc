@@ -39,7 +39,9 @@ Plane::Plane(irr::IrrlichtDevice* device,
 		m_direction(irr::core::vector3df(0.0f, 0.0f, -1.0f)),
 		m_params(plane_params),
 		m_gyro_drift(frand()*10., frand()*10., frand()*10.),
-		m_gps_thread(&Plane::gps_update, this)
+		m_gps_thread(&Plane::gps_update, this),
+		m_forced_tilt(-1.),
+		m_forced_pitch(-1.)
 {
 	irr::scene::ISceneManager* smgr = m_device->getSceneManager();
 
@@ -55,10 +57,15 @@ Plane::Plane(irr::IrrlichtDevice* device,
 }
 
 irr::core::vector3df Plane::calc_angle_vel() const {
+
+	float pitch_data = m_forced_pitch > 0 ? m_forced_pitch : m_pitch_servo->get_data();
+	float tilt_data  = m_forced_tilt  > 0 ? m_forced_tilt  : m_tilt_servo->get_data();
+	float yaw_data = m_yaw_servo->get_data();
+
 	return irr::core::vector3df(
-				((m_pitch_servo->get_data() - 50.)/50.)*m_params.get_pitch_speed(),
-				((m_yaw_servo->get_data()   - 50.)/50.)*m_params.get_yaw_speed(),
-				((m_tilt_servo->get_data()  - 50.)/50.)*m_params.get_ailron_speed()
+				((pitch_data - 50.)/50.)*m_params.get_pitch_speed(),
+				((yaw_data   - 50.)/50.)*m_params.get_yaw_speed(),
+				((tilt_data  - 50.)/50.)*m_params.get_ailron_speed()
 	);
 }
 

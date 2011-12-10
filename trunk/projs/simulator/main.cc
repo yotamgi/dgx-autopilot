@@ -125,6 +125,11 @@ int main()
 
 	simulator::Plane p(device, core::vector3df(0.0f, 0.0f, 0.0f), plane_params);
 
+	// inital servo data
+	p.get_pitch_servo()->set_data(50.);
+	p.get_tilt_servo()->set_data(50.);
+	p.get_yaw_servo()->set_data(50.);
+
 	// export all the sensors
 	boost::thread t(export_import, boost::ref(p));
 
@@ -201,13 +206,13 @@ int main()
 		///////////////////////////////////////
 		// Update the plane according to the keys
 		//////////////
-		if (receiver.IsKeyDown(KEY_UP)) p.get_pitch_servo()->set_data(10.);
-		else if (receiver.IsKeyDown(KEY_DOWN)) p.get_pitch_servo()->set_data(90.);
-		else p.get_pitch_servo()->set_data(50.f);
+		if (receiver.IsKeyDown(KEY_UP)) p.force_pitch(10.);
+		else if (receiver.IsKeyDown(KEY_DOWN)) p.force_pitch(90.);
+		else p.unforce_pitch();
 
-		if (receiver.IsKeyDown(KEY_LEFT))  p.get_tilt_servo()->set_data(10.);
-		else if (receiver.IsKeyDown(KEY_RIGHT)) p.get_tilt_servo()->set_data(90.);
-		else p.get_tilt_servo()->set_data(50.f);
+		if (receiver.IsKeyDown(KEY_LEFT))  p.force_tilt(10.);
+		else if (receiver.IsKeyDown(KEY_RIGHT)) p.force_tilt(90.);
+		else p.unforce_tilt();
 
 		if (receiver.IsKeyDown(KEY_KEY_Z)) c.setType(simulator::Camera::FPS);
 		if (receiver.IsKeyDown(KEY_KEY_X)) c.setType(simulator::Camera::TRACK_BEHIND);
