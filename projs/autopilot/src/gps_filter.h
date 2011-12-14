@@ -20,6 +20,7 @@ public:
 	/** Functions for getting the output of the gps filter */
 	boost::shared_ptr<stream::DataPopStream<lin_algebra::vec3f> > get_position_stream();
 	boost::shared_ptr<stream::DataPopStream<lin_algebra::vec3f> > get_speed_stream();
+	boost::shared_ptr<stream::DataPopStream<float> > get_speed_reliable_stream();
 
 private:
 
@@ -29,6 +30,8 @@ private:
 
 	boost::shared_ptr<stream::PushToPopConv<lin_algebra::vec3f> > m_position_stream;
 	boost::shared_ptr<stream::PushToPopConv<lin_algebra::vec3f> > m_speed_stream;
+	boost::shared_ptr<stream::PushToPopConv<float> > m_speed_reliable_stream;
+
 };
 
 #endif /* GPS_LISTENER_H_ */
