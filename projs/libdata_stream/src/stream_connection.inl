@@ -81,9 +81,14 @@ inline T StreamConnection::PopStreamProxy<T>::get_data()  {
 	// deserialize
 	std::stringstream ss(serialized_data);
 	T data;
+	try {
 	ss >> data;
+	} catch (...) {
+		throw std::runtime_error(std::string("Exception was thrown in StreamProxy, when trying to "
+				"decode data from the other. The data is ") + serialized_data);
+	}
 	if (ss.fail()) {
-		throw std::runtime_error("The exported stream does not match: couldn't parse: " + ss.str());
+		throw std::runtime_error("The exported stream does not match: couldn't parse: " + serialized_data);
 	}
 	return data;
 }
