@@ -99,6 +99,9 @@ void Plane::update(float time_delta) {
 }
 
 void Plane::update_sensors(float time_delta) {
+	if (time_delta == 0.0f) {
+		time_delta = 0.001f;
+	}
 
 	// calculate some data
 	irr::core::vector3df angle_vel = calc_angle_vel();
