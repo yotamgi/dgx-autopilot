@@ -30,7 +30,7 @@ static lin_algebra::mat3f update_matrix(const lin_algebra::mat3f& m1,
 
 inline Cockpit::Cockpit(boost::shared_ptr<NormalPlainPlatform> platform):
 		m_platform(platform),
-		m_gps_filter(boost::make_shared<SimpleGpsFilter>(5))
+		m_gps_filter(boost::make_shared<SimpleGpsFilter>(3))
 {
 	// This is the stream schematics:
 	//
