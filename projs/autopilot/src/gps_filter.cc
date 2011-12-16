@@ -14,7 +14,8 @@ SimpleGpsFilter::SimpleGpsFilter(size_t avarge_len):
 				boost::make_shared<stream::PushToPopConv<lin_algebra::vec3f> >(
 					lin_algebra::vec3f()
 				)
-			)
+			),
+			m_speed_reliable_stream(boost::make_shared<stream::PushToPopConv<float> >(0.))
 {}
 
 void SimpleGpsFilter::set_data(const lin_algebra::vec3f& data) {

@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
 	autopilot::WaypointPilot pilot(pilot_params, cockpit);
 
 	lin_algebra::vec2f waypoint;
-	waypoint[0] = 100.; waypoint[1] = 101.;
+	waypoint[0] = 1000.; waypoint[1] = 1010.;
 	pilot.to_waypoint(waypoint, 60.);
 
 	pilot.start(false);

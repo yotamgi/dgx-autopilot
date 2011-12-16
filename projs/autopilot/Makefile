@@ -55,18 +55,18 @@ $(LIBDIR)/libautopilot.a: $(AUTOPILIT_OBJS)
 	$(ARCHIVE) cr  $(LIBDIR)/libautopilot.a $(AUTOPILIT_OBJS)
 
 gtest: $(GTESTS_OBJS) $(LIBDIR) $(LIBDIR)/libautopilot.a
-	$(CXX) $(GTESTS_OBJS) $(LDFLAGS) -lgtest_main -lgtest -lpthread -lautopilot -o gtest
+	$(CXX) $(GTESTS_OBJS) -lgtest_main -lgtest -lpthread -lautopilot $(LDFLAGS) -o gtest
 
 .PHONY:
 test: gtest
 	./gtest --gtest_color=yes
 
 sensor_watch_test: $(SRCDIR)/sandbox/sensor_watch_test.o $(LIBDIR) $(LIBDIR)/libautopilot.a 
-	$(CXX) $(SRCDIR)/sandbox/sensor_watch_test.o $(LDFLAGS) -lautopilot -o sensor_watch_test
+	$(CXX) $(SRCDIR)/sandbox/sensor_watch_test.o -lautopilot $(LDFLAGS) -o sensor_watch_test
 	
 cockpit_test: $(SRCDIR)/sandbox/cockpit_test.o $(LIBDIR) $(LIBDIR)/libautopilot.a
-	$(CXX) $(SRCDIR)/sandbox/cockpit_test.o $(LDFLAGS) -lautopilot -o cockpit_test
+	$(CXX) $(SRCDIR)/sandbox/cockpit_test.o -lautopilot $(LDFLAGS) -o cockpit_test
 
 waypoint_pilot_test: $(SRCDIR)/sandbox/waypoint_pilot_test.o $(LIBDIR) $(LIBDIR)/libautopilot.a
-	$(CXX) $(SRCDIR)/sandbox/waypoint_pilot_test.o $(LDFLAGS) -lautopilot -o waypoint_pilot_test
+	$(CXX) $(SRCDIR)/sandbox/waypoint_pilot_test.o -lautopilot $(LDFLAGS)  -o waypoint_pilot_test
 	
