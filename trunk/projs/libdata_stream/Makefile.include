@@ -1,3 +1,3 @@
 LIBDS_LIBDIRS= $(LIBDS_PATH)/lib
 LIBDS_CXXFLAGS=-I$(LIBDS_PATH)/include
-LIBDS_LDFLAGS =  -L$(LIBDS_LIBDIRS) -ldata_stream -lblas -llapack
+LIBDS_LDFLAGS =  -L$(LIBDS_LIBDIRS) -ldata_stream -larmadillo
