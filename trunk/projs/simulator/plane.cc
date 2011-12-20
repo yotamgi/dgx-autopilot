@@ -154,7 +154,8 @@ void Plane::gps_update() {
 			pos[2] = irrpos.Z;
 
 			lin_algebra::vec3f rand;
-			rand.randu(3);
+			rand.randu();
+			rand = lin_algebra::normalize(rand);
 
 			m_gps_listener->set_data(pos/10. + rand*3.);
 		}

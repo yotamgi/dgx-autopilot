@@ -200,7 +200,7 @@ int main()
 
 		if (lastFPS != fps)
 		{
-			core::stringw tmp(L"Movement Example - Irrlicht Engine [");
+			core::stringw tmp(L"DGX Project Plane Simulator");
 			tmp += driver->getName();
 			tmp += L"] fps: ";
 			tmp += fps;
