@@ -27,7 +27,6 @@ MapStreamView::MapStreamView(std::string map_fname, std::string map_type):
 	QgsSingleSymbolRenderer *map_renderer = new QgsSingleSymbolRenderer(map_layer->geometryType());
 	QList<QgsMapCanvasLayer> map_layer_set;
 	map_layer->setRenderer(map_renderer);
-
 	if (!map_layer->isValid()) {
 		throw std::runtime_error("Couldn't load the map layer");
 	}
@@ -37,6 +36,10 @@ MapStreamView::MapStreamView(std::string map_fname, std::string map_type):
 	map_layer_set.append(QgsMapCanvasLayer(map_layer));
 	m_map_canvas->setExtent(map_layer->extent());
 	m_map_canvas->setLayerSet(map_layer_set);
+
+	QgsPoint p(0., 0.);
+	m_map_canvas->setExtent(QgsRectangle(p, p));
+	m_map_canvas->refresh();
 
 	QVBoxLayout* layout = new QVBoxLayout();
 	layout->addWidget(m_map_canvas);
