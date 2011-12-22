@@ -68,7 +68,6 @@ void MapStreamView::update() {
 	m_map_canvas->refresh();
 
 	// draw the line of the plane's way
-	std::cout << "adding point" << std::endl;
 	m_plane_track->addPoint(p);
 	m_map_canvas->refresh();
 }
