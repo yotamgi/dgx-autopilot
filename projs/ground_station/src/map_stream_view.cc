@@ -63,7 +63,6 @@ void MapStreamView::update() {
 	QgsPoint p(pos[0], pos[1]);
 
 	// go to the current plane pos on the map
-	std::cout << "Setting extent" << std::endl;
 	m_map_canvas->setExtent(QgsRectangle(p, p));
 	m_map_canvas->refresh();
 
