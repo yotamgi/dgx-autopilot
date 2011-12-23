@@ -16,10 +16,12 @@ class MapStreamView : public QWidget {
 	Q_OBJECT
 public:
 
-	MapStreamView(std::string map_fname,
-				  std::string map_type,
-				  boost::shared_ptr<pos_stream> pos_stream,
-				  float update_time);
+	MapStreamView(boost::shared_ptr<pos_stream> pos_stream,
+				  float update_time,
+				  QSize widget_size,
+				  std::string map_fname,
+				  std::string map_type
+	);
 
 public slots:
 

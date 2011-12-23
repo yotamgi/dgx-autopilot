@@ -8,10 +8,11 @@
 
 namespace gs {
 
-MapStreamView::MapStreamView(std::string map_fname,
-		  	  	  	  	  	 std::string map_type,
-		  	  	  	  	  	 boost::shared_ptr<pos_stream> pos_stream,
-		  	  	  	  	  	 float update_time):
+MapStreamView::MapStreamView(boost::shared_ptr<pos_stream> pos_stream,
+		  	  	  	  	  	 float update_time,
+		  	  	  	  	  	 QSize widget_size,
+		  	  	  	  	  	 std::string map_fname,
+		  	  	  	  	  	 std::string map_type):
 		  	 m_map_canvas(new QgsMapCanvas(0,0)),
 		  	 m_pos_stream(pos_stream),
 		  	 m_update_time(update_time)
@@ -26,7 +27,7 @@ MapStreamView::MapStreamView(std::string map_fname,
 	m_map_canvas->freeze(false);
 	m_map_canvas->setVisible(true);
 	m_map_canvas->refresh();
-	m_map_canvas->setFixedSize(QSize(300, 200));
+	m_map_canvas->setFixedSize(widget_size);
 	m_map_canvas->show();
 
 
