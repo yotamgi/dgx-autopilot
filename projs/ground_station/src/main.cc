@@ -1,4 +1,5 @@
 #include "map_stream_view.h"
+#include "3d_stream_view.h"
 #include <QtGui>
 
 class SimplePosStream : public stream::DataPopStream<lin_algebra::vec2f> {
@@ -20,19 +21,24 @@ private:
 
 
 int main(int argc, char** argv) {
+
 	boost::shared_ptr<SimplePosStream> pos_stream(new SimplePosStream);
 	QApplication app(argc, argv);
 
+	QWidget* window = new QWidget();
+
 	QVBoxLayout* layout = new QVBoxLayout();
 	layout->addWidget(new QPushButton("&A"));
-	layout->addWidget(new QPushButton("&B"));
 
-	gs::MapStreamView* map_view = new gs::MapStreamView("./data/map", "ogr", pos_stream, 0.2);
+	gs::MapStreamView* map_view = new gs::MapStreamView(pos_stream, 0.2, QSize(400, 300), "./data/map", "ogr");
+	gs::StreamView3d* view3d = new gs::StreamView3d(0.1, QSize(400, 300));
+
 	layout->addWidget(map_view);
+	layout->addWidget(view3d);
 
-	QWidget* window = new QWidget();
 	window->setLayout(layout);
 	window->show();
+	view3d->start();
 
 	return app.exec();
 }
