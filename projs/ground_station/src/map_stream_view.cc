@@ -30,7 +30,6 @@ MapStreamView::MapStreamView(boost::shared_ptr<pos_stream> pos_stream,
 	m_map_canvas->setFixedSize(widget_size);
 	m_map_canvas->show();
 
-
 	// create the vector layer
 	QgsVectorLayer * map_layer = new QgsVectorLayer(QString(map_fname.c_str()), tr("layer1"), QString(map_type.c_str()));
 	QgsSingleSymbolRenderer *map_renderer = new QgsSingleSymbolRenderer(map_layer->geometryType());
@@ -45,7 +44,6 @@ MapStreamView::MapStreamView(boost::shared_ptr<pos_stream> pos_stream,
 	map_layer_set.append(QgsMapCanvasLayer(map_layer));
 	m_map_canvas->setExtent(map_layer->extent());
 	m_map_canvas->setLayerSet(map_layer_set);
-
 
  	m_plane_track = boost::shared_ptr<QgsRubberBand>(new QgsRubberBand(m_map_canvas, false));
 	m_map_canvas->scene()->addItem(m_plane_track.get());
