@@ -33,15 +33,16 @@ public:
 
 	void start();
 
+
 public slots:
 
 	void update();
 
 protected:
-	virtual void paintEvent( QPaintEvent* event );
+
+	void paintEvent(QPaintEvent* event);
 
 private:
-
 
 	class AnglePresenter {
 	public:
@@ -82,7 +83,6 @@ private:
 		irr::core::vector2df m_pos;
 		irr::core::vector2df m_scale;
 	};
-
 
 	irr::IrrlichtDevice* m_device;
 
