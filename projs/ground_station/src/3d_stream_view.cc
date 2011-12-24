@@ -33,7 +33,6 @@ void StreamView3d::start() {
 	SIrrlichtCreationParameters params;
     params.AntiAlias = 0;
     params.DriverType = video::EDT_OPENGL;
-    params.EventReceiver = 0;
     params.WindowId = reinterpret_cast<void*>(winId());
     params.WindowSize.Width = width();
     params.WindowSize.Height = height();
@@ -79,21 +78,23 @@ void StreamView3d::start() {
 		size->initalize(m_device);
 	}
 
-	// create the camera
-	irr::scene::ISceneNode* camera = smgr->addCameraSceneNodeFPS(0, 70, 0.05);
-	camera->setPosition(irr::core::vector3df(0., 0., -30.));
-	m_device->getCursorControl()->setVisible(false);
+	// create the static camera
+	irr::core::vector3df pos    = irr::core::vector3df(0., 0., -30.);
+	irr::core::vector3df lookat = irr::core::vector3df(0., 0., 0.);
+	smgr->addCameraSceneNode(0, pos, lookat);
+	m_device->getCursorControl()->setVisible(true);
 
 	// Set the light
 	smgr->setAmbientLight(video::SColorf(0.3,0.3,0.3,1));
-	smgr->addLightSceneNode( 0, core::vector3df(-5,-5,-5), video::SColorf(1.f, 1., 1.f), 100.0f, 1 );
+	smgr->addLightSceneNode(0, core::vector3df(-5,-5,-5), video::SColorf(1.f, 1., 1.f), 100.0f, 1);
 
+	// start the update timer
 	m_timer = new QTimer(this);
 	connect(m_timer, SIGNAL(timeout()), this, SLOT(update()));
-	m_timer->start(1000/m_update_time);
+	m_timer->start(1000*m_update_time);
 }
 
-void StreamView3d::paintEvent( QPaintEvent* event ) {
+void StreamView3d::paintEvent(QPaintEvent* event) {
 	update();
 }
 
@@ -202,8 +203,6 @@ void StreamView3d::VecPresenter::draw(irr::IrrlichtDevice* m_device) {
 
 	m_object->setRotation(vec.getSphericalCoordinateAngles());
 	m_object->setScale(irr::core::vector3df(m_scale.X/2., m_scale.Y*vec_len, m_scale.Z/2.));
-//	m_device->getVideoDriver()->setTransform(video::ETS_WORLD, core::IdentityMatrix);
-//	m_device->getVideoDriver()->draw3DLine(m_pos, m_pos + vec*10.);
 }
 
 StreamView3d::SizePresenter::SizePresenter(StreamView3d::streamfptr size_stream,

@@ -19,10 +19,29 @@ private:
 	float m_num;
 };
 
+class SimpleVecStream : public stream::DataPopStream<lin_algebra::vec3f> {
+public:
+	SimpleVecStream(): m_num(0.) {}
+
+	lin_algebra::vec3f get_data()  {
+
+		lin_algebra::vec3f vec;
+		vec[0] = m_num;
+		vec[1] = m_num/5.;
+		vec[2] = m_num/50.;
+		m_num -= 0.1;
+		return vec;
+	}
+
+private:
+	float m_num;
+};
+
 
 int main(int argc, char** argv) {
 
 	boost::shared_ptr<SimplePosStream> pos_stream(new SimplePosStream);
+	boost::shared_ptr<SimpleVecStream> vec_stream(new SimpleVecStream);
 	QApplication app(argc, argv);
 
 	QWidget* window = new QWidget();
@@ -38,6 +57,7 @@ int main(int argc, char** argv) {
 
 	window->setLayout(layout);
 	window->show();
+	view3d->addVecStream(vec_stream);
 	view3d->start();
 
 	return app.exec();
