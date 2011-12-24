@@ -17,8 +17,9 @@ MOC = moc-qt4
 CXXFLAGS += -fPIC -g -Wall -pipe $(LIBDS_CXXFLAGS) $(QT_CXXFLAGS) $(QGIS_CXXFLAGS) $(IRRLICHT_CXXFLAGS) -O2 -DMEDIA_DIR=\"$(MEDIADIR)\"
 LDFLAGS += -fPIC -L./lib -Wl,--rpath,$(LIBDS_LIBDIRS):$(LIBDIR) -lboost_thread $(IRRLICHT_LDFLAGS) $(LIBDS_LDFLAGS) $(QT_LDGLAGS) $(QGIS_LDFLAGS)
 
-STREAMVIEW_OBJS =  $(SRCDIR)/map_stream_view.o \
-				   $(SRCDIR)/3d_stream_view.o
+STREAMVIEW_OBJS =  $(SRCDIR)/map_stream_view.o 		\
+				   $(SRCDIR)/3d_stream_view.o 		\
+				   $(SRCDIR)/size_stream_view.o
 
 ###############################################################################
 ## TARGETS 
