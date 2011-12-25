@@ -2,6 +2,7 @@ LIBDS_PATH = ../libdata_stream/
 include $(LIBDS_PATH)/Makefile.include
 
 LIBDIR = ./lib
+AUTOGENDIR = ./autogen
 SRCDIR = ./src
 MEDIADIR=`pwd`/data
 
@@ -31,17 +32,19 @@ STREAMVIEW_OBJS =  $(SRCDIR)/map_stream_view.o 		\
 all: host device
 
 .PHONY:
-host: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libstreamview.so ground_station
+host: $(OBJDIR) $(LIBDIR) $(AUTOGENDIR) $(LIBDIR)/libstreamview.so ground_station
 
 .PHONY:
 device: 
 
 .PHONY:
 clean:
-	rm -fr $(AUTOPILIT_OBJS) */*/*.o */*.o *.o $(LIBDIR) gtest sensor_watch_test watch_test cockpit_test waypoint_pilot_test
+	rm -fr $(AUTOPILIT_OBJS) */*/*.o */*.o *.o $(AUTOGENDIR) $(LIBDIR) gtest sensor_watch_test watch_test cockpit_test waypoint_pilot_test 
 
 $(LIBDIR):
 	mkdir $(LIBDIR)
+$(AUTOGENDIR):
+	mkdir $(AUTOGENDIR)
 
 ## real targets ###############################################################
 
@@ -49,11 +52,11 @@ $(LIBDIR):
 	$(CXX) -c $(CXXFLAGS) $<  -o $*.o
 
 $(SRCDIR)/map_stream_view_moc.o: $(SRCDIR)/map_stream_view.h
-	$(MOC) $(QT_CXXFLAGS)  $(SRCDIR)/map_stream_view.h -o $(SRCDIR)/map_stream_view_moc.cxx
-	$(CXX) -c $(CXXFLAGS) $(SRCDIR)/map_stream_view_moc.cxx  -o $*.o
+	$(MOC) $(QT_CXXFLAGS)  $(SRCDIR)/map_stream_view.h -o $(AUTOGENDIR)/map_stream_view_moc.cxx -p$(SRCDIR)
+	$(CXX) -c $(CXXFLAGS) $(AUTOGENDIR)/map_stream_view_moc.cxx  -o $*.o
 $(SRCDIR)/3d_stream_view_moc.o: $(SRCDIR)/3d_stream_view.h
-	$(MOC) $(QT_CXXFLAGS)  $(SRCDIR)/3d_stream_view.h -o $(SRCDIR)/3d_stream_view_moc.cxx
-	$(CXX) -c $(CXXFLAGS) $(SRCDIR)/3d_stream_view_moc.cxx  -o $*.o
+	$(MOC) $(QT_CXXFLAGS)  $(SRCDIR)/3d_stream_view.h -o $(AUTOGENDIR)/3d_stream_view_moc.cxx -p$(SRCDIR)
+	$(CXX) -c $(CXXFLAGS) $(AUTOGENDIR)/3d_stream_view_moc.cxx  -o $*.o 
 
 $(LIBDIR)/libstreamview.so: $(STREAMVIEW_OBJS)  $(SRCDIR)/map_stream_view_moc.o $(SRCDIR)/3d_stream_view_moc.o
 	$(CXX) $(LDFLAGS) -shared  $(STREAMVIEW_OBJS) $(SRCDIR)/map_stream_view_moc.o $(SRCDIR)/3d_stream_view_moc.o -o $(LIBDIR)/libstreamview.so 
