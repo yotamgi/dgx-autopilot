@@ -10,7 +10,7 @@ QT_CXXFLAGS = -D_REENTRANT -DQT_WEBKIT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -
 QGIS_CXXFLAGS = -DGUI_EXPORT= -DCORE_EXPORT=
 IRRLICHT_CXXFLAGS =  -I/usr/X11R6/include 
 IRRLICHT_LDFLAGS =  -L/usr/X11R6/lib -lGL -lXxf86vm -lXext -lX11 -lIrrlicht 
-QT_LDGLAGS = -L/usr/lib/x86_64-linux-gnu  -lQtXml -lQtGui -lQtOpenGL -lQtCore -lpthread 
+QT_LDGLAGS = -L/usr/lib/x86_64-linux-gnu  -lQtXml -lQtGui -lQtCore -lpthread 
 QGIS_LDFLAGS = -lqgis_core -lqgis_gui -lgeos -lgdal1.7.0
 
 CXX = g++

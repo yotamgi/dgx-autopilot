@@ -9,12 +9,12 @@
 #include <stdexcept>
 #include <iostream>
 #include <vector>
-#include <QtGui>
-#include <QtOpenGL/qgl.h>
+#include <qt4/QtGui/QtGui>
+//#include <QtOpenGL/qgl.h>
 
 namespace gs {
 
-class StreamView3d : public QGLWidget {
+class StreamView3d : public QWidget {
 	Q_OBJECT
 public:
 	typedef stream::DataPopStream<float> streamf;
