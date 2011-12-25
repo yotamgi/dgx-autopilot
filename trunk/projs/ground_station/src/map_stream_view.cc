@@ -5,14 +5,16 @@
 #include <qgis/qgsmaplayerregistry.h>
 #include <qgis/qgsrubberband.h>
 #include <stdexcept>
+#include <boost/filesystem.hpp>
+
+namespace fs = boost::filesystem;
 
 namespace gs {
 
 MapStreamView::MapStreamView(boost::shared_ptr<pos_stream> pos_stream,
 		  	  	  	  	  	 float update_time,
 		  	  	  	  	  	 QSize widget_size,
-		  	  	  	  	  	 std::string map_fname,
-		  	  	  	  	  	 std::string map_type):
+		  	  	  	  	  	 std::string map_dir):
 		  	 m_map_canvas(new QgsMapCanvas(0,0)),
 		  	 m_pos_stream(pos_stream),
 		  	 m_update_time(update_time)
@@ -30,20 +32,7 @@ MapStreamView::MapStreamView(boost::shared_ptr<pos_stream> pos_stream,
 	m_map_canvas->setFixedSize(widget_size);
 	m_map_canvas->show();
 
-	// create the vector layer
-	QgsVectorLayer * map_layer = new QgsVectorLayer(QString(map_fname.c_str()), tr("layer1"), QString(map_type.c_str()));
-	QgsSingleSymbolRenderer *map_renderer = new QgsSingleSymbolRenderer(map_layer->geometryType());
-	QList<QgsMapCanvasLayer> map_layer_set;
-	map_layer->setRenderer(map_renderer);
-	if (!map_layer->isValid()) {
-		throw std::runtime_error("Couldn't load the map layer");
-	}
-	// Add the Vector Layer to the Layer Registry
-	QgsMapLayerRegistry::instance()->addMapLayer(map_layer, TRUE);
-
-	map_layer_set.append(QgsMapCanvasLayer(map_layer));
-	m_map_canvas->setExtent(map_layer->extent());
-	m_map_canvas->setLayerSet(map_layer_set);
+	load_map(fs::path(map_dir));
 
  	m_plane_track = boost::shared_ptr<QgsRubberBand>(new QgsRubberBand(m_map_canvas, false));
  	m_plane_track->setColor(QColor(255, 0, 0, 255));
@@ -57,6 +46,43 @@ MapStreamView::MapStreamView(boost::shared_ptr<pos_stream> pos_stream,
  	m_timer = new QTimer(this);
 	connect(m_timer, SIGNAL(timeout()), this, SLOT(update()));
 	m_timer->start(1000*m_update_time);
+}
+
+void MapStreamView::load_map(fs::path dir) {
+	// validate that it is a dir
+	if (!fs::exists(dir) || !fs::is_directory(dir)) {
+		throw std::runtime_error("The map dir path was not a directory");
+	}
+
+	// create the layer set, where we will put all the layers
+	QList<QgsMapCanvasLayer> map_layer_set;
+
+	// iterate over the files in the directory, and fill the layer set
+	for (fs::directory_iterator f(dir); f != fs::directory_iterator(); f++) {
+		std::string extention = f->path().extension().c_str();
+
+		// if it is a vector layer
+		if (extention == ".shp") {
+			std::cout << "added shp layer " << f->path().filename().c_str() << std::endl;
+			// create the vector layer
+			QgsVectorLayer* map_layer = new QgsVectorLayer(tr(f->path().c_str()), tr(f->path().filename().c_str()), QString("ogr"));
+			QgsSingleSymbolRenderer *map_renderer = new QgsSingleSymbolRenderer(map_layer->geometryType());
+			map_layer->setRenderer(map_renderer);
+			if (!map_layer->isValid()) {
+				throw std::runtime_error("Couldn't load the map layer");
+			}
+			// Add the Vector Layer to the Layer Registry
+			QgsMapLayerRegistry::instance()->addMapLayer(map_layer, TRUE);
+			map_layer_set.append(QgsMapCanvasLayer(map_layer));
+			m_map_canvas->setExtent(map_layer->extent());
+		}
+
+		// if it is a raster layer
+		else if (extention == ".tif" || extention == ".tiff" || extention == ".jpg" || extention == ".jpeg") {
+		}
+	}
+
+	m_map_canvas->setLayerSet(map_layer_set);
 }
 
 void MapStreamView::update() {

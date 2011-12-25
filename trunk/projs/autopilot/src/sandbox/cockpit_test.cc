@@ -96,7 +96,7 @@ int main(int argc, char** argv) {
 
 		// the position
 		gs::MapStreamView map_view(conn.import_pop_stream<v2s::type>("position"), 1.0f, stream3d_dimention,
-				std::string("../ground_station/data/map"), std::string("ogr"));
+				std::string("../ground_station/data/map"));
 
 		// create the window itself
 		QHBoxLayout* layout = new QHBoxLayout();
@@ -144,7 +144,7 @@ int main(int argc, char** argv) {
 
 			// the position
 			gs::MapStreamView map_view(cockpit.position(), 1.0f, stream3d_dimention,
-							std::string("../ground_station/data/map"), std::string("ogr"));
+							std::string("../ground_station/data/map"));
 
 
 			// create the window itself
