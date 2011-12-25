@@ -93,14 +93,14 @@ inline Cockpit::Cockpit(boost::shared_ptr<NormalPlainPlatform> platform):
 	m_rest_reliability = rr->get_watch_stream();
 }
 
-inline boost::shared_ptr<vec_stream> Cockpit::watch_gyro_orientation() {
+inline boost::shared_ptr<vec3_stream> Cockpit::watch_gyro_orientation() {
 	return m_gyro_orientation;
 }
-inline boost::shared_ptr<vec_stream> Cockpit::watch_rest_orientation() {
+inline boost::shared_ptr<vec3_stream> Cockpit::watch_rest_orientation() {
 	return m_rest_orientation;
 }
 
-inline boost::shared_ptr<vec_watch_stream> Cockpit::orientation() {
+inline boost::shared_ptr<vec3_watch_stream> Cockpit::orientation() {
 	return m_orientation;
 }
 
@@ -108,12 +108,16 @@ inline boost::shared_ptr<float_stream> Cockpit::watch_rest_reliability() {
 	return m_rest_reliability;
 }
 
-inline boost::shared_ptr<vec_watch_stream> Cockpit::speed() {
-	return boost::make_shared<vec_watch_stream>(m_gps_filter->get_speed_stream());
+inline boost::shared_ptr<vec3_watch_stream> Cockpit::speed() {
+	return boost::make_shared<vec3_watch_stream>(m_gps_filter->get_speed_stream());
 }
 
-inline boost::shared_ptr<vec_watch_stream> Cockpit::position() {
-	return boost::make_shared<vec_watch_stream>(m_gps_filter->get_position_stream());
+inline boost::shared_ptr<vec2_watch_stream> Cockpit::position() {
+	return boost::make_shared<vec2_watch_stream>(m_gps_filter->get_position_stream());
+}
+
+inline boost::shared_ptr<float_watch_stream> Cockpit::alt() {
+	return boost::make_shared<float_watch_stream>(m_gps_filter->get_alt_stream());
 }
 
 inline servo_stream_ptr Cockpit::tilt_servo() {

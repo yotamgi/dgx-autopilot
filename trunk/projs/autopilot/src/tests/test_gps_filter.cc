@@ -31,8 +31,9 @@ TEST(simple_gps_filter, position) {
 
 	gps.set_data(pos);
 
-	lin_algebra::vec3f gps_pos = gps.get_position_stream()->get_data();
+	lin_algebra::vec2f gps_pos = gps.get_position_stream()->get_data();
+	float gps_alt = gps.get_alt_stream()->get_data();
 	ASSERT_NEAR(gps_pos[0], pos[0], 0.001);
-	ASSERT_NEAR(gps_pos[1], pos[1], 0.001);
-	ASSERT_NEAR(gps_pos[2], pos[2], 0.001);
+	ASSERT_NEAR(gps_pos[1], pos[2], 0.001);
+	ASSERT_NEAR(gps_alt, pos[1], 0.001);
 }

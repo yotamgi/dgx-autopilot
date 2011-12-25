@@ -22,11 +22,13 @@ public:
 
 	/* NormalPlainCockpit Implementation */
 
-	boost::shared_ptr<vec_watch_stream> orientation();
+	boost::shared_ptr<vec3_watch_stream> orientation();
 
-	boost::shared_ptr<vec_watch_stream> speed();
+	boost::shared_ptr<vec3_watch_stream> speed();
 
-	boost::shared_ptr<vec_watch_stream> position();
+	boost::shared_ptr<vec2_watch_stream> position();
+
+	boost::shared_ptr<float_watch_stream> alt();
 
 	servo_stream_ptr tilt_servo();
 
@@ -39,18 +41,18 @@ public:
 
 	/* Extending function */
 
-	boost::shared_ptr<vec_stream> 		watch_gyro_orientation();
+	boost::shared_ptr<vec3_stream> 		watch_gyro_orientation();
 
-	boost::shared_ptr<vec_stream> 		watch_rest_orientation();
+	boost::shared_ptr<vec3_stream> 		watch_rest_orientation();
 
 	boost::shared_ptr<float_stream> 	watch_rest_reliability();
 
 private:
 	boost::shared_ptr<NormalPlainPlatform> m_platform;
 
-	boost::shared_ptr<vec_watch_stream> m_orientation;
-	boost::shared_ptr<vec_stream> 		m_gyro_orientation;
-	boost::shared_ptr<vec_stream> 		m_rest_orientation;
+	boost::shared_ptr<vec3_watch_stream> m_orientation;
+	boost::shared_ptr<vec3_stream> 		m_gyro_orientation;
+	boost::shared_ptr<vec3_stream> 		m_rest_orientation;
 	boost::shared_ptr<float_stream> 	m_rest_reliability;
 
 	boost::shared_ptr<SimpleGpsFilter> m_gps_filter;

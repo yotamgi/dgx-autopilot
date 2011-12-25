@@ -10,20 +10,20 @@
 namespace autopilot {
 
 DGX1Platform::DGX1Platform():
-		m_acc(new vec_watch_stream(boost::make_shared<Adxl345Acc>(2))),
-		m_gyro(new vec_watch_stream(boost::make_shared<Itg3200Gyro>(2))),
-		m_compass(new vec_watch_stream(boost::make_shared<Hmc5843Compass>(2)))
+		m_acc(new vec3_watch_stream(boost::make_shared<Adxl345Acc>(2))),
+		m_gyro(new vec3_watch_stream(boost::make_shared<Itg3200Gyro>(2))),
+		m_compass(new vec3_watch_stream(boost::make_shared<Hmc5843Compass>(2)))
 {}
 
-boost::shared_ptr<vec_watch_stream> DGX1Platform::acc_sensor() {
+boost::shared_ptr<vec3_watch_stream> DGX1Platform::acc_sensor() {
 	return m_acc;
 }
 
-boost::shared_ptr<vec_watch_stream> DGX1Platform::gyro_sensor() {
+boost::shared_ptr<vec3_watch_stream> DGX1Platform::gyro_sensor() {
 	return m_gyro;
 }
 
-boost::shared_ptr<vec_watch_stream> DGX1Platform::compass_sensor() {
+boost::shared_ptr<vec3_watch_stream> DGX1Platform::compass_sensor() {
 	return m_compass;
 }
 
@@ -65,22 +65,22 @@ DGX1SimulatorPlatform::DGX1SimulatorPlatform(boost::shared_ptr<stream::Connectio
 	m_stream_conn.run();
 
 	// import streams
-	m_gyro = boost::make_shared<vec_watch_stream>(m_stream_conn.import_pop_stream<lin_algebra::vec3f>("simulator_gyro"));
-	m_acc = boost::make_shared<vec_watch_stream>(m_stream_conn.import_pop_stream<lin_algebra::vec3f>("simulator_acc"));
-	m_compass = boost::make_shared<vec_watch_stream>(m_stream_conn.import_pop_stream<lin_algebra::vec3f>("simulator_compass"));
+	m_gyro = boost::make_shared<vec3_watch_stream>(m_stream_conn.import_pop_stream<lin_algebra::vec3f>("simulator_gyro"));
+	m_acc = boost::make_shared<vec3_watch_stream>(m_stream_conn.import_pop_stream<lin_algebra::vec3f>("simulator_acc"));
+	m_compass = boost::make_shared<vec3_watch_stream>(m_stream_conn.import_pop_stream<lin_algebra::vec3f>("simulator_compass"));
 	m_pitch = m_stream_conn.import_push_stream<float>("simulator_pitch_servo");
 	m_tilt = m_stream_conn.import_push_stream<float>("simulator_tilt_servo");
 }
 
-boost::shared_ptr<vec_watch_stream> DGX1SimulatorPlatform::acc_sensor() {
+boost::shared_ptr<vec3_watch_stream> DGX1SimulatorPlatform::acc_sensor() {
 	return m_acc;
 }
 
-boost::shared_ptr<vec_watch_stream> DGX1SimulatorPlatform::gyro_sensor() {
+boost::shared_ptr<vec3_watch_stream> DGX1SimulatorPlatform::gyro_sensor() {
 	return m_gyro;
 }
 
-boost::shared_ptr<vec_watch_stream> DGX1SimulatorPlatform::compass_sensor() {
+boost::shared_ptr<vec3_watch_stream> DGX1SimulatorPlatform::compass_sensor() {
 	return m_compass;
 }
 
