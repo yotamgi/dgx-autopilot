@@ -7,6 +7,7 @@
 #include <boost/thread.hpp>
 #include <QtGui/QtGui>
 #include <qgis/qgsmapcanvas.h>
+#include <boost/filesystem.hpp>
 
 namespace gs {
 
@@ -19,8 +20,7 @@ public:
 	MapStreamView(boost::shared_ptr<pos_stream> pos_stream,
 				  float update_time,
 				  QSize widget_size,
-				  std::string map_fname,
-				  std::string map_type
+				  std::string map_dir
 	);
 
 public slots:
@@ -28,6 +28,8 @@ public slots:
 	void update();
 
 private:
+
+	void load_map(boost::filesystem::path p);
 
 	QgsMapCanvas* m_map_canvas;
 	boost::shared_ptr<QgsRubberBand> m_plane_track;
