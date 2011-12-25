@@ -1,16 +1,16 @@
 LIBDS_PATH = ../libdata_stream/
 include $(LIBDS_PATH)/Makefile.include
 
-STREAM_WATCH_PATH = ../stream_watch
-include $(STREAM_WATCH_PATH)/Makefile.include
+GROUND_STATION_PATH = ../ground_station/
+include $(GROUND_STATION_PATH)/Makefile.include
 
 LIBDIR = ./lib
 SRCDIR = ./src
 
 CXX = g++
 ARCHIVE = ar
-CXXFLAGS += -g -I$(SRCDIR) -Wall  $(LIBDS_CXXFLAGS) $(STREAM_WATCH_CXXFLAGS) -O3
-LDFLAGS += -lboost_thread -L./lib $(LIBDS_LDFLAGS) $(STREAM_WATCH_LDFLAGS) -Wl,--rpath,$(LIBDS_LIBDIRS):$(STREAM_WATCH_LIBDIRS)
+CXXFLAGS += -g -I$(SRCDIR) -Wall  $(LIBDS_CXXFLAGS) $(GROUND_STATION_CXXFLAGS) -O3
+LDFLAGS += -lboost_thread -L./lib $(LIBDS_LDFLAGS) $(GROUND_STATION_LDFLAGS) -Wl,--rpath,$(LIBDS_LIBDIRS):$(GROUND_STATION_LIBDIRS)
 
 AUTOPILIT_OBJS =  $(SRCDIR)/platform/hw/i2c_interface.o	\
 		$(SRCDIR)/platform/hw/itg3200_gyro.o				\
