@@ -18,7 +18,7 @@ StreamView3d::~StreamView3d()
 }
 
 StreamView3d::StreamView3d(float update_time, QSize size, QWidget* parent):
-		QGLWidget(parent),
+		QWidget(parent),
 		m_update_time(update_time)
 {
 	setFixedSize(size);

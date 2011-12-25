@@ -1,0 +1,3 @@
+GROUND_STATION_LIBDIRS  = $(GROUND_STATION_PATH)/lib
+GROUND_STATION_CXXFLAGS = -I$(GROUND_STATION_PATH)/include -I/usr/include/qt4
+GROUND_STATION_LDFLAGS  = -L$(GROUND_STATION_LIBDIRS) -lstreamview -lQtGui -lqgis_core -lqgis_gui -lgeos -lgdal1.7.0
