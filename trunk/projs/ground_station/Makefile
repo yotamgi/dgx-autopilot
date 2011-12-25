@@ -32,7 +32,7 @@ STREAMVIEW_OBJS =  $(SRCDIR)/map_stream_view.o 		\
 all: host device
 
 .PHONY:
-host: $(OBJDIR) $(LIBDIR) $(AUTOGENDIR) $(LIBDIR)/libstreamview.so ground_station
+host: $(OBJDIR) $(LIBDIR) $(AUTOGENDIR) $(LIBDIR)/libground_station.so ground_station
 
 .PHONY:
 device: 
@@ -58,8 +58,8 @@ $(SRCDIR)/3d_stream_view_moc.o: $(SRCDIR)/3d_stream_view.h
 	$(MOC) $(QT_CXXFLAGS)  $(SRCDIR)/3d_stream_view.h -o $(AUTOGENDIR)/3d_stream_view_moc.cxx -p$(SRCDIR)
 	$(CXX) -c $(CXXFLAGS) $(AUTOGENDIR)/3d_stream_view_moc.cxx  -o $*.o 
 
-$(LIBDIR)/libstreamview.so: $(STREAMVIEW_OBJS)  $(SRCDIR)/map_stream_view_moc.o $(SRCDIR)/3d_stream_view_moc.o
-	$(CXX) $(LDFLAGS) -shared  $(STREAMVIEW_OBJS) $(SRCDIR)/map_stream_view_moc.o $(SRCDIR)/3d_stream_view_moc.o -o $(LIBDIR)/libstreamview.so 
+$(LIBDIR)/libground_station.so: $(STREAMVIEW_OBJS)  $(SRCDIR)/map_stream_view_moc.o $(SRCDIR)/3d_stream_view_moc.o
+	$(CXX) $(LDFLAGS) -shared  $(STREAMVIEW_OBJS) $(SRCDIR)/map_stream_view_moc.o $(SRCDIR)/3d_stream_view_moc.o -o $(LIBDIR)/libground_station.so 
 
-ground_station: $(LIBDIR)/libstreamview.so $(SRCDIR)/main.o
-	$(CXX) -L$(LIBDIR) $(SRCDIR)/main.o -lstreamview $(LDFLAGS) -o ground_station
+ground_station: $(LIBDIR)/libground_station.so $(SRCDIR)/main.o
+	$(CXX) -L$(LIBDIR) $(SRCDIR)/main.o -lground_station $(LDFLAGS) -o ground_station
