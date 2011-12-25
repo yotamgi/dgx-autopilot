@@ -6,10 +6,11 @@ SimpleGpsFilter::SimpleGpsFilter(size_t avarge_len):
 			m_avarge_len(avarge_len),
 			m_samples(avarge_len),
 			m_position_stream(
-				boost::make_shared<stream::PushToPopConv<lin_algebra::vec3f> >(
-					lin_algebra::vec3f()
+				boost::make_shared<stream::PushToPopConv<lin_algebra::vec2f> >(
+					lin_algebra::vec2f()
 				)
 			),
+			m_alt_stream(boost::make_shared<stream::PushToPopConv<float> >(0.)),
 			m_speed_stream(
 				boost::make_shared<stream::PushToPopConv<lin_algebra::vec3f> >(
 					lin_algebra::vec3f()
@@ -33,13 +34,23 @@ void SimpleGpsFilter::set_data(const lin_algebra::vec3f& data) {
 	lin_algebra::vec3f speed = ce.col(0) * score.at(0,0) * -2.;
 	float reliability = score.at(0, 1);
 
+	// seperate data to pos and alt
+	float alt = data[1];
+	lin_algebra::vec2f pos;
+	pos[0] = data[0]; pos[1] = data[2];
+
+
+	m_position_stream->set_data(pos);
+	m_alt_stream->set_data(alt);
 	m_speed_stream->set_data(speed);
-	m_position_stream->set_data(data);
 	m_speed_reliable_stream->set_data(reliability);
 }
 
-boost::shared_ptr<stream::DataPopStream<lin_algebra::vec3f> > SimpleGpsFilter::get_position_stream() {
+boost::shared_ptr<stream::DataPopStream<lin_algebra::vec2f> > SimpleGpsFilter::get_position_stream() {
 	return m_position_stream;
+}
+boost::shared_ptr<stream::DataPopStream<float> > SimpleGpsFilter::get_alt_stream() {
+	return m_alt_stream;
 }
 
 boost::shared_ptr<stream::DataPopStream<lin_algebra::vec3f> > SimpleGpsFilter::get_speed_stream() {

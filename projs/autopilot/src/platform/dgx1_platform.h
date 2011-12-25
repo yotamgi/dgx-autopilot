@@ -10,9 +10,9 @@
 
 namespace autopilot {
 
-typedef stream::filters::WatchFilter<lin_algebra::vec3f> 	vec_watch_stream;
-typedef stream::DataPopStream<lin_algebra::vec3f>			vec_stream;
-typedef boost::shared_ptr<vec_stream> 						vec_stream_ptr;
+typedef stream::filters::WatchFilter<lin_algebra::vec3f> 	vec3_watch_stream;
+typedef stream::DataPopStream<lin_algebra::vec3f>			vec3_stream;
+typedef boost::shared_ptr<vec3_stream> 						vec3_stream_ptr;
 typedef stream::DataPushStream<float> 						servo_stream;
 
 
@@ -23,11 +23,11 @@ public:
 
 	typedef boost::shared_ptr<stream::DataPopStream<lin_algebra::vec3f> > vec_stream_ptr;
 
-	boost::shared_ptr<vec_watch_stream> acc_sensor();
+	boost::shared_ptr<vec3_watch_stream> acc_sensor();
 
-	boost::shared_ptr<vec_watch_stream> gyro_sensor();
+	boost::shared_ptr<vec3_watch_stream> gyro_sensor();
 
-	boost::shared_ptr<vec_watch_stream> compass_sensor();
+	boost::shared_ptr<vec3_watch_stream> compass_sensor();
 
 	void register_gps_reciever(gps_reciever_ptr reciever);
 
@@ -40,9 +40,9 @@ public:
 	boost::shared_ptr<stream::DataPushStream<float> > gas_servo();
 
 private:
-	boost::shared_ptr<vec_watch_stream> m_acc;
-	boost::shared_ptr<vec_watch_stream> m_gyro;
-	boost::shared_ptr<vec_watch_stream> m_compass;
+	boost::shared_ptr<vec3_watch_stream> m_acc;
+	boost::shared_ptr<vec3_watch_stream> m_gyro;
+	boost::shared_ptr<vec3_watch_stream> m_compass;
 };
 
 
@@ -50,11 +50,11 @@ class DGX1SimulatorPlatform : public NormalPlainPlatform {
 public:
 	DGX1SimulatorPlatform(boost::shared_ptr<stream::ConnectionFactory> conn);
 
-	boost::shared_ptr<vec_watch_stream> acc_sensor();
+	boost::shared_ptr<vec3_watch_stream> acc_sensor();
 
-	boost::shared_ptr<vec_watch_stream> gyro_sensor();
+	boost::shared_ptr<vec3_watch_stream> gyro_sensor();
 
-	boost::shared_ptr<vec_watch_stream> compass_sensor();
+	boost::shared_ptr<vec3_watch_stream> compass_sensor();
 
 	void register_gps_reciever(gps_reciever_ptr reciever);
 
@@ -79,9 +79,9 @@ private:
 		gps_reciever_ptr m_reciever;
 	};
 
-	boost::shared_ptr<vec_watch_stream> m_acc;
-	boost::shared_ptr<vec_watch_stream> m_gyro;
-	boost::shared_ptr<vec_watch_stream> m_compass;
+	boost::shared_ptr<vec3_watch_stream> m_acc;
+	boost::shared_ptr<vec3_watch_stream> m_gyro;
+	boost::shared_ptr<vec3_watch_stream> m_compass;
 
 	boost::shared_ptr<servo_stream> m_gas;
 	boost::shared_ptr<servo_stream> m_pitch;

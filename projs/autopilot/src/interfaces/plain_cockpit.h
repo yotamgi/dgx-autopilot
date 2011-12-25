@@ -7,11 +7,15 @@
 
 namespace autopilot {
 
-typedef stream::DataPopStream<lin_algebra::vec3f> 			vec_stream;
-typedef boost::shared_ptr<vec_stream> 						vec_stream_ptr;
-typedef stream::filters::WatchFilter<lin_algebra::vec3f> 	vec_watch_stream;
+typedef stream::DataPopStream<lin_algebra::vec3f> 			vec3_stream;
+typedef boost::shared_ptr<vec3_stream> 						vec3_stream_ptr;
+typedef stream::filters::WatchFilter<lin_algebra::vec3f> 	vec3_watch_stream;
+typedef stream::DataPopStream<lin_algebra::vec2f> 			vec2_stream;
+typedef boost::shared_ptr<vec2_stream> 						vec2_stream_ptr;
+typedef stream::filters::WatchFilter<lin_algebra::vec2f> 	vec2_watch_stream;
 typedef stream::DataPopStream<float> 						float_stream;
-typedef stream::filters::WatchFilter<float_stream>			float_watch_stream;
+typedef boost::shared_ptr<float_stream>						float_stream_ptr;
+typedef stream::filters::WatchFilter<float>					float_watch_stream;
 typedef boost::shared_ptr<stream::DataPushStream<float> >   servo_stream_ptr;
 
 /**
@@ -24,11 +28,13 @@ public:
 
 	~NormalPlainCockpit() {}
 
-	virtual boost::shared_ptr<vec_watch_stream> orientation() = 0;
+	virtual boost::shared_ptr<vec3_watch_stream> orientation() = 0;
 
-	virtual boost::shared_ptr<vec_watch_stream> speed() = 0;
+	virtual boost::shared_ptr<vec3_watch_stream> speed() = 0;
 
-	virtual boost::shared_ptr<vec_watch_stream> position() = 0;
+	virtual boost::shared_ptr<vec2_watch_stream> position() = 0;
+
+	virtual boost::shared_ptr<float_watch_stream> alt() = 0;
 
 	virtual servo_stream_ptr tilt_servo() = 0;
 

@@ -23,9 +23,10 @@ void WaypointPilot::stop() {
 }
 
 void WaypointPilot::fly() {
-	vec_stream_ptr oreintation = m_cockpit->orientation();
-	vec_stream_ptr position = m_cockpit->position();
-	vec_stream_ptr speed = m_cockpit->speed();
+	vec3_stream_ptr oreintation = m_cockpit->orientation();
+	vec2_stream_ptr position = m_cockpit->position();
+	float_stream_ptr alt = m_cockpit->alt();
+	vec3_stream_ptr speed = m_cockpit->speed();
 	servo_stream_ptr tilt = m_cockpit->tilt_servo();
 	servo_stream_ptr pitch = m_cockpit->pitch_servo();
 
@@ -33,13 +34,11 @@ void WaypointPilot::fly() {
 
 		// calculate the planes position, altitude and orientation
 		lin_algebra::vec3f plain_orientation = oreintation->get_data();
-		lin_algebra::vec3f plain_pos_and_alt = position->get_data();
 		lin_algebra::vec3f plain_speed = speed->get_data();
-		lin_algebra::vec2f plain_pos;
-		plain_pos[0] = plain_pos_and_alt[0]; plain_pos[1] = plain_pos_and_alt[2];
+		lin_algebra::vec2f plain_pos = position->get_data();;
 		lin_algebra::vec2f plain_direction;
 		plain_direction[0] = plain_speed[0]; plain_direction[1] = plain_speed[2];
-		float plain_alt = plain_pos_and_alt[1];
+		float plain_alt = alt->get_data();
 
 		// understand the wanted direction and altitude
 		lin_algebra::vec2f wanted_diretion = m_target - plain_pos;
