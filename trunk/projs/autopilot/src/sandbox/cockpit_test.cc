@@ -4,6 +4,7 @@
 #include <cockpit.h>
 #include <gs/3d_stream_view.h>
 #include <gs/size_stream_view.h>
+#include <gs/map_stream_view.h>
 
 #include <string>
 #include <iostream>
@@ -76,6 +77,7 @@ int main(int argc, char** argv) {
 		stream::StreamConnection conn(server);
 
 		typedef stream::DataPopStream<lin_algebra::vec3f> vs;
+		typedef stream::DataPopStream<lin_algebra::vec2f> v2s;
 		typedef stream::DataPopStream<float> fs;
 
 		// the left one
@@ -92,10 +94,15 @@ int main(int argc, char** argv) {
 		// the reliable stream
 		gs::SizeStreamView view_size(conn.import_pop_stream<fs::type>("reliability"), view_update_time, 0., 1.);
 
+		// the position
+		gs::MapStreamView map_view(conn.import_pop_stream<v2s::type>("position"), 1.0f, stream3d_dimention,
+				std::string("../ground_station/data/map"), std::string("ogr"));
+
 		// create the window itself
 		QHBoxLayout* layout = new QHBoxLayout();
 		layout->addWidget(&view3d);
 		layout->addWidget(&view_size);
+		layout->addWidget(&map_view);
 		QWidget* wnd = new QWidget;
 		wnd->setLayout(layout);
 		wnd->show();
@@ -135,10 +142,16 @@ int main(int argc, char** argv) {
 			// the reliable stream
 			gs::SizeStreamView view_size(cockpit.watch_rest_reliability(), view_update_time, 0., 1.);
 
+			// the position
+			gs::MapStreamView map_view(cockpit.position(), 1.0f, stream3d_dimention,
+							std::string("../ground_station/data/map"), std::string("ogr"));
+
+
 			// create the window itself
 			QHBoxLayout* layout = new QHBoxLayout();
 			layout->addWidget(&view3d);
 			layout->addWidget(&view_size);
+			layout->addWidget(&map_view);
 			QWidget* wnd = new QWidget;
 			wnd->setLayout(layout);
 			wnd->show();
@@ -156,6 +169,7 @@ int main(int argc, char** argv) {
 			conn.export_pop_stream<lin_algebra::vec3f>(platform->compass_sensor()->get_watch_stream(), "watch_compass_sensor");
 			conn.export_pop_stream<lin_algebra::vec3f>(cockpit.orientation(), "orientation");
 			conn.export_pop_stream<float>(cockpit.watch_rest_reliability(), "reliability");
+			conn.export_pop_stream<lin_algebra::vec2f>(cockpit.position(), "position");
 
 			// run connection and make it block
 			conn.run(false);
