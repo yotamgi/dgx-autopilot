@@ -46,6 +46,8 @@ MapStreamView::MapStreamView(boost::shared_ptr<pos_stream> pos_stream,
 	m_map_canvas->setLayerSet(map_layer_set);
 
  	m_plane_track = boost::shared_ptr<QgsRubberBand>(new QgsRubberBand(m_map_canvas, false));
+ 	m_plane_track->setColor(QColor(255, 0, 0, 255));
+ 	m_plane_track->setWidth(3);
 	m_map_canvas->scene()->addItem(m_plane_track.get());
 
 	QVBoxLayout* layout = new QVBoxLayout();

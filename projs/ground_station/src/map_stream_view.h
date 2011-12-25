@@ -5,7 +5,7 @@
 #include <stream/util/lin_algebra.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
-#include <QtGui>
+#include <QtGui/QtGui>
 #include <qgis/qgsmapcanvas.h>
 
 namespace gs {
