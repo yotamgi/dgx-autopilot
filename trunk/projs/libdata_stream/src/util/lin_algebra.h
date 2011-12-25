@@ -80,34 +80,18 @@ namespace lin_algebra {
  * Global vector operators
  */
 inline std::ostream& operator << (std::ostream& os, const lin_algebra::vec3f &v) {
-//	os << '[';
-//	std::copy(v.begin(), v.end()-1, std::ostream_iterator<lin_algebra::vec3f::value_type>(os, ", "));
-//	os << v[2] << "]";
 	v.save(os, arma::arma_ascii);
 	return os;
 }
-
 inline std::istream& operator >> (std::istream &is, lin_algebra::vec3f &v) {
-
-//    char ch;
-//    if (is >> ch && ch != '[') {
-//        is.putback (ch);
-//        is.setstate (std::ios_base::failbit);
-//    };
-//    for (size_t i=0; i<2; i++) {
-//    	is >> v[i] >> ch;
-//    	if (ch != ',') {
-//    		is.putback (ch);
-//    		is.setstate (std::ios_base::failbit);
-//    		break;
-//    	}
-//    }
-//	is >> v[2] >> ch;
-//	if (ch != ']') {
-//		is.putback (ch);
-//		is.setstate (std::ios_base::failbit);
-//	}
-//
+	v.load(is, arma::arma_ascii);
+    return is;
+}
+inline std::ostream& operator << (std::ostream& os, const lin_algebra::vec2f &v) {
+	v.save(os, arma::arma_ascii);
+	return os;
+}
+inline std::istream& operator >> (std::istream &is, lin_algebra::vec2f &v) {
 	v.load(is, arma::arma_ascii);
     return is;
 }
