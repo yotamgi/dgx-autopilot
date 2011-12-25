@@ -12,10 +12,16 @@ typedef stream::DataPopStream<float> size_stream;
 
 class SizeStreamView : public QWidget {
 public:
+	enum Style {
+		VERTICAL_DIAGRAM,
+		HORIZONTAL_DIAGRAM,
+	};
+
 	SizeStreamView(boost::shared_ptr<size_stream> size_stream,
 			  	   float update_time,
 	   	   	   	   float max_size,
-	   	   	   	   float min_size);
+	   	   	   	   float min_size,
+	   	   	   	   Style style = VERTICAL_DIAGRAM);
 
 	void start();
 protected:
@@ -29,7 +35,7 @@ private:
 	float m_upadte_time;
 	boost::shared_ptr<size_stream> m_size_stream;
 
-	QProgressBar* m_progress_bar;
+	QProgressBar* m_bar;
 };
 
 } // namespace gs
