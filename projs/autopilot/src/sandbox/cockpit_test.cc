@@ -11,6 +11,12 @@ void usage(std::string arg0) {
 	std::cout << arg0 << " [--sensor-sim <address> ]  [--present-from <address> ] [--present-local]  [--help]" << std::endl;
 }
 
+void update_cockpit(autopilot::Cockpit* cockpit) {
+	while (true) {
+		cockpit->orientation()->get_data();
+	}
+}
+
 int main(int argc, char** argv) {
 	bool sim = false;
 	std::string sim_addr;
@@ -92,6 +98,8 @@ int main(int argc, char** argv) {
 
 		autopilot::Cockpit cockpit(platform);
 
+		boost::thread update_thread(update_cockpit, &cockpit);
+
 		if (present_local) {
 			std::cout << "Presenting locally" << std::endl;
 			// the left one
@@ -108,7 +116,8 @@ int main(int argc, char** argv) {
 			// the reliable stream
 			presenter.addSizeStream(cockpit.watch_rest_reliability());
 
-			presenter.run(true);
+			// run presenter and make it block
+			presenter.run(false);
 		}  else {
 			std::cout << "Exporting all data" << std::endl;
 			boost::shared_ptr<stream::TcpipClient> client = boost::make_shared<stream::TcpipClient>(present_addr, 0x6060);
@@ -119,13 +128,11 @@ int main(int argc, char** argv) {
 			conn.export_pop_stream<lin_algebra::vec3f>(platform->compass_sensor()->get_watch_stream(), "watch_compass_sensor");
 			conn.export_pop_stream<lin_algebra::vec3f>(cockpit.orientation(), "orientation");
 			conn.export_pop_stream<float>(cockpit.watch_rest_reliability(), "reliability");
-			conn.run();
+
+			// run connection and make it block
+			conn.run(false);
 		}
 
-		// to apply the watches
-		while (true) {
-			cockpit.orientation()->get_data();
-		}
 	}
 	return 0;
 
