@@ -2,7 +2,8 @@
 #include <stream/util/tcpip_connection.h>
 #include <platform/dgx1_platform.h>
 #include <cockpit.h>
-#include <stream_watch/stream_presenter_3d.h>
+#include <gs/3d_stream_view.h>
+#include <gs/size_stream_view.h>
 
 #include <string>
 #include <iostream>
@@ -18,6 +19,11 @@ void update_cockpit(autopilot::Cockpit* cockpit) {
 }
 
 int main(int argc, char** argv) {
+	// global parameters
+	const QSize stream3d_dimention(640, 480);
+	const float view_update_time = 0.01;
+
+	// commandline parsing
 	bool sim = false;
 	std::string sim_addr;
 	std::string present_addr;
@@ -61,10 +67,11 @@ int main(int argc, char** argv) {
 		exit(1);
 	}
 
-	StreamPresenter presenter;
-
 	if (present_addr != "")  {
 		std::cout << "Presenting from addr " << present_addr << std::endl;
+		QApplication app(argc, argv);
+		gs::StreamView3d view3d(view_update_time, stream3d_dimention);
+
 		boost::shared_ptr<stream::TcpipServer> server = boost::make_shared<stream::TcpipServer>(present_addr, 0x6060);
 		stream::StreamConnection conn(server);
 
@@ -72,20 +79,29 @@ int main(int argc, char** argv) {
 		typedef stream::DataPopStream<float> fs;
 
 		// the left one
-		presenter.addAngleStream(conn.import_pop_stream<vs::type>("gyro_watch_orientation"), irr::core::vector3df(-20., 0., 0.));
+		view3d.addAngleStream(conn.import_pop_stream<vs::type>("gyro_watch_orientation"), irr::core::vector3df(-20., 0., 0.));
 
 		// the mid one
-		presenter.addAngleStream(conn.import_pop_stream<vs::type>("watch_rest_orientation"), irr::core::vector3df(0., 0., 0.));
-		presenter.addVecStream(conn.import_pop_stream<vs::type>("watch_acc_sensor"), irr::core::vector3df(0., 0., 0.));
-		presenter.addVecStream(conn.import_pop_stream<vs::type>("watch_compass_sensor"), irr::core::vector3df(0., 0., 0.));
+		view3d.addAngleStream(conn.import_pop_stream<vs::type>("watch_rest_orientation"), irr::core::vector3df(0., 0., 0.));
+		view3d.addVecStream(conn.import_pop_stream<vs::type>("watch_acc_sensor"), irr::core::vector3df(0., 0., 0.));
+		view3d.addVecStream(conn.import_pop_stream<vs::type>("watch_compass_sensor"), irr::core::vector3df(0., 0., 0.));
 
 		// the right one
-		presenter.addAngleStream(conn.import_pop_stream<vs::type>("orientation"), irr::core::vector3df(20., 0., 0.));
+		view3d.addAngleStream(conn.import_pop_stream<vs::type>("orientation"), irr::core::vector3df(20., 0., 0.));
 
 		// the reliable stream
-		presenter.addSizeStream(conn.import_pop_stream<fs::type>("reliability"));
+		gs::SizeStreamView view_size(conn.import_pop_stream<fs::type>("reliability"), view_update_time, 0., 1.);
 
-		presenter.run(false);
+		// create the window itself
+		QHBoxLayout* layout = new QHBoxLayout();
+		layout->addWidget(&view3d);
+		layout->addWidget(&view_size);
+		QWidget* wnd = new QWidget;
+		wnd->setLayout(layout);
+		wnd->show();
+		view3d.start();
+		view_size.start();
+		app.exec();
 
 	} else {
 
@@ -102,22 +118,34 @@ int main(int argc, char** argv) {
 
 		if (present_local) {
 			std::cout << "Presenting locally" << std::endl;
+			QApplication app(argc, argv);
+			gs::StreamView3d view3d(view_update_time, stream3d_dimention);
+
 			// the left one
-			presenter.addAngleStream(cockpit.watch_gyro_orientation(), irr::core::vector3df(-20., 0., 0.));
+			view3d.addAngleStream(cockpit.watch_gyro_orientation(), irr::core::vector3df(-20., 0., 0.));
 
 			// the mid one
-			presenter.addAngleStream(cockpit.watch_rest_orientation(), irr::core::vector3df(0., 0., 0.));
-			presenter.addVecStream(platform->acc_sensor()->get_watch_stream(), irr::core::vector3df(0., 0., 0.));
-			presenter.addVecStream(platform->compass_sensor()->get_watch_stream(), irr::core::vector3df(0., 0., 0.));
+			view3d.addAngleStream(cockpit.watch_rest_orientation(), irr::core::vector3df(0., 0., 0.));
+			view3d.addVecStream(platform->acc_sensor()->get_watch_stream(), irr::core::vector3df(0., 0., 0.));
+			view3d.addVecStream(platform->compass_sensor()->get_watch_stream(), irr::core::vector3df(0., 0., 0.));
 
 			// the right one
-			presenter.addAngleStream(cockpit.orientation()->get_watch_stream(), irr::core::vector3df(20., 0., 0.));
+			view3d.addAngleStream(cockpit.orientation()->get_watch_stream(), irr::core::vector3df(20., 0., 0.));
 
 			// the reliable stream
-			presenter.addSizeStream(cockpit.watch_rest_reliability());
+			gs::SizeStreamView view_size(cockpit.watch_rest_reliability(), view_update_time, 0., 1.);
 
-			// run presenter and make it block
-			presenter.run(false);
+			// create the window itself
+			QHBoxLayout* layout = new QHBoxLayout();
+			layout->addWidget(&view3d);
+			layout->addWidget(&view_size);
+			QWidget* wnd = new QWidget;
+			wnd->setLayout(layout);
+			wnd->show();
+			view3d.start();
+			view_size.start();
+			app.exec();
+
 		}  else {
 			std::cout << "Exporting all data" << std::endl;
 			boost::shared_ptr<stream::TcpipClient> client = boost::make_shared<stream::TcpipClient>(present_addr, 0x6060);
