@@ -2,8 +2,6 @@
 #include <cockpit.h>
 #include <waypoint_pilot.h>
 #include <irrlicht/irrlicht.h>
-
-
 #include <stream/util/tcpip_connection.h>
 
 #include <iostream>
