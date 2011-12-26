@@ -9,8 +9,8 @@ SRCDIR = ./src
 
 CXX = g++
 ARCHIVE = ar
-CXXFLAGS += -g -I$(SRCDIR) -Wall  $(LIBDS_CXXFLAGS) $(GROUND_STATION_CXXFLAGS) -O3
-LDFLAGS += -lboost_thread -L./lib $(LIBDS_LDFLAGS) $(GROUND_STATION_LDFLAGS) -Wl,--rpath,$(LIBDS_LIBDIRS):$(GROUND_STATION_LIBDIRS)
+CXXFLAGS += -g -I$(SRCDIR) -Wall  $(LIBDS_CXXFLAGS) -O3
+LDFLAGS += -lboost_thread -L./lib $(LIBDS_LDFLAGS) -Wl,--rpath,$(LIBDS_LIBDIRS):$(GROUND_STATION_LIBDIRS)
 
 AUTOPILIT_OBJS =  $(SRCDIR)/platform/hw/i2c_interface.o	\
 		$(SRCDIR)/platform/hw/itg3200_gyro.o				\
@@ -51,6 +51,11 @@ $(LIBDIR):
 .cc.o: Makefile
 	$(CXX) -c $(CXXFLAGS) $<  -o $*.o
 
+# specific objs that need different cxxflags
+$(SRCDIR)/sandbox/cockpit_test.o: $(SRCDIR)/sandbox/cockpit_test.cc
+	$(CXX) -c $(CXXFLAGS)  $(GROUND_STATION_CXXFLAGS) $(SRCDIR)/sandbox/cockpit_test.cc -o $(SRCDIR)/sandbox/cockpit_test.o
+	
+
 $(LIBDIR)/libautopilot.a: $(AUTOPILIT_OBJS)
 	$(ARCHIVE) cr  $(LIBDIR)/libautopilot.a $(AUTOPILIT_OBJS)
 
@@ -65,7 +70,7 @@ sensor_watch_test: $(SRCDIR)/sandbox/sensor_watch_test.o $(LIBDIR) $(LIBDIR)/lib
 	$(CXX) $(SRCDIR)/sandbox/sensor_watch_test.o -lautopilot $(LDFLAGS) -o sensor_watch_test
 	
 cockpit_test: $(SRCDIR)/sandbox/cockpit_test.o $(LIBDIR) $(LIBDIR)/libautopilot.a
-	$(CXX) $(SRCDIR)/sandbox/cockpit_test.o -lautopilot $(LDFLAGS) -o cockpit_test
+	$(CXX) $(SRCDIR)/sandbox/cockpit_test.o -lautopilot  $(GROUND_STATION_LDFLAGS) $(LDFLAGS) -o cockpit_test
 
 waypoint_pilot_test: $(SRCDIR)/sandbox/waypoint_pilot_test.o $(LIBDIR) $(LIBDIR)/libautopilot.a
 	$(CXX) $(SRCDIR)/sandbox/waypoint_pilot_test.o -lautopilot $(LDFLAGS)  -o waypoint_pilot_test

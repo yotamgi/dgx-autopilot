@@ -1,8 +1,7 @@
 #include <platform/dgx1_platform.h>
 #include <cockpit.h>
 #include <waypoint_pilot.h>
-#include <gs/3d_stream_view.h>
-#include <gs/size_stream_view.h>
+#include <irrlicht/irrlicht.h>
 
 
 #include <stream/util/tcpip_connection.h>
