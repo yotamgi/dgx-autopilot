@@ -90,7 +90,7 @@ irrvec3f Plane::calc_angle_vel() const {
 
 irrvec3f Plane::calc_plane_acceleration() const {
 	// TODO : the calc_angle_vel should consieder the attack
-	const float ATTACK_DRAG_AFFECTION = 100.;
+	const float ATTACK_DRAG_AFFECTION = 50.;
 	const float AIR_DENSITY = 1.293;
 	const float MIN_LIFT_ATTACK_ANGLE = irr::core::degToRad(-5.);
 
@@ -113,9 +113,7 @@ irrvec3f Plane::calc_plane_acceleration() const {
 	velocity_plane.X = 0.;
 	velocity_plane.normalize();
 	float attack_angle = acos( velocity_plane.dotProduct(irrvec3f(0., 0., -1.)) );
-	attack_angle *= lin_algebra::sign(
-			(plane_up.Y < 0.)? velocity_plane.Y : velocity_plane.Y
-	);
+	attack_angle *= lin_algebra::sign(-1. * velocity_plane.Y);
 
 	// calculate the engine force
 	irrvec3f engine_force = plane_heading;
@@ -141,8 +139,7 @@ irrvec3f Plane::calc_plane_acceleration() const {
 			"Plane's alt is " << m_object->getPosition().Y <<
 			" and speed is " << vel_length*3.6 <<
 			" km/h attack:" << irr::core::radToDeg(attack_angle) <<
-			" and lift is " << lift_force.getLength() <<
-			" and coef is " << (-1./MIN_LIFT_ATTACK_ANGLE)*attack_angle + 1. << std::endl;
+			" and lift is " << lift_force.getLength() << std::endl;
 	return acc;
 }
 

@@ -128,8 +128,8 @@ int main()
 			 100.0f,
 			 100.0f,
 			 1000.0f,  // mass
-			 5000.0f,  // engine power
-			 0.6f, // drag
+			 3000.0f,  // engine power
+			 0.8f, // drag
 			 13.0f); // lift
 
 	simulator::Plane p(device, core::vector3df(0.0f, 0.0f, 0.0f), plane_params);
