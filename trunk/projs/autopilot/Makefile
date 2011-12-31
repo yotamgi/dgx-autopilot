@@ -10,7 +10,7 @@ SRCDIR = ./src
 CXX = g++
 ARCHIVE = ar
 CXXFLAGS += -g -I$(SRCDIR) -Wall  $(LIBDS_CXXFLAGS) -O3 -fPIC
-LDFLAGS += -L./lib -fPIC -Wl,--rpath,$(LIBDS_LIBDIRS):$(GROUND_STATION_LIBDIRS) $(LIBDS_LDFLAGS) -lboost_thread
+LDFLAGS += -L./lib -fPIC -Wl,--rpath,$(LIBDS_LIBDIRS):$(GROUND_STATION_LIBDIRS):$(LIBDIR) $(LIBDS_LDFLAGS) -lboost_thread
 
 AUTOPILIT_OBJS =  $(SRCDIR)/platform/hw/i2c_interface.o	\
 		$(SRCDIR)/platform/hw/itg3200_gyro.o				\
