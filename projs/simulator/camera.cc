@@ -2,9 +2,10 @@
 
 namespace simulator {
 
-Camera::Camera(irr::IrrlichtDevice* device, FlyingObject* tracked, irr::core::vector3df pos):
+Camera::Camera(irr::IrrlichtDevice* device, FlyingObject* tracked, irr::core::vector3df pos, float closeness):
 		m_type(Camera::TRACK_BEHIND),
 		m_fixed_pos(pos),
+		m_closeness(closeness),
 		m_tracked(tracked),
 		m_device(device)
 {
@@ -28,7 +29,7 @@ void Camera::update(float time_delta) {
 		tracked_dir = (tracked_pos - m_tracked_prev_pos).normalize();
 
 		m_tracking_camera_node->setTarget(tracked_pos);
-		m_tracking_camera_node->setPosition(tracked_pos - tracked_dir*8.f);
+		m_tracking_camera_node->setPosition(tracked_pos - tracked_dir*m_closeness);
 
 		m_tracked_prev_pos = tracked_pos;
 
