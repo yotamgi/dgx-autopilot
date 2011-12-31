@@ -21,6 +21,7 @@ PlainParams::PlainParams(const std::string& mesh_file,
 		float mass,
 		float engine_power,
 		float drag,
+		float wings_area,
 		float wings_lift):
 	m_mesh_file(mesh_file),
 	m_texture_file(texture_file),
@@ -31,6 +32,7 @@ PlainParams::PlainParams(const std::string& mesh_file,
 	m_mass(mass),
     m_engine_power(engine_power),
 	m_drag(drag),
+	m_wings_area(wings_area),
 	m_wings_lift(wings_lift)
 {}
 
@@ -92,7 +94,7 @@ irrvec3f Plane::calc_plane_acceleration() const {
 	// TODO : the calc_angle_vel should consieder the attack
 	const float ATTACK_DRAG_AFFECTION = 50.;
 	const float AIR_DENSITY = 1.293;
-	const float MIN_LIFT_ATTACK_ANGLE = irr::core::degToRad(-5.);
+	const float MIN_LIFT_ATTACK_ANGLE = irr::core::degToRad(m_params.get_wings_lift());
 
 	// calculate some useful params
 	irrvec3f plane_heading = irrvec3f(0., 0., -1.);
@@ -126,8 +128,8 @@ irrvec3f Plane::calc_plane_acceleration() const {
 
 	// calculate the lift force
 	irrvec3f lift_force = plane_up;
-	lift_force *= 0.5 * AIR_DENSITY * vel_length*vel_length * m_params.get_wings_lift();
-	lift_force *= (-1./MIN_LIFT_ATTACK_ANGLE)*attack_angle + 1.;
+	lift_force *= 0.5 * AIR_DENSITY * vel_length*vel_length * m_params.get_wings_area();
+	lift_force *= 11.5*attack_angle + MIN_LIFT_ATTACK_ANGLE / (-0.085);
 
 	// calculate the gravity force
 	irrvec3f gravity_force = irrvec3f(0., -1., 0.) * m_params.get_mass() * 10.;

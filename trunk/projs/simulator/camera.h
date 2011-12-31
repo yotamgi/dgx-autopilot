@@ -15,7 +15,7 @@ namespace simulator {
  */
 class Camera {
 public:
-	Camera(irr::IrrlichtDevice* device, FlyingObject* tracked, irr::core::vector3df pos);
+	Camera(irr::IrrlichtDevice* device, FlyingObject* tracked, irr::core::vector3df pos, float closeness);
 
 	enum CameraType {
 		TRACK_BEHIND, TRACK_FIXED, FPS
@@ -30,6 +30,7 @@ private:
 	CameraType m_type;
 
 	irr::core::vector3df m_fixed_pos;
+	float m_closeness;
 
 	/** needed for calculating the tracked direction */
 	irr::core::vector3df m_tracked_prev_pos;

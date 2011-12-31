@@ -30,7 +30,8 @@ struct PlainParams {
 				float mass, 						// kg
 				float engine_power,					// N
 				float drag,
-				float wings_lift);					// m^2
+				float wings_area,					// m^2
+				float wings_lift);					// min angle (degree) for the wing to lift
 
 
 	const std::string& get_mesh_file() const { return m_mesh_file; }
@@ -43,6 +44,7 @@ struct PlainParams {
 	float get_mass() const { return m_mass; }
 	float get_engine_power() const { return m_engine_power; }
 	float get_drag() const { return m_drag; }
+	float get_wings_area() const { return m_wings_area; }
 	float get_wings_lift() const { return m_wings_lift; }
 
 private:
@@ -57,6 +59,7 @@ private:
 	float m_mass;
 	float m_engine_power;
 	float m_drag;
+	float m_wings_area;
 	float m_wings_lift;
 };
 
