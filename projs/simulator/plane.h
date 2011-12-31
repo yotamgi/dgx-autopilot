@@ -24,29 +24,40 @@ struct PlainParams {
 	PlainParams(const std::string& mesh_file,
 				const std::string& texture_file,
 				const irr::core::vector3df scale,
-				float speed,
 				float yaw_speed,					// degrees/sec
 				float pitch_speed,					// degrees/sec
-				float ailron_speed);				// degrees/sec
+				float ailron_speed,					// degrees/sec
+				float mass, 						// kg
+				float engine_power,					// N
+				float drag,
+				float wings_lift);					// m^2
 
 
 	const std::string& get_mesh_file() const { return m_mesh_file; }
 	const std::string& get_texture_file() const { return m_texture_file; }
 	const irr::core::vector3df& get_scale() const {	return m_scale; }
-	float get_speed() const { return m_speed; }
 	float get_yaw_speed() const { return m_yaw_speed; }
 	float get_pitch_speed() const { return m_pitch_speed; }
 	float get_ailron_speed() const { return m_ailron_speed; }
+
+	float get_mass() const { return m_mass; }
+	float get_engine_power() const { return m_engine_power; }
+	float get_drag() const { return m_drag; }
+	float get_wings_lift() const { return m_wings_lift; }
 
 private:
 
 	std::string m_mesh_file;
 	std::string m_texture_file;
 	irr::core::vector3df m_scale;
-	float m_speed;
 	float m_yaw_speed;
 	float m_pitch_speed;
 	float m_ailron_speed;
+
+	float m_mass;
+	float m_engine_power;
+	float m_drag;
+	float m_wings_lift;
 };
 
 typedef boost::shared_ptr<stream::DataPushStream<float> > servo_stream_ptr_t;
@@ -71,6 +82,7 @@ public:
 	servo_stream_ptr_t get_pitch_servo() { return m_pitch_servo; }
 	servo_stream_ptr_t get_yaw_servo()   { return m_yaw_servo; }
 	servo_stream_ptr_t get_tilt_servo()  { return m_tilt_servo; }
+	servo_stream_ptr_t get_gas_servo()  { return m_gas_servo; }
 
 	// getting data from sensors
 	sensor_stream_ptr_t gyro_gen() { return m_gyro; }
@@ -86,6 +98,8 @@ public:
 
 private:
 
+	irr::core::vector3df calc_plane_acceleration() const ;
+
 	void update_sensors(float time_delta);
 	irr::core::vector3df calc_angle_vel() const;
 	void gps_update(); // blocking
@@ -100,10 +114,11 @@ private:
 	boost::shared_ptr<stream::PushToPopConv<float> > m_tilt_servo;
 	boost::shared_ptr<stream::PushToPopConv<float> > m_pitch_servo;
 	boost::shared_ptr<stream::PushToPopConv<float> > m_yaw_servo;
+	boost::shared_ptr<stream::PushToPopConv<float> > m_gas_servo;
 
 	boost::shared_ptr<stream::DataPushStream<lin_algebra::vec3f> > m_gps_listener;
 
-	irr::core::vector3df m_direction;
+	irr::core::vector3df m_velocity;
 	irr::core::vector3df m_priv_dir;
 
 	irr::scene::ISceneNode * m_object;
