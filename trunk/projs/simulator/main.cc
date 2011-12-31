@@ -123,11 +123,14 @@ int main()
 	simulator::PlainParams plane_params(
 			 "media/F16_Thuderbirds.x",
 			 "media/F16_Thuderbirds.bmp",
-			 irr::core::vector3df(10.0f, 10.0f, 10.0f),
+			 irr::core::vector3df(4.0f, 4.0f, 4.0f),
 			 200.0f,
 			 100.0f,
 			 100.0f,
-			 200.0f);
+			 1000.0f,  // mass
+			 5000.0f,  // engine power
+			 0.6f, // drag
+			 13.0f); // lift
 
 	simulator::Plane p(device, core::vector3df(0.0f, 0.0f, 0.0f), plane_params);
 
@@ -144,9 +147,9 @@ int main()
         "media/terrain-heightmap.bmp",
         0,                  // parent node
         -1,                 // node id
-        core::vector3df(-5000.0f, -400.f, -5000.f),     // position
+        core::vector3df(-5000.0f, -30., -5000.f),     // position
         core::vector3df(0.f, 0.f, 0.f),     // rotation
-        core::vector3df(40.f, 4.4f, 40.f),  // scale
+        core::vector3df(40.f, 0.2f, 40.f),  // scale
         video::SColor ( 255, 255, 255, 255 ),   // vertexColor
         5,                  // maxLOD
         scene::ETPS_17,             // patchSize
@@ -165,8 +168,8 @@ int main()
     terrain->scaleTexture(1.0f, 20.0f);
 
 
-    simulator::Camera c(device, &p, irr::core::vector3df(0.f, -30.f, 0.f));
-    c.setType(simulator::Camera::TRACK_BEHIND);
+    simulator::Camera c(device, &p, irr::core::vector3df(4.0, 4.0, -4.0));
+    c.setType(simulator::Camera::TRACK_FIXED);
 
 	/*
 	We have done everything, so lets draw it. We also write the current
@@ -223,6 +226,7 @@ int main()
 		if (receiver.IsKeyDown(KEY_KEY_Z)) c.setType(simulator::Camera::FPS);
 		if (receiver.IsKeyDown(KEY_KEY_X)) c.setType(simulator::Camera::TRACK_BEHIND);
 		if (receiver.IsKeyDown(KEY_KEY_C)) c.setType(simulator::Camera::TRACK_FIXED);
+		if (receiver.IsKeyDown(KEY_KEY_A)) p.get_gas_servo()->set_data(100.);
 
 		// make it have exactly 20 fps
 		int64_t wt = ((int64_t)(((1./50.) - frameDeltaTime) * 1000000.));
