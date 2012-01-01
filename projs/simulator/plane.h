@@ -122,7 +122,7 @@ private:
 	boost::shared_ptr<stream::DataPushStream<lin_algebra::vec3f> > m_gps_listener;
 
 	irr::core::vector3df m_velocity;
-	irr::core::vector3df m_priv_dir;
+	irr::core::vector3df m_priv_vel;
 
 	irr::scene::ISceneNode * m_object;
 
