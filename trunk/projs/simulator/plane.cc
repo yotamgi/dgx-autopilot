@@ -185,9 +185,11 @@ void Plane::update_sensors(float time_delta) {
 
 	// calculate some data
 	irrvec3f angle_vel = calc_angle_vel();
+	irrvec3f acceleration = (m_velocity - m_priv_vel)/time_delta;
 	irr::core::matrix4 trans = m_object->getAbsoluteTransformation();
-	irrvec3f dir;
-	trans.rotateVect(dir, m_velocity);
+	float acc_len = acceleration.getLength();
+	trans.rotateVect(acceleration);
+	acceleration = acceleration.normalize()*acc_len; // rotateVect doesn't maintain vec size...
 
 	// update the gyro
 	lin_algebra::vec3f gyro_data;
@@ -199,10 +201,10 @@ void Plane::update_sensors(float time_delta) {
 	// update the accelerometer
 	lin_algebra::vec3f acc_data;
 	irrvec3f g(0, -1., 0);
-	irrvec3f acc = g + 4.*(m_priv_dir - dir)/time_delta;
-	float acc_len = acc.getLength();
+	irrvec3f acc = g + 0.1*acceleration;
+	acc_len = acc.getLength();
 	trans.getTransposed().rotateVect(acc);
-	acc = acc.normalize()*acc_len; // rotateVect doesn't maintain vec size...
+	acc = acc.normalize()*acc_len;
 	acc_data[0] = -acc.X + frand()*0.05;
 	acc_data[1] =  acc.Y + frand()*0.05;
 	acc_data[2] = -acc.Z + frand()*0.05;
@@ -218,7 +220,7 @@ void Plane::update_sensors(float time_delta) {
 	compass_data[2] = -north.Z;
 	m_compass->set_data(compass_data);
 
-	m_priv_dir = dir;
+	m_priv_vel = m_velocity;
 
 	m_data_ready = true;
 }
