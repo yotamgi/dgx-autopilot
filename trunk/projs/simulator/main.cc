@@ -125,7 +125,7 @@ int main()
 			 "media/F16_Thuderbirds.bmp",
 			 irr::core::vector3df(4.0f, 4.0f, 4.0f),
 			 200.0f,
-			 100.0f,
+			 60.0f,
 			 100.0f,
 			 1000.0f,  // mass
 			 3000.0f,  // engine power

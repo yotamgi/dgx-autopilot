@@ -49,7 +49,7 @@ Plane::Plane(irr::IrrlichtDevice* device,
 		m_gas_servo(new stream::PushToPopConv<float>(0.)),
 		m_velocity(irrvec3f(0.0f, 0.0f, 0.0f)),
 		m_params(plane_params),
-		m_gyro_drift(frand()*10., frand()*10., frand()*10.),
+		m_gyro_drift(frand()*1., frand()*1., frand()*1.),
 		m_gps_thread(&Plane::gps_update, this),
 		m_forced_tilt(-1.),
 		m_forced_pitch(-1.),
@@ -187,24 +187,21 @@ void Plane::update_sensors(float time_delta) {
 	irrvec3f angle_vel = calc_angle_vel();
 	irrvec3f acceleration = (m_velocity - m_priv_vel)/time_delta;
 	irr::core::matrix4 trans = m_object->getAbsoluteTransformation();
-	float acc_len = acceleration.getLength();
-	trans.rotateVect(acceleration);
-	acceleration = acceleration.normalize()*acc_len; // rotateVect doesn't maintain vec size...
 
 	// update the gyro
 	lin_algebra::vec3f gyro_data;
-	gyro_data[0] = angle_vel.X + frand()*10. + m_gyro_drift.X;
-	gyro_data[1] = angle_vel.Y + frand()*10. + m_gyro_drift.Y;
-	gyro_data[2] = angle_vel.Z + frand()*10. + m_gyro_drift.Z;
+	gyro_data[0] = angle_vel.X + frand()*1.0 + m_gyro_drift.X;
+	gyro_data[1] =-angle_vel.Y + frand()*1.0 + m_gyro_drift.Y;
+	gyro_data[2] = angle_vel.Z + frand()*1.0 + m_gyro_drift.Z;
 	m_gyro->set_data(gyro_data);
 
 	// update the accelerometer
 	lin_algebra::vec3f acc_data;
 	irrvec3f g(0, -1., 0);
 	irrvec3f acc = g + 0.1*acceleration;
-	acc_len = acc.getLength();
+	float acc_len = acc.getLength();
 	trans.getTransposed().rotateVect(acc);
-	acc = acc.normalize()*acc_len;
+	acc = acc.normalize()*acc_len; // rotateVect doesn't maintain vec size...
 	acc_data[0] = -acc.X + frand()*0.05;
 	acc_data[1] =  acc.Y + frand()*0.05;
 	acc_data[2] = -acc.Z + frand()*0.05;
