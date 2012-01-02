@@ -92,7 +92,7 @@ irrvec3f Plane::calc_angle_vel() const {
 
 irrvec3f Plane::calc_plane_acceleration() const {
 	// TODO : the calc_angle_vel should consieder the attack
-	const float ATTACK_DRAG_AFFECTION = 50.;
+	const float ATTACK_DRAG_AFFECTION = 1.2;
 	const float AIR_DENSITY = 1.293;
 	const float MIN_LIFT_ATTACK_ANGLE = irr::core::degToRad(m_params.get_wings_lift());
 
@@ -123,8 +123,8 @@ irrvec3f Plane::calc_plane_acceleration() const {
 
 	// calculate the drag force
 	irrvec3f drag_force = -1. * vel_dir;
-	drag_force *=  0.5 * AIR_DENSITY * vel_length*vel_length * m_params.get_drag();
-	drag_force *=  1. + attack_angle*attack_angle * ATTACK_DRAG_AFFECTION;
+	drag_force *= 0.5 * AIR_DENSITY * vel_length*vel_length * m_params.get_drag();
+	drag_force *= ATTACK_DRAG_AFFECTION * (11.5*fabs(attack_angle) + MIN_LIFT_ATTACK_ANGLE / (-0.085));
 
 	// calculate the lift force
 	irrvec3f lift_force = plane_up;
