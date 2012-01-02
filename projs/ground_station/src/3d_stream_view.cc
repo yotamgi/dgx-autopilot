@@ -26,6 +26,7 @@ StreamView3d::StreamView3d(float update_time, QSize size, QWidget* parent):
 	setAttribute(Qt::WA_OpaquePaintEvent);
 	setAttribute(Qt::WA_NoSystemBackground);
 	setAttribute(Qt::WA_PaintOnScreen, true);
+	setAutoFillBackground(false);
 }
 
 void StreamView3d::start() {
@@ -36,6 +37,10 @@ void StreamView3d::start() {
     params.WindowId = reinterpret_cast<void*>(winId());
     params.WindowSize.Width = width();
     params.WindowSize.Height = height();
+    params.Bits = 32;
+    params.Stencilbuffer = true;
+    params.Doublebuffer = true;
+    params.Stereobuffer = false;
 
 	m_device = createDeviceEx(params);
 	if (m_device == 0) {
