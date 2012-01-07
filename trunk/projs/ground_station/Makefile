@@ -39,7 +39,7 @@ device:
 
 .PHONY:
 clean:
-	rm -fr $(AUTOPILIT_OBJS) */*/*.o */*.o *.o $(AUTOGENDIR) $(LIBDIR) gtest sensor_watch_test watch_test cockpit_test waypoint_pilot_test 
+	rm -fr $(AUTOPILIT_OBJS) */*/*.o */*.o *.o $(AUTOGENDIR) $(LIBDIR) ground_station
 
 $(LIBDIR):
 	mkdir $(LIBDIR)
