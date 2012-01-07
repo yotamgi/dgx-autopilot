@@ -121,8 +121,8 @@ int main()
 	scene::ISceneManager* smgr = device->getSceneManager();
 
 	simulator::PlainParams plane_params(
-			 "media/F16_Thuderbirds.x",
-			 "media/F16_Thuderbirds.bmp",
+			 "media/pf-cessna-182.x",
+			 "media/pf-cessna-182.bmp",
 			 irr::core::vector3df(4.0f, 4.0f, 4.0f),
 			 200.0f,
 			 60.0f,
