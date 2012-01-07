@@ -61,7 +61,7 @@ lin_algebra::mat3f AccCompassRotation::get_data() {
 			0., 1.
 	);
 	//std::cout << acc_len_closeness << ", " <<  compass_len_closeness << ", " << angle_closeness << " = " << m_reliable_stream->reliability << std::endl;
-	//std::cout << angle << std::endl;
+	std::cout << angle << std::endl;
 
 	// create the rotation matrix and fill its components
 	lin_algebra::mat3f rot;
@@ -70,12 +70,11 @@ lin_algebra::mat3f AccCompassRotation::get_data() {
 	rot.row(1) = -ground;
 
 	// calculate z as the vector orthogonal to x and y
-	lin_algebra::rowvec3f plane_z = lin_algebra::cross_product(north, ground);
+	lin_algebra::rowvec3f plane_z = lin_algebra::normalize(lin_algebra::cross_product(north, ground));
 	rot.row(2) = plane_z;
 
 	// calculating the x using the north
-	rot.row(0) = lin_algebra::cross_product(plane_z, ground);
-
+	rot.row(0) = lin_algebra::normalize(lin_algebra::cross_product(plane_z, ground));
 
 	return rot;
 }
