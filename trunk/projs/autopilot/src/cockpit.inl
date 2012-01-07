@@ -63,9 +63,12 @@ inline Cockpit::Cockpit(boost::shared_ptr<NormalPlainPlatform> platform):
 	boost::shared_ptr<filter::AccCompassRotation> acc_compass = boost::make_shared<filter::AccCompassRotation>(
 		boost::shared_ptr<stream::StreamPopFilter<lin_algebra::vec3f> >(new stream::filters::LowPassFilter<lin_algebra::vec3f> (
 				(boost::shared_ptr<stream::StreamPopFilter<lin_algebra::vec3f> >)m_platform->acc_sensor(),
-				1
+				4
 		)),
-		m_platform->compass_sensor(),
+		boost::shared_ptr<stream::StreamPopFilter<lin_algebra::vec3f> >(new stream::filters::LowPassFilter<lin_algebra::vec3f> (
+				(boost::shared_ptr<stream::StreamPopFilter<lin_algebra::vec3f> >)m_platform->compass_sensor(),
+				4
+		)),
 		20. // the north explected angle
 	);
 
