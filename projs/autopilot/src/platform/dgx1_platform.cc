@@ -70,6 +70,7 @@ DGX1SimulatorPlatform::DGX1SimulatorPlatform(boost::shared_ptr<stream::Connectio
 	m_compass = boost::make_shared<vec3_watch_stream>(m_stream_conn.import_pop_stream<lin_algebra::vec3f>("simulator_compass"));
 	m_pitch = m_stream_conn.import_push_stream<float>("simulator_pitch_servo");
 	m_tilt = m_stream_conn.import_push_stream<float>("simulator_tilt_servo");
+	m_gas = m_stream_conn.import_push_stream<float>("simulator_gas_servo");
 }
 
 boost::shared_ptr<vec3_watch_stream> DGX1SimulatorPlatform::acc_sensor() {
