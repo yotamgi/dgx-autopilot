@@ -4,6 +4,7 @@
 #include "interfaces/plain_cockpit.h"
 #include "interfaces/plain_platform.h"
 #include "gps_filter.h"
+#include "fusion_filter.h"
 #include <stream/util/lin_algebra.h>
 
 #include <boost/shared_ptr.hpp>

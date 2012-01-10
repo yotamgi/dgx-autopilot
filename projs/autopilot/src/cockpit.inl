@@ -60,40 +60,16 @@ inline Cockpit::Cockpit(boost::shared_ptr<NormalPlainPlatform> platform):
 		)
 	);
 
-	boost::shared_ptr<filter::AccCompassRotation> acc_compass = boost::make_shared<filter::AccCompassRotation>(
-		boost::shared_ptr<stream::StreamPopFilter<lin_algebra::vec3f> >(new stream::filters::LowPassFilter<lin_algebra::vec3f> (
-				(boost::shared_ptr<stream::StreamPopFilter<lin_algebra::vec3f> >)m_platform->acc_sensor(),
-				4
-		)),
-		boost::shared_ptr<stream::StreamPopFilter<lin_algebra::vec3f> >(new stream::filters::LowPassFilter<lin_algebra::vec3f> (
-				(boost::shared_ptr<stream::StreamPopFilter<lin_algebra::vec3f> >)m_platform->compass_sensor(),
-				4
-		)),
-		20. // the north explected angle
+	boost::shared_ptr<FusionFilter> fusion_filter = boost::make_shared<FusionFilter>(
+					m_platform->acc_sensor(),
+					m_platform->compass_sensor(),
+					m_platform->gyro_sensor(),
+					20. // the north explected angle
 	);
 
-	boost::shared_ptr<filter::WatchFilter<lin_algebra::mat3f> > ro(
-			new filter::WatchFilter<lin_algebra::mat3f>(acc_compass));
-
-	boost::shared_ptr<filter::WatchFilter<float> > rr(
-			new filter::WatchFilter<float>(acc_compass->reliable_stream()));
-
-	m_orientation = boost::make_shared<filter::WatchFilter<lin_algebra::vec3f> >(
-		boost::make_shared<filter::MatrixToEulerFilter>(
-			boost::make_shared<filter::KalmanFilter<lin_algebra::mat3f> >(
-				boost::make_shared<filter::GyroToAVMatrix>(
-					m_platform->gyro_sensor()
-				),
-				ro,
-				rr,
-				lin_algebra::identity_matrix<lin_algebra::mat3f>(3, 3),
-				update_matrix
-			)
-		)
-	);
-
-	m_rest_orientation = boost::make_shared<filter::MatrixToEulerFilter>(ro->get_watch_stream());
-	m_rest_reliability = rr->get_watch_stream();
+	m_orientation = boost::make_shared<vec3_watch_stream>(fusion_filter);
+	m_rest_reliability = fusion_filter->get_reliability_stream();
+	m_rest_orientation = fusion_filter->get_rest_orientation_stream();
 }
 
 inline boost::shared_ptr<vec3_stream> Cockpit::watch_gyro_orientation() {
