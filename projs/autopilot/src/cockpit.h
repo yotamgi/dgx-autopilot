@@ -48,6 +48,8 @@ public:
 
 	boost::shared_ptr<float_stream> 	watch_rest_reliability();
 
+	boost::shared_ptr<vec3_stream> 	watch_fixed_acc();
+
 private:
 	boost::shared_ptr<NormalPlainPlatform> m_platform;
 
@@ -55,6 +57,7 @@ private:
 	boost::shared_ptr<vec3_stream> 		m_gyro_orientation;
 	boost::shared_ptr<vec3_stream> 		m_rest_orientation;
 	boost::shared_ptr<float_stream> 	m_rest_reliability;
+	boost::shared_ptr<vec3_stream> 		m_fixed_acc;
 
 	boost::shared_ptr<SimpleGpsFilter> m_gps_filter;
 
