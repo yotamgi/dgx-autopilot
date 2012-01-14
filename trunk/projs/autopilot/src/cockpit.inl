@@ -4,7 +4,6 @@
 #include <stream/filters/matrix_to_euler_filter.h>
 #include <stream/filters/acc_compass_rot.h>
 #include <stream/filters/gyro_to_av_matrix.h>
-#include <stream/filters/kalman_filter.h>
 #include <stream/filters/low_pass_filter.h>
 #include <boost/make_shared.hpp>
 
@@ -64,12 +63,14 @@ inline Cockpit::Cockpit(boost::shared_ptr<NormalPlainPlatform> platform):
 					m_platform->acc_sensor(),
 					m_platform->compass_sensor(),
 					m_platform->gyro_sensor(),
-					20. // the north explected angle
+					20., // the north explected angle
+					m_gps_filter->get_speed_stream()
 	);
 
 	m_orientation = boost::make_shared<vec3_watch_stream>(fusion_filter);
 	m_rest_reliability = fusion_filter->get_reliability_stream();
 	m_rest_orientation = fusion_filter->get_rest_orientation_stream();
+	m_fixed_acc = fusion_filter->get_fixed_acc_stream();
 }
 
 inline boost::shared_ptr<vec3_stream> Cockpit::watch_gyro_orientation() {
@@ -85,6 +86,10 @@ inline boost::shared_ptr<vec3_watch_stream> Cockpit::orientation() {
 
 inline boost::shared_ptr<float_stream> Cockpit::watch_rest_reliability() {
 	return m_rest_reliability;
+}
+
+inline boost::shared_ptr<vec3_stream> 	Cockpit::watch_fixed_acc() {
+	return m_fixed_acc;
 }
 
 inline boost::shared_ptr<vec3_watch_stream> Cockpit::speed() {

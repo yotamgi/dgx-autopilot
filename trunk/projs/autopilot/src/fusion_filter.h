@@ -17,19 +17,22 @@ public:
 	FusionFilter(
 			boost::shared_ptr<vec_stream_t> acc,
 			boost::shared_ptr<vec_stream_t> compass,
-			boost::shared_ptr<vec_stream_t> gyro);
+			boost::shared_ptr<vec_stream_t> gyro,
+			boost::shared_ptr<vec_stream_t> speed = boost::shared_ptr<vec_stream_t>());
 
 	FusionFilter(
 			boost::shared_ptr<vec_stream_t> acc,
 			boost::shared_ptr<vec_stream_t> compass,
 			boost::shared_ptr<vec_stream_t> gyro,
-			lin_algebra::vec3f expected_north);
+			lin_algebra::vec3f expected_north,
+			boost::shared_ptr<vec_stream_t> speed = boost::shared_ptr<vec_stream_t>());
 
 	FusionFilter(
 			boost::shared_ptr<vec_stream_t> acc,
 			boost::shared_ptr<vec_stream_t> compass,
 			boost::shared_ptr<vec_stream_t> gyro,
-			float north_pitch_angle);
+			float north_pitch_angle,
+			boost::shared_ptr<vec_stream_t> speed = boost::shared_ptr<vec_stream_t>());
 
 	virtual ~FusionFilter() {}
 
@@ -40,6 +43,10 @@ public:
 
 	boost::shared_ptr<vec_stream_t> get_rest_orientation_stream()
 				{ return m_rest_orientation; }
+
+	boost::shared_ptr<vec_stream_t> get_fixed_acc_stream()
+				{ return m_fixed_acc; }
+
 
 private:
 
@@ -66,11 +73,14 @@ private:
 	boost::shared_ptr<vec_stream_t> m_acc;
 	boost::shared_ptr<vec_stream_t> m_compass;
 	boost::shared_ptr<vec_stream_t> m_gyro;
+	boost::shared_ptr<vec_stream_t> m_speed;
 
 	float m_north_pitch_angle;
 
 	boost::shared_ptr<stream::PushToPopConv<float> > m_reliable_stream;
 	boost::shared_ptr<stream::PushToPopConv<lin_algebra::vec3f> > m_rest_orientation;
+	boost::shared_ptr<stream::PushToPopConv<lin_algebra::vec3f> > m_fixed_acc;
+
 };
 
 }  // namespace autopilot

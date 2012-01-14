@@ -133,7 +133,7 @@ int main(int argc, char** argv) {
 
 			// the mid one
 			view3d.addAngleStream(cockpit.watch_rest_orientation(), irr::core::vector3df(0., 0., 0.));
-			view3d.addVecStream(platform->acc_sensor()->get_watch_stream(), irr::core::vector3df(0., 0., 0.));
+			view3d.addVecStream(cockpit.watch_fixed_acc(), irr::core::vector3df(0., 0., 0.));
 			view3d.addVecStream(platform->compass_sensor()->get_watch_stream(), irr::core::vector3df(0., 0., 0.));
 
 			// the right one
@@ -165,7 +165,7 @@ int main(int argc, char** argv) {
 			stream::StreamConnection conn(client);
 			conn.export_pop_stream<lin_algebra::vec3f>(cockpit.watch_gyro_orientation(), "gyro_watch_orientation");
 			conn.export_pop_stream<lin_algebra::vec3f>(cockpit.watch_rest_orientation(), "watch_rest_orientation");
-			conn.export_pop_stream<lin_algebra::vec3f>(platform->acc_sensor()->get_watch_stream(), "watch_acc_sensor");
+			conn.export_pop_stream<lin_algebra::vec3f>(cockpit.watch_fixed_acc(), "watch_acc_sensor");
 			conn.export_pop_stream<lin_algebra::vec3f>(platform->compass_sensor()->get_watch_stream(), "watch_compass_sensor");
 			conn.export_pop_stream<lin_algebra::vec3f>(cockpit.orientation(), "orientation");
 			conn.export_pop_stream<float>(cockpit.watch_rest_reliability(), "reliability");
