@@ -55,6 +55,8 @@ $(LIBDIR):
 # specific objs that need different cxxflags
 $(SRCDIR)/sandbox/cockpit_test.o: $(SRCDIR)/sandbox/cockpit_test.cc
 	$(CXX) -c $(CXXFLAGS)  $(GROUND_STATION_CXXFLAGS) $(SRCDIR)/sandbox/cockpit_test.cc -o $(SRCDIR)/sandbox/cockpit_test.o
+$(SRCDIR)/sandbox/waypoint_pilot_test.o: $(SRCDIR)/sandbox/waypoint_pilot_test.cc
+	$(CXX) -c $(CXXFLAGS)  $(GROUND_STATION_CXXFLAGS) $(SRCDIR)/sandbox/waypoint_pilot_test.cc -o $(SRCDIR)/sandbox/waypoint_pilot_test.o
 	
 
 $(LIBDIR)/libautopilot.so: $(AUTOPILIT_OBJS)
@@ -77,5 +79,5 @@ cockpit_test_device: $(SRCDIR)/sandbox/cockpit_test_device.o $(LIBDIR) $(LIBDIR)
 	$(CXX) $(SRCDIR)/sandbox/cockpit_test_device.o -lautopilot  $(LDFLAGS) -o cockpit_test_device
 	
 waypoint_pilot_test: $(SRCDIR)/sandbox/waypoint_pilot_test.o $(LIBDIR) $(LIBDIR)/libautopilot.so
-	$(CXX) $(SRCDIR)/sandbox/waypoint_pilot_test.o -lautopilot $(LDFLAGS)  -o waypoint_pilot_test
+	$(CXX) $(SRCDIR)/sandbox/waypoint_pilot_test.o -lautopilot $(GROUND_STATION_LDFLAGS) $(LDFLAGS)  -o waypoint_pilot_test
 	
