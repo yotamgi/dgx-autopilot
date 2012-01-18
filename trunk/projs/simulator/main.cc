@@ -124,15 +124,29 @@ int main()
 	simulator::PlainParams plane_params(
 			 "media/pf-cessna-182.x",
 			 "media/pf-cessna-182.bmp",
-			 irr::core::vector3df(4.0f, 4.0f, 4.0f),
+			 irr::core::vector3df(0.8f, 0.8f, 0.8f),
 			 200.0f,
-			 60.0f,
 			 100.0f,
-			 1000.0f,  // mass
-			 3000.0f,  // engine power
-			 0.8f, // drag
-			 13.0f, // wing area
-			 -5.); // lift
+			 100.0f,
+			 6.5f,  // mass
+			 40.0f,  // engine power
+			 0.15f, // drag
+			 1.0f, // wing area
+			 -3.); // lift
+
+//	simulator::PlainParams plane_params(
+//			 "media/pf-cessna-182.x",
+//			 "media/pf-cessna-182.bmp",
+//			 irr::core::vector3df(4.0f, 4.0f, 4.0f),
+//			 200.0f,
+//			 60.0f,
+//			 100.0f,
+//			 1000.0f,  // mass
+//			 3000.0f,  // engine power
+//			 0.8f, // drag
+//			 13.0f, // wing area
+//			 -5.); // lift
+
 
 	simulator::Plane p(device, core::vector3df(0.0f, 0.0f, 0.0f), plane_params);
 
@@ -170,7 +184,7 @@ int main()
     terrain->scaleTexture(1.0f, 20.0f);
 
 
-    simulator::Camera c(device, &p, irr::core::vector3df(4.0, 4.0, -4.0), 8.);
+    simulator::Camera c(device, &p, irr::core::vector3df(4.0, 4.0, -4.0), 2.0);
     c.setType(simulator::Camera::TRACK_FIXED);
 
 	/*
