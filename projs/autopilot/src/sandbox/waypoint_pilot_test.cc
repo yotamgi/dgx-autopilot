@@ -2,6 +2,7 @@
 #include <cockpit.h>
 #include <waypoint_pilot.h>
 #include <stream/util/tcpip_connection.h>
+#include <gs/map_stream_view.h>
 
 #include <iostream>
 #include <string>
@@ -45,7 +46,18 @@ int main(int argc, char** argv) {
 	waypoint[0] = 1000.; waypoint[1] = 1010.;
 	pilot.to_waypoint(waypoint, 60.);
 
-	pilot.start(false);
+	pilot.start(true);
+
+	// Show a map
+	QApplication app(argc, argv);
+	QWidget* window = new QWidget();
+	QHBoxLayout* layout = new QHBoxLayout();
+	gs::MapStreamView* map_view = new gs::MapStreamView(cockpit->position(),
+			0.2, QSize(400, 300), std::string("../ground_station/data/map"));
+	layout->addWidget(map_view);
+	window->setLayout(layout);
+	window->show();
+	app.exec();
 
 	return 0;
 }
