@@ -55,6 +55,7 @@ Plane::Plane(irr::IrrlichtDevice* device,
 		m_gps_thread(&Plane::gps_update, this),
 		m_forced_tilt(-1.),
 		m_forced_pitch(-1.),
+		m_print_timer(0.),
 		m_data_ready(false)
 {
 	irr::scene::ISceneManager* smgr = m_device->getSceneManager();
@@ -95,7 +96,7 @@ irrvec3f Plane::calc_angle_vel() const {
 	return servo_angle_speed;
 }
 
-irrvec3f Plane::calc_plane_acceleration() const {
+irrvec3f Plane::calc_plane_acceleration() {
 	// TODO : the calc_angle_vel should consieder the attack
 	const float ATTACK_DRAG_AFFECTION = 1.2;
 	const float AIR_DENSITY = 1.293;
@@ -142,11 +143,15 @@ irrvec3f Plane::calc_plane_acceleration() const {
 	// calculate the acceleration
 	irrvec3f acc = (engine_force + drag_force + lift_force + gravity_force) / m_params.get_mass();
 
-//	std::cout << std::setprecision(2) << std::fixed <<
-//			"Plane's alt is " << m_object->getPosition().Y <<
-//			" and speed is " << vel_length*3.6 <<
-//			" km/h attack:" << irr::core::radToDeg(attack_angle) <<
-//			" and lift is " << lift_force.getLength() << std::endl;
+
+	if (m_print_timer > 1.) {
+		m_print_timer = 0.;
+		std::cout << std::setprecision(2) << std::fixed <<
+				"Plane's alt is " << m_object->getPosition().Y <<
+				" and speed is " << vel_length*3.6 <<
+				" km/h attack:" << irr::core::radToDeg(attack_angle) << std::endl;
+	}
+
 	return acc;
 }
 
@@ -179,6 +184,7 @@ void Plane::update(float time_delta) {
 	m_object->setRotation(final_trans.getRotationDegrees());
 	m_object->setPosition(pos);
 
+	m_print_timer += time_delta;
 	update_sensors(time_delta);
 }
 
@@ -193,9 +199,9 @@ void Plane::update_sensors(float time_delta) {
 
 	// update the gyro
 	lin_algebra::vec3f gyro_data;
-	gyro_data[0] = angle_vel.X + frand()*1.0 + m_gyro_drift.X;
-	gyro_data[1] = angle_vel.Y + frand()*1.0 + m_gyro_drift.Y;
-	gyro_data[2] = angle_vel.Z + frand()*1.0 + m_gyro_drift.Z;
+	gyro_data[0] = angle_vel.X + frand()*2.0 + 2*m_gyro_drift.X;
+	gyro_data[1] = angle_vel.Y + frand()*2.0 + 2*m_gyro_drift.Y;
+	gyro_data[2] = angle_vel.Z + frand()*2.0 + 2*m_gyro_drift.Z;
 	m_gyro->set_data(gyro_data);
 
 	// update the accelerometer
@@ -239,7 +245,7 @@ void Plane::gps_update() {
 			rand.randu();
 			rand = lin_algebra::normalize(rand);
 
-			m_gps_listener->set_data(pos/10. + rand*3.);
+			m_gps_listener->set_data(pos/10. + rand*1.);
 		}
 		sleep(1);
 	}

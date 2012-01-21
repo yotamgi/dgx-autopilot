@@ -104,7 +104,7 @@ public:
 
 private:
 
-	irr::core::vector3df calc_plane_acceleration() const ;
+	irr::core::vector3df calc_plane_acceleration();
 
 	void update_sensors(float time_delta);
 	irr::core::vector3df calc_angle_vel() const;
@@ -137,6 +137,8 @@ private:
 
 	float m_forced_tilt;
 	float m_forced_pitch;
+
+	float m_print_timer;
 
 	volatile bool m_data_ready;
 };
