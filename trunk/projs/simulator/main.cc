@@ -121,10 +121,12 @@ int main()
 	video::IVideoDriver* driver = device->getVideoDriver();
 	scene::ISceneManager* smgr = device->getSceneManager();
 
+
 	simulator::PlainParams plane_params(
 			 "media/pf-cessna-182.x",
 			 "media/pf-cessna-182.bmp",
-			 irr::core::vector3df(0.8f, 0.8f, 0.8f),
+			 irr::core::vector3df(1., 1., 1.),
+			 irr::core::vector3df(0., 180., 0.),
 			 200.0f,
 			 100.0f,
 			 100.0f,
@@ -197,12 +199,13 @@ int main()
 	// In order to do framerate independent movement, we have to know
 	// how long it was since the last frame
 	u32 then = device->getTimer()->getTime();
+	f32 frameDeltaTime = 0.;
 
 	while(device->run())
 	{
 		// Work out a frame delta time.
 		const u32 now = device->getTimer()->getTime();
-		const f32 frameDeltaTime = (f32)(now - then) / 1000.f; // Time in seconds
+		frameDeltaTime = (f32)(now - then) / 1000.f; // Time in seconds
 		then = now;
 
 		p.update(frameDeltaTime);
@@ -231,22 +234,19 @@ int main()
 		///////////////////////////////////////
 		// Update the plane according to the keys
 		//////////////
-		if (receiver.IsKeyDown(KEY_UP)) p.force_pitch(10.);
-		else if (receiver.IsKeyDown(KEY_DOWN)) p.force_pitch(90.);
+		if (receiver.IsKeyDown(KEY_UP)) p.force_pitch(90.);
+		else if (receiver.IsKeyDown(KEY_DOWN)) p.force_pitch(10.);
 		else p.unforce_pitch();
 
-		if (receiver.IsKeyDown(KEY_LEFT))  p.force_tilt(10.);
-		else if (receiver.IsKeyDown(KEY_RIGHT)) p.force_tilt(90.);
+		if (receiver.IsKeyDown(KEY_LEFT))  p.force_tilt(90.);
+		else if (receiver.IsKeyDown(KEY_RIGHT)) p.force_tilt(10.);
 		else p.unforce_tilt();
 
-		if (receiver.IsKeyDown(KEY_KEY_Z)) c.setType(simulator::Camera::FPS);
+		if (receiver.IsKeyDown(KEY_KEY_V)) c.setType(simulator::Camera::FPS);
 		if (receiver.IsKeyDown(KEY_KEY_X)) c.setType(simulator::Camera::TRACK_BEHIND);
 		if (receiver.IsKeyDown(KEY_KEY_C)) c.setType(simulator::Camera::TRACK_FIXED);
 		if (receiver.IsKeyDown(KEY_KEY_A)) p.get_gas_servo()->set_data(100.);
-
-		// make it have exactly 20 fps
-		int64_t wt = ((int64_t)(((1./50.) - frameDeltaTime) * 1000000.));
-		usleep(wt>0?wt:0);
+		if (receiver.IsKeyDown(KEY_KEY_Z)) p.get_gas_servo()->set_data(0.);
 	}
 
 	/*

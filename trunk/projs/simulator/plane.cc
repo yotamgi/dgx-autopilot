@@ -14,7 +14,8 @@ static float frand() {
 
 PlainParams::PlainParams(const std::string& mesh_file,
 		const std::string& texture_file,
-		const irrvec3f scale,
+		const irr::core::vector3df scale,
+		const irr::core::vector3df rot,
 		float yaw_speed,					// degrees/sec
 		float pitch_speed,					// degrees/sec
 		float ailron_speed,					// degrees/sec
@@ -26,6 +27,7 @@ PlainParams::PlainParams(const std::string& mesh_file,
 	m_mesh_file(mesh_file),
 	m_texture_file(texture_file),
 	m_scale(scale),
+	m_rot(rot),
 	m_yaw_speed(yaw_speed),
 	m_pitch_speed(pitch_speed),
 	m_ailron_speed(ailron_speed),
@@ -64,8 +66,11 @@ Plane::Plane(irr::IrrlichtDevice* device,
 
 	m_object->setPosition(start_pos);
 	m_object->setScale(plane_params.get_scale());
+	m_object->setRotation(plane_params.get_rot());
 	m_object->setMaterialTexture(0, m_device->getVideoDriver()->getTexture(m_params.get_texture_file().c_str()));
 	m_object->setMaterialFlag(irr::video::EMF_LIGHTING, false);
+
+	m_transformation.setRotationDegrees(irrvec3f(frand()/10., frand()/10., frand()/10)); // it cant be actual zeors
 }
 
 irrvec3f Plane::calc_angle_vel() const {
@@ -81,11 +86,11 @@ irrvec3f Plane::calc_angle_vel() const {
 	);
 
 	irr::core::matrix4 inverse_trans;
-	m_object->getAbsoluteTransformation().getInverse(inverse_trans);
+	m_transformation.getInverse(inverse_trans);
 	irrvec3f velocity_plane = m_velocity;
 	inverse_trans.rotateVect(velocity_plane);
 	velocity_plane.normalize();
-	servo_angle_speed.Y -= velocity_plane.X*1000.;
+	servo_angle_speed.Y += velocity_plane.X*1000.;
 
 	return servo_angle_speed;
 }
@@ -97,11 +102,11 @@ irrvec3f Plane::calc_plane_acceleration() const {
 	const float MIN_LIFT_ATTACK_ANGLE = irr::core::degToRad(m_params.get_wings_lift());
 
 	// calculate some useful params
-	irrvec3f plane_heading = irrvec3f(0., 0., -1.);
-	m_object->getAbsoluteTransformation().rotateVect(plane_heading);
+	irrvec3f plane_heading = irrvec3f(0., 0., 1.);
+	m_transformation.rotateVect(plane_heading);
 	plane_heading.normalize();
 	irrvec3f plane_up = irrvec3f(0., 1., 0.);
-	m_object->getAbsoluteTransformation().rotateVect(plane_up);
+	m_transformation.rotateVect(plane_up);
 	plane_up.normalize();
 	const float vel_length = m_velocity.getLength();
 	irrvec3f vel_dir = m_velocity;
@@ -109,12 +114,12 @@ irrvec3f Plane::calc_plane_acceleration() const {
 
 	// calculate the attack angle
 	irr::core::matrix4 inverse_trans;
-	m_object->getAbsoluteTransformation().getInverse(inverse_trans);
+	m_transformation.getInverse(inverse_trans);
 	irrvec3f velocity_plane = vel_dir;
 	inverse_trans.rotateVect(velocity_plane);
 	velocity_plane.X = 0.;
 	velocity_plane.normalize();
-	float attack_angle = acos( velocity_plane.dotProduct(irrvec3f(0., 0., -1.)) );
+	float attack_angle = acos( velocity_plane.dotProduct(irrvec3f(0., 0., 1.)) );
 	attack_angle *= lin_algebra::sign(-1. * velocity_plane.Y);
 
 	// calculate the engine force
@@ -145,18 +150,14 @@ irrvec3f Plane::calc_plane_acceleration() const {
 	return acc;
 }
 
-
 void Plane::update(float time_delta) {
 	irrvec3f pos = m_object->getPosition();
 
-	// update the the rotation by the servos values
-	irr::core::matrix4 transformation = m_object->getAbsoluteTransformation();
-
 	irrvec3f angle_vel = calc_angle_vel();
-	irrvec3f angle_diff = angle_vel *time_delta;
+	irrvec3f angle_diff = angle_vel * time_delta;
 	irr::core::matrix4 rot_mat;
 	rot_mat.setRotationDegrees(angle_diff);
-	transformation *= rot_mat;
+	m_transformation *= rot_mat;
 
 	// update the speed by the acceleration
 	irrvec3f acceleration = calc_plane_acceleration();
@@ -172,7 +173,10 @@ void Plane::update(float time_delta) {
 	}
 
 	// Update the object with the new data
-	m_object->setRotation(transformation.getRotationDegrees());
+	irr::core::matrix4 plain_rot;
+	plain_rot.setRotationDegrees(m_params.get_rot());
+	irr::core::matrix4 final_trans =  m_transformation * plain_rot;
+	m_object->setRotation(final_trans.getRotationDegrees());
 	m_object->setPosition(pos);
 
 	update_sensors(time_delta);
@@ -184,14 +188,13 @@ void Plane::update_sensors(float time_delta) {
 	}
 
 	// calculate some data
-	irrvec3f angle_vel = calc_angle_vel();
+	irrvec3f angle_vel = -1.*calc_angle_vel();
 	irrvec3f acceleration = (m_velocity - m_priv_vel)/time_delta;
-	irr::core::matrix4 trans = m_object->getAbsoluteTransformation();
 
 	// update the gyro
 	lin_algebra::vec3f gyro_data;
 	gyro_data[0] = angle_vel.X + frand()*1.0 + m_gyro_drift.X;
-	gyro_data[1] =-angle_vel.Y + frand()*1.0 + m_gyro_drift.Y;
+	gyro_data[1] = angle_vel.Y + frand()*1.0 + m_gyro_drift.Y;
 	gyro_data[2] = angle_vel.Z + frand()*1.0 + m_gyro_drift.Z;
 	m_gyro->set_data(gyro_data);
 
@@ -200,21 +203,21 @@ void Plane::update_sensors(float time_delta) {
 	irrvec3f g(0, -1., 0);
 	irrvec3f acc = g + 0.1*acceleration;
 	float acc_len = acc.getLength();
-	trans.getTransposed().rotateVect(acc);
+	m_transformation.getTransposed().rotateVect(acc);
 	acc = acc.normalize()*acc_len; // rotateVect doesn't maintain vec size...
-	acc_data[0] = -acc.X + frand()*0.05;
-	acc_data[1] =  acc.Y + frand()*0.05;
-	acc_data[2] = -acc.Z + frand()*0.05;
+	acc_data[0] = acc.X + frand()*0.05;
+	acc_data[1] = acc.Y + frand()*0.05;
+	acc_data[2] = acc.Z + frand()*0.05;
 	m_acc->set_data(acc_data);
 
 	// update the compass
 	lin_algebra::vec3f compass_data;
 	irrvec3f north(1., -1., 0);
-	trans.getTransposed().rotateVect(north);
+	m_transformation.getTransposed().rotateVect(north);
 	north = north.normalize() * 20.;
-	compass_data[0] = -north.X;
-	compass_data[1] =  north.Y;
-	compass_data[2] = -north.Z;
+	compass_data[0] = north.X;
+	compass_data[1] = north.Y;
+	compass_data[2] = north.Z;
 	m_compass->set_data(compass_data);
 
 	m_priv_vel = m_velocity;
