@@ -43,7 +43,7 @@ public:
 		vec[0] = m_num;
 		vec[1] = m_num/5.;
 		vec[2] = m_num/50.;
-		m_num -= 0.1;
+		m_num += 0.1;
 		return vec;
 	}
 
@@ -74,6 +74,7 @@ int main(int argc, char** argv) {
 	window->setLayout(layout);
 	window->show();
 	view3d->addVecStream(vec_stream);
+	view3d->addAngleStream(vec_stream);
 	view3d->start();
 	size->start();
 
