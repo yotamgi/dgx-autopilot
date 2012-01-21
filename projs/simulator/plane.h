@@ -24,6 +24,7 @@ struct PlainParams {
 	PlainParams(const std::string& mesh_file,
 				const std::string& texture_file,
 				const irr::core::vector3df scale,
+				const irr::core::vector3df rot,
 				float yaw_speed,					// degrees/sec
 				float pitch_speed,					// degrees/sec
 				float ailron_speed,					// degrees/sec
@@ -36,7 +37,8 @@ struct PlainParams {
 
 	const std::string& get_mesh_file() const { return m_mesh_file; }
 	const std::string& get_texture_file() const { return m_texture_file; }
-	const irr::core::vector3df& get_scale() const {	return m_scale; }
+	const irr::core::vector3df& get_scale() const { return m_scale; }
+	const irr::core::vector3df& get_rot() const { return m_rot; }
 	float get_yaw_speed() const { return m_yaw_speed; }
 	float get_pitch_speed() const { return m_pitch_speed; }
 	float get_ailron_speed() const { return m_ailron_speed; }
@@ -51,7 +53,8 @@ private:
 
 	std::string m_mesh_file;
 	std::string m_texture_file;
-	irr::core::vector3df m_scale;
+	const irr::core::vector3df m_scale;
+	const irr::core::vector3df m_rot;
 	float m_yaw_speed;
 	float m_pitch_speed;
 	float m_ailron_speed;
@@ -125,6 +128,7 @@ private:
 	irr::core::vector3df m_priv_vel;
 
 	irr::scene::ISceneNode * m_object;
+	irr::core::matrix4 m_transformation;
 
 	PlainParams m_params;
 	irr::core::vector3df m_gyro_drift;
