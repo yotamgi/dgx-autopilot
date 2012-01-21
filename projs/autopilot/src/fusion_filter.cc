@@ -83,8 +83,8 @@ lin_algebra::vec3f FusionFilter::filter(lin_algebra::vec3f acc_data,
 
 	if (m_speed) {
 		// fix the acc with the gyro data:
-		//acc_data[1] -= 0.01 * lin_algebra::vec_len(m_speed->get_data()) * gyro_data[0] * lin_algebra::PI / 180.;
 		acc_data[0] -= 0.5 * lin_algebra::vec_len(m_speed->get_data()) * gyro_data[1] * lin_algebra::PI / 180.;
+		acc_data[1] += 0.5 * lin_algebra::vec_len(m_speed->get_data()) * gyro_data[0] * lin_algebra::PI / 180.;
 	}
 
 	// first, understand the orientation from the acc-compass
