@@ -142,11 +142,11 @@ irrvec3f Plane::calc_plane_acceleration() const {
 	// calculate the acceleration
 	irrvec3f acc = (engine_force + drag_force + lift_force + gravity_force) / m_params.get_mass();
 
-	std::cout << std::setprecision(2) << std::fixed <<
-			"Plane's alt is " << m_object->getPosition().Y <<
-			" and speed is " << vel_length*3.6 <<
-			" km/h attack:" << irr::core::radToDeg(attack_angle) <<
-			" and lift is " << lift_force.getLength() << std::endl;
+//	std::cout << std::setprecision(2) << std::fixed <<
+//			"Plane's alt is " << m_object->getPosition().Y <<
+//			" and speed is " << vel_length*3.6 <<
+//			" km/h attack:" << irr::core::radToDeg(attack_angle) <<
+//			" and lift is " << lift_force.getLength() << std::endl;
 	return acc;
 }
 
@@ -201,7 +201,7 @@ void Plane::update_sensors(float time_delta) {
 	// update the accelerometer
 	lin_algebra::vec3f acc_data;
 	irrvec3f g(0, -1., 0);
-	irrvec3f acc = g + 0.1*acceleration;
+	irrvec3f acc = g - 0.1*acceleration;
 	float acc_len = acc.getLength();
 	m_transformation.getTransposed().rotateVect(acc);
 	acc = acc.normalize()*acc_len; // rotateVect doesn't maintain vec size...
