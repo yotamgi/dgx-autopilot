@@ -81,7 +81,7 @@ int main(int argc, char** argv) {
 		typedef stream::DataPopStream<float> fs;
 
 		// the left one
-		view3d.addAngleStream(conn.import_pop_stream<vs::type>("gyro_watch_orientation"), irr::core::vector3df(-20., 0., 0.));
+		view3d.addAngleStream(conn.import_pop_stream<vs::type>("orientation"), irr::core::vector3df(-20., 0., 0.));
 
 		// the mid one
 		view3d.addAngleStream(conn.import_pop_stream<vs::type>("watch_rest_orientation"), irr::core::vector3df(0., 0., 0.));
@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
 		view3d.addVecStream(conn.import_pop_stream<vs::type>("watch_compass_sensor"), irr::core::vector3df(0., 0., 0.));
 
 		// the right one
-		view3d.addAngleStream(conn.import_pop_stream<vs::type>("orientation"), irr::core::vector3df(20., 0., 0.));
+		view3d.addAngleStream(conn.import_pop_stream<vs::type>("gyro_watch_orientation"), irr::core::vector3df(20., 0., 0.));
 
 		// the reliable stream
 		gs::SizeStreamView view_size(conn.import_pop_stream<fs::type>("reliability"), view_update_time, 0., 1.);
@@ -129,7 +129,7 @@ int main(int argc, char** argv) {
 			gs::StreamView3d view3d(view_update_time, stream3d_dimention);
 
 			// the left one
-			view3d.addAngleStream(cockpit.watch_gyro_orientation(), irr::core::vector3df(-20., 0., 0.));
+			view3d.addAngleStream(cockpit.orientation()->get_watch_stream(), irr::core::vector3df(-20., 0., 0.));
 
 			// the mid one
 			view3d.addAngleStream(cockpit.watch_rest_orientation(), irr::core::vector3df(0., 0., 0.));
@@ -137,7 +137,7 @@ int main(int argc, char** argv) {
 			view3d.addVecStream(platform->compass_sensor()->get_watch_stream(), irr::core::vector3df(0., 0., 0.));
 
 			// the right one
-			view3d.addAngleStream(cockpit.orientation()->get_watch_stream(), irr::core::vector3df(20., 0., 0.));
+			view3d.addAngleStream(cockpit.watch_gyro_orientation(), irr::core::vector3df(20., 0., 0.));
 
 			// the reliable stream
 			gs::SizeStreamView view_size(cockpit.watch_rest_reliability(), view_update_time, 0., 1.);

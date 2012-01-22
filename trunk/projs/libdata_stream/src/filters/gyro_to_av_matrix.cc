@@ -17,9 +17,9 @@ lin_algebra::mat3f GyroToAVMatrix::get_data() {
 	lin_algebra::vec3f data =
 		StreamPopFilter<lin_algebra::vec3f, lin_algebra::mat3f>::m_generator->get_data();
 
-	float wx = -data[0] / 180. * lin_algebra::PI;
-	float wy = -data[1] / 180. * lin_algebra::PI;
-	float wz = -data[2] / 180. * lin_algebra::PI;
+	float wx = data[0] / 180. * lin_algebra::PI;
+	float wy = data[1] / 180. * lin_algebra::PI;
+	float wz = data[2] / 180. * lin_algebra::PI;
 
 	lin_algebra::mat3f update; // = W + I
 	update(0,0) = 0.;		update(0,1) = -1.*wz;	update(0,2) = wy;

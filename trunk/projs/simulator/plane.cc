@@ -180,7 +180,7 @@ void Plane::update(float time_delta) {
 	// Update the object with the new data
 	irr::core::matrix4 plain_rot;
 	plain_rot.setRotationDegrees(m_params.get_rot());
-	irr::core::matrix4 final_trans =  m_transformation * plain_rot;
+	irr::core::matrix4 final_trans = m_transformation * plain_rot;
 	m_object->setRotation(final_trans.getRotationDegrees());
 	m_object->setPosition(pos);
 
@@ -194,7 +194,7 @@ void Plane::update_sensors(float time_delta) {
 	}
 
 	// calculate some data
-	irrvec3f angle_vel = -1.*calc_angle_vel();
+	irrvec3f angle_vel = calc_angle_vel();
 	irrvec3f acceleration = (m_velocity - m_priv_vel)/time_delta;
 
 	// update the gyro
