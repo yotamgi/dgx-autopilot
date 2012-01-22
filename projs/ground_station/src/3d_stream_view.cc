@@ -84,7 +84,7 @@ void StreamView3d::start() {
 	}
 
 	// create the static camera
-	irr::core::vector3df pos    = irr::core::vector3df(0., 0., -30.);
+	irr::core::vector3df pos    = irr::core::vector3df(0., 0., 30.);
 	irr::core::vector3df lookat = irr::core::vector3df(0., 0., 0.);
 	smgr->addCameraSceneNode(0, pos, lookat);
 	m_device->getCursorControl()->setVisible(true);
@@ -148,7 +148,8 @@ void StreamView3d::update() {
 
 StreamView3d::AnglePresenter::AnglePresenter(StreamView3d::stream3ptr angle_stream, irr::core::vector3df pos):
 	m_angle_stream(angle_stream),
-	m_pos(pos)
+	m_pos(pos),
+	m_rot(0., 180., 0.)
 {}
 
 void StreamView3d::AnglePresenter::initalize(irr::IrrlichtDevice* m_device) {
@@ -175,7 +176,9 @@ void StreamView3d::AnglePresenter::draw(irr::IrrlichtDevice* m_device) {
 	roty.setRotationDegrees(core::vector3df(0., curr_angle[1], 0.));
 	rotz.setRotationDegrees(core::vector3df(0., 0., curr_angle[2]));
 
-	irr::core::matrix4 trans = roty * rotx * rotz;
+	irr::core::matrix4 obj_rot;
+	obj_rot.setRotationDegrees(m_rot);
+	irr::core::matrix4 trans = obj_rot * roty * rotx * rotz;
 	m_object->setRotation(trans.getRotationDegrees());
 }
 

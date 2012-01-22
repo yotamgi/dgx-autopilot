@@ -83,8 +83,8 @@ lin_algebra::vec3f FusionFilter::filter(lin_algebra::vec3f acc_data,
 
 	if (m_speed) {
 		// fix the acc with the gyro data:
-		acc_data[0] -= 0.5 * lin_algebra::vec_len(m_speed->get_data()) * gyro_data[1] * lin_algebra::PI / 180.;
-		acc_data[1] += 0.5 * lin_algebra::vec_len(m_speed->get_data()) * gyro_data[0] * lin_algebra::PI / 180.;
+		acc_data[1] -= 0.5 * lin_algebra::vec_len(m_speed->get_data()) * gyro_data[0] * lin_algebra::PI / 180.;
+		acc_data[0] += 0.5 * lin_algebra::vec_len(m_speed->get_data()) * gyro_data[1] * lin_algebra::PI / 180.;
 	}
 
 	// first, understand the orientation from the acc-compass
@@ -166,9 +166,9 @@ lin_algebra::vec3f FusionFilter::matrix_to_euler(lin_algebra::mat3f rot_mat) {
 }
 
 lin_algebra::mat3f FusionFilter::av_to_rot_mat(lin_algebra::vec3f av) {
-	float wx = -av[0] / 180. * lin_algebra::PI;
-	float wy = -av[1] / 180. * lin_algebra::PI;
-	float wz = -av[2] / 180. * lin_algebra::PI;
+	float wx = av[0] / 180. * lin_algebra::PI;
+	float wy = av[1] / 180. * lin_algebra::PI;
+	float wz = av[2] / 180. * lin_algebra::PI;
 
 	lin_algebra::mat3f update; // = W + I
 	update(0,0) = 0.;		update(0,1) = -1.*wz;	update(0,2) = wy;

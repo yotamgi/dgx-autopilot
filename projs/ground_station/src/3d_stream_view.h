@@ -54,6 +54,7 @@ private:
 	private:
 		stream3ptr m_angle_stream;
 		irr::core::vector3df m_pos;
+		irr::core::vector3df m_rot;
 		irr::scene::ISceneNode * m_object;
 	};
 
