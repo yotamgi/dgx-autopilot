@@ -33,6 +33,13 @@ private:
 
 	void fly();
 
+	void maintain_angle(float angle);
+	void maintain_pitch(float pitch);
+	void maintain_alt(float altitude);
+	void maintain_heading(float heading);
+	bool nav_to(lin_algebra::vec2f waypoint, float alt);
+
+
 	boost::shared_ptr<NormalPlainCockpit> m_cockpit;
 
 	lin_algebra::vec2f m_target;
