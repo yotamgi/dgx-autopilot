@@ -1,5 +1,6 @@
 #include "waypoint_pilot.h"
 #include <cmath>
+#include <iostream>
 
 namespace autopilot {
 
@@ -22,48 +23,143 @@ void WaypointPilot::stop() {
 	m_running_thread.join();
 }
 
-void WaypointPilot::fly() {
+void WaypointPilot::maintain_pitch(float pitch_a){
+
+	vec3_stream_ptr oreintation = m_cockpit->orientation();
+	servo_stream_ptr pitch = m_cockpit->pitch_servo();
+
+
+	lin_algebra::vec3f plain_pitch = oreintation->get_data();
+
+
+	if(plain_pitch[0] > m_params.max_climbing_angle)
+				pitch->set_data(100.);
+	else if (plain_pitch[0] <  -1.*m_params.max_climbing_angle)
+				pitch->set_data(0.);
+	else
+				pitch->set_data(50. - 50.*(pitch_a - plain_pitch[0])/m_params.max_climbing_angle);
+
+
+	//return plain_pitch[0];
+}
+
+
+void WaypointPilot::maintain_angle(float angle){
+
+	vec3_stream_ptr oreintation = m_cockpit->orientation();
+	servo_stream_ptr tilt = m_cockpit->tilt_servo();
+
+
+	lin_algebra::vec3f plain_tilt = oreintation->get_data();
+
+	if(plain_tilt[2] > m_params.max_tilt_angle)
+				tilt->set_data(100.);
+	else if (plain_tilt[2] < -1.*m_params.max_tilt_angle)
+				tilt->set_data(0.);
+	else
+				tilt->set_data(50. - 50.*(angle - plain_tilt[2])/m_params.max_tilt_angle);
+
+
+}
+
+void WaypointPilot::maintain_heading(float heading){
+
+	vec3_stream_ptr oreintation = m_cockpit->orientation();
+	vec2_stream_ptr position = m_cockpit->position();
+
+
+	lin_algebra::vec3f plain_oreintation = oreintation->get_data();
+
+	//calc the smaller angle  180 - -180
+	float delta_heading = plain_oreintation[1] - heading;
+	if (delta_heading > 180)
+			delta_heading = delta_heading - 360.;
+	else if (delta_heading < -180 )
+			delta_heading = 360 + delta_heading;
+
+	if (delta_heading > 5)
+				maintain_angle(-16);
+	else if (delta_heading < -5)
+				maintain_angle(16);
+	else
+				maintain_angle(-delta_heading/2);
+
+
+}
+
+
+
+ void WaypointPilot::maintain_alt(float altitude){
+
 	vec3_stream_ptr oreintation = m_cockpit->orientation();
 	vec2_stream_ptr position = m_cockpit->position();
 	float_stream_ptr alt = m_cockpit->alt();
 	vec3_stream_ptr speed = m_cockpit->speed();
-	servo_stream_ptr tilt = m_cockpit->tilt_servo();
-	servo_stream_ptr pitch = m_cockpit->pitch_servo();
+	servo_stream_ptr gas = m_cockpit->gas_servo();
+
+	float delta_alt;
+
+	delta_alt = alt->get_data()*10. - altitude;
+
+	if(delta_alt < -5){				//max climbing
+		gas->set_data(100.);
+		maintain_pitch(4.);
+	}
+	else if (delta_alt > 5){		//max
+		gas->set_data(0.);
+		maintain_pitch(-10);
+	}
+	else {							//need to be air speed loop
+		gas->set_data(28.);
+		maintain_pitch(0.);
+	}
+ }
+
+
+ bool WaypointPilot::nav_to(lin_algebra::vec2f waypoint, float alt){
+
+
+	 vec2_stream_ptr position = m_cockpit->position();
+	 lin_algebra::vec2f plain_pos = position->get_data();
+	 float distance;
+	 lin_algebra::vec2f wanted_direction =   plain_pos - waypoint;
+
+	 //calc the wanted angle
+	 float heading = 180.*std::atan(wanted_direction[0]/wanted_direction[1])/lin_algebra::PI;
+
+
+	 //fix the tag answer
+	 if (wanted_direction[1] < 0.)
+		 heading += 180;
+
+	 maintain_heading(heading);
+
+	 maintain_alt(alt);
+
+	 //calc the distance from the waypoint
+	 distance = lin_algebra::vec_len(wanted_direction);
+
+	 if (distance < 10)
+		 return true;
+	 else
+	 return false;
+
+
+
+ }
+
+
+void WaypointPilot::fly() {
+
+
+
 
 	while (m_running) {
 
-		// calculate the planes position, altitude and orientation
-		lin_algebra::vec3f plain_orientation = oreintation->get_data();
-		lin_algebra::vec3f plain_speed = speed->get_data();
-		lin_algebra::vec2f plain_pos = position->get_data();;
-		lin_algebra::vec2f plain_direction;
-		plain_direction[0] = plain_speed[0]; plain_direction[1] = plain_speed[2];
-		float plain_alt = alt->get_data();
 
-		// understand the wanted direction and altitude
-		lin_algebra::vec2f wanted_diretion = m_target - plain_pos;
-		float wanted_altitude = m_altitude;
 
-		// understand the expected pitch and tilt to achive the wanted vectors
-		float delta_alt = wanted_altitude - plain_alt;
-		float expected_pitch;
-		if (delta_alt >  20.) 		expected_pitch =  std::sin(m_params.avg_climbing_angle);
-		else if (delta_alt < -20.) 	expected_pitch = -std::sin(m_params.avg_climbing_angle);
-		else expected_pitch = delta_alt/20. / 4.;
-		expected_pitch = std::min(expected_pitch,  std::sin(m_params.max_climbing_angle));
-		expected_pitch = std::max(expected_pitch, -std::sin(m_params.max_decending_angle));
 
-		lin_algebra::vec2f delta_dir = wanted_diretion - plain_direction;
-		delta_dir = lin_algebra::normalize(delta_dir);
-		float expected_tilt = std::atan(delta_dir[1]/delta_dir[0])/lin_algebra::PI;
-		expected_tilt = std::min(expected_tilt,  std::sin(m_params.max_tilt_angle));
-		expected_tilt = std::max(expected_tilt, -std::sin(m_params.max_tilt_angle));
 
-		// control the stick to achieve the expected vector we calculated
-		float pitch_data = expected_pitch - plain_orientation[0]/180.;
-		float tilt_data  = expected_tilt  - plain_orientation[2]/180.;
-		m_cockpit->pitch_servo()->set_data(50. + 50. * pitch_data);
-		m_cockpit->tilt_servo()->set_data(50. + 50. * tilt_data);
 	}
 }
 

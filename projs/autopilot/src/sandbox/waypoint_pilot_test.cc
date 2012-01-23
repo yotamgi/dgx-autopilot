@@ -4,12 +4,36 @@
 #include <stream/util/tcpip_connection.h>
 #include <gs/map_stream_view.h>
 
+#include <boost/thread.hpp>
+
 #include <iostream>
 #include <string>
+
+
+
+struct waypoints
+{
+	lin_algebra::vec2f WP;
+	float alt;
+	bool must_alt;
+}
 
 void usage_and_exit(std::string argv0) {
 	std::cerr << "usage: " << argv0 << " [--sensor-sim <address>]" << std::endl;
 	exit(1);
+}
+
+void create_gs(boost::shared_ptr<autopilot::Cockpit> cockpit, int argc, char** argv) {
+	// Show a map
+	QApplication app(argc, argv);
+	QWidget* window = new QWidget();
+	QHBoxLayout* layout = new QHBoxLayout();
+	gs::MapStreamView* map_view = new gs::MapStreamView(cockpit->position(),
+			0.2, QSize(400, 300), std::string("../ground_station/data/map"));
+	layout->addWidget(map_view);
+	window->setLayout(layout);
+	window->show();
+	app.exec();
 }
 
 int main(int argc, char** argv) {
@@ -27,10 +51,10 @@ int main(int argc, char** argv) {
 	// configure the pilot
 	autopilot::WaypointPilotParams pilot_params;
 	pilot_params.avg_climbing_angle = (1./8.) * lin_algebra::PI;
-	pilot_params.max_climbing_angle = (1./8.) * lin_algebra::PI;
+	pilot_params.max_climbing_angle = 15.;
 	pilot_params.avg_decending_angle = (1./8.) * lin_algebra::PI;
-	pilot_params.max_decending_angle = (1./8.) * lin_algebra::PI;
-	pilot_params.max_tilt_angle = (1./4.) * lin_algebra::PI;
+	pilot_params.max_decending_angle = -10.;
+	pilot_params.max_tilt_angle = 20.;
 
 	// create the platform according to the args
 	boost::shared_ptr<autopilot::NormalPlainPlatform> platform(
@@ -47,17 +71,10 @@ int main(int argc, char** argv) {
 	pilot.to_waypoint(waypoint, 60.);
 
 	pilot.start(true);
+	boost::thread(create_gs, cockpit, argc, argv);
 
 	// Show a map
-	QApplication app(argc, argv);
-	QWidget* window = new QWidget();
-	QHBoxLayout* layout = new QHBoxLayout();
-	gs::MapStreamView* map_view = new gs::MapStreamView(cockpit->position(),
-			0.2, QSize(400, 300), std::string("../ground_station/data/map"));
-	layout->addWidget(map_view);
-	window->setLayout(layout);
-	window->show();
-	app.exec();
-
+	//create_gs(cockpit);
+	while (true);
 	return 0;
 }
