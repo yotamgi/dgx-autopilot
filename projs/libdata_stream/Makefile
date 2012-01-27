@@ -14,7 +14,8 @@ GTEST_OBJS = tests/integral_test.o \
 			 tests/low_pass_test.o \
 			 tests/watch_test.o \
 			 tests/tcpip_conn_test.o \
-			 tests/stream_conn_test.o
+			 tests/stream_conn_test.o \
+			 tests/func_filter_test.o
 
 all: host device 
 host: $(LIBDIR)/libdata_stream.so gtest
