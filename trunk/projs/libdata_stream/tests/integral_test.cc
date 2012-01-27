@@ -1,5 +1,5 @@
-#include <iostream>
 #include <gtest/gtest.h>
+#include <iostream>
 #include <sys/time.h>
 #include <cstdlib>
 #include "data_pop_stream.h"
