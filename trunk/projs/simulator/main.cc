@@ -89,7 +89,7 @@ void export_import(simulator::Plane& p) {
 			conn.export_push_stream<float>(p.get_gas_servo(), "simulator_gas_servo");
 			conn.run(true);
 
-			p.set_gps_listener(conn.import_push_stream<lin_algebra::vec3f>("gps_reciever"));
+			p.set_gps_pos_listener(conn.import_push_stream<lin_algebra::vec3f>("gps_pos_reciever"));
 
 			// now wait
 			while (true) usleep(10000000);

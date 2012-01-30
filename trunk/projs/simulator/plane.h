@@ -94,7 +94,7 @@ public:
 	sensor_stream_ptr_t gyro_gen() { return m_gyro; }
 	sensor_stream_ptr_t acc_gen() { return m_acc; }
 	sensor_stream_ptr_t compass_gen() { return m_compass; }
-	void set_gps_listener(boost::shared_ptr<stream::DataPushStream<lin_algebra::vec3f> > listenr);
+	void set_gps_pos_listener(boost::shared_ptr<stream::DataPushStream<lin_algebra::vec3f> > listenr);
 
 	// forcing servos methods
 	void force_tilt(float howmuch) 		{ m_forced_tilt = howmuch; 	}
@@ -122,7 +122,7 @@ private:
 	boost::shared_ptr<stream::PushToPopConv<float> > m_yaw_servo;
 	boost::shared_ptr<stream::PushToPopConv<float> > m_gas_servo;
 
-	boost::shared_ptr<stream::DataPushStream<lin_algebra::vec3f> > m_gps_listener;
+	boost::shared_ptr<stream::DataPushStream<lin_algebra::vec3f> > m_gps_pos_listener;
 
 	irr::core::vector3df m_velocity;
 	irr::core::vector3df m_priv_vel;

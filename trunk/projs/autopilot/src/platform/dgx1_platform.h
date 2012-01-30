@@ -29,7 +29,7 @@ public:
 
 	boost::shared_ptr<vec3_watch_stream> compass_sensor();
 
-	void register_gps_reciever(gps_reciever_ptr reciever);
+	void register_pos_gps_reciever(gps_pos_reciever_ptr reciever);
 
 	boost::shared_ptr<stream::DataPushStream<float> > tilt_servo();
 
@@ -56,7 +56,7 @@ public:
 
 	boost::shared_ptr<vec3_watch_stream> compass_sensor();
 
-	void register_gps_reciever(gps_reciever_ptr reciever);
+	void register_pos_gps_reciever(gps_pos_reciever_ptr reciever);
 
 	boost::shared_ptr<servo_stream> tilt_servo();
 
@@ -67,17 +67,20 @@ public:
 	boost::shared_ptr<servo_stream> gas_servo();
 
 private:
-	class GpsForwarder : public stream::DataPushStream<lin_algebra::vec3f> {
+
+	template <class T>
+	class PushStreamForwarder : public stream::DataPushStream<T> {
 	public:
-		typedef boost::shared_ptr<stream::DataPushStream<lin_algebra::vec3f> > gps_reciever_ptr;
+		typedef boost::shared_ptr<stream::DataPushStream<T> > reciever_ptr;
 
-		void set_reciever(gps_reciever_ptr reciever) { m_reciever = reciever; }
+		void set_reciever(reciever_ptr reciever) { m_reciever = reciever; }
 
-		void set_data(const lin_algebra::vec3f& data) { if (m_reciever) m_reciever->set_data(data); }
+		void set_data(const T& data) { if (m_reciever) m_reciever->set_data(data); }
 
 	private:
-		gps_reciever_ptr m_reciever;
+		reciever_ptr m_reciever;
 	};
+
 
 	boost::shared_ptr<vec3_watch_stream> m_acc;
 	boost::shared_ptr<vec3_watch_stream> m_gyro;
@@ -88,7 +91,7 @@ private:
 	boost::shared_ptr<servo_stream> m_tilt;
 	boost::shared_ptr<servo_stream> m_yaw;
 
-	boost::shared_ptr<GpsForwarder> m_gps_forwarder;
+	boost::shared_ptr<PushStreamForwarder<lin_algebra::vec3f> > m_gps_forwarder;
 
 	stream::StreamConnection m_stream_conn;
 };
