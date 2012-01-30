@@ -27,7 +27,7 @@ boost::shared_ptr<vec3_watch_stream> DGX1Platform::compass_sensor() {
 	return m_compass;
 }
 
-void DGX1Platform::register_gps_reciever(gps_reciever_ptr reciever) {
+void DGX1Platform::register_pos_gps_reciever(gps_pos_reciever_ptr reciever) {
 	throw std::logic_error("GPS not implemented yet on dgx1 platform");
 }
 
@@ -57,11 +57,11 @@ boost::shared_ptr<stream::DataPushStream<float> > DGX1Platform::gas_servo() {
 //
 
 DGX1SimulatorPlatform::DGX1SimulatorPlatform(boost::shared_ptr<stream::ConnectionFactory> conn):
-		m_gps_forwarder(boost::make_shared<GpsForwarder>()),
+		m_gps_forwarder(boost::make_shared<PushStreamForwarder<lin_algebra::vec3f> >()),
 		m_stream_conn(conn)
 {
 	// export streams
-	m_stream_conn.export_push_stream<lin_algebra::vec3f>(m_gps_forwarder, std::string("gps_reciever"));
+	m_stream_conn.export_push_stream<lin_algebra::vec3f>(m_gps_forwarder, std::string("gps_pos_reciever"));
 	m_stream_conn.run();
 
 	// import streams
@@ -85,7 +85,7 @@ boost::shared_ptr<vec3_watch_stream> DGX1SimulatorPlatform::compass_sensor() {
 	return m_compass;
 }
 
-void DGX1SimulatorPlatform::register_gps_reciever(gps_reciever_ptr reciever) {
+void DGX1SimulatorPlatform::register_pos_gps_reciever(gps_pos_reciever_ptr reciever) {
 	m_gps_forwarder->set_reciever(reciever);
 }
 

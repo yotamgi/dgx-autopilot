@@ -234,7 +234,7 @@ void Plane::update_sensors(float time_delta) {
 void Plane::gps_update() {
 
 	while (true) {
-		if (m_gps_listener) {
+		if (m_gps_pos_listener) {
 			irrvec3f irrpos = m_object->getPosition();
 			lin_algebra::vec3f pos;
 			pos[0] = irrpos.X;
@@ -245,14 +245,14 @@ void Plane::gps_update() {
 			rand.randu();
 			rand = lin_algebra::normalize(rand);
 
-			m_gps_listener->set_data(pos/10. + rand*1.);
+			m_gps_pos_listener->set_data(pos/10. + rand*1.);
 		}
 		sleep(1);
 	}
 }
 
-void Plane::set_gps_listener(boost::shared_ptr<stream::DataPushStream<lin_algebra::vec3f> > listenr) {
-	m_gps_listener = listenr;
+void Plane::set_gps_pos_listener(boost::shared_ptr<stream::DataPushStream<lin_algebra::vec3f> > listenr) {
+	m_gps_pos_listener = listenr;
 }
 
 }  // namespace simulator
