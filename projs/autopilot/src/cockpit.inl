@@ -47,7 +47,7 @@ inline Cockpit::Cockpit(boost::shared_ptr<NormalPlainPlatform> platform):
 
 	namespace filter = stream::filters;
 
-	m_platform->register_gps_reciever(m_gps_filter);
+	m_platform->register_pos_gps_reciever(m_gps_filter);
 
 	m_gyro_orientation = boost::make_shared<filter::MatrixToEulerFilter>(
 		boost::make_shared<filter::IntegralFilter<lin_algebra::mat3f> >(
