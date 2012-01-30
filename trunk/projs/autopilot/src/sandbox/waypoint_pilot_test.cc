@@ -16,7 +16,7 @@ struct waypoints
 	lin_algebra::vec2f WP;
 	float alt;
 	bool must_alt;
-}
+};
 
 void usage_and_exit(std::string argv0) {
 	std::cerr << "usage: " << argv0 << " [--sensor-sim <address>]" << std::endl;
