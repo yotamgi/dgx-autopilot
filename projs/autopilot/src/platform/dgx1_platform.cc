@@ -30,6 +30,13 @@ boost::shared_ptr<vec3_watch_stream> DGX1Platform::compass_sensor() {
 void DGX1Platform::register_pos_gps_reciever(gps_pos_reciever_ptr reciever) {
 	throw std::logic_error("GPS not implemented yet on dgx1 platform");
 }
+void DGX1Platform::register_gps_speed_dir_reciever(gps_speed_dir_reciever_ptr reciever) {
+	throw std::logic_error("GPS not implemented yet on dgx1 platform");
+}
+void DGX1Platform::register_gps_speed_mag_reciever(gps_speed_mag_reciever_ptr reciever) {
+	throw std::logic_error("GPS not implemented yet on dgx1 platform");
+}
+
 
 boost::shared_ptr<stream::DataPushStream<float> > DGX1Platform::tilt_servo() {
 	throw std::logic_error("Servos not implemented yet on dgx1 platform");
@@ -57,11 +64,15 @@ boost::shared_ptr<stream::DataPushStream<float> > DGX1Platform::gas_servo() {
 //
 
 DGX1SimulatorPlatform::DGX1SimulatorPlatform(boost::shared_ptr<stream::ConnectionFactory> conn):
-		m_gps_forwarder(boost::make_shared<PushStreamForwarder<lin_algebra::vec3f> >()),
+		m_gps_pos_forwarder(boost::make_shared<PushStreamForwarder<lin_algebra::vec3f> >()),
+		m_gps_speed_dir_forwarder(boost::make_shared<PushStreamForwarder<float> >()),
+		m_gps_speed_mag_forwarder(boost::make_shared<PushStreamForwarder<float> >()),
 		m_stream_conn(conn)
 {
 	// export streams
-	m_stream_conn.export_push_stream<lin_algebra::vec3f>(m_gps_forwarder, std::string("gps_pos_reciever"));
+	m_stream_conn.export_push_stream<lin_algebra::vec3f>(m_gps_pos_forwarder, std::string("gps_pos_reciever"));
+	m_stream_conn.export_push_stream<float>(m_gps_speed_dir_forwarder, std::string("gps_speed_dir_reciever"));
+	m_stream_conn.export_push_stream<float>(m_gps_speed_mag_forwarder, std::string("gps_speed_mag_reciever"));
 	m_stream_conn.run();
 
 	// import streams
@@ -86,8 +97,15 @@ boost::shared_ptr<vec3_watch_stream> DGX1SimulatorPlatform::compass_sensor() {
 }
 
 void DGX1SimulatorPlatform::register_pos_gps_reciever(gps_pos_reciever_ptr reciever) {
-	m_gps_forwarder->set_reciever(reciever);
+	m_gps_pos_forwarder->set_reciever(reciever);
 }
+void DGX1SimulatorPlatform::register_gps_speed_dir_reciever(gps_speed_dir_reciever_ptr reciever) {
+	m_gps_speed_dir_forwarder->set_reciever(reciever);
+}
+void DGX1SimulatorPlatform::register_gps_speed_mag_reciever(gps_speed_mag_reciever_ptr reciever) {
+	m_gps_speed_mag_forwarder->set_reciever(reciever);
+}
+
 
 boost::shared_ptr<stream::DataPushStream<float> > DGX1SimulatorPlatform::tilt_servo() {
 	return m_tilt;

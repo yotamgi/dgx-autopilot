@@ -90,6 +90,8 @@ void export_import(simulator::Plane& p) {
 			conn.run(true);
 
 			p.set_gps_pos_listener(conn.import_push_stream<lin_algebra::vec3f>("gps_pos_reciever"));
+			p.set_gps_speed_dir_listener(conn.import_push_stream<float>("gps_speed_dir_reciever"));
+			p.set_gps_speed_mag_listener(conn.import_push_stream<float>("gps_speed_mag_reciever"));
 
 			// now wait
 			while (true) usleep(10000000);

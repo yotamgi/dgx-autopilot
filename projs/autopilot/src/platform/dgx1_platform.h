@@ -31,6 +31,10 @@ public:
 
 	void register_pos_gps_reciever(gps_pos_reciever_ptr reciever);
 
+	void register_gps_speed_dir_reciever(gps_speed_dir_reciever_ptr reciever);
+
+	void register_gps_speed_mag_reciever(gps_speed_mag_reciever_ptr reciever);
+
 	boost::shared_ptr<stream::DataPushStream<float> > tilt_servo();
 
 	boost::shared_ptr<stream::DataPushStream<float> > yaw_servo();
@@ -57,6 +61,10 @@ public:
 	boost::shared_ptr<vec3_watch_stream> compass_sensor();
 
 	void register_pos_gps_reciever(gps_pos_reciever_ptr reciever);
+
+	void register_gps_speed_dir_reciever(gps_speed_dir_reciever_ptr reciever);
+
+	void register_gps_speed_mag_reciever(gps_speed_mag_reciever_ptr reciever);
 
 	boost::shared_ptr<servo_stream> tilt_servo();
 
@@ -91,7 +99,9 @@ private:
 	boost::shared_ptr<servo_stream> m_tilt;
 	boost::shared_ptr<servo_stream> m_yaw;
 
-	boost::shared_ptr<PushStreamForwarder<lin_algebra::vec3f> > m_gps_forwarder;
+	boost::shared_ptr<PushStreamForwarder<lin_algebra::vec3f> > m_gps_pos_forwarder;
+	boost::shared_ptr<PushStreamForwarder<float> > m_gps_speed_dir_forwarder;
+	boost::shared_ptr<PushStreamForwarder<float> > m_gps_speed_mag_forwarder;
 
 	stream::StreamConnection m_stream_conn;
 };
