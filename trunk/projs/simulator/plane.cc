@@ -247,12 +247,27 @@ void Plane::gps_update() {
 
 			m_gps_pos_listener->set_data(pos/10. + rand*1.);
 		}
+		if (m_gps_speed_dir_listener) {
+			m_gps_speed_dir_listener->set_data(0.);
+		}
+
+		if (m_gps_speed_mag_listener) {
+			m_gps_speed_dir_listener->set_data(0.);
+		}
+
 		sleep(1);
 	}
 }
 
 void Plane::set_gps_pos_listener(boost::shared_ptr<stream::DataPushStream<lin_algebra::vec3f> > listenr) {
 	m_gps_pos_listener = listenr;
+}
+
+void Plane::set_gps_speed_dir_listener(boost::shared_ptr<stream::DataPushStream<float> > listenr) {
+	m_gps_speed_dir_listener = listenr;
+}
+void Plane::set_gps_speed_mag_listener(boost::shared_ptr<stream::DataPushStream<float> > listenr) {
+	m_gps_speed_mag_listener = listenr;
 }
 
 }  // namespace simulator
