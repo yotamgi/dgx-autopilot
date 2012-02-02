@@ -218,13 +218,10 @@ void Plane::update_sensors(float time_delta) {
 	m_acc->set_data(acc_data);
 
 	// update the compass
-	lin_algebra::vec3f compass_data;
 	irrvec3f north(1., -1., 0);
 	m_transformation.getTransposed().rotateVect(north);
 	north = north.normalize() * 20.;
-	compass_data[0] = north.X;
-	compass_data[1] = north.Y;
-	compass_data[2] = north.Z;
+	lin_algebra::vec3f compass_data = lin_algebra::create_vec3f(north.X, north.Y, north.Z);
 	m_compass->set_data(compass_data);
 
 	m_priv_vel = m_velocity;
@@ -238,10 +235,7 @@ void Plane::gps_update() {
 		if (!m_data_ready) continue;
 		// calculate the position
 		irrvec3f irrpos = m_object->getPosition();
-		lin_algebra::vec3f gps_pos;
-		gps_pos[0] = irrpos.X;
-		gps_pos[1] = irrpos.Y;
-		gps_pos[2] = irrpos.Z;
+		lin_algebra::vec3f gps_pos = lin_algebra::create_vec3f(irrpos.X, irrpos.Y, irrpos.Z);
 
 		lin_algebra::vec3f rand;
 		rand.randu();

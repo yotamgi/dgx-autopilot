@@ -35,6 +35,22 @@ namespace lin_algebra {
 	// Methods
 	//////////////////////////
 
+	vec3f create_vec3f(float a, float b, float c) {
+		vec3f ans;
+		ans[0] = a;
+		ans[1] = b;
+		ans[2] = c;
+		return ans;
+	}
+
+	vec2f create_vec2f(float a, float b) {
+		vec2f ans;
+		ans[0] = a;
+		ans[1] = b;
+		return ans;
+	}
+
+
 	template <size_t I>
 	float get(vec3f v) {
 		return v[I];
