@@ -3,9 +3,9 @@
 
 #include "interfaces/plain_cockpit.h"
 #include "interfaces/plain_platform.h"
-#include "gps_filter.h"
 #include "fusion_filter.h"
 #include <stream/util/lin_algebra.h>
+#include <stream/stream_utils.h>
 
 #include <boost/shared_ptr.hpp>
 
@@ -25,7 +25,7 @@ public:
 
 	boost::shared_ptr<vec3_watch_stream> orientation();
 
-	boost::shared_ptr<vec3_watch_stream> speed();
+	boost::shared_ptr<float_watch_stream> ground_speed();
 
 	boost::shared_ptr<vec2_watch_stream> position();
 
@@ -59,7 +59,9 @@ private:
 	boost::shared_ptr<float_stream> 	m_rest_reliability;
 	boost::shared_ptr<vec3_stream> 		m_fixed_acc;
 
-	boost::shared_ptr<SimpleGpsFilter> m_gps_filter;
+	boost::shared_ptr<stream::PushToPopConv<lin_algebra::vec3f> > m_gps_pos;
+	boost::shared_ptr<stream::PushToPopConv<float> > m_gps_speed_dir;
+	boost::shared_ptr<stream::PushToPopConv<float> > m_gps_speed_mag;
 
 };
 

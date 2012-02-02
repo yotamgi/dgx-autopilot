@@ -35,6 +35,18 @@ namespace lin_algebra {
 	// Methods
 	//////////////////////////
 
+	template <size_t I>
+	float get(vec3f v) {
+		return v[I];
+	}
+	template <size_t I1, size_t I2>
+	vec2f get(vec3f v) {
+		vec2f ans;
+		ans[0] = v[I1];
+		ans[1] = v[I2];
+		return ans;
+	}
+
 	template <typename Mat>
 	Mat identity_matrix(size_t x, size_t y) {
 		Mat m;

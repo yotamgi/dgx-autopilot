@@ -13,7 +13,7 @@ static float lim(float a, float down, float up) {
 FusionFilter::FusionFilter(boost::shared_ptr<vec_stream_t> acc,
 						   boost::shared_ptr<vec_stream_t> compass,
 						   boost::shared_ptr<vec_stream_t> gyro,
-						   boost::shared_ptr<vec_stream_t> speed):
+						   boost::shared_ptr<float_stream_t> speed):
 			m_acc(acc),
 			m_compass(compass),
 			m_gyro(gyro),
@@ -32,7 +32,7 @@ FusionFilter::FusionFilter(boost::shared_ptr<vec_stream_t> acc,
 						   boost::shared_ptr<vec_stream_t> compass,
 						   boost::shared_ptr<vec_stream_t> gyro,
 						   lin_algebra::vec3f expected_north,
-						   boost::shared_ptr<vec_stream_t> speed):
+						   boost::shared_ptr<float_stream_t> speed):
 		m_acc(acc),
 		m_compass(compass),
 		m_gyro(gyro),
@@ -49,7 +49,7 @@ FusionFilter::FusionFilter(boost::shared_ptr<vec_stream_t> acc,
 						   boost::shared_ptr<vec_stream_t> compass,
 						   boost::shared_ptr<vec_stream_t> gyro,
 						   float north_pitch_angle,
-						   boost::shared_ptr<vec_stream_t> speed):
+						   boost::shared_ptr<float_stream_t> speed):
 		m_acc(acc),
 		m_compass(compass),
 		m_gyro(gyro),
@@ -83,8 +83,8 @@ lin_algebra::vec3f FusionFilter::filter(lin_algebra::vec3f acc_data,
 
 	if (m_speed) {
 		// fix the acc with the gyro data:
-		acc_data[1] -= 0.5 * lin_algebra::vec_len(m_speed->get_data()) * gyro_data[0] * lin_algebra::PI / 180.;
-		acc_data[0] += 0.5 * lin_algebra::vec_len(m_speed->get_data()) * gyro_data[1] * lin_algebra::PI / 180.;
+		acc_data[1] -= 0.05 * m_speed->get_data() * gyro_data[0] * lin_algebra::PI / 180.;
+		acc_data[0] += 0.05 * m_speed->get_data() * gyro_data[1] * lin_algebra::PI / 180.;
 	}
 
 	// first, understand the orientation from the acc-compass
