@@ -22,9 +22,7 @@ public:
 
 	lin_algebra::vec2f get_data()  {
 
-		lin_algebra::vec2f pos;
-		pos[0] = m_num;
-		pos[1] = m_num/5.;
+		lin_algebra::vec2f pos = lin_algebra::create_vec2f(m_num, m_num/5.);
 		m_num -= 1.0;
 		return pos;
 	}
@@ -39,10 +37,7 @@ public:
 
 	lin_algebra::vec3f get_data()  {
 
-		lin_algebra::vec3f vec;
-		vec[0] = m_num;
-		vec[1] = m_num/5.;
-		vec[2] = m_num/50.;
+		lin_algebra::vec3f vec = lin_algebra::create_vec3f(m_num, m_num/5., m_num/50.);
 		m_num += 0.1;
 		return vec;
 	}
