@@ -5,7 +5,9 @@
 #include <stream/filters/acc_compass_rot.h>
 #include <stream/filters/gyro_to_av_matrix.h>
 #include <stream/filters/low_pass_filter.h>
+#include <stream/func_filter.h>
 #include <boost/make_shared.hpp>
+#include <boost/bind/bind.hpp>
 
 namespace autopilot {
 
@@ -29,7 +31,9 @@ static lin_algebra::mat3f update_matrix(const lin_algebra::mat3f& m1,
 
 inline Cockpit::Cockpit(boost::shared_ptr<NormalPlainPlatform> platform):
 		m_platform(platform),
-		m_gps_filter(boost::make_shared<SimpleGpsFilter>(3))
+		m_gps_pos(boost::make_shared<stream::PushToPopConv<lin_algebra::vec3f> >(lin_algebra::vec3f())),
+		m_gps_speed_dir(boost::make_shared<stream::PushToPopConv<float> >(0.)),
+		m_gps_speed_mag(boost::make_shared<stream::PushToPopConv<float> >(0.))
 {
 	// This is the stream schematics:
 	//
@@ -47,7 +51,9 @@ inline Cockpit::Cockpit(boost::shared_ptr<NormalPlainPlatform> platform):
 
 	namespace filter = stream::filters;
 
-	m_platform->register_pos_gps_reciever(m_gps_filter);
+	m_platform->register_pos_gps_reciever(m_gps_pos);
+	m_platform->register_gps_speed_dir_reciever(m_gps_speed_dir);
+	m_platform->register_gps_speed_mag_reciever(m_gps_speed_mag);
 
 	m_gyro_orientation = boost::make_shared<filter::MatrixToEulerFilter>(
 		boost::make_shared<filter::IntegralFilter<lin_algebra::mat3f> >(
@@ -64,7 +70,7 @@ inline Cockpit::Cockpit(boost::shared_ptr<NormalPlainPlatform> platform):
 					m_platform->compass_sensor(),
 					m_platform->gyro_sensor(),
 					20., // the north explected angle
-					m_gps_filter->get_speed_stream()
+					m_gps_speed_mag
 	);
 
 	m_orientation = boost::make_shared<vec3_watch_stream>(fusion_filter);
@@ -92,16 +98,28 @@ inline boost::shared_ptr<vec3_stream> 	Cockpit::watch_fixed_acc() {
 	return m_fixed_acc;
 }
 
-inline boost::shared_ptr<vec3_watch_stream> Cockpit::speed() {
-	return boost::make_shared<vec3_watch_stream>(m_gps_filter->get_speed_stream());
+inline boost::shared_ptr<float_watch_stream> Cockpit::ground_speed() {
+	return boost::make_shared<float_watch_stream>(
+			(boost::shared_ptr<stream::DataPopStream<float> >)m_gps_speed_mag
+	);
 }
 
 inline boost::shared_ptr<vec2_watch_stream> Cockpit::position() {
-	return boost::make_shared<vec2_watch_stream>(m_gps_filter->get_position_stream());
+	return boost::make_shared<vec2_watch_stream>(
+			stream::create_func_pop_filter<lin_algebra::vec3f,lin_algebra::vec2f> (
+					m_gps_pos,
+					lin_algebra::get<0, 2>
+			)
+	);
 }
 
 inline boost::shared_ptr<float_watch_stream> Cockpit::alt() {
-	return boost::make_shared<float_watch_stream>(m_gps_filter->get_alt_stream());
+	return boost::make_shared<float_watch_stream>(
+			stream::create_func_pop_filter<lin_algebra::vec3f,float>(
+				m_gps_pos,
+				lin_algebra::get<1>
+		)
+	);
 }
 
 inline servo_stream_ptr Cockpit::tilt_servo() {

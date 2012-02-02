@@ -56,6 +56,7 @@ Plane::Plane(irr::IrrlichtDevice* device,
 		m_forced_tilt(-1.),
 		m_forced_pitch(-1.),
 		m_print_timer(0.),
+		m_past_samples(m_avarge_len),
 		m_data_ready(false)
 {
 	irr::scene::ISceneManager* smgr = m_device->getSceneManager();
@@ -234,25 +235,44 @@ void Plane::update_sensors(float time_delta) {
 void Plane::gps_update() {
 
 	while (true) {
+		if (!m_data_ready) continue;
+		// calculate the position
+		irrvec3f irrpos = m_object->getPosition();
+		lin_algebra::vec3f gps_pos;
+		gps_pos[0] = irrpos.X;
+		gps_pos[1] = irrpos.Y;
+		gps_pos[2] = irrpos.Z;
+
+		lin_algebra::vec3f rand;
+		rand.randu();
+		rand = lin_algebra::normalize(rand);
+		gps_pos += rand;
+
+		// calculate the speed
+		m_past_samples.push_back(gps_pos);
+
+		// fill the data into a matrix
+		lin_algebra::Mat<float> m(2, m_past_samples.size());
+		for (size_t i=0; i<m_past_samples.size(); i++) {
+			m.col(i) = lin_algebra::get<2, 0>(m_past_samples.at(i));
+		}
+		m = lin_algebra::trans(m);
+
+		lin_algebra::Mat<float> ce, score;
+		lin_algebra::princomp(ce, score, m);
+		lin_algebra::vec2f speed = ce.col(0) * score.at(0,0) * -2.;
+		//float reliability = score.at(0, 1);
+		float speed_mag = std::sqrt(speed[0]*speed[0] + speed[1]*speed[1]);
+		float speed_angle = std::atan(speed[1]/speed[0])/lin_algebra::PI * 180.;
+
 		if (m_gps_pos_listener) {
-			irrvec3f irrpos = m_object->getPosition();
-			lin_algebra::vec3f pos;
-			pos[0] = irrpos.X;
-			pos[1] = irrpos.Y;
-			pos[2] = irrpos.Z;
-
-			lin_algebra::vec3f rand;
-			rand.randu();
-			rand = lin_algebra::normalize(rand);
-
-			m_gps_pos_listener->set_data(pos/10. + rand*1.);
+			m_gps_pos_listener->set_data(gps_pos);
 		}
 		if (m_gps_speed_dir_listener) {
-			m_gps_speed_dir_listener->set_data(0.);
+			m_gps_speed_dir_listener->set_data(speed_angle);
 		}
-
 		if (m_gps_speed_mag_listener) {
-			m_gps_speed_dir_listener->set_data(0.);
+			m_gps_speed_mag_listener->set_data(speed_mag);
 		}
 
 		sleep(1);

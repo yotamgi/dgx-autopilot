@@ -30,7 +30,7 @@ public:
 
 	virtual boost::shared_ptr<vec3_watch_stream> orientation() = 0;
 
-	virtual boost::shared_ptr<vec3_watch_stream> speed() = 0;
+	virtual boost::shared_ptr<float_watch_stream> ground_speed() = 0;
 
 	virtual boost::shared_ptr<vec2_watch_stream> position() = 0;
 

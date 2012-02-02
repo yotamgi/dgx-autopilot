@@ -94,7 +94,7 @@ void WaypointPilot::maintain_heading(float heading){
 	vec3_stream_ptr oreintation = m_cockpit->orientation();
 	vec2_stream_ptr position = m_cockpit->position();
 	float_stream_ptr alt = m_cockpit->alt();
-	vec3_stream_ptr speed = m_cockpit->speed();
+	float_stream_ptr speed = m_cockpit->ground_speed();
 	servo_stream_ptr gas = m_cockpit->gas_servo();
 
 	float delta_alt;

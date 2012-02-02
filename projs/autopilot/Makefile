@@ -18,12 +18,11 @@ AUTOPILIT_OBJS =  $(SRCDIR)/platform/hw/i2c_interface.o	\
 		$(SRCDIR)/platform/hw/hmc5843_compass.o		 	\
 		$(SRCDIR)/platform/hw/maestro_servo_controller.o \
 		$(SRCDIR)/platform/dgx1_platform.o \
-		$(SRCDIR)/gps_filter.o \
 		$(SRCDIR)/waypoint_pilot.o \
 		$(SRCDIR)/fusion_filter.o 
 		
 		
-GTESTS_OBJS= $(SRCDIR)/tests/test_gps_filter.o
+GTESTS_OBJS= 
 
 ###############################################################################
 ## TARGETS 

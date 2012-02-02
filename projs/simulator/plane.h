@@ -1,7 +1,6 @@
 #ifndef PLANE_H_
 #define PLANE_H_
 
-
 #include <stream/data_pop_stream.h>
 #include <stream/data_push_stream.h>
 #include <stream/stream_utils.h>
@@ -11,6 +10,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/circular_buffer.hpp>
 #include <stdexcept>
 
 namespace simulator {
@@ -143,6 +143,10 @@ private:
 	float m_forced_pitch;
 
 	float m_print_timer;
+
+	// members for calculating the gps speed
+	static const size_t m_avarge_len = 3;
+	boost::circular_buffer<lin_algebra::vec3f> m_past_samples;
 
 	volatile bool m_data_ready;
 };
