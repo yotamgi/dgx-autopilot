@@ -35,7 +35,7 @@ namespace lin_algebra {
 	// Methods
 	//////////////////////////
 
-	vec3f create_vec3f(float a, float b, float c) {
+	inline vec3f create_vec3f(float a, float b, float c) {
 		vec3f ans;
 		ans[0] = a;
 		ans[1] = b;
@@ -43,7 +43,7 @@ namespace lin_algebra {
 		return ans;
 	}
 
-	vec2f create_vec2f(float a, float b) {
+	inline vec2f create_vec2f(float a, float b) {
 		vec2f ans;
 		ans[0] = a;
 		ans[1] = b;
