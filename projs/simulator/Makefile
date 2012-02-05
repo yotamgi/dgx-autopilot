@@ -4,7 +4,7 @@ LIBDS_PATH = ../libdata_stream
 include $(LIBDS_PATH)/Makefile.include
 
 CXX = g++
-CXXFLAGS +=  -O3 -I/usr/X11R6/include  -g $(LIBDS_CXXFLAGS)
+CXXFLAGS +=  -O3 -I/usr/X11R6/include  -g $(LIBDS_CXXFLAGS) -I.
 LDFLAGS += -L/usr/X11R6/lib -lGL -lXxf86vm -lXext -lX11 -lIrrlicht $(LIBDS_LDFLAGS) -lboost_thread -Wl,-rpath,$(LIBDS_LIBDIRS)
 
 OBJDIR = ./obj
@@ -30,8 +30,12 @@ $(OBJDIR)/plane.o: plane.cc
 
 $(OBJDIR)/camera.o: camera.cc
 	$(CXX) -c camera.cc $(CXXFLAGS) -o $(OBJDIR)/camera.o
+	
+$(OBJDIR)/simulator_gyro.o: sensors/simulator_gyro.cc
+	$(CXX) -c sensors/simulator_gyro.cc $(CXXFLAGS) -o $(OBJDIR)/simulator_gyro.o
+	
 
-sim: $(OBJDIR)/main.o $(OBJDIR)/plane.o $(OBJDIR)/camera.o
-	$(CXX) $(OBJDIR)/main.o $(OBJDIR)/plane.o $(OBJDIR)/camera.o $(LDFLAGS) -o sim
+sim: $(OBJDIR)/main.o $(OBJDIR)/plane.o $(OBJDIR)/camera.o $(OBJDIR)/simulator_gyro.o
+	$(CXX) $(OBJDIR)/main.o $(OBJDIR)/plane.o $(OBJDIR)/camera.o $(OBJDIR)/simulator_gyro.o $(LDFLAGS) -o sim
 
 

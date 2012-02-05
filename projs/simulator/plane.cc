@@ -1,16 +1,11 @@
 #include "plane.h"
 #include <iostream>
+#include <boost/foreach.hpp>
 
 namespace simulator {
 
 typedef irr::core::vector3df irrvec3f;
 
-/**
- * Retunrs random float between -0.5 to 0.5
- */
-static float frand() {
-	return (float)rand()/(float)RAND_MAX - 0.5;
-}
 
 PlainParams::PlainParams(const std::string& mesh_file,
 		const std::string& texture_file,
@@ -42,7 +37,6 @@ Plane::Plane(irr::IrrlichtDevice* device,
 		irrvec3f start_pos,
 		const PlainParams plane_params):
 		FlyingObject(device),
-		m_gyro(new stream::PushToPopConv<lin_algebra::vec3f>(lin_algebra::vec3f())),
 		m_acc(new stream::PushToPopConv<lin_algebra::vec3f>(lin_algebra::vec3f())),
 		m_compass(new stream::PushToPopConv<lin_algebra::vec3f>(lin_algebra::vec3f())),
 		m_tilt_servo(new stream::PushToPopConv<float>(50.)),
@@ -51,7 +45,6 @@ Plane::Plane(irr::IrrlichtDevice* device,
 		m_gas_servo(new stream::PushToPopConv<float>(0.)),
 		m_velocity(irrvec3f(0.0f, 0.0f, 0.0f)),
 		m_params(plane_params),
-		m_gyro_drift(frand()*1., frand()*1., frand()*1.),
 		m_gps_thread(&Plane::gps_update, this),
 		m_forced_tilt(-1.),
 		m_forced_pitch(-1.),
@@ -72,7 +65,8 @@ Plane::Plane(irr::IrrlichtDevice* device,
 	m_object->setMaterialTexture(0, m_device->getVideoDriver()->getTexture(m_params.get_texture_file().c_str()));
 	m_object->setMaterialFlag(irr::video::EMF_LIGHTING, false);
 
-	m_transformation.setRotationDegrees(irrvec3f(frand()/10., frand()/10., frand()/10)); // it cant be actual zeors
+	m_transformation.setRotationDegrees(irrvec3f(lin_algebra::frand()/10.,
+						lin_algebra::frand()/10., lin_algebra::frand()/10)); // it cant be actual zeors
 }
 
 irrvec3f Plane::calc_angle_vel() const {
@@ -187,6 +181,11 @@ void Plane::update(float time_delta) {
 
 	m_print_timer += time_delta;
 	update_sensors(time_delta);
+
+	BOOST_FOREACH(boost::shared_ptr<AnySensor> sensor, m_sensors) {
+		sensor->update(time_delta);
+	}
+
 }
 
 void Plane::update_sensors(float time_delta) {
@@ -194,27 +193,17 @@ void Plane::update_sensors(float time_delta) {
 		time_delta = 0.001f;
 	}
 
-	// calculate some data
-	irrvec3f angle_vel = calc_angle_vel();
-	irrvec3f acceleration = (m_velocity - m_priv_vel)/time_delta;
-
-	// update the gyro
-	lin_algebra::vec3f gyro_data;
-	gyro_data[0] = angle_vel.X + frand()*2.0 + 2*m_gyro_drift.X;
-	gyro_data[1] = angle_vel.Y + frand()*2.0 + 2*m_gyro_drift.Y;
-	gyro_data[2] = angle_vel.Z + frand()*2.0 + 2*m_gyro_drift.Z;
-	m_gyro->set_data(gyro_data);
-
 	// update the accelerometer
+	irrvec3f acceleration = (m_velocity - m_priv_vel)/time_delta;
 	lin_algebra::vec3f acc_data;
 	irrvec3f g(0, -1., 0);
 	irrvec3f acc = g - 0.1*acceleration;
 	float acc_len = acc.getLength();
 	m_transformation.getTransposed().rotateVect(acc);
 	acc = acc.normalize()*acc_len; // rotateVect doesn't maintain vec size...
-	acc_data[0] = acc.X + frand()*0.05;
-	acc_data[1] = acc.Y + frand()*0.05;
-	acc_data[2] = acc.Z + frand()*0.05;
+	acc_data[0] = acc.X + lin_algebra::frand()*0.05;
+	acc_data[1] = acc.Y + lin_algebra::frand()*0.05;
+	acc_data[2] = acc.Z + lin_algebra::frand()*0.05;
 	m_acc->set_data(acc_data);
 
 	// update the compass
@@ -282,6 +271,17 @@ void Plane::set_gps_speed_dir_listener(boost::shared_ptr<stream::DataPushStream<
 }
 void Plane::set_gps_speed_mag_listener(boost::shared_ptr<stream::DataPushStream<float> > listenr) {
 	m_gps_speed_mag_listener = listenr;
+}
+
+void Plane::add_sensor(boost::shared_ptr<simulator::AnySensor> sensor)  {
+	sensor->setSensedObject(m_object);
+	m_sensors.push_back(sensor);
+}
+
+Plane::~Plane() {
+	BOOST_FOREACH(boost::shared_ptr<AnySensor> sensor, m_sensors) {
+		sensor->setSensedObject(NULL);
+	}
 }
 
 }  // namespace simulator

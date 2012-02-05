@@ -19,6 +19,7 @@ and tell the linker to link with the .lib file.
 
 #include "plane.h"
 #include "camera.h"
+#include "sensors/simulator_gyro.h"
 #include <irrlicht/irrlicht.h>
 #include <cmath>
 #include <boost/make_shared.hpp>
@@ -33,6 +34,10 @@ and tell the linker to link with the .lib file.
 #include <boost/thread.hpp>
 
 using namespace irr;
+
+typedef stream::DataPopStream<lin_algebra::vec3f> vec3stream;
+typedef boost::shared_ptr<vec3stream> vec3stream_ptr;
+
 
 /*
 To receive events like mouse and keyboard input, or GUI events like "the OK
@@ -72,7 +77,7 @@ private:
 	bool KeyIsDown[KEY_KEY_CODES_COUNT];
 };
 
-void export_import(simulator::Plane& p) {
+void export_import(simulator::Plane& p, vec3stream_ptr gyro) {
 
 	while (true) {
 		while (!p.data_ready());
@@ -80,7 +85,7 @@ void export_import(simulator::Plane& p) {
 			boost::shared_ptr<stream::TcpipClient> client =
 					boost::make_shared<stream::TcpipClient>("localhost", 0x6060);
 			stream::StreamConnection conn(client);
-			conn.export_pop_stream<lin_algebra::vec3f>(p.gyro_gen(), "simulator_gyro");
+			conn.export_pop_stream<lin_algebra::vec3f>(gyro, "simulator_gyro");
 			conn.export_pop_stream<lin_algebra::vec3f>(p.acc_gen(), "simulator_acc");
 			conn.export_pop_stream<lin_algebra::vec3f>(p.compass_gen(), "simulator_compass");
 
@@ -153,6 +158,10 @@ int main()
 
 
 	simulator::Plane p(device, core::vector3df(0.0f, 0.0f, 0.0f), plane_params);
+	boost::shared_ptr<simulator::SimulatorGyroSensor> gyro_sensor(
+			new simulator::SimulatorGyroSensor(plane_params.get_rot())
+	);
+	p.add_sensor(gyro_sensor);
 
 	// inital servo data
 	p.get_pitch_servo()->set_data(50.);
@@ -160,7 +169,7 @@ int main()
 	p.get_yaw_servo()->set_data(50.);
 
 	// export all the sensors
-	boost::thread t(export_import, boost::ref(p));
+	boost::thread t(export_import, boost::ref(p), gyro_sensor);
 
     // add terrain scene node
     scene::ITerrainSceneNode* terrain = smgr->addTerrainSceneNode(
