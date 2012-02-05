@@ -1,6 +1,8 @@
 #ifndef PLANE_H_
 #define PLANE_H_
 
+#include "sensor.h"
+
 #include <stream/data_pop_stream.h>
 #include <stream/data_push_stream.h>
 #include <stream/stream_utils.h>
@@ -78,6 +80,8 @@ public:
 			irr::core::vector3df start_pos,
 			const PlainParams plane_params);
 
+	~Plane();
+
 	virtual void update(float time_delta);
 
 	virtual irr::core::vector3df get_pos() const { return m_object->getPosition(); }
@@ -91,7 +95,6 @@ public:
 	servo_stream_ptr_t get_gas_servo()  { return m_gas_servo; }
 
 	// getting data from sensors
-	sensor_stream_ptr_t gyro_gen() { return m_gyro; }
 	sensor_stream_ptr_t acc_gen() { return m_acc; }
 	sensor_stream_ptr_t compass_gen() { return m_compass; }
 	void set_gps_pos_listener(boost::shared_ptr<stream::DataPushStream<lin_algebra::vec3f> > listenr);
@@ -104,6 +107,8 @@ public:
 	void force_pitch(float howmuch) 	{ m_forced_pitch = howmuch; }
 	void unforce_pitch()				{ m_forced_pitch = -1.; 	}
 
+	void add_sensor(boost::shared_ptr<AnySensor> sensor);
+
 private:
 
 	irr::core::vector3df calc_plane_acceleration();
@@ -115,7 +120,6 @@ private:
 	/**
 	 * all the streams that the plane simulates.
 	 */
-	boost::shared_ptr<stream::PushToPopConv<lin_algebra::vec3f> > m_gyro;
 	boost::shared_ptr<stream::PushToPopConv<lin_algebra::vec3f> > m_acc;
 	boost::shared_ptr<stream::PushToPopConv<lin_algebra::vec3f> > m_compass;
 
@@ -135,7 +139,6 @@ private:
 	irr::core::matrix4 m_transformation;
 
 	PlainParams m_params;
-	irr::core::vector3df m_gyro_drift;
 
 	boost::thread m_gps_thread;
 
@@ -149,6 +152,8 @@ private:
 	boost::circular_buffer<lin_algebra::vec3f> m_past_samples;
 
 	volatile bool m_data_ready;
+
+	std::vector<boost::shared_ptr<AnySensor> > m_sensors;
 };
 
 }  // namespace simulator

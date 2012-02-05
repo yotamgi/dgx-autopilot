@@ -71,6 +71,13 @@ namespace lin_algebra {
 	}
 
 	/**
+	 * Retunrs random float between -0.5 to 0.5
+	 */
+	inline float frand() {
+		return (float)rand()/(float)RAND_MAX - 0.5;
+	}
+
+	/**
 	 * Expects two normalized vectors
 	 */
 	template <typename Vec3>
