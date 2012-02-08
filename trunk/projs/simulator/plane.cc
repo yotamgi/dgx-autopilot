@@ -37,7 +37,6 @@ Plane::Plane(irr::IrrlichtDevice* device,
 		irrvec3f start_pos,
 		const PlainParams plane_params):
 		FlyingObject(device),
-		m_acc(new stream::PushToPopConv<lin_algebra::vec3f>(lin_algebra::vec3f())),
 		m_compass(new stream::PushToPopConv<lin_algebra::vec3f>(lin_algebra::vec3f())),
 		m_tilt_servo(new stream::PushToPopConv<float>(50.)),
 		m_pitch_servo(new stream::PushToPopConv<float>(50.)),
@@ -189,22 +188,6 @@ void Plane::update(float time_delta) {
 }
 
 void Plane::update_sensors(float time_delta) {
-	if (time_delta == 0.0f) {
-		time_delta = 0.001f;
-	}
-
-	// update the accelerometer
-	irrvec3f acceleration = (m_velocity - m_priv_vel)/time_delta;
-	lin_algebra::vec3f acc_data;
-	irrvec3f g(0, -1., 0);
-	irrvec3f acc = g - 0.1*acceleration;
-	float acc_len = acc.getLength();
-	m_transformation.getTransposed().rotateVect(acc);
-	acc = acc.normalize()*acc_len; // rotateVect doesn't maintain vec size...
-	acc_data[0] = acc.X + lin_algebra::frand()*0.05;
-	acc_data[1] = acc.Y + lin_algebra::frand()*0.05;
-	acc_data[2] = acc.Z + lin_algebra::frand()*0.05;
-	m_acc->set_data(acc_data);
 
 	// update the compass
 	irrvec3f north(1., -1., 0);
@@ -212,8 +195,6 @@ void Plane::update_sensors(float time_delta) {
 	north = north.normalize() * 20.;
 	lin_algebra::vec3f compass_data = lin_algebra::create_vec3f(north.X, north.Y, north.Z);
 	m_compass->set_data(compass_data);
-
-	m_priv_vel = m_velocity;
 
 	m_data_ready = true;
 }
