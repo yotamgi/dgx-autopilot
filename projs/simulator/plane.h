@@ -95,7 +95,6 @@ public:
 	servo_stream_ptr_t get_gas_servo()  { return m_gas_servo; }
 
 	// getting data from sensors
-	sensor_stream_ptr_t acc_gen() { return m_acc; }
 	sensor_stream_ptr_t compass_gen() { return m_compass; }
 	void set_gps_pos_listener(boost::shared_ptr<stream::DataPushStream<lin_algebra::vec3f> > listenr);
 	void set_gps_speed_dir_listener(boost::shared_ptr<stream::DataPushStream<float> > listenr);
@@ -120,7 +119,6 @@ private:
 	/**
 	 * all the streams that the plane simulates.
 	 */
-	boost::shared_ptr<stream::PushToPopConv<lin_algebra::vec3f> > m_acc;
 	boost::shared_ptr<stream::PushToPopConv<lin_algebra::vec3f> > m_compass;
 
 	boost::shared_ptr<stream::PushToPopConv<float> > m_tilt_servo;
@@ -133,7 +131,6 @@ private:
 	boost::shared_ptr<stream::DataPushStream<float> > m_gps_speed_mag_listener;
 
 	irr::core::vector3df m_velocity;
-	irr::core::vector3df m_priv_vel;
 
 	irr::scene::ISceneNode * m_object;
 	irr::core::matrix4 m_transformation;

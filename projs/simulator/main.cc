@@ -20,9 +20,11 @@ and tell the linker to link with the .lib file.
 #include "plane.h"
 #include "camera.h"
 #include "sensors/simulator_gyro.h"
+#include "sensors/simulator_accelerometer.h"
 #include <irrlicht/irrlicht.h>
 #include <cmath>
 #include <boost/make_shared.hpp>
+#include <sys/time.h>
 
 #include <stream/stream_connection.h>
 #include <stream/util/tcpip_connection.h>
@@ -77,7 +79,7 @@ private:
 	bool KeyIsDown[KEY_KEY_CODES_COUNT];
 };
 
-void export_import(simulator::Plane& p, vec3stream_ptr gyro) {
+void export_import(simulator::Plane& p, vec3stream_ptr gyro, vec3stream_ptr acc) {
 
 	while (true) {
 		while (!p.data_ready());
@@ -86,7 +88,7 @@ void export_import(simulator::Plane& p, vec3stream_ptr gyro) {
 					boost::make_shared<stream::TcpipClient>("localhost", 0x6060);
 			stream::StreamConnection conn(client);
 			conn.export_pop_stream<lin_algebra::vec3f>(gyro, "simulator_gyro");
-			conn.export_pop_stream<lin_algebra::vec3f>(p.acc_gen(), "simulator_acc");
+			conn.export_pop_stream<lin_algebra::vec3f>(acc, "simulator_acc");
 			conn.export_pop_stream<lin_algebra::vec3f>(p.compass_gen(), "simulator_compass");
 
 			conn.export_push_stream<float>(p.get_pitch_servo(), "simulator_pitch_servo");
@@ -161,7 +163,11 @@ int main()
 	boost::shared_ptr<simulator::SimulatorGyroSensor> gyro_sensor(
 			new simulator::SimulatorGyroSensor(plane_params.get_rot())
 	);
+	boost::shared_ptr<simulator::SimulatorAccelerometerSensor> acc_sensor(
+			new simulator::SimulatorAccelerometerSensor(plane_params.get_rot())
+	);
 	p.add_sensor(gyro_sensor);
+	p.add_sensor(acc_sensor);
 
 	// inital servo data
 	p.get_pitch_servo()->set_data(50.);
@@ -169,7 +175,7 @@ int main()
 	p.get_yaw_servo()->set_data(50.);
 
 	// export all the sensors
-	boost::thread t(export_import, boost::ref(p), gyro_sensor);
+	boost::thread t(export_import, boost::ref(p), gyro_sensor, acc_sensor);
 
     // add terrain scene node
     scene::ITerrainSceneNode* terrain = smgr->addTerrainSceneNode(
@@ -209,14 +215,21 @@ int main()
 
 	// In order to do framerate independent movement, we have to know
 	// how long it was since the last frame
-	u32 then = device->getTimer()->getTime();
-	f32 frameDeltaTime = 0.;
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	double then = tv.tv_sec + tv.tv_usec;
+	double frameDeltaTime = 0.;
 
 	while(device->run())
 	{
-		// Work out a frame delta time.
-		const u32 now = device->getTimer()->getTime();
-		frameDeltaTime = (f32)(now - then) / 1000.f; // Time in seconds
+		// calculate the delta time, and make sure it does not exceed 100 fps
+		double now;
+		do {
+			gettimeofday(&tv, NULL);
+			now = tv.tv_sec * 1000. +  tv.tv_usec/1000.;
+			frameDeltaTime = (now - then) / 1000.;
+			usleep(1000);
+		} while (frameDeltaTime < 0.01);
 		then = now;
 
 		p.update(frameDeltaTime);
