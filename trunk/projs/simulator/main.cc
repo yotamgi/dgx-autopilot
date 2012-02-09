@@ -142,7 +142,7 @@ int main()
 			 6.5f,  // mass
 			 40.0f,  // engine power
 			 0.15f, // drag
-			 1.0f, // wing area
+			 1.4f, // wing area
 			 -3.); // lift
 
 //	simulator::PlainParams plane_params(
