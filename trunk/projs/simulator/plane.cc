@@ -43,11 +43,9 @@ Plane::Plane(irr::IrrlichtDevice* device,
 		m_gas_servo(new stream::PushToPopConv<float>(0.)),
 		m_velocity(irrvec3f(0.0f, 0.0f, 0.0f)),
 		m_params(plane_params),
-		m_gps_thread(&Plane::gps_update, this),
 		m_forced_tilt(-1.),
 		m_forced_pitch(-1.),
 		m_print_timer(0.),
-		m_past_samples(m_avarge_len),
 		m_data_ready(false)
 {
 	irr::scene::ISceneManager* smgr = m_device->getSceneManager();
@@ -179,77 +177,22 @@ void Plane::update(float time_delta) {
 
 	m_print_timer += time_delta;
 
-	BOOST_FOREACH(boost::shared_ptr<Carriable> sensor, m_sensors) {
-		sensor->update(time_delta);
+	BOOST_FOREACH(boost::shared_ptr<Carriable> carried, m_stuff) {
+		carried->update(time_delta);
 	}
 
 	m_data_ready = true;
 
 }
 
-void Plane::gps_update() {
-
-	while (true) {
-		if (!m_data_ready) continue;
-		// calculate the position
-		irrvec3f irrpos = m_object->getPosition();
-		lin_algebra::vec3f gps_pos = lin_algebra::create_vec3f(irrpos.X, irrpos.Y, irrpos.Z);
-
-		lin_algebra::vec3f rand;
-		rand.randu();
-		rand = lin_algebra::normalize(rand);
-		gps_pos += rand;
-
-		// calculate the speed
-		m_past_samples.push_back(gps_pos);
-
-		// fill the data into a matrix
-		lin_algebra::Mat<float> m(2, m_past_samples.size());
-		for (size_t i=0; i<m_past_samples.size(); i++) {
-			m.col(i) = lin_algebra::get<2, 0>(m_past_samples.at(i));
-		}
-		m = lin_algebra::trans(m);
-
-		lin_algebra::Mat<float> ce, score;
-		lin_algebra::princomp(ce, score, m);
-		lin_algebra::vec2f speed = ce.col(0) * score.at(0,0) * -2.;
-		//float reliability = score.at(0, 1);
-		float speed_mag = std::sqrt(speed[0]*speed[0] + speed[1]*speed[1]);
-		float speed_angle = std::atan(speed[1]/speed[0])/lin_algebra::PI * 180.;
-
-		if (m_gps_pos_listener) {
-			m_gps_pos_listener->set_data(gps_pos);
-		}
-		if (m_gps_speed_dir_listener) {
-			m_gps_speed_dir_listener->set_data(speed_angle);
-		}
-		if (m_gps_speed_mag_listener) {
-			m_gps_speed_mag_listener->set_data(speed_mag);
-		}
-
-		sleep(1);
-	}
-}
-
-void Plane::set_gps_pos_listener(boost::shared_ptr<stream::DataPushStream<lin_algebra::vec3f> > listenr) {
-	m_gps_pos_listener = listenr;
-}
-
-void Plane::set_gps_speed_dir_listener(boost::shared_ptr<stream::DataPushStream<float> > listenr) {
-	m_gps_speed_dir_listener = listenr;
-}
-void Plane::set_gps_speed_mag_listener(boost::shared_ptr<stream::DataPushStream<float> > listenr) {
-	m_gps_speed_mag_listener = listenr;
-}
-
-void Plane::carry(boost::shared_ptr<simulator::Carriable> sensor)  {
-	sensor->setSensedObject(m_object);
-	m_sensors.push_back(sensor);
+void Plane::carry(boost::shared_ptr<simulator::Carriable> carried)  {
+	carried->setSensedObject(m_object);
+	m_stuff.push_back(carried);
 }
 
 Plane::~Plane() {
-	BOOST_FOREACH(boost::shared_ptr<Carriable> sensor, m_sensors) {
-		sensor->setSensedObject(NULL);
+	BOOST_FOREACH(boost::shared_ptr<Carriable> carried, m_stuff) {
+		carried->setSensedObject(NULL);
 	}
 }
 

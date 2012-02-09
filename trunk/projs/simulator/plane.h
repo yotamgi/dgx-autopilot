@@ -94,24 +94,18 @@ public:
 	servo_stream_ptr_t get_tilt_servo()  { return m_tilt_servo; }
 	servo_stream_ptr_t get_gas_servo()  { return m_gas_servo; }
 
-	// getting data from sensors
-	void set_gps_pos_listener(boost::shared_ptr<stream::DataPushStream<lin_algebra::vec3f> > listenr);
-	void set_gps_speed_dir_listener(boost::shared_ptr<stream::DataPushStream<float> > listenr);
-	void set_gps_speed_mag_listener(boost::shared_ptr<stream::DataPushStream<float> > listenr);
-
 	// forcing servos methods
 	void force_tilt(float howmuch) 		{ m_forced_tilt = howmuch; 	}
 	void unforce_tilt() 				{ m_forced_tilt = -1.; 		}
 	void force_pitch(float howmuch) 	{ m_forced_pitch = howmuch; }
 	void unforce_pitch()				{ m_forced_pitch = -1.; 	}
 
-	void carry(boost::shared_ptr<Carriable> sensor);
+	void carry(boost::shared_ptr<Carriable> carried);
 
 private:
 
 	irr::core::vector3df calc_plane_acceleration();
 	irr::core::vector3df calc_angle_vel() const;
-	void gps_update(); // blocking
 
 	/**
 	 * The plain's servos
@@ -121,10 +115,6 @@ private:
 	boost::shared_ptr<stream::PushToPopConv<float> > m_yaw_servo;
 	boost::shared_ptr<stream::PushToPopConv<float> > m_gas_servo;
 
-	boost::shared_ptr<stream::DataPushStream<lin_algebra::vec3f> > m_gps_pos_listener;
-	boost::shared_ptr<stream::DataPushStream<float> > m_gps_speed_dir_listener;
-	boost::shared_ptr<stream::DataPushStream<float> > m_gps_speed_mag_listener;
-
 	irr::core::vector3df m_velocity;
 
 	irr::scene::ISceneNode * m_object;
@@ -132,20 +122,14 @@ private:
 
 	PlainParams m_params;
 
-	boost::thread m_gps_thread;
-
 	float m_forced_tilt;
 	float m_forced_pitch;
 
 	float m_print_timer;
 
-	// members for calculating the gps speed
-	static const size_t m_avarge_len = 3;
-	boost::circular_buffer<lin_algebra::vec3f> m_past_samples;
-
 	volatile bool m_data_ready;
 
-	std::vector<boost::shared_ptr<Carriable> > m_sensors;
+	std::vector<boost::shared_ptr<Carriable> > m_stuff;
 };
 
 }  // namespace simulator
