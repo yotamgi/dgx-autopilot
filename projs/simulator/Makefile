@@ -36,9 +36,12 @@ $(OBJDIR)/simulator_gyro.o: sensors/simulator_gyro.cc
 
 $(OBJDIR)/simulator_accelerometer.o: sensors/simulator_accelerometer.cc
 	$(CXX) -c sensors/simulator_accelerometer.cc $(CXXFLAGS) -o $(OBJDIR)/simulator_accelerometer.o
-	
 
-sim: $(OBJDIR)/main.o $(OBJDIR)/plane.o $(OBJDIR)/camera.o $(OBJDIR)/simulator_gyro.o $(OBJDIR)/simulator_accelerometer.o
-	$(CXX) $(OBJDIR)/main.o $(OBJDIR)/plane.o $(OBJDIR)/camera.o $(OBJDIR)/simulator_gyro.o $(OBJDIR)/simulator_accelerometer.o $(LDFLAGS) -o sim
+$(OBJDIR)/simulator_magnetometer.o: sensors/simulator_magnetometer.cc
+	$(CXX) -c sensors/simulator_magnetometer.cc $(CXXFLAGS) -o $(OBJDIR)/simulator_magnetometer.o
+		
+
+sim: $(OBJDIR)/main.o $(OBJDIR)/plane.o $(OBJDIR)/camera.o $(OBJDIR)/simulator_gyro.o $(OBJDIR)/simulator_accelerometer.o $(OBJDIR)/simulator_magnetometer.o
+	$(CXX) $(OBJDIR)/main.o $(OBJDIR)/plane.o $(OBJDIR)/camera.o $(OBJDIR)/simulator_gyro.o $(OBJDIR)/simulator_accelerometer.o $(OBJDIR)/simulator_magnetometer.o $(LDFLAGS) -o sim
 
 
