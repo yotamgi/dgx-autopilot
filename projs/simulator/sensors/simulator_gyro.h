@@ -2,6 +2,7 @@
 #define SIMULATOR_GYRO_H_
 
 #include <stream/util/lin_algebra.h>
+#include <stream/data_pop_stream.h>
 #include <stdexcept>
 #include "carriable.h"
 

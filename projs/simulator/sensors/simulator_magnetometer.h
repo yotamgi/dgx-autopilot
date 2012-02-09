@@ -1,9 +1,9 @@
 #ifndef SIMULATOR_MAGNETOMETER_H_
 #define SIMULATOR_MAGNETOMETER_H_
 
-
-#include "carriable.h"
 #include <stream/util/lin_algebra.h>
+#include <stream/data_pop_stream.h>
+#include "carriable.h"
 
 namespace simulator {
 
