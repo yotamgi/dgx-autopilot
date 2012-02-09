@@ -6,8 +6,7 @@ typedef irr::core::vector3df irrvec3f;
 
 SimulatorAccelerometerSensor::SimulatorAccelerometerSensor(irr::core::vector3df sensor_orientation):
 		m_sensor_orientation(sensor_orientation),
-		m_traced_object(NULL),
-		m_prev_time_delta(0.)
+		m_traced_object(NULL)
 {}
 
 void SimulatorAccelerometerSensor::setSensedObject(irr::scene::ISceneNode *object) {
@@ -25,12 +24,7 @@ void SimulatorAccelerometerSensor::update(float time_delta) {
 	// calculate the acceleration
 	irrvec3f curr_pos = m_traced_object->getPosition();
 	irrvec3f curr_speed = (curr_pos - m_old_pos)/time_delta;
-	irrvec3f acceleration = (curr_speed - m_old_speed) / (time_delta);
-
-
-	m_old_pos = curr_pos;
-	m_old_speed = curr_speed;
-	m_prev_time_delta = time_delta;
+	irrvec3f acceleration = (curr_speed - m_old_speed)/time_delta;
 
 	// add the g
 	irrvec3f g(0, -1., 0);
@@ -44,6 +38,9 @@ void SimulatorAccelerometerSensor::update(float time_delta) {
 	m_acc_data = lin_algebra::create_vec3f(acc_g.X + lin_algebra::frand()*0.05,
 										   acc_g.Y + lin_algebra::frand()*0.05,
 										   acc_g.Z + lin_algebra::frand()*0.05);
+
+	m_old_pos = curr_pos;
+	m_old_speed = curr_speed;
 }
 
 lin_algebra::vec3f SimulatorAccelerometerSensor::get_data() {
