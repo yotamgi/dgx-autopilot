@@ -8,8 +8,6 @@
 #ifndef SENSOR_H_
 #define SENSOR_H_
 
-#include <stream/data_pop_stream.h>
-#include <stream/data_push_stream.h>
 #include <irrlicht/irrlicht.h>
 
 namespace simulator {

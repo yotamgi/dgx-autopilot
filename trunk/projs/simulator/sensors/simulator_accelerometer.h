@@ -3,6 +3,7 @@
 
 #include "carriable.h"
 #include <stream/util/lin_algebra.h>
+#include <stream/data_pop_stream.h>
 
 namespace simulator {
 
