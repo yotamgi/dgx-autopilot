@@ -25,8 +25,6 @@ private:
 
 	irr::core::vector3df m_old_pos;
 	irr::core::vector3df m_old_speed;
-	float m_prev_time_delta;
-
 
 	lin_algebra::vec3f m_acc_data;
 };
