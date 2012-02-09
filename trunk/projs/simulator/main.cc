@@ -166,8 +166,8 @@ int main()
 	boost::shared_ptr<simulator::SimulatorAccelerometerSensor> acc_sensor(
 			new simulator::SimulatorAccelerometerSensor(plane_params.get_rot())
 	);
-	p.add_sensor(gyro_sensor);
-	p.add_sensor(acc_sensor);
+	p.carry(gyro_sensor);
+	p.carry(acc_sensor);
 
 	// inital servo data
 	p.get_pitch_servo()->set_data(50.);

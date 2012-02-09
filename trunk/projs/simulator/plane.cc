@@ -181,7 +181,7 @@ void Plane::update(float time_delta) {
 	m_print_timer += time_delta;
 	update_sensors(time_delta);
 
-	BOOST_FOREACH(boost::shared_ptr<AnySensor> sensor, m_sensors) {
+	BOOST_FOREACH(boost::shared_ptr<Carriable> sensor, m_sensors) {
 		sensor->update(time_delta);
 	}
 
@@ -254,13 +254,13 @@ void Plane::set_gps_speed_mag_listener(boost::shared_ptr<stream::DataPushStream<
 	m_gps_speed_mag_listener = listenr;
 }
 
-void Plane::add_sensor(boost::shared_ptr<simulator::AnySensor> sensor)  {
+void Plane::carry(boost::shared_ptr<simulator::Carriable> sensor)  {
 	sensor->setSensedObject(m_object);
 	m_sensors.push_back(sensor);
 }
 
 Plane::~Plane() {
-	BOOST_FOREACH(boost::shared_ptr<AnySensor> sensor, m_sensors) {
+	BOOST_FOREACH(boost::shared_ptr<Carriable> sensor, m_sensors) {
 		sensor->setSensedObject(NULL);
 	}
 }
