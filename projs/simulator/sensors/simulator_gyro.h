@@ -3,12 +3,12 @@
 
 #include <stream/util/lin_algebra.h>
 #include <stdexcept>
-#include "sensor.h"
+#include "carriable.h"
 
 namespace simulator {
 
 
-class SimulatorGyroSensor : public SimulatorPopSensor<lin_algebra::vec3f> {
+class SimulatorGyroSensor : public Carriable, public stream::DataPopStream<lin_algebra::vec3f> {
 public:
 
 	SimulatorGyroSensor(irr::core::vector3df sensor_orientation = irr::core::vector3df());

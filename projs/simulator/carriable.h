@@ -14,26 +14,12 @@
 
 namespace simulator {
 
-class AnySensor {
+class Carriable {
 public:
 	virtual void setSensedObject(irr::scene::ISceneNode *object) = 0;
 
 	virtual void update(float time_delta) = 0;
 };
-
-
-template <typename data_t>
-class SimulatorPopSensor : public AnySensor, public stream::DataPopStream<data_t> {
-public:
-
-	virtual void setSensedObject(irr::scene::ISceneNode *object) = 0;
-
-	virtual void update(float time_delta) = 0;
-
-	virtual data_t get_data() = 0;
-
-};
-
 
 }  // namespace simulator
 

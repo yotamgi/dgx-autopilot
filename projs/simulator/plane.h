@@ -1,7 +1,7 @@
 #ifndef PLANE_H_
 #define PLANE_H_
 
-#include "sensor.h"
+#include "carriable.h"
 
 #include <stream/data_pop_stream.h>
 #include <stream/data_push_stream.h>
@@ -106,7 +106,7 @@ public:
 	void force_pitch(float howmuch) 	{ m_forced_pitch = howmuch; }
 	void unforce_pitch()				{ m_forced_pitch = -1.; 	}
 
-	void add_sensor(boost::shared_ptr<AnySensor> sensor);
+	void carry(boost::shared_ptr<Carriable> sensor);
 
 private:
 
@@ -150,7 +150,7 @@ private:
 
 	volatile bool m_data_ready;
 
-	std::vector<boost::shared_ptr<AnySensor> > m_sensors;
+	std::vector<boost::shared_ptr<Carriable> > m_sensors;
 };
 
 }  // namespace simulator
