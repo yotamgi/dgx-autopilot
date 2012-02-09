@@ -37,7 +37,6 @@ Plane::Plane(irr::IrrlichtDevice* device,
 		irrvec3f start_pos,
 		const PlainParams plane_params):
 		FlyingObject(device),
-		m_compass(new stream::PushToPopConv<lin_algebra::vec3f>(lin_algebra::vec3f())),
 		m_tilt_servo(new stream::PushToPopConv<float>(50.)),
 		m_pitch_servo(new stream::PushToPopConv<float>(50.)),
 		m_yaw_servo(new stream::PushToPopConv<float>(50.)),
@@ -138,7 +137,7 @@ irrvec3f Plane::calc_plane_acceleration() {
 	irrvec3f acc = (engine_force + drag_force + lift_force + gravity_force) / m_params.get_mass();
 
 
-	if (m_print_timer > 1.) {
+	if (m_print_timer > 0.1) {
 		m_print_timer = 0.;
 		std::cout << std::setprecision(2) << std::fixed <<
 				"Plane's alt is " << m_object->getPosition().Y <<
@@ -179,24 +178,13 @@ void Plane::update(float time_delta) {
 	m_object->setPosition(pos);
 
 	m_print_timer += time_delta;
-	update_sensors(time_delta);
 
 	BOOST_FOREACH(boost::shared_ptr<Carriable> sensor, m_sensors) {
 		sensor->update(time_delta);
 	}
 
-}
-
-void Plane::update_sensors(float time_delta) {
-
-	// update the compass
-	irrvec3f north(1., -1., 0);
-	m_transformation.getTransposed().rotateVect(north);
-	north = north.normalize() * 20.;
-	lin_algebra::vec3f compass_data = lin_algebra::create_vec3f(north.X, north.Y, north.Z);
-	m_compass->set_data(compass_data);
-
 	m_data_ready = true;
+
 }
 
 void Plane::gps_update() {
