@@ -23,6 +23,7 @@ and tell the linker to link with the .lib file.
 #include "sensors/simulator_accelerometer.h"
 #include "sensors/simulator_magnetometer.h"
 #include "sensors/simulator_gps.h"
+#include "sensors/simulator_altmeter.h"
 #include <irrlicht/irrlicht.h>
 #include <cmath>
 #include <boost/make_shared.hpp>
@@ -40,7 +41,10 @@ and tell the linker to link with the .lib file.
 using namespace irr;
 
 typedef stream::DataPopStream<lin_algebra::vec3f> vec3stream;
+typedef stream::DataPopStream<float> floatstream;
 typedef boost::shared_ptr<vec3stream> vec3stream_ptr;
+typedef boost::shared_ptr<floatstream> floatstream_ptr;
+
 
 
 /*
@@ -85,6 +89,7 @@ void export_import(simulator::Plane& p,
 		vec3stream_ptr gyro,
 		vec3stream_ptr acc,
 		vec3stream_ptr magneto,
+		floatstream_ptr alt,
 		boost::shared_ptr<simulator::SimulatorGpsSensor> gps_sensor)
 {
 
@@ -97,6 +102,7 @@ void export_import(simulator::Plane& p,
 			conn.export_pop_stream<lin_algebra::vec3f>(gyro, "simulator_gyro");
 			conn.export_pop_stream<lin_algebra::vec3f>(acc, "simulator_acc");
 			conn.export_pop_stream<lin_algebra::vec3f>(magneto, "simulator_compass");
+			conn.export_pop_stream<float>(alt, "simulator_alt");
 
 			conn.export_push_stream<float>(p.get_pitch_servo(), "simulator_pitch_servo");
 			conn.export_push_stream<float>(p.get_tilt_servo(), "simulator_tilt_servo");
@@ -176,13 +182,18 @@ int main()
 	boost::shared_ptr<simulator::SimulatorMagnetometerSensor> magneto_sensor(
 			new simulator::SimulatorMagnetometerSensor(plane_params.get_rot())
 	);
+	boost::shared_ptr<simulator::SimulatorAltmeterSensor> alt_sensor(
+			new simulator::SimulatorAltmeterSensor()
+	);
 	boost::shared_ptr<simulator::SimulatorGpsSensor> gps_sensor(
 			new simulator::SimulatorGpsSensor()
 	);
+
 	p.carry(gyro_sensor);
 	p.carry(acc_sensor);
 	p.carry(magneto_sensor);
 	p.carry(gps_sensor);
+	p.carry(alt_sensor);
 
 	// inital servo data
 	p.get_pitch_servo()->set_data(50.);
@@ -190,7 +201,7 @@ int main()
 	p.get_yaw_servo()->set_data(50.);
 
 	// export all the sensors
-	boost::thread t(export_import, boost::ref(p), gyro_sensor, acc_sensor, magneto_sensor, gps_sensor);
+	boost::thread t(export_import, boost::ref(p), gyro_sensor, acc_sensor, magneto_sensor, alt_sensor, gps_sensor);
 
     // add terrain scene node
     scene::ITerrainSceneNode* terrain = smgr->addTerrainSceneNode(
