@@ -10,13 +10,14 @@ SRCDIR = ./src
 CXX = g++
 ARCHIVE = ar
 CXXFLAGS += -g -I$(SRCDIR) -Wall  $(LIBDS_CXXFLAGS) -O3 -fPIC
-LDFLAGS += -L./lib -fPIC -Wl,--rpath,$(LIBDS_LIBDIRS):$(GROUND_STATION_LIBDIRS):$(LIBDIR) $(LIBDS_LDFLAGS) -lboost_thread
+LDFLAGS += -L./lib -fPIC -Wl,--rpath,$(LIBDS_LIBDIRS):$(GROUND_STATION_LIBDIRS):$(LIBDIR) $(LIBDS_LDFLAGS) -lboost_thread -lgps
 
 AUTOPILIT_OBJS =  $(SRCDIR)/platform/hw/i2c_interface.o	\
 		$(SRCDIR)/platform/hw/itg3200_gyro.o				\
 		$(SRCDIR)/platform/hw/adxl345_acc.o				\
 		$(SRCDIR)/platform/hw/hmc5843_compass.o		 	\
 		$(SRCDIR)/platform/hw/maestro_servo_controller.o \
+		$(SRCDIR)/platform/hw/gps.o \
 		$(SRCDIR)/platform/dgx1_platform.o \
 		$(SRCDIR)/waypoint_pilot.o \
 		$(SRCDIR)/fusion_filter.o 
@@ -37,11 +38,11 @@ all: host device
 host: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.so sensor_watch_test cockpit_test cockpit_test_device waypoint_pilot_test gtest  
 
 .PHONY:
-device: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.so sensor_watch_test cockpit_test_device waypoint_pilot_test gtest 
+device: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.so sensor_watch_test cockpit_test_device waypoint_pilot_test gtest gps_test
 
 .PHONY:
 clean:
-	rm -fr $(AUTOPILIT_OBJS) */*/*.o */*.o *.o $(LIBDIR) gtest sensor_watch_test watch_test cockpit_test* waypoint_pilot_test
+	rm -fr $(AUTOPILIT_OBJS) */*/*.o */*.o *.o $(LIBDIR) gtest sensor_watch_test watch_test cockpit_test* waypoint_pilot_test gps_test
 
 $(LIBDIR):
 	mkdir $(LIBDIR)
@@ -70,6 +71,9 @@ test: gtest
 
 sensor_watch_test: $(SRCDIR)/sandbox/sensor_watch_test.o $(LIBDIR) $(LIBDIR)/libautopilot.so 
 	$(CXX) $(SRCDIR)/sandbox/sensor_watch_test.o -lautopilot $(LDFLAGS) -o sensor_watch_test
+
+gps_test: $(SRCDIR)/sandbox/gps_test.o $(LIBDIR) $(LIBDIR)/libautopilot.so 
+	$(CXX) $(SRCDIR)/sandbox/gps_test.o -lautopilot $(LDFLAGS) -o gps_test
 	
 cockpit_test: $(SRCDIR)/sandbox/cockpit_test.o $(LIBDIR) $(LIBDIR)/libautopilot.so
 	$(CXX) $(SRCDIR)/sandbox/cockpit_test.o -lautopilot  $(GROUND_STATION_LDFLAGS) $(LDFLAGS) -o cockpit_test
