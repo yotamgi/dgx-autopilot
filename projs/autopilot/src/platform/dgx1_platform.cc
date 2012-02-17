@@ -28,13 +28,13 @@ boost::shared_ptr<vec3_watch_stream> DGX1Platform::compass_sensor() {
 }
 
 void DGX1Platform::register_pos_gps_reciever(gps_pos_reciever_ptr reciever) {
-	throw std::logic_error("GPS not implemented yet on dgx1 platform");
+	m_gps_sensor->set_pos_reciever_stream(reciever);
 }
 void DGX1Platform::register_gps_speed_dir_reciever(gps_speed_dir_reciever_ptr reciever) {
-	throw std::logic_error("GPS not implemented yet on dgx1 platform");
+	m_gps_sensor->set_speed_dir_reciever_stream(reciever);
 }
 void DGX1Platform::register_gps_speed_mag_reciever(gps_speed_mag_reciever_ptr reciever) {
-	throw std::logic_error("GPS not implemented yet on dgx1 platform");
+	m_gps_sensor->set_speed_mag_reciever_stream(reciever);
 }
 
 

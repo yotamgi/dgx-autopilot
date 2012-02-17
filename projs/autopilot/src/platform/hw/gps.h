@@ -10,13 +10,13 @@
 namespace autopilot {
 
 typedef boost::shared_ptr<stream::DataPushStream<float> > 				mag_reciever_ptr;
-typedef boost::shared_ptr<stream::DataPushStream<lin_algebra::vec2f> > 	vec2_reciever_ptr;
+typedef boost::shared_ptr<stream::DataPushStream<lin_algebra::vec3f> > 	vec3_reciever_ptr;
 
 class Gps {
 public:
 	Gps();
 
-	void set_pos_reciever_stream(vec2_reciever_ptr reciever);
+	void set_pos_reciever_stream(vec3_reciever_ptr reciever);
 	void set_speed_mag_reciever_stream(mag_reciever_ptr reciever);
 	void set_speed_dir_reciever_stream(mag_reciever_ptr reciever);
 
@@ -27,7 +27,7 @@ private:
 	boost::thread m_update_thread;
 	mag_reciever_ptr m_speed_mag;
 	mag_reciever_ptr m_speed_dir;
-	vec2_reciever_ptr m_pos;
+	vec3_reciever_ptr m_pos;
 	gpsmm m_gpsmm;
 };
 

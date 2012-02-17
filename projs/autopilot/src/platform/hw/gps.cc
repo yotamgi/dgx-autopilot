@@ -5,7 +5,7 @@ namespace autopilot {
 Gps::Gps():m_update_thread(&Gps::update, this)
 {}
 
-void Gps::set_pos_reciever_stream(vec2_reciever_ptr reciever) {
+void Gps::set_pos_reciever_stream(vec3_reciever_ptr reciever) {
 	m_pos = reciever;
 }
 void Gps::set_speed_mag_reciever_stream(mag_reciever_ptr reciever) {
@@ -23,14 +23,18 @@ void Gps::update() {
 		throw stream::PushStreamException("No GPS Found");
 	}
 
+	float height = 0.;
 	while (true) {
 		struct gps_data_t* data = m_gpsmm.poll();
 
-		if (data->fix.mode >= 2) {
+		if (data->fix.mode == 3) {
+			height = data->fix.altitude;
+		}
 
+		if (data->fix.mode >= 2) {
 			if (m_pos) {
-				lin_algebra::vec2f pos = lin_algebra::create_vec2f(
-						data->fix.longitude, data->fix.latitude
+				lin_algebra::vec3f pos = lin_algebra::create_vec3f(
+						data->fix.longitude, data->fix.latitude, height
 				);
 				m_pos->set_data(pos);
  			}
