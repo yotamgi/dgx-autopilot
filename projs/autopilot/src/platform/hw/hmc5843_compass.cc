@@ -2,6 +2,8 @@
 #include <stdint.h>
 #include <sstream>
 
+namespace autopilot {
+
 Hmc5843Compass::Hmc5843Compass(size_t device_i2c_num):
 			I2C_ADDRESS(0x1e),
 			WHO_AM_I_VALUE(0x48),
@@ -38,3 +40,6 @@ lin_algebra::vec3f Hmc5843Compass::get_data() {
 	
 	return fans;
 }
+
+}  // namespace autopilot
+

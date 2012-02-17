@@ -6,6 +6,9 @@
 #include <stream/data_pop_stream.h>
 #include "platform/hw/i2c_interface.h"
 
+namespace autopilot {
+
+
 class Adxl345Acc : public stream::DataPopStream<lin_algebra::vec3f> {
 public:
 	Adxl345Acc(size_t device_i2c_num);
@@ -42,5 +45,6 @@ private:
 	I2C_Interface m_i2c;
 };
 
+}  // namespace autopilot
 
 #endif /* ITG3200_GYRO_H_ */

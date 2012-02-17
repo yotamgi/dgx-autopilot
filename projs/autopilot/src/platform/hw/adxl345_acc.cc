@@ -2,6 +2,8 @@
 #include <stdint.h>
 #include <sstream>
 
+namespace autopilot {
+
 Adxl345Acc::Adxl345Acc(size_t device_i2c_num):
 			I2C_ADDRESS(0x53),
 			WHO_AM_I_VALUE(0xe5),
@@ -41,3 +43,5 @@ lin_algebra::vec3f Adxl345Acc::get_data() {
 	fans[2] =  float((int16_t)((ans[2]<<8)&0xff00) + (ans[2]>>8))*0.008;
 	return fans;
 }
+
+}  // namespace autopilot

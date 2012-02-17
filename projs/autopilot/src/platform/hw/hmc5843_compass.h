@@ -6,6 +6,8 @@
 #include <stream/util/lin_algebra.h>
 #include "platform/hw/i2c_interface.h"
 
+namespace autopilot {
+
 class Hmc5843Compass : public stream::DataPopStream<lin_algebra::vec3f> {
 public:
 	Hmc5843Compass(size_t device_i2c_num);
@@ -43,5 +45,6 @@ private:
 	I2C_Interface m_i2c;
 };
 
+}  // namespace autopilot
 
 #endif /* HMC5843_COMPASS_H */
