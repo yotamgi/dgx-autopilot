@@ -17,7 +17,7 @@ private:
 };
 
 int main() {
-	boost::shared_ptr<PushPrinter<lin_algebra::vec2f> > pos(new PushPrinter<lin_algebra::vec2f>("Position"));
+	boost::shared_ptr<PushPrinter<lin_algebra::vec3f> > pos(new PushPrinter<lin_algebra::vec3f>("Position"));
 	boost::shared_ptr<PushPrinter<float> > dir(new PushPrinter<float>("Direction"));
 	boost::shared_ptr<PushPrinter<float> > speed(new PushPrinter<float>("Speed"));
 

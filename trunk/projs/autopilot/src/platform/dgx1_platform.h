@@ -2,6 +2,7 @@
 #define DGX1_PLATFORM_H_
 
 #include "interfaces/plain_platform.h"
+#include "platform/hw/gps.h"
 #include <stream/data_pop_stream.h>
 #include <stream/data_push_stream.h>
 #include <stream/connection.h>
@@ -19,7 +20,7 @@ typedef stream::DataPushStream<float> 						servo_stream;
 class DGX1Platform : public NormalPlainPlatform {
 public:
 	DGX1Platform();
-	~DGX1Platform(){}
+	virtual ~DGX1Platform(){}
 
 	typedef boost::shared_ptr<stream::DataPopStream<lin_algebra::vec3f> > vec_stream_ptr;
 
@@ -47,6 +48,7 @@ private:
 	boost::shared_ptr<vec3_watch_stream> m_acc;
 	boost::shared_ptr<vec3_watch_stream> m_gyro;
 	boost::shared_ptr<vec3_watch_stream> m_compass;
+	boost::shared_ptr<Gps> m_gps_sensor;
 };
 
 
