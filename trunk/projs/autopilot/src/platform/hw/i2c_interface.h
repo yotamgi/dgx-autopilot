@@ -9,6 +9,8 @@
 #include <fcntl.h>
 #include <iostream>
 
+namespace autopilot {
+
 template <typename T>
 void reverse_endianity(T* data) {
 	char* bytes = reinterpret_cast<char*>(data);
@@ -102,5 +104,7 @@ private:
 
 	int m_i2c_device_fd;
 };
+
+}  // namespace autopilot
 
 #endif /* I2C_H_ */

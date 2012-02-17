@@ -6,6 +6,9 @@
 #include <fcntl.h>   // File control definitions
 #include <termios.h> // POSIX terminal control definitions
 
+namespace autopilot {
+
+
 MaestroServoController::MaestroServoController(std::string port_name):m_port_name(port_name) {
 
 	// open the file
@@ -119,3 +122,4 @@ void MaestroServoController::MaestroServoChannel::set_data(const float& statePer
 	m_father.check_errors();
 }
 
+}  // namespace autopilot

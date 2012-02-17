@@ -2,6 +2,7 @@
 #include <linux/i2c-dev.h>
 #include <sys/ioctl.h>
 
+namespace autopilot {
 
 I2C_Interface::I2C_Interface(size_t device_num, uint8_t device_i2c_add) {
 	std::stringstream ss;
@@ -25,3 +26,5 @@ void I2C_Interface::init(std::string device_name, uint8_t device_i2c_add) {
 		throw SensorException("Could not ioctl i2c device " + device_name);
 	}
 }
+
+}  // namespace autopilot

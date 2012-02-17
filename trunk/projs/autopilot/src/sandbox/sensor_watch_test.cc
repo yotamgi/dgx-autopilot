@@ -48,7 +48,7 @@ int main(int argc, char** argv) {
 	using namespace stream::filters;
 	using namespace boost;
 
-	shared_ptr<Itg3200Gyro> gyro = make_shared<Itg3200Gyro>(2);
+	shared_ptr<autopilot::Itg3200Gyro> gyro = make_shared<autopilot::Itg3200Gyro>(2);
 	shared_ptr<StaticFilter<lin_algebra::vec3f> > s = make_shared<StaticFilter<lin_algebra::vec3f> >(gyro, a);
 	shared_ptr<GyroToAVMatrix> gyro_rot = make_shared<GyroToAVMatrix>(s);
 	shared_ptr<MatrixToEulerFilter> gyro_rot_euler = make_shared<MatrixToEulerFilter>(gyro_rot);
@@ -56,11 +56,11 @@ int main(int argc, char** argv) {
 	conn.export_pop_stream<lin_algebra::vec3f>(gyro_rot_euler, std::string("gyro_test"));
 
 	// accelerometer
-	shared_ptr<Adxl345Acc> acc(new Adxl345Acc(2));
+	shared_ptr<autopilot::Adxl345Acc> acc(new autopilot::Adxl345Acc(2));
 	conn.export_pop_stream<lin_algebra::vec3f>(acc, std::string("acc_test"));
 
 	// compass
-	shared_ptr<Hmc5843Compass> c(new Hmc5843Compass(2));
+	shared_ptr<autopilot::Hmc5843Compass> c(new autopilot::Hmc5843Compass(2));
 	conn.export_pop_stream<lin_algebra::vec3f>(c, std::string("compass_test"));
 
 	std::cout << "Waiting for connections. " << std::endl;

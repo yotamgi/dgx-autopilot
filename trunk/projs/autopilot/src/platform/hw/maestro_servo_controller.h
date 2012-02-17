@@ -9,6 +9,9 @@
 #include <common/exceptions.h>
 #include <boost/shared_ptr.hpp>
 
+namespace autopilot {
+
+
 class ServoException: public stream::PushStreamException {
 public:
 	ServoException(std::string what): stream::PushStreamException(what) {}
@@ -79,5 +82,7 @@ private:
 	static const uint8_t GET_ERROR_OPCODE 	= 0xA1;
 
 };
+
+}  // namespace autopilot
 
 #endif // __MAESTRO_H__
