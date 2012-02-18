@@ -6,4 +6,14 @@ Wireless:
 
 GPS:
  * Install kernel-module-pl2303 from opkg
- * Install gpsd
+ * Install gpsd libgps-dev
+ * for gpsmon install gpsd-clients
+
+
+Video Transmisstion:
+ * Install gstreamer0.10-tools and gstreamer0.10-ffmpeg 
+ * Install gstreamer0.10-plugins-good
+ * on Host, install vlc
+ * device cmd: gst-launch-0.10 v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=\(fraction\)5/1 ! ffmpegcolorspace ! jpegenc ! multipartmux ! tcpserversink port=5000 &
+
+
