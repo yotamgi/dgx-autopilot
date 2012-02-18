@@ -38,7 +38,7 @@ all: host device
 host: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.so sensor_watch_test cockpit_test cockpit_test_device waypoint_pilot_test gtest  
 
 .PHONY:
-device: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.so sensor_watch_test cockpit_test_device waypoint_pilot_test gtest gps_test
+device: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.so sensor_watch_test cockpit_test_device waypoint_pilot_test gtest gps_test servo_test
 
 .PHONY:
 clean:
@@ -71,6 +71,9 @@ test: gtest
 
 sensor_watch_test: $(SRCDIR)/sandbox/sensor_watch_test.o $(LIBDIR) $(LIBDIR)/libautopilot.so 
 	$(CXX) $(SRCDIR)/sandbox/sensor_watch_test.o -lautopilot $(LDFLAGS) -o sensor_watch_test
+
+servo_test: $(SRCDIR)/sandbox/servo_test.o $(LIBDIR) $(LIBDIR)/libautopilot.so 
+	$(CXX) $(SRCDIR)/sandbox/servo_test.o -lautopilot $(LDFLAGS) -o servo_test
 
 gps_test: $(SRCDIR)/sandbox/gps_test.o $(LIBDIR) $(LIBDIR)/libautopilot.so 
 	$(CXX) $(SRCDIR)/sandbox/gps_test.o -lautopilot $(LDFLAGS) -o gps_test
