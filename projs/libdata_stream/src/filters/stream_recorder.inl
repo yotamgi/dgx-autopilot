@@ -1,5 +1,6 @@
 #include "stream_recorder.h"
 #include <boost/shared_ptr.hpp>
+#include <typeinfo>
 
 namespace stream {
 namespace filters {
