@@ -14,7 +14,7 @@ void update_cockpit(autopilot::Cockpit* cockpit) {
 }
 
 int main(int argc, char** argv) {
-	if (argc != 1) {
+	if (argc != 2) {
 		std::cout << "Please enter the address to export to" << std::endl;
 		exit(1);
 	}
