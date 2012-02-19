@@ -17,7 +17,7 @@ namespace autopilot {
 class Cockpit : public NormalPlainCockpit {
 public:
 
-	Cockpit(boost::shared_ptr<NormalPlainPlatform> platform);
+	Cockpit(NormalPlainPlatform platform);
 	virtual ~Cockpit() {}
 
 
@@ -51,7 +51,7 @@ public:
 	boost::shared_ptr<vec3_stream> 	watch_fixed_acc();
 
 private:
-	boost::shared_ptr<NormalPlainPlatform> m_platform;
+	NormalPlainPlatform m_platform;
 
 	boost::shared_ptr<vec3_watch_stream> m_orientation;
 	boost::shared_ptr<vec3_stream> 		m_gyro_orientation;

@@ -3,125 +3,66 @@
 #include "hw/itg3200_gyro.h"
 #include "hw/hmc5843_compass.h"
 #include <stream/stream_connection.h>
+#include <stream/stream_utils.h>
 
 #include <boost/make_shared.hpp>
 
 
 namespace autopilot {
 
-DGX1Platform::DGX1Platform():
-		m_acc(new vec3_watch_stream(boost::make_shared<Adxl345Acc>(2))),
-		m_gyro(new vec3_watch_stream(boost::make_shared<Itg3200Gyro>(2))),
-		m_compass(new vec3_watch_stream(boost::make_shared<Hmc5843Compass>(2)))
-{}
+NormalPlainPlatform create_dgx1_platform() {
+	NormalPlainPlatform dgx1_platform;
+	dgx1_platform.acc_sensor.reset(new vec3_watch_stream(boost::make_shared<Adxl345Acc>(2)));
+	dgx1_platform.gyro_sensor.reset(new vec3_watch_stream(boost::make_shared<Itg3200Gyro>(2)));
+	dgx1_platform.compass_sensor.reset(new vec3_watch_stream(boost::make_shared<Hmc5843Compass>(2)));
 
-boost::shared_ptr<vec3_watch_stream> DGX1Platform::acc_sensor() {
-	return m_acc;
-}
+	boost::shared_ptr<stream::PushForwarder<lin_algebra::vec3f> > pos_forwarder(new stream::PushForwarder<lin_algebra::vec3f>);
+	boost::shared_ptr<stream::PushForwarder<float> > speed_dir_forwarder(new stream::PushForwarder<float>);
+	boost::shared_ptr<stream::PushForwarder<float> > speed_mag_forwarder(new stream::PushForwarder<float>);
 
-boost::shared_ptr<vec3_watch_stream> DGX1Platform::gyro_sensor() {
-	return m_gyro;
-}
+	static Gps gps_sensor;
+	gps_sensor.set_pos_reciever_stream(pos_forwarder);
+	gps_sensor.set_speed_dir_reciever_stream(speed_dir_forwarder);
+	gps_sensor.set_speed_mag_reciever_stream(speed_mag_forwarder);
 
-boost::shared_ptr<vec3_watch_stream> DGX1Platform::compass_sensor() {
-	return m_compass;
-}
+	dgx1_platform.gps_pos_generator = pos_forwarder;
+	dgx1_platform.gps_speed_mag_generator = speed_mag_forwarder;
+	dgx1_platform.gps_speed_dir_generator = speed_dir_forwarder;
 
-void DGX1Platform::register_pos_gps_reciever(gps_pos_reciever_ptr reciever) {
-	m_gps_sensor->set_pos_reciever_stream(reciever);
-}
-void DGX1Platform::register_gps_speed_dir_reciever(gps_speed_dir_reciever_ptr reciever) {
-	m_gps_sensor->set_speed_dir_reciever_stream(reciever);
-}
-void DGX1Platform::register_gps_speed_mag_reciever(gps_speed_mag_reciever_ptr reciever) {
-	m_gps_sensor->set_speed_mag_reciever_stream(reciever);
+	return dgx1_platform;
 }
 
 
-boost::shared_ptr<stream::DataPushStream<float> > DGX1Platform::tilt_servo() {
-	throw std::logic_error("Servos not implemented yet on dgx1 platform");
-	return boost::shared_ptr<stream::DataPushStream<float> >();
-}
-
-boost::shared_ptr<stream::DataPushStream<float> > DGX1Platform::yaw_servo() {
-	throw std::logic_error("Servos not implemented yet on dgx1 platform");
-	return boost::shared_ptr<stream::DataPushStream<float> >();
-}
-
-boost::shared_ptr<stream::DataPushStream<float> > DGX1Platform::pitch_servo() {
-	throw std::logic_error("Servos not implemented yet on dgx1 platform");
-	return boost::shared_ptr<stream::DataPushStream<float> >();
-}
-
-boost::shared_ptr<stream::DataPushStream<float> > DGX1Platform::gas_servo() {
-	throw std::logic_error("Servos not implemented yet on dgx1 platform");
-	return boost::shared_ptr<stream::DataPushStream<float> >();
-}
-
-
-//
-// The simulator platform methods
-//
-
-DGX1SimulatorPlatform::DGX1SimulatorPlatform(boost::shared_ptr<stream::ConnectionFactory> conn):
-		m_gps_pos_forwarder(boost::make_shared<PushStreamForwarder<lin_algebra::vec3f> >()),
-		m_gps_speed_dir_forwarder(boost::make_shared<PushStreamForwarder<float> >()),
-		m_gps_speed_mag_forwarder(boost::make_shared<PushStreamForwarder<float> >()),
-		m_stream_conn(conn)
+NormalPlainPlatform create_dgx1_simulator_platform(boost::shared_ptr<stream::ConnectionFactory> conn_factory)
 {
-	// export streams
-	m_stream_conn.export_push_stream<lin_algebra::vec3f>(m_gps_pos_forwarder, std::string("gps_pos_reciever"));
-	m_stream_conn.export_push_stream<float>(m_gps_speed_dir_forwarder, std::string("gps_speed_dir_reciever"));
-	m_stream_conn.export_push_stream<float>(m_gps_speed_mag_forwarder, std::string("gps_speed_mag_reciever"));
-	m_stream_conn.run();
+	static stream::StreamConnection conn(conn_factory);
 
-	// import streams
-	m_gyro = boost::make_shared<vec3_watch_stream>(m_stream_conn.import_pop_stream<lin_algebra::vec3f>("simulator_gyro"));
-	m_acc = boost::make_shared<vec3_watch_stream>(m_stream_conn.import_pop_stream<lin_algebra::vec3f>("simulator_acc"));
-	m_compass = boost::make_shared<vec3_watch_stream>(m_stream_conn.import_pop_stream<lin_algebra::vec3f>("simulator_compass"));
-	m_pitch = m_stream_conn.import_push_stream<float>("simulator_pitch_servo");
-	m_tilt = m_stream_conn.import_push_stream<float>("simulator_tilt_servo");
-	m_gas = m_stream_conn.import_push_stream<float>("simulator_gas_servo");
-}
+	// gps
+	boost::shared_ptr<stream::PushForwarder<lin_algebra::vec3f> > pos_forwarder(new stream::PushForwarder<lin_algebra::vec3f>);
+	boost::shared_ptr<stream::PushForwarder<float> > speed_dir_forwarder(new stream::PushForwarder<float>);
+	boost::shared_ptr<stream::PushForwarder<float> > speed_mag_forwarder(new stream::PushForwarder<float>);
+	conn.export_push_stream<lin_algebra::vec3f>(pos_forwarder, std::string("gps_pos_reciever"));
+	conn.export_push_stream<float>(speed_dir_forwarder, std::string("gps_speed_dir_reciever"));
+	conn.export_push_stream<float>(speed_mag_forwarder, std::string("gps_speed_mag_reciever"));
+	conn.run();
 
-boost::shared_ptr<vec3_watch_stream> DGX1SimulatorPlatform::acc_sensor() {
-	return m_acc;
-}
+	// create the platform and fill it
+	NormalPlainPlatform dgx1_platform;
 
-boost::shared_ptr<vec3_watch_stream> DGX1SimulatorPlatform::gyro_sensor() {
-	return m_gyro;
-}
+	dgx1_platform.acc_sensor.reset(new vec3_watch_stream(conn.import_pop_stream<lin_algebra::vec3f>("simulator_acc")));
+	dgx1_platform.gyro_sensor.reset(new vec3_watch_stream(conn.import_pop_stream<lin_algebra::vec3f>("simulator_gyro")));
+	dgx1_platform.compass_sensor.reset(new vec3_watch_stream(conn.import_pop_stream<lin_algebra::vec3f>("simulator_compass")));
 
-boost::shared_ptr<vec3_watch_stream> DGX1SimulatorPlatform::compass_sensor() {
-	return m_compass;
-}
+	dgx1_platform.pitch_servo = conn.import_push_stream<float>("simulator_pitch_servo");
+	dgx1_platform.tilt_servo = conn.import_push_stream<float>("simulator_tilt_servo");
+	dgx1_platform.gas_servo = conn.import_push_stream<float>("simulator_gas_servo");
 
-void DGX1SimulatorPlatform::register_pos_gps_reciever(gps_pos_reciever_ptr reciever) {
-	m_gps_pos_forwarder->set_reciever(reciever);
-}
-void DGX1SimulatorPlatform::register_gps_speed_dir_reciever(gps_speed_dir_reciever_ptr reciever) {
-	m_gps_speed_dir_forwarder->set_reciever(reciever);
-}
-void DGX1SimulatorPlatform::register_gps_speed_mag_reciever(gps_speed_mag_reciever_ptr reciever) {
-	m_gps_speed_mag_forwarder->set_reciever(reciever);
-}
+	dgx1_platform.gps_pos_generator = pos_forwarder;
+	dgx1_platform.gps_speed_dir_generator = speed_dir_forwarder;
+	dgx1_platform.gps_speed_mag_generator = speed_mag_forwarder;
 
 
-boost::shared_ptr<stream::DataPushStream<float> > DGX1SimulatorPlatform::tilt_servo() {
-	return m_tilt;
+	return dgx1_platform;
 }
-
-boost::shared_ptr<stream::DataPushStream<float> > DGX1SimulatorPlatform::yaw_servo() {
-	return m_yaw;
-}
-
-boost::shared_ptr<stream::DataPushStream<float> > DGX1SimulatorPlatform::pitch_servo() {
-	return m_pitch;
-}
-
-boost::shared_ptr<stream::DataPushStream<float> > DGX1SimulatorPlatform::gas_servo() {
-	return m_gas;
-}
-
 
 } //namespace autopilot

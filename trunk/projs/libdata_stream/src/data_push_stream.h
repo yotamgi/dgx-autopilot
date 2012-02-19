@@ -2,6 +2,7 @@
 #define DATA_COLLECTOR_H_
 
 #include "stream_exception.h"
+#include <boost/shared_ptr.hpp>
 
 namespace stream {
 
@@ -12,7 +13,7 @@ public:
 };
 
 /**
- * A class for push kind streams
+ * An interface for push kind streams
  */
 template <typename T>
 class DataPushStream {
@@ -27,6 +28,16 @@ public:
 	virtual void set_data(const T& data) = 0;
 };
 
+/**
+ * An interface for those who push data into a push stream
+ */
+template <typename T>
+class PushGenerator {
+public:
+	virtual ~PushGenerator() {}
+
+	virtual void set_receiver(boost::shared_ptr<DataPushStream<T> >) = 0;
+};
 
 }  // namespace stream
 
