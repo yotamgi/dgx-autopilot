@@ -19,9 +19,7 @@ int main(int argc, char** argv) {
 		exit(1);
 	}
 
-	boost::shared_ptr<autopilot::NormalPlainPlatform> platform(
-			(autopilot::NormalPlainPlatform*)new autopilot::DGX1Platform()
-	);
+	autopilot::NormalPlainPlatform platform = autopilot::create_dgx1_platform();
 
 	autopilot::Cockpit cockpit(platform);
 
@@ -33,8 +31,8 @@ int main(int argc, char** argv) {
 	stream::StreamConnection conn(client);
 	conn.export_pop_stream<lin_algebra::vec3f>(cockpit.watch_gyro_orientation(), "gyro_watch_orientation");
 	conn.export_pop_stream<lin_algebra::vec3f>(cockpit.watch_rest_orientation(), "watch_rest_orientation");
-	conn.export_pop_stream<lin_algebra::vec3f>(platform->acc_sensor()->get_watch_stream(), "watch_acc_sensor");
-	conn.export_pop_stream<lin_algebra::vec3f>(platform->compass_sensor()->get_watch_stream(), "watch_compass_sensor");
+	conn.export_pop_stream<lin_algebra::vec3f>(platform.acc_sensor->get_watch_stream(), "watch_acc_sensor");
+	conn.export_pop_stream<lin_algebra::vec3f>(platform.compass_sensor->get_watch_stream(), "watch_compass_sensor");
 	conn.export_pop_stream<lin_algebra::vec3f>(cockpit.orientation(), "orientation");
 	conn.export_pop_stream<float>(cockpit.watch_rest_reliability(), "reliability");
 	conn.export_pop_stream<lin_algebra::vec2f>(cockpit.position(), "position");

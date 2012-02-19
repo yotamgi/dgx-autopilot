@@ -21,31 +21,27 @@ typedef boost::shared_ptr<stream::DataPushStream<float> > gps_speed_mag_reciever
  *  - To have GPS sensor
  *  - To be controlled by Servos.
  */
-class NormalPlainPlatform {
-public:
-	typedef boost::shared_ptr<stream::DataPopStream<lin_algebra::vec3f> > vec_stream_ptr;
+struct NormalPlainPlatform {
 
-	virtual ~NormalPlainPlatform() {}
+	boost::shared_ptr<vec3_watch_stream> acc_sensor;
 
-	virtual boost::shared_ptr<vec3_watch_stream> acc_sensor() = 0;
+	boost::shared_ptr<vec3_watch_stream> gyro_sensor;
 
-	virtual boost::shared_ptr<vec3_watch_stream> gyro_sensor() = 0;
+	boost::shared_ptr<vec3_watch_stream> compass_sensor;
 
-	virtual boost::shared_ptr<vec3_watch_stream> compass_sensor() = 0;
+	boost::shared_ptr<stream::PushGenerator<lin_algebra::vec3f> > gps_pos_generator;
 
-	virtual void register_pos_gps_reciever(gps_pos_reciever_ptr reciever) = 0;
+	boost::shared_ptr<stream::PushGenerator<float> > gps_speed_dir_generator;
 
-	virtual void register_gps_speed_dir_reciever(gps_speed_dir_reciever_ptr reciever) = 0;
+	boost::shared_ptr<stream::PushGenerator<float> > gps_speed_mag_generator;
 
-	virtual void register_gps_speed_mag_reciever(gps_speed_mag_reciever_ptr reciever) = 0;
+	boost::shared_ptr<stream::DataPushStream<float> > tilt_servo;
 
-	virtual boost::shared_ptr<stream::DataPushStream<float> > tilt_servo() = 0;
+	boost::shared_ptr<stream::DataPushStream<float> > yaw_servo;
 
-	virtual boost::shared_ptr<stream::DataPushStream<float> > yaw_servo() = 0;
+	boost::shared_ptr<stream::DataPushStream<float> > pitch_servo;
 
-	virtual boost::shared_ptr<stream::DataPushStream<float> > pitch_servo() = 0;
-
-	virtual boost::shared_ptr<stream::DataPushStream<float> > gas_servo() = 0;
+	boost::shared_ptr<stream::DataPushStream<float> > gas_servo;
 };
 
 } //namespace autopilot

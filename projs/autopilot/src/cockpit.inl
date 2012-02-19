@@ -29,7 +29,7 @@ static lin_algebra::mat3f update_matrix(const lin_algebra::mat3f& m1,
 	return rot;
 }
 
-inline Cockpit::Cockpit(boost::shared_ptr<NormalPlainPlatform> platform):
+inline Cockpit::Cockpit(NormalPlainPlatform platform):
 		m_platform(platform),
 		m_gps_pos(boost::make_shared<stream::PushToPopConv<lin_algebra::vec3f> >(lin_algebra::vec3f())),
 		m_gps_speed_dir(boost::make_shared<stream::PushToPopConv<float> >(0.)),
@@ -51,14 +51,14 @@ inline Cockpit::Cockpit(boost::shared_ptr<NormalPlainPlatform> platform):
 
 	namespace filter = stream::filters;
 
-	m_platform->register_pos_gps_reciever(m_gps_pos);
-	m_platform->register_gps_speed_dir_reciever(m_gps_speed_dir);
-	m_platform->register_gps_speed_mag_reciever(m_gps_speed_mag);
+	m_platform.gps_pos_generator->set_receiver(m_gps_pos);
+	m_platform.gps_speed_dir_generator->set_receiver(m_gps_speed_dir);
+	m_platform.gps_speed_mag_generator->set_receiver(m_gps_speed_mag);
 
 	m_gyro_orientation = boost::make_shared<filter::MatrixToEulerFilter>(
 		boost::make_shared<filter::IntegralFilter<lin_algebra::mat3f> >(
 			boost::make_shared<filter::GyroToAVMatrix>(
-				m_platform->gyro_sensor()->get_watch_stream()
+				m_platform.gyro_sensor->get_watch_stream()
 			),
 			lin_algebra::identity_matrix<lin_algebra::mat3f>(3u, 3u),
 			update_matrix
@@ -66,9 +66,9 @@ inline Cockpit::Cockpit(boost::shared_ptr<NormalPlainPlatform> platform):
 	);
 
 	boost::shared_ptr<FusionFilter> fusion_filter = boost::make_shared<FusionFilter>(
-					m_platform->acc_sensor(),
-					m_platform->compass_sensor(),
-					m_platform->gyro_sensor(),
+					m_platform.acc_sensor,
+					m_platform.compass_sensor,
+					m_platform.gyro_sensor,
 					20., // the north explected angle
 					m_gps_speed_mag
 	);
@@ -123,19 +123,19 @@ inline boost::shared_ptr<float_watch_stream> Cockpit::alt() {
 }
 
 inline servo_stream_ptr Cockpit::tilt_servo() {
-	return m_platform->tilt_servo();
+	return m_platform.tilt_servo;
 }
 
 inline servo_stream_ptr Cockpit::yaw_servo() {
-	return m_platform->yaw_servo();
+	return m_platform.yaw_servo;
 }
 
 inline servo_stream_ptr Cockpit::pitch_servo(){
-	return m_platform->pitch_servo();
+	return m_platform.pitch_servo;
 }
 
 inline servo_stream_ptr Cockpit::gas_servo() {
-	return m_platform->gas_servo();
+	return m_platform.gas_servo;
 }
 
 

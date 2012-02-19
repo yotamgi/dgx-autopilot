@@ -24,6 +24,24 @@ private:
 	T m_data;
 };
 
+/**
+ * A bypass PushStream forwarder class.
+ * It only forwards the calls if there is a receiver stream. if not, it will do
+ * nothing.
+ */
+template <typename T>
+class PushForwarder : public DataPushStream<T>, public PushGenerator<T> {
+public:
+
+	void set_data(const T& data) { if (m_stream) m_stream->set_data(data); }
+
+	void set_receiver(boost::shared_ptr<DataPushStream<T> > stream) { m_stream = stream; }
+
+private:
+
+	boost::shared_ptr<DataPushStream<T> > m_stream;
+};
+
 } // namespace stream
 
 #endif /* STREAM_UTILS_H_ */

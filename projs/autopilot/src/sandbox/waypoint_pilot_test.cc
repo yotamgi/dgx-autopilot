@@ -57,10 +57,10 @@ int main(int argc, char** argv) {
 	pilot_params.max_tilt_angle = 20.;
 
 	// create the platform according to the args
-	boost::shared_ptr<autopilot::NormalPlainPlatform> platform(
+	autopilot::NormalPlainPlatform platform(
 		(sim_address == "") ?
-			(autopilot::NormalPlainPlatform*)new autopilot::DGX1Platform() :
-			(autopilot::NormalPlainPlatform*)new autopilot::DGX1SimulatorPlatform(boost::make_shared<stream::TcpipServer>(sim_address, 0x6060))
+			autopilot::create_dgx1_platform() :
+			autopilot::create_dgx1_simulator_platform(boost::make_shared<stream::TcpipServer>(sim_address, 0x6060))
 	);
 
 	boost::shared_ptr<autopilot::Cockpit> cockpit(boost::make_shared<autopilot::Cockpit>(platform));
