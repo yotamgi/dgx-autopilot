@@ -9,10 +9,10 @@
 
 namespace autopilot {
 
-typedef stream::filters::WatchFilter<lin_algebra::vec3f> 	vec3_watch_stream;
-typedef boost::shared_ptr<stream::DataPushStream<lin_algebra::vec3f> > gps_pos_reciever_ptr;
-typedef boost::shared_ptr<stream::DataPushStream<float> > gps_speed_dir_reciever_ptr;
-typedef boost::shared_ptr<stream::DataPushStream<float> > gps_speed_mag_reciever_ptr;
+typedef stream::DataPopStream<lin_algebra::vec3f> 	vec3_pop_stream;
+typedef stream::DataPushStream<float> 				float_push_stream;
+typedef stream::PushGenerator<lin_algebra::vec3f> 	vec3_push_gen;
+typedef stream::PushGenerator<float> 				float_push_gen;
 
 /**
  * Normal Plain Platform.
@@ -23,25 +23,21 @@ typedef boost::shared_ptr<stream::DataPushStream<float> > gps_speed_mag_reciever
  */
 struct NormalPlainPlatform {
 
-	boost::shared_ptr<vec3_watch_stream> acc_sensor;
+	// The ordinary pop sensors
+	boost::shared_ptr<vec3_pop_stream> acc_sensor;
+	boost::shared_ptr<vec3_pop_stream> gyro_sensor;
+	boost::shared_ptr<vec3_pop_stream> compass_sensor;
 
-	boost::shared_ptr<vec3_watch_stream> gyro_sensor;
+	// The Gps stream generators
+	boost::shared_ptr<vec3_push_gen>  gps_pos_generator;
+	boost::shared_ptr<float_push_gen> gps_speed_dir_generator;
+	boost::shared_ptr<float_push_gen> gps_speed_mag_generator;
 
-	boost::shared_ptr<vec3_watch_stream> compass_sensor;
-
-	boost::shared_ptr<stream::PushGenerator<lin_algebra::vec3f> > gps_pos_generator;
-
-	boost::shared_ptr<stream::PushGenerator<float> > gps_speed_dir_generator;
-
-	boost::shared_ptr<stream::PushGenerator<float> > gps_speed_mag_generator;
-
-	boost::shared_ptr<stream::DataPushStream<float> > tilt_servo;
-
-	boost::shared_ptr<stream::DataPushStream<float> > yaw_servo;
-
-	boost::shared_ptr<stream::DataPushStream<float> > pitch_servo;
-
-	boost::shared_ptr<stream::DataPushStream<float> > gas_servo;
+	// The Servos
+	boost::shared_ptr<float_push_stream> tilt_servo;
+	boost::shared_ptr<float_push_stream> yaw_servo;
+	boost::shared_ptr<float_push_stream> pitch_servo;
+	boost::shared_ptr<float_push_stream> gas_servo;
 };
 
 } //namespace autopilot
