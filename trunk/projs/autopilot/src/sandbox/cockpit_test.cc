@@ -9,6 +9,8 @@
 #include <string>
 #include <iostream>
 
+typedef stream::filters::WatchFilter<lin_algebra::vec3f> vec3_watch_stream;
+
 void usage(std::string arg0) {
 	std::cout << arg0 << " [--sensor-sim <address> ]  [--present-from <address> ] [--present-local]  [--help]" << std::endl;
 }
@@ -118,6 +120,10 @@ int main(int argc, char** argv) {
 				autopilot::create_dgx1_simulator_platform(boost::make_shared<stream::TcpipServer>(sim_addr, 0x6060)):
 				autopilot::create_dgx1_platform();
 
+		// add a watch stream on the compass stream
+		boost::shared_ptr<vec3_watch_stream> compass_watch(new vec3_watch_stream(platform.compass_sensor));
+		platform.compass_sensor = compass_watch;
+
 		autopilot::Cockpit cockpit(platform);
 
 		boost::thread update_thread(update_cockpit, &cockpit);
@@ -134,7 +140,7 @@ int main(int argc, char** argv) {
 			// the mid one
 			view3d.addAngleStream(cockpit.watch_rest_orientation(), irr::core::vector3df(0., 0., 0.));
 			view3d.addVecStream(cockpit.watch_fixed_acc(), irr::core::vector3df(0., 0., 0.));
-			view3d.addVecStream(platform.compass_sensor->get_watch_stream(), irr::core::vector3df(0., 0., 0.));
+			view3d.addVecStream(compass_watch->get_watch_stream(), irr::core::vector3df(0., 0., 0.));
 
 			// the right one
 			view3d.addAngleStream(cockpit.watch_gyro_orientation(), irr::core::vector3df(20., 0., 0.));
@@ -166,7 +172,7 @@ int main(int argc, char** argv) {
 			conn.export_pop_stream<lin_algebra::vec3f>(cockpit.watch_gyro_orientation(), "gyro_watch_orientation");
 			conn.export_pop_stream<lin_algebra::vec3f>(cockpit.watch_rest_orientation(), "watch_rest_orientation");
 			conn.export_pop_stream<lin_algebra::vec3f>(cockpit.watch_fixed_acc(), "watch_acc_sensor");
-			conn.export_pop_stream<lin_algebra::vec3f>(platform.compass_sensor->get_watch_stream(), "watch_compass_sensor");
+			conn.export_pop_stream<lin_algebra::vec3f>(compass_watch->get_watch_stream(), "watch_compass_sensor");
 			conn.export_pop_stream<lin_algebra::vec3f>(cockpit.orientation(), "orientation");
 			conn.export_pop_stream<float>(cockpit.watch_rest_reliability(), "reliability");
 			conn.export_pop_stream<lin_algebra::vec2f>(cockpit.position(), "position");

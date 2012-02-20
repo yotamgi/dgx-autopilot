@@ -11,6 +11,8 @@
 
 namespace autopilot {
 
+typedef stream::filters::WatchFilter<lin_algebra::vec3f> vec3_watch_stream;
+
 /**
  * Specific cockpit for normal plains.
  */

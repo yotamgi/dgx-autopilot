@@ -11,11 +11,6 @@
 
 namespace autopilot {
 
-typedef stream::filters::WatchFilter<lin_algebra::vec3f> 	vec3_watch_stream;
-typedef stream::DataPopStream<lin_algebra::vec3f>			vec3_stream;
-typedef boost::shared_ptr<vec3_stream> 						vec3_stream_ptr;
-typedef stream::DataPushStream<float> 						servo_stream;
-
 
 NormalPlainPlatform create_dgx1_platform();
 
