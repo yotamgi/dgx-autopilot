@@ -4,9 +4,10 @@
 #include <stream/func_filter.h>
 #include <stream/data_pop_stream.h>
 #include <stream/data_push_stream.h>
-#include <util/time.h>
+#include <stream/util/time.h>
 #include <ostream>
 #include <string>
+#include <stdexcept>
 
 namespace stream {
 namespace filters {
