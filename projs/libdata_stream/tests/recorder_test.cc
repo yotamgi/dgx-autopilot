@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 #include <sstream>
 #include <iostream>
+#include <fstream>
 
 class RunningGen : public stream::DataPopStream<int> {
 public:
@@ -82,4 +83,26 @@ TEST(player_recorder, non_blocking_fast_slow) {
 	}
 }
 
+TEST(player_recorder, blocking_functional_file) {
+	boost::shared_ptr<RunningGen> gen(new RunningGen);
+	//std::stringstream ss;
+	std::ofstream record_file("/tmp/file");
 
+	stream::filters::RecorderPopFilter<int> filter(record_file, gen);
+
+	// make the recording
+	for (size_t i=0; i<100; i++) {
+		usleep(10000); // 1/100 sec
+		filter.get_data();
+	}
+	record_file.close();
+
+	// play it
+	std::ifstream play_file("/tmp/file");
+	stream::PopStreamPlayer<int> player(play_file);
+	Timer t;
+	for (size_t i=0; i<100; i++) {
+		ASSERT_EQ(i, player.get_data());
+	}
+	ASSERT_NEAR(t.passed(), 1.0, 0.2);
+}
