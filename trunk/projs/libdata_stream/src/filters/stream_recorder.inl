@@ -8,13 +8,23 @@ namespace filters {
 template <typename T>
 inline RecorderFunctor<T>::RecorderFunctor(std::ostream& out):m_out(out)
 {
+	if (!m_out.good()) {
+		throw std::runtime_error("Recording std::stream is not valid (Recorder Constructor)");
+	}
+
 	// create a little header
-	out << "STREAM" << std::endl;
-	out << typeid(T).name() << std::endl;
+	m_out << "STREAM" << std::endl;
+	m_out << typeid(T).name() << std::endl;
+
 }
 
 template <typename T>
 inline T RecorderFunctor<T>::operator() (const T& data) {
+
+	if (!m_out.good()) {
+		throw std::runtime_error("Recording std::stream is not valid");
+	}
+
 	m_out << m_timer.passed() << "," << data << std::endl;
 	return data;
 }
