@@ -35,6 +35,34 @@ boost::shared_ptr<DataPopStream<data_t> > create_func_pop_filter(
 }
 
 
+template <typename data_source_t, typename data_t = data_source_t>
+class FuncPushFilter : public StreamPushFilter<data_source_t, data_t> {
+public:
+	FuncPushFilter(boost::shared_ptr<DataPushStream<data_t> > collector,
+					   boost::function<data_t(data_source_t)> filter_func):
+		StreamPushFilter<data_source_t, data_t>(collector),
+		m_filter_func(filter_func)
+	{}
+
+	void set_data(const data_source_t& data) {
+		StreamPushFilter<data_source_t, data_t>::m_collector->set_data(m_filter_func(data));
+	}
+
+private:
+
+	boost::function<data_t(data_source_t)> m_filter_func;
+};
+
+template <typename data_source_t, typename data_t>
+boost::shared_ptr<DataPushStream<data_t> > create_func_push_filter(
+							boost::shared_ptr<DataPushStream<data_source_t> > collector,
+							boost::function<data_t(data_source_t)> filter_func)
+{
+	return boost::make_shared<FuncPushFilter<data_source_t, data_t> >(collector, filter_func);
+}
+
+
+
 } // namespace stream
 
 
