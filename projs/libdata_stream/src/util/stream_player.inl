@@ -74,6 +74,40 @@ inline T PopStreamPlayer<T>::get_data() {
 	}
 }
 
+template <typename T>
+PushStreamPlayer<T>::PushStreamPlayer(std::istream& in):
+	m_reader(in),
+	m_worker_thread(&PushStreamPlayer<T>::run, this)
+{}
+
+template <typename T>
+void PushStreamPlayer<T>::set_receiver(boost::shared_ptr<DataPushStream<T> > reciever) {
+	m_reciever = reciever;
+}
+
+template <typename T>
+void PushStreamPlayer<T>::run() {
+	typename StreamReader<T>::sample curr_sample = m_reader.next_sample();
+
+	while (true) {
+
+		// block until the time comes
+		while (curr_sample.time > m_timer.passed()) {
+			usleep((uint32_t)((curr_sample.time - m_timer.passed()) * 1000000.));
+		}
+
+		// set the data, if somone listens
+		if (m_reciever) {
+			m_reciever->set_data(curr_sample.data);
+		}
+
+		// read the next sample
+		curr_sample = m_reader.next_sample();
+
+	}
+}
+
+
 } // namespace stream
 
 #endif /* STREAM_PLAYER_INL_ */

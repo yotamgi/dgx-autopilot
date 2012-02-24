@@ -2,7 +2,9 @@
 #define STREAM_PLAYER_H_
 
 #include <stream/data_pop_stream.h>
+#include <stream/data_push_stream.h>
 #include <stream/util/time.h>
+#include <boost/thread.hpp>
 #include <istream>
 
 namespace stream {
@@ -43,7 +45,7 @@ class PopStreamPlayer : public DataPopStream<T> {
 public:
 	/**
 	 * Constructor.
-	 * @param in - the stream to write to.
+	 * @param in - the stream to play.
 	 * @param blocking - tells the stream player to be either blocking and
 	 * completely complient with recorded stream, or it can skip samples if their
 	 * time passed and to return the data immedietly if not.
@@ -62,6 +64,36 @@ private:
 
 	typename StreamReader<T>::sample m_curr_sample;
 };
+
+
+/**
+ * The PushStreamPlayer class.
+ * This class is a PushGenerator that uses StreamReader class (above) to play a
+ * stream format std::istream.
+ * In order for it to work it opens a thread.
+ */
+template <typename T>
+class PushStreamPlayer : public PushGenerator<T> {
+public:
+	/**
+	 * Constructor.
+	 * @param in - the stream to play.
+	 */
+	PushStreamPlayer(std::istream& in);
+
+	void set_receiver(boost::shared_ptr<DataPushStream<T> > reciever);
+
+private:
+
+	void run();
+
+	StreamReader<T> m_reader;
+	boost::thread m_worker_thread;
+	boost::shared_ptr<DataPushStream<T> > m_reciever;
+
+	Timer m_timer;
+};
+
 
 } // namespace stream
 
