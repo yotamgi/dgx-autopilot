@@ -29,7 +29,7 @@ void update_cockpit(autopilot::Cockpit* cockpit) {
 template <typename T>
 boost::shared_ptr<stream::PushGenerator<T> > add_push_recorder(
 		boost::shared_ptr<stream::PushGenerator<T> > unfiltered,
-		std::ostream& out)
+		boost::shared_ptr<std::ostream> out)
 {
 	// create a forwarder
 	boost::shared_ptr<stream::PushForwarder<T> > forwarder(new stream::PushForwarder<T>);
@@ -37,7 +37,7 @@ boost::shared_ptr<stream::PushGenerator<T> > add_push_recorder(
 	// bind it through a filter to the generator
 	unfiltered->set_receiver(
 			boost::make_shared<stream::filters::RecorderPushFilter<T> >(
-					boost::ref(out),
+					out,
 					forwarder
 			)
 	);
@@ -117,21 +117,22 @@ int main(int argc, char** argv) {
 		typedef stream::PushStreamPlayer<lin_algebra::vec3f> vec3_push_player;
 		typedef stream::PushStreamPlayer<float> float_push_player;
 
-		std::ifstream acc_file((play_dir + "/acc.stream").c_str());
-		std::ifstream compass_file((play_dir + "/compass.stream").c_str());
-		std::ifstream gyro_file((play_dir + "/gyro.stream").c_str());
-		std::ifstream gps_pos_file((play_dir + "/gps_pos.stream").c_str());
-		std::ifstream gps_speed_mag_file((play_dir + "/gps_speed_mag.stream").c_str());
-		std::ifstream gps_speed_dir_file((play_dir + "/gps_speed_dir.stream").c_str());
+		typedef boost::shared_ptr<std::ifstream> ifile_ptr;
+		ifile_ptr acc_file				= boost::make_shared<std::ifstream>((play_dir + "/acc.stream").c_str());
+		ifile_ptr compass_file			= boost::make_shared<std::ifstream>((play_dir + "/compass.stream").c_str());
+		ifile_ptr gyro_file				= boost::make_shared<std::ifstream>((play_dir + "/gyro.stream").c_str());
+		ifile_ptr gps_pos_file			= boost::make_shared<std::ifstream>((play_dir + "/gps_pos.stream").c_str());
+		ifile_ptr gps_speed_mag_file	= boost::make_shared<std::ifstream>((play_dir + "/gps_speed_mag.stream").c_str());
+		ifile_ptr gps_speed_dir_file	= boost::make_shared<std::ifstream>((play_dir + "/gps_speed_dir.stream").c_str());
 
 		// create the player platform
 		autopilot::NormalPlainPlatform platform;
-		platform.acc_sensor = boost::make_shared<vec3_pop_player>(boost::ref(acc_file));
-		platform.gyro_sensor = boost::make_shared<vec3_pop_player>(boost::ref(gyro_file));
-		platform.compass_sensor = boost::make_shared<vec3_pop_player>(boost::ref(compass_file));
-		platform.gps_pos_generator = boost::make_shared<vec3_push_player>(boost::ref(gps_pos_file));
-		platform.gps_speed_dir_generator = boost::make_shared<float_push_player>(boost::ref(gps_speed_dir_file));
-		platform.gps_speed_mag_generator = boost::make_shared<float_push_player>(boost::ref(gps_speed_mag_file));
+		platform.acc_sensor = boost::make_shared<vec3_pop_player>(acc_file);
+		platform.gyro_sensor = boost::make_shared<vec3_pop_player>(gyro_file);
+		platform.compass_sensor = boost::make_shared<vec3_pop_player>(compass_file);
+		platform.gps_pos_generator = boost::make_shared<vec3_push_player>(gps_pos_file);
+		platform.gps_speed_dir_generator = boost::make_shared<float_push_player>(gps_speed_dir_file);
+		platform.gps_speed_mag_generator = boost::make_shared<float_push_player>(gps_speed_mag_file);
 
 		std::cout << "Playing data from directory: " << play_dir << std::endl;
 
@@ -229,13 +230,16 @@ int main(int argc, char** argv) {
 		boost::shared_ptr<vec3_watch_stream> compass_watch(new vec3_watch_stream(platform.compass_sensor));
 		platform.compass_sensor = compass_watch;
 
-		std::ofstream acc_file((record_dir + "/acc.stream").c_str());
-		std::ofstream compass_file((record_dir + "/compass.stream").c_str());
-		std::ofstream gyro_file((record_dir + "/gyro.stream").c_str());
-		std::ofstream gps_pos_file((record_dir + "/gps_pos.stream").c_str());
-		std::ofstream gps_speed_mag_file((record_dir + "/gps_speed_mag.stream").c_str());
-		std::ofstream gps_speed_dir_file((record_dir + "/gps_speed_dir.stream").c_str());
 		if (record_dir != "") {
+
+			typedef boost::shared_ptr<std::ofstream> file_ptr;
+			file_ptr acc_file 			= boost::make_shared<std::ofstream>((record_dir + "/acc.stream").c_str());
+			file_ptr compass_file 		= boost::make_shared<std::ofstream>((record_dir + "/compass.stream").c_str());
+			file_ptr gyro_file 			= boost::make_shared<std::ofstream>((record_dir + "/gyro.stream").c_str());
+			file_ptr gps_pos_file 		= boost::make_shared<std::ofstream>((record_dir + "/gps_pos.stream").c_str());
+			file_ptr gps_speed_mag_file = boost::make_shared<std::ofstream>((record_dir + "/gps_speed_mag.stream").c_str());
+			file_ptr gps_speed_dir_file = boost::make_shared<std::ofstream>((record_dir + "/gps_speed_dir.stream").c_str());
+
 			typedef stream::filters::RecorderPopFilter<lin_algebra::vec3f> pop_recorder;
 
 			platform.acc_sensor.reset(new pop_recorder(acc_file, platform.acc_sensor));

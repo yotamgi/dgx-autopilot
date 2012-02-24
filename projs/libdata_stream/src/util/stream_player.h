@@ -5,6 +5,7 @@
 #include <stream/data_push_stream.h>
 #include <stream/util/time.h>
 #include <boost/thread.hpp>
+#include <boost/shared_ptr.hpp>
 #include <istream>
 
 namespace stream {
@@ -22,7 +23,7 @@ namespace stream {
 template <typename T>
 class StreamReader {
 public:
-	StreamReader(std::istream& in);
+	StreamReader(boost::shared_ptr<std::istream> in);
 
 	struct sample {
 		T data;
@@ -32,7 +33,7 @@ public:
 	sample next_sample();
 
 private:
-	std::istream& m_in;
+	boost::shared_ptr<std::istream> m_in;
 };
 
 /**
@@ -50,7 +51,7 @@ public:
 	 * completely complient with recorded stream, or it can skip samples if their
 	 * time passed and to return the data immedietly if not.
 	 */
-	PopStreamPlayer(std::istream& in, bool blocking = true);
+	PopStreamPlayer(boost::shared_ptr<std::istream> in, bool blocking = true);
 
 	T get_data();
 
@@ -79,7 +80,7 @@ public:
 	 * Constructor.
 	 * @param in - the stream to play.
 	 */
-	PushStreamPlayer(std::istream& in);
+	PushStreamPlayer(boost::shared_ptr<std::istream> in);
 
 	void set_receiver(boost::shared_ptr<DataPushStream<T> > reciever);
 
