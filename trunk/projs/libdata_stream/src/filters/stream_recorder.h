@@ -46,6 +46,18 @@ public:
 	RecorderPopFilter(std::ostream& out, boost::shared_ptr<DataPopStream<data_t> > generator);
 };
 
+/**
+ * The Push Stream Recorder class.
+ * This is a stream filter that uses the RecorederFunctor (above) to record the data
+ * passes in a push stream.
+ * It does not affect the data flow inside the stream, except for the time takes to
+ * save the data.
+ */
+template <typename data_t>
+class RecorderPushFilter : public FuncPushFilter<data_t> {
+public:
+	RecorderPushFilter(std::ostream& out, boost::shared_ptr<DataPushStream<data_t> > collector);
+};
 
 }  // namespace filter
 }  // namespace stream

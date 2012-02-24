@@ -35,6 +35,11 @@ RecorderPopFilter<data_t>::RecorderPopFilter(std::ostream& out,
 				FuncPopFilter<data_t>(generator, RecorderFunctor<data_t>(out))
 {}
 
+template <typename data_t>
+RecorderPushFilter<data_t>::RecorderPushFilter(std::ostream& out,
+									 boost::shared_ptr<DataPushStream<data_t> > collector):
+				FuncPushFilter<data_t>(collector, RecorderFunctor<data_t>(out))
+{}
 
 }  // namespace filter
 }  // namespace stream
