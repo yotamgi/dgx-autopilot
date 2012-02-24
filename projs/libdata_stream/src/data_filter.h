@@ -35,20 +35,20 @@ protected:
  * To implement it, one must implement the get_data function.
  */
 template <typename data_source_t, typename data_t = data_source_t>
-class StreamPushFilter : public DataPushStream<data_t> {
+class StreamPushFilter : public DataPushStream<data_source_t> {
 public:
 
 	/**
 	 * Inits the filter with the DataPopStream object it will filter
 	 */
-	StreamPushFilter(boost::shared_ptr<DataPushStream<data_source_t> > collector):m_collector(collector) {}
+	StreamPushFilter(boost::shared_ptr<DataPushStream<data_t> > collector):m_collector(collector) {}
 
 protected:
 
 	/**
 	 * The generator that it filters.
 	 */
-	boost::shared_ptr<DataPushStream<data_source_t> > m_collector;
+	boost::shared_ptr<DataPushStream<data_t> > m_collector;
 };
 
 /**
@@ -60,19 +60,19 @@ class StreamFilter : 	public StreamPopFilter<data_t>,
 {
 public:
 	StreamFilter(boost::shared_ptr<DataPopStream<data_source_t> > generator,
-				boost::shared_ptr<DataPushStream<data_source_t> > collector):
+				boost::shared_ptr<DataPushStream<data_t> > collector):
 		StreamPopFilter<data_t>(generator),
 		StreamPushFilter<data_t>(collector)
 	{}
 
-	StreamFilter(boost::shared_ptr<DataPushStream<data_source_t> > collector):
+	StreamFilter(boost::shared_ptr<DataPushStream<data_t> > collector):
 		StreamPopFilter<data_t>(boost::shared_ptr<DataPopStream<data_source_t> >()),
 		StreamPushFilter<data_t>(collector)
 	{}
 
 	StreamFilter(boost::shared_ptr<DataPopStream<data_source_t> > generator):
 		StreamPopFilter<data_t>(generator),
-		StreamPushFilter<data_t>(boost::shared_ptr<DataPushStream<data_source_t> >())
+		StreamPushFilter<data_t>(boost::shared_ptr<DataPushStream<data_t> >())
 	{}
 
 
