@@ -5,6 +5,8 @@
 #include <stream/data_pop_stream.h>
 #include <stream/data_push_stream.h>
 #include <stream/util/time.h>
+
+#include <boost/shared_ptr.hpp>
 #include <ostream>
 #include <string>
 #include <stdexcept>
@@ -24,12 +26,12 @@ namespace filters {
 template <typename T>
 class RecorderFunctor {
 public:
-	RecorderFunctor(std::ostream& out);
+	RecorderFunctor(boost::shared_ptr<std::ostream> out);
 
 	T operator() (const T& data);
 
 private:
-	std::ostream& m_out;
+	boost::shared_ptr<std::ostream> m_out;
 	Timer m_timer;
 };
 
@@ -43,7 +45,7 @@ private:
 template <typename data_t>
 class RecorderPopFilter : public FuncPopFilter<data_t> {
 public:
-	RecorderPopFilter(std::ostream& out, boost::shared_ptr<DataPopStream<data_t> > generator);
+	RecorderPopFilter(boost::shared_ptr<std::ostream> out, boost::shared_ptr<DataPopStream<data_t> > generator);
 };
 
 /**
@@ -56,7 +58,7 @@ public:
 template <typename data_t>
 class RecorderPushFilter : public FuncPushFilter<data_t> {
 public:
-	RecorderPushFilter(std::ostream& out, boost::shared_ptr<DataPushStream<data_t> > collector);
+	RecorderPushFilter(boost::shared_ptr<std::ostream>, boost::shared_ptr<DataPushStream<data_t> > collector);
 };
 
 }  // namespace filter

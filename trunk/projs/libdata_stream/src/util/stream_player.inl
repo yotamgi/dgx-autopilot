@@ -9,17 +9,17 @@
 namespace stream {
 
 template <typename T>
-StreamReader<T>::StreamReader(std::istream& in):m_in(in)
+StreamReader<T>::StreamReader(boost::shared_ptr<std::istream> in):m_in(in)
 {
 	// parse header
 	std::string constant;
-	m_in >> constant;
+	(*m_in) >> constant;
 	if (constant != std::string("STREAM")) {
 		throw PopStreamException("Could not parse the std::stream as a stream format");
 	}
 
 	std::string typeid_string;
-	m_in >> typeid_string;
+	(*m_in) >> typeid_string;
 	if (typeid_string != typeid(T).name()) {
 		std::stringstream error;
 		error << "The stream is in not in the correct type (" << typeid_string << "!=" << typeid(T).name() << ")";
@@ -31,19 +31,19 @@ template <typename T>
 typename StreamReader<T>::sample StreamReader<T>::next_sample() {
 	typename StreamReader<T>::sample s;
 	char c;
-	m_in >> s.time;
-	m_in >> c;
+	(*m_in) >> s.time;
+	(*m_in) >> c;
 	if (c != ',') {
 		std::stringstream error;
 		error << "Could not parse the std::stream as a stream format - Expected ',' as seperator, but got " << c;
 		throw PopStreamException(error.str());
 	}
-	m_in >> s.data;
+	(*m_in) >> s.data;
 	return s;
 }
 
 template <typename T>
-inline PopStreamPlayer<T>::PopStreamPlayer(std::istream& in, bool blocking):
+inline PopStreamPlayer<T>::PopStreamPlayer(boost::shared_ptr<std::istream> in, bool blocking):
 		m_reader(in), m_blocking(blocking)
 {
 	if (!blocking) {
@@ -75,7 +75,7 @@ inline T PopStreamPlayer<T>::get_data() {
 }
 
 template <typename T>
-PushStreamPlayer<T>::PushStreamPlayer(std::istream& in):
+PushStreamPlayer<T>::PushStreamPlayer(boost::shared_ptr<std::istream> in):
 	m_reader(in),
 	m_worker_thread(&PushStreamPlayer<T>::run, this)
 {}

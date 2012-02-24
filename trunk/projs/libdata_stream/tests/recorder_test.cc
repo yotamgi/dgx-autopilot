@@ -22,7 +22,7 @@ private:
 
 TEST(player_recorder, blocking_functional) {
 	boost::shared_ptr<RunningGen> gen(new RunningGen);
-	std::stringstream ss;
+	boost::shared_ptr<std::iostream> ss(new std::stringstream);
 
 	stream::filters::RecorderPopFilter<int> filter(ss, gen);
 
@@ -43,7 +43,7 @@ TEST(player_recorder, blocking_functional) {
 
 TEST(player_recorder, non_blocking_slow_fast) {
 	boost::shared_ptr<RunningGen> gen(new RunningGen);
-	std::stringstream ss;
+	boost::shared_ptr<std::iostream> ss(new std::stringstream);
 
 	stream::filters::RecorderPopFilter<int> filter(ss, gen);
 
@@ -63,7 +63,7 @@ TEST(player_recorder, non_blocking_slow_fast) {
 
 TEST(player_recorder, non_blocking_fast_slow) {
 	boost::shared_ptr<RunningGen> gen(new RunningGen);
-	std::stringstream ss;
+	boost::shared_ptr<std::iostream> ss(new std::stringstream);
 
 	stream::filters::RecorderPopFilter<int> filter(ss, gen);
 
@@ -86,8 +86,7 @@ TEST(player_recorder, non_blocking_fast_slow) {
 
 TEST(player_recorder, blocking_functional_file) {
 	boost::shared_ptr<RunningGen> gen(new RunningGen);
-	//std::stringstream ss;
-	std::ofstream record_file("/tmp/file");
+	boost::shared_ptr<std::ofstream> record_file(new std::ofstream("/tmp/file"));
 
 	stream::filters::RecorderPopFilter<int> filter(record_file, gen);
 
@@ -96,10 +95,11 @@ TEST(player_recorder, blocking_functional_file) {
 		usleep(10000); // 1/100 sec
 		filter.get_data();
 	}
-	record_file.close();
+	record_file->close();
 
 	// play it
-	std::ifstream play_file("/tmp/file");
+	boost::shared_ptr<std::istream> play_file(new std::ifstream("/tmp/file"));
+
 	stream::PopStreamPlayer<int> player(play_file);
 	Timer t;
 	for (size_t i=0; i<100; i++) {
@@ -113,7 +113,7 @@ TEST(player_recorder, push_functional) {
 	boost::shared_ptr<stream::PushToPopConv<float> > stream(new stream::PushToPopConv<float>(0.));
 
 	// record
-	std::stringstream ss;
+	boost::shared_ptr<std::iostream> ss(new std::stringstream);
 	stream::filters::RecorderPushFilter<float> filter(ss, stream);
 
 	Timer t;
