@@ -1,6 +1,7 @@
 #include <stream/util/stream_player.h>
 #include <stream/filters/stream_recorder.h>
 #include <stream/data_pop_stream.h>
+#include <stream/stream_utils.h>
 #include <stream/util/time.h>
 #include <gtest/gtest.h>
 #include <sstream>
@@ -106,3 +107,30 @@ TEST(player_recorder, blocking_functional_file) {
 	}
 	ASSERT_NEAR(t.passed(), 1.0, 0.2);
 }
+
+
+TEST(player_recorder, push_functional) {
+	boost::shared_ptr<stream::PushToPopConv<float> > stream(new stream::PushToPopConv<float>(0.));
+
+	// record
+	std::stringstream ss;
+	stream::filters::RecorderPushFilter<float> filter(ss, stream);
+
+	Timer t;
+	while (t.passed() < 1.1) {
+		filter.set_data(t.passed());
+		usleep(100000); // 1/10 sec
+	}
+
+	// play
+	stream::PushStreamPlayer<float> player(ss);
+	player.set_receiver(stream);
+	usleep(10000); // 1/100 sec
+
+	t.reset();
+	while (t.passed() < 0.9) {
+		ASSERT_NEAR(stream->get_data(), t.passed(), 0.15);
+	}
+
+}
+
