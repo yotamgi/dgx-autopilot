@@ -7,6 +7,7 @@
 #include <gs/3d_stream_view.h>
 #include <gs/size_stream_view.h>
 #include <gs/map_stream_view.h>
+#include <boost/make_shared.hpp>
 
 #include <string>
 #include <iostream>
@@ -23,6 +24,26 @@ void update_cockpit(autopilot::Cockpit* cockpit) {
 	while (true) {
 		cockpit->orientation()->get_data();
 	}
+}
+
+template <typename T>
+boost::shared_ptr<stream::PushGenerator<T> > add_push_recorder(
+		boost::shared_ptr<stream::PushGenerator<T> > unfiltered,
+		std::ostream& out)
+{
+	// create a forwarder
+	boost::shared_ptr<stream::PushForwarder<T> > forwarder(new stream::PushForwarder<T>);
+
+	// bind it through a filter to the generator
+	unfiltered->set_receiver(
+			boost::make_shared<stream::filters::RecorderPushFilter<T> >(
+					boost::ref(out),
+					forwarder
+			)
+	);
+
+	// return the forwarder
+	return forwarder;
 }
 
 int main(int argc, char** argv) {
@@ -92,17 +113,27 @@ int main(int argc, char** argv) {
 	}
 
 	if (play_dir != "") {
-		typedef stream::PopStreamPlayer<lin_algebra::vec3f> vec3_player;
+		typedef stream::PopStreamPlayer<lin_algebra::vec3f> vec3_pop_player;
+		typedef stream::PushStreamPlayer<lin_algebra::vec3f> vec3_push_player;
+		typedef stream::PushStreamPlayer<float> float_push_player;
 
 		std::ifstream acc_file((play_dir + "/acc.stream").c_str());
 		std::ifstream compass_file((play_dir + "/compass.stream").c_str());
 		std::ifstream gyro_file((play_dir + "/gyro.stream").c_str());
+		std::ifstream gps_pos_file((play_dir + "/gps_pos.stream").c_str());
+		std::ifstream gps_speed_mag_file((play_dir + "/gps_speed_mag.stream").c_str());
+		std::ifstream gps_speed_dir_file((play_dir + "/gps_speed_dir.stream").c_str());
 
 		// create the player platform
 		autopilot::NormalPlainPlatform platform;
-		platform.acc_sensor = boost::make_shared<vec3_player>(boost::ref(acc_file));
-		platform.gyro_sensor = boost::make_shared<vec3_player>(boost::ref(gyro_file));
-		platform.compass_sensor = boost::make_shared<vec3_player>(boost::ref(compass_file));
+		platform.acc_sensor = boost::make_shared<vec3_pop_player>(boost::ref(acc_file));
+		platform.gyro_sensor = boost::make_shared<vec3_pop_player>(boost::ref(gyro_file));
+		platform.compass_sensor = boost::make_shared<vec3_pop_player>(boost::ref(compass_file));
+		platform.gps_pos_generator = boost::make_shared<vec3_push_player>(boost::ref(gps_pos_file));
+		platform.gps_speed_dir_generator = boost::make_shared<float_push_player>(boost::ref(gps_speed_dir_file));
+		platform.gps_speed_mag_generator = boost::make_shared<float_push_player>(boost::ref(gps_speed_mag_file));
+
+		std::cout << "Playing data from directory: " << play_dir << std::endl;
 
 		// add a watch stream on the compass stream
 		boost::shared_ptr<vec3_watch_stream> compass_watch(new vec3_watch_stream(platform.compass_sensor));
@@ -126,6 +157,22 @@ int main(int argc, char** argv) {
 
 		// the reliable stream
 		gs::SizeStreamView view_size(cockpit.watch_rest_reliability(), view_update_time, 0., 1.);
+
+		// the position
+		gs::MapStreamView map_view(cockpit.position(), 1.0f, stream3d_dimention,
+						std::string("../ground_station/data/map"));
+
+		// create the window itself
+		QHBoxLayout* layout = new QHBoxLayout();
+		layout->addWidget(&view3d);
+		layout->addWidget(&view_size);
+		layout->addWidget(&map_view);
+		QWidget* wnd = new QWidget;
+		wnd->setLayout(layout);
+		wnd->show();
+		view3d.start();
+		view_size.start();
+		app.exec();
 
 	} if (present_addr != "")  {
 		std::cout << "Presenting from addr " << present_addr << std::endl;
@@ -185,12 +232,19 @@ int main(int argc, char** argv) {
 		std::ofstream acc_file((record_dir + "/acc.stream").c_str());
 		std::ofstream compass_file((record_dir + "/compass.stream").c_str());
 		std::ofstream gyro_file((record_dir + "/gyro.stream").c_str());
+		std::ofstream gps_pos_file((record_dir + "/gps_pos.stream").c_str());
+		std::ofstream gps_speed_mag_file((record_dir + "/gps_speed_mag.stream").c_str());
+		std::ofstream gps_speed_dir_file((record_dir + "/gps_speed_dir.stream").c_str());
 		if (record_dir != "") {
-			typedef stream::filters::RecorderPopFilter<lin_algebra::vec3f> recorder;
+			typedef stream::filters::RecorderPopFilter<lin_algebra::vec3f> pop_recorder;
 
-			platform.acc_sensor.reset(new recorder(acc_file, platform.acc_sensor));
-			platform.compass_sensor.reset(new recorder(compass_file, platform.compass_sensor));
-			platform.gyro_sensor.reset(new recorder(gyro_file, platform.gyro_sensor));
+			platform.acc_sensor.reset(new pop_recorder(acc_file, platform.acc_sensor));
+			platform.compass_sensor.reset(new pop_recorder(compass_file, platform.compass_sensor));
+			platform.gyro_sensor.reset(new pop_recorder(gyro_file, platform.gyro_sensor));
+
+			platform.gps_pos_generator = add_push_recorder<lin_algebra::vec3f>(platform.gps_pos_generator, gps_pos_file);
+			platform.gps_speed_mag_generator = add_push_recorder<float>(platform.gps_speed_mag_generator, gps_speed_mag_file);
+			platform.gps_speed_dir_generator = add_push_recorder<float>(platform.gps_speed_dir_generator, gps_speed_dir_file);
   		}
 
 		autopilot::Cockpit cockpit(platform);

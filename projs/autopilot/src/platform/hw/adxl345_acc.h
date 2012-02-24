@@ -8,7 +8,6 @@
 
 namespace autopilot {
 
-
 class Adxl345Acc : public stream::DataPopStream<lin_algebra::vec3f> {
 public:
 	Adxl345Acc(size_t device_i2c_num);
