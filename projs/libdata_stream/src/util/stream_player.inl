@@ -57,8 +57,10 @@ inline T PopStreamPlayer<T>::get_data() {
 		typename StreamReader<T>::sample curr_sample = m_reader.next_sample();
 
 		// block until the time comes
-		while (curr_sample.time > m_timer.passed()) {
-			usleep((uint32_t)((curr_sample.time - m_timer.passed()) * 1000000.));
+		float time_diff = curr_sample.time - m_timer.passed();
+		while (time_diff > 0.) {
+			usleep((uint32_t)(time_diff * 1000000.));
+			time_diff = curr_sample.time - m_timer.passed();
 		}
 
 		return curr_sample.data;
