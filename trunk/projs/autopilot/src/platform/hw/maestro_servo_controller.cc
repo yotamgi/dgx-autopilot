@@ -68,26 +68,26 @@ MaestroServoController::~MaestroServoController() {
 void MaestroServoController::check_errors() const {
 
 	// ask for error state
-	uint8_t packet = MaestroServoController::GET_ERROR_OPCODE;
-	size_t count = write(m_device_fd,&packet,1);
-	if (count != 1) {
-		throw ServoException("Could not write to device file");
-	}
-
-	// check it
-	uint16_t error_reg;
-	count = read(m_device_fd, (uint8_t*)&error_reg, 2);
-	if (count != 2) {
-		std::cout << count << std::endl;
-		throw ServoException("Could not read from device file");
-	}
-
-	if (error_reg != 0) {
-		std::stringstream ss;
-		ss << "There was an error in the device. The error register is " <<
-				std::hex << error_reg;
-		throw ServoException(ss.str());
-	}
+//	uint8_t packet = MaestroServoController::GET_ERROR_OPCODE;
+//	size_t count = write(m_device_fd,&packet,1);
+//	if (count != 1) {
+//		throw ServoException("Could not write to device file");
+//	}
+//	
+//	// check it
+//	uint16_t error_reg;
+//	count = read(m_device_fd, (uint8_t*)&error_reg, 2);
+//	if (count != 2) {
+//		std::cout << count << std::endl;
+//		throw ServoException("Could not read from device file");
+//	}
+//	
+//	if (error_reg != 0) {
+//		std::stringstream ss;
+//		ss << "There was an error in the device. The error register is " <<
+//				std::hex << error_reg;
+//		throw ServoException(ss.str());
+//	}
 }
 
 MaestroServoController::MaestroServoChannel::MaestroServoChannel(size_t channel, MaestroServoController& father):
