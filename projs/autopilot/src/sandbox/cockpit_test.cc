@@ -275,7 +275,7 @@ int main(int argc, char** argv) {
 				conn.import_pop_stream<lin_algebra::vec3f>("watch_rest_orientation"),
 				conn.import_pop_stream<lin_algebra::vec3f>("orientation"),
 				conn.import_pop_stream<float>("reliability"),
-				float_pop_stream_ptr(),
+				conn.import_pop_stream<float>("gyro_fps"),
 				conn.import_pop_stream<lin_algebra::vec2f>("position")
 		);
 	}
