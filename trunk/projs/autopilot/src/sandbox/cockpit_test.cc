@@ -8,6 +8,7 @@
 #include <gs/size_stream_view.h>
 #include <gs/map_stream_view.h>
 #include <boost/make_shared.hpp>
+#include <boost/filesystem.hpp>
 
 #include <string>
 #include <iostream>
@@ -113,6 +114,9 @@ int main(int argc, char** argv) {
 	}
 
 	if (play_dir != "") {
+		if (!boost::filesystem::exists(play_dir)) {
+			throw std::runtime_error("The requested play dir does not exist");
+		}
 		typedef stream::PopStreamPlayer<lin_algebra::vec3f> vec3_pop_player;
 		typedef stream::PushStreamPlayer<lin_algebra::vec3f> vec3_push_player;
 		typedef stream::PushStreamPlayer<float> float_push_player;
@@ -231,6 +235,13 @@ int main(int argc, char** argv) {
 		platform.compass_sensor = compass_watch;
 
 		if (record_dir != "") {
+
+			if (boost::filesystem::exists(record_dir) && !boost::filesystem::is_directory(record_dir)) {
+				throw std::runtime_error("The requested record dir exists and is not a directory");
+			}
+			if (!boost::filesystem::exists(record_dir)) {
+				boost::filesystem::create_directory(record_dir);
+			}
 
 			typedef boost::shared_ptr<std::ofstream> file_ptr;
 			file_ptr acc_file 			= boost::make_shared<std::ofstream>((record_dir + "/acc.stream").c_str());
