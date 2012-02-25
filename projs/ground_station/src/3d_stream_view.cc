@@ -13,8 +13,10 @@ namespace gs {
 
 StreamView3d::~StreamView3d()
 {
-	m_device->closeDevice();
-	m_device->drop();
+	if (m_device) {
+		m_device->closeDevice();
+		m_device->drop();
+	}
 }
 
 StreamView3d::StreamView3d(float update_time, QSize size, QWidget* parent):
