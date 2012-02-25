@@ -228,10 +228,10 @@ int main(int argc, char** argv) {
 		exit(1);
 	}
 
+	// if the user asked to play, play!
 	if (play_dir != "") {
-
-		autopilot::NormalPlainPlatform platform = platform_player(play_dir);
 		std::cout << "Playing data from directory: " << play_dir << std::endl;
+		autopilot::NormalPlainPlatform platform = platform_player(play_dir);
 
 		// add a watch stream on the compass stream
 		boost::shared_ptr<vec3_watch_stream> compass_watch(new vec3_watch_stream(platform.compass_sensor));
@@ -243,9 +243,11 @@ int main(int argc, char** argv) {
 		);
 		platform.gyro_sensor = fpsed_gyro;
 
+		// create the cockpit and run it
 		autopilot::Cockpit cockpit(platform);
 		boost::thread update_thread(update_cockpit, &cockpit);
 
+		// open the ground station with data
 		open_gs(compass_watch->get_watch_stream(),
 				cockpit.watch_fixed_acc(),
 				cockpit.watch_gyro_orientation(),
@@ -255,13 +257,17 @@ int main(int argc, char** argv) {
 				fpsed_gyro->get_fps_stream(),
 				cockpit.position()
 		);
+	}
 
-	} if (present_addr != "")  {
+	// if the user asked to view a foreighn host, do it!
+	if (present_addr != "")  {
 		std::cout << "Presenting from addr " << present_addr << std::endl;
 
+		// open server and connect to the foreign host
 		boost::shared_ptr<stream::TcpipServer> server = boost::make_shared<stream::TcpipServer>(present_addr, 0x6060);
 		stream::StreamConnection conn(server);
 
+		// open the ground station with data
 		open_gs(
 				conn.import_pop_stream<lin_algebra::vec3f>("watch_compass_sensor"),
 				conn.import_pop_stream<lin_algebra::vec3f>("watch_acc_sensor"),
@@ -272,16 +278,19 @@ int main(int argc, char** argv) {
 				float_pop_stream_ptr(),
 				conn.import_pop_stream<lin_algebra::vec2f>("position")
 		);
+	}
 
-	} else {
-
+	// if not, just open a ground station with the asked platform
+	else {
 		std::cout << "Opening GS" << std::endl;
 
+		// create the platform according to what the user asked
 		autopilot::NormalPlainPlatform platform =
 			sim?
 				autopilot::create_dgx1_simulator_platform(boost::make_shared<stream::TcpipServer>(sim_addr, 0x6060)):
 				autopilot::create_dgx1_platform();
 
+		// if the user asked to record, record!
 		if (record_dir != "") {
 			platform = record_platform(platform, record_dir);
   		}
@@ -296,9 +305,11 @@ int main(int argc, char** argv) {
 		);
 		platform.gyro_sensor = fpsed_gyro;
 
+		// create the cockpit and run it
 		autopilot::Cockpit cockpit(platform);
 		boost::thread update_thread(update_cockpit, &cockpit);
 
+		// open the ground station with data
 		open_gs(compass_watch->get_watch_stream(),
 				cockpit.watch_fixed_acc(),
 				cockpit.watch_gyro_orientation(),
