@@ -1,5 +1,6 @@
 #include <stream/stream_connection.h>
 #include <stream/filters/stream_recorder.h>
+#include <stream/filters/fps_filter.h>
 #include <stream/util/tcpip_connection.h>
 #include <stream/util/stream_player.h>
 #include <platform/dgx1_platform.h>
@@ -234,6 +235,12 @@ int main(int argc, char** argv) {
 		boost::shared_ptr<vec3_watch_stream> compass_watch(new vec3_watch_stream(platform.compass_sensor));
 		platform.compass_sensor = compass_watch;
 
+		// add fps stream to the gyro stream
+		boost::shared_ptr<stream::filters::FpsFilter<lin_algebra::vec3f> > fpsed_gyro(
+				new stream::filters::FpsFilter<lin_algebra::vec3f>(platform.gyro_sensor)
+		);
+		platform.gyro_sensor = fpsed_gyro;
+
 		if (record_dir != "") {
 
 			if (boost::filesystem::exists(record_dir) && !boost::filesystem::is_directory(record_dir)) {
@@ -282,6 +289,9 @@ int main(int argc, char** argv) {
 		// the reliable stream
 		gs::SizeStreamView view_size(cockpit.watch_rest_reliability(), view_update_time, 0., 1.);
 
+		// the gyro_fps stream
+		gs::SizeStreamView view_fps(fpsed_gyro->get_fps_stream(), 1., 0., 4000.);
+
 		// the position
 		gs::MapStreamView map_view(cockpit.position(), 1.0f, stream3d_dimention,
 						std::string("../ground_station/data/map"));
@@ -291,12 +301,14 @@ int main(int argc, char** argv) {
 		QHBoxLayout* layout = new QHBoxLayout();
 		layout->addWidget(&view3d);
 		layout->addWidget(&view_size);
+		layout->addWidget(&view_fps);
 		layout->addWidget(&map_view);
 		QWidget* wnd = new QWidget;
 		wnd->setLayout(layout);
 		wnd->show();
 		view3d.start();
 		view_size.start();
+		view_fps.start();
 		app.exec();
 
 	}
