@@ -100,7 +100,7 @@ int main(int argc, char** argv) {
 	// create the cockpit and run it
 	autopilot::Cockpit cockpit(platform);
 	boost::shared_ptr<stream::filters::WatchFilter<lin_algebra::vec3f> > orientation(cockpit.orientation());
-	boost::thread update_thread(stream_popper, oreintation);
+	boost::thread update_thread(stream_popper<lin_algebra::vec3f>, cockpit.orientation());
 
 
 	// export all the data
@@ -111,7 +111,7 @@ int main(int argc, char** argv) {
 	conn.export_pop_stream<lin_algebra::vec3f>(cockpit.watch_rest_orientation(), "watch_rest_orientation");
 	conn.export_pop_stream<lin_algebra::vec3f>(acc_watch->get_watch_stream(), "watch_acc_sensor");
 	conn.export_pop_stream<lin_algebra::vec3f>(compass_watch->get_watch_stream(), "watch_compass_sensor");
-	conn.export_pop_stream<lin_algebra::vec3f>(orientation->get_watch_stream(), "orientation");
+	conn.export_pop_stream<lin_algebra::vec3f>(cockpit.orientation()->get_watch_stream(), "orientation");
 	conn.export_pop_stream<float>(cockpit.watch_rest_reliability(), "reliability");
 	conn.export_pop_stream<lin_algebra::vec2f>(cockpit.position(), "position");
 	conn.export_pop_stream<float>(fpsed_gyro->get_fps_stream(), "gyro_fps");
