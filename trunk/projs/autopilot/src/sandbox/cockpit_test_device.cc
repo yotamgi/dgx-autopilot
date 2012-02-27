@@ -12,9 +12,10 @@
 
 typedef stream::filters::WatchFilter<lin_algebra::vec3f> vec3_watch_stream;
 
-void update_cockpit(autopilot::Cockpit* cockpit) {
+template <typename T>
+void stream_popper(boost::shared_ptr<stream::DataPopStream<T> > stream) {
 	while (true) {
-		cockpit->orientation()->get_data();
+		stream->get_data();
 	}
 }
 template <typename T>
@@ -98,7 +99,8 @@ int main(int argc, char** argv) {
 
 	// create the cockpit and run it
 	autopilot::Cockpit cockpit(platform);
-	boost::thread update_thread(update_cockpit, &cockpit);
+	boost::shared_ptr<stream::filters::WatchFilter<lin_algebra::vec3f> > orientation(cockpit.orientation());
+	boost::thread update_thread(stream_popper, oreintation);
 
 
 	// export all the data
@@ -109,7 +111,7 @@ int main(int argc, char** argv) {
 	conn.export_pop_stream<lin_algebra::vec3f>(cockpit.watch_rest_orientation(), "watch_rest_orientation");
 	conn.export_pop_stream<lin_algebra::vec3f>(acc_watch->get_watch_stream(), "watch_acc_sensor");
 	conn.export_pop_stream<lin_algebra::vec3f>(compass_watch->get_watch_stream(), "watch_compass_sensor");
-	conn.export_pop_stream<lin_algebra::vec3f>(cockpit.orientation(), "orientation");
+	conn.export_pop_stream<lin_algebra::vec3f>(orientation->get_watch_stream(), "orientation");
 	conn.export_pop_stream<float>(cockpit.watch_rest_reliability(), "reliability");
 	conn.export_pop_stream<lin_algebra::vec2f>(cockpit.position(), "position");
 	conn.export_pop_stream<float>(fpsed_gyro->get_fps_stream(), "gyro_fps");
