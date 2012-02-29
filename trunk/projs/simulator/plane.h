@@ -104,14 +104,26 @@ public:
 
 private:
 
+	class Servo : public stream::DataPushStream<float> {
+	public:
+		Servo(float speed, float inital_val=0.); // speed deg/sec
+
+		void set_data(const float& data);
+		float get_data(float time_delta);
+	private:
+		float m_speed;
+		float m_state;
+		float m_new_state;
+	};
+
 	irr::core::vector3df calc_plane_acceleration();
-	irr::core::vector3df calc_angle_vel() const;
+	irr::core::vector3df calc_angle_vel(float time_delta);
 
 	/**
 	 * The plain's servos
 	 */
 	boost::shared_ptr<stream::PushToPopConv<float> > m_tilt_servo;
-	boost::shared_ptr<stream::PushToPopConv<float> > m_pitch_servo;
+	boost::shared_ptr<Servo> m_pitch_servo;
 	boost::shared_ptr<stream::PushToPopConv<float> > m_yaw_servo;
 	boost::shared_ptr<stream::PushToPopConv<float> > m_gas_servo;
 

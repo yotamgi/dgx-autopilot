@@ -38,7 +38,7 @@ Plane::Plane(irr::IrrlichtDevice* device,
 		const PlainParams plane_params):
 		FlyingObject(device),
 		m_tilt_servo(new stream::PushToPopConv<float>(50.)),
-		m_pitch_servo(new stream::PushToPopConv<float>(50.)),
+		m_pitch_servo(new Servo(90.0, 50.)),
 		m_yaw_servo(new stream::PushToPopConv<float>(50.)),
 		m_gas_servo(new stream::PushToPopConv<float>(0.)),
 		m_velocity(irrvec3f(0.0f, 0.0f, 0.0f)),
@@ -65,9 +65,9 @@ Plane::Plane(irr::IrrlichtDevice* device,
 						lin_algebra::frand()/10., lin_algebra::frand()/10)); // it cant be actual zeors
 }
 
-irrvec3f Plane::calc_angle_vel() const {
+irrvec3f Plane::calc_angle_vel(float time_delta) {
 
-	float pitch_data = m_forced_pitch > 0 ? m_forced_pitch : m_pitch_servo->get_data();
+	float pitch_data = m_forced_pitch > 0 ? m_forced_pitch : m_pitch_servo->get_data(time_delta);
 	float tilt_data  = m_forced_tilt  > 0 ? m_forced_tilt  : m_tilt_servo->get_data();
 	float yaw_data = m_yaw_servo->get_data();
 
@@ -149,7 +149,7 @@ irrvec3f Plane::calc_plane_acceleration() {
 void Plane::update(float time_delta) {
 	irrvec3f pos = m_object->getPosition();
 
-	irrvec3f angle_vel = calc_angle_vel();
+	irrvec3f angle_vel = calc_angle_vel(time_delta);
 	irrvec3f angle_diff = angle_vel * time_delta;
 	irr::core::matrix4 rot_mat;
 	rot_mat.setRotationDegrees(angle_diff);
@@ -195,6 +195,30 @@ Plane::~Plane() {
 		carried->setSensedObject(NULL);
 	}
 }
+
+Plane::Servo::Servo(float speed, float initial_val):
+		m_speed(speed),
+		m_state(initial_val),
+		m_new_state(initial_val)
+{}
+
+void Plane::Servo::set_data(const float& data) {
+	if (data > 100.1 || data < -0.1) {
+		throw std::runtime_error("Tried to set the servo with unsuported value");
+	}
+	m_new_state = data;
+}
+
+float Plane::Servo::get_data(float time_delta) {
+
+	// update the state
+	if (fabs(m_new_state - m_state) > 0.01) {
+		m_state += ((m_new_state - m_state) > 0)?
+				time_delta*m_speed: -time_delta*m_speed;
+	}
+	return m_state;
+}
+
 
 }  // namespace simulator
 
