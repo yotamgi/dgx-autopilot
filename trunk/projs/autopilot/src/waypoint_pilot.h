@@ -10,11 +10,14 @@ namespace autopilot {
 
 struct WaypointPilotParams {
 
-	float avg_climbing_angle;
 	float max_climbing_angle;
+	float climbing_gas;
 
-	float avg_decending_angle;
 	float max_decending_angle;
+	float decending_gas;
+
+	float avg_gas;
+	float avg_pitch;
 
 	float max_tilt_angle;
 };
@@ -26,8 +29,17 @@ public:
 	void start(bool open_thread=true);
 	void stop();
 
-	void to_waypoint(lin_algebra::vec2f target, float altitude = -1.);
-	void set_altitude(float altitude = -1.);
+	struct waypoint {
+		waypoint(lin_algebra::vec2f target_, float altitude_);
+
+		lin_algebra::vec2f target;
+		float altitude;
+	};
+
+	typedef std::vector<waypoint> waypoint_list;
+
+	void set_path(waypoint_list path);
+	waypoint_list get_path();
 
 private:
 
@@ -37,16 +49,33 @@ private:
 	void maintain_pitch(float pitch);
 	void maintain_alt(float altitude);
 	void maintain_heading(float heading);
-	bool nav_to(lin_algebra::vec2f waypoint, float alt);
+	bool nav_to(waypoint waypoint);
 
 
 	boost::shared_ptr<NormalPlainCockpit> m_cockpit;
 
-	lin_algebra::vec2f m_target;
-	float m_altitude;
+	/**
+	 * The current plain path
+	 */
+	waypoint_list m_path;
 
-	bool m_running;
+	/**
+	 * members for the new path synching.
+	 * Because the std::vector is not thread safe, there is a mechanism to avoid
+	 * thread safty problem. when the user tries to set a new path, the path is
+	 * inserted to the new path and the m_waiting path is set to true in an
+	 * atomic action.
+	 */
+	waypoint_list m_new_path;
+	volatile bool m_waiting_path;
+
+	/** Indicates if the flying mech is working */
+	volatile bool m_running;
+
+	/** The flying mech thread */
 	boost::thread m_running_thread;
+
+	/** The Pilot params as set in the Ctor */
 	WaypointPilotParams m_params;
 };
 

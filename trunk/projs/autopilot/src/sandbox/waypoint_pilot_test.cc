@@ -5,18 +5,13 @@
 #include <gs/map_stream_view.h>
 
 #include <boost/thread.hpp>
+#include <boost/assign/std/vector.hpp>
 
 #include <iostream>
 #include <string>
 
+using namespace boost::assign;
 
-
-struct waypoints
-{
-	lin_algebra::vec2f WP;
-	float alt;
-	bool must_alt;
-};
 
 void usage_and_exit(std::string argv0) {
 	std::cerr << "usage: " << argv0 << " [--sensor-sim <address>]" << std::endl;
@@ -50,10 +45,12 @@ int main(int argc, char** argv) {
 
 	// configure the pilot
 	autopilot::WaypointPilotParams pilot_params;
-	pilot_params.avg_climbing_angle = (1./8.) * lin_algebra::PI;
 	pilot_params.max_climbing_angle = 15.;
-	pilot_params.avg_decending_angle = (1./8.) * lin_algebra::PI;
+	pilot_params.climbing_gas = 100.;
 	pilot_params.max_decending_angle = -10.;
+	pilot_params.decending_gas = 20.;
+	pilot_params.avg_gas = 40;
+	pilot_params.avg_pitch = 0.;
 	pilot_params.max_tilt_angle = 20.;
 
 	// create the platform according to the args
@@ -66,9 +63,13 @@ int main(int argc, char** argv) {
 	boost::shared_ptr<autopilot::Cockpit> cockpit(boost::make_shared<autopilot::Cockpit>(platform));
 	autopilot::WaypointPilot pilot(pilot_params, cockpit);
 
-	lin_algebra::vec2f waypoint;
-	waypoint[0] = 1000.; waypoint[1] = 1010.;
-	pilot.to_waypoint(waypoint, 60.);
+	autopilot::WaypointPilot::waypoint_list path;
+	path += autopilot::WaypointPilot::waypoint(lin_algebra::create_vec2f(300., 300.), 100.),
+			autopilot::WaypointPilot::waypoint(lin_algebra::create_vec2f(300., -300.), 100.),
+			autopilot::WaypointPilot::waypoint(lin_algebra::create_vec2f(-300., -300.), 100.),
+			autopilot::WaypointPilot::waypoint(lin_algebra::create_vec2f(-300., 300.), 100.);
+
+	pilot.set_path(path);
 
 	pilot.start(true);
 	boost::thread(create_gs, cockpit, argc, argv);
