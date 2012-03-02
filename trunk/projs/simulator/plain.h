@@ -27,9 +27,9 @@ struct PlainParams {
 				const std::string& texture_file,
 				const irr::core::vector3df scale,
 				const irr::core::vector3df rot,
-				float rudder_speed,					// degrees/sec
-				float elevator_speed,					// degrees/sec
-				float ailron_speed,					// degrees/sec
+				float rudder_intensity,				// degrees/sec at speed 100m/h
+				float elevator_intensity,			// degrees/sec at speed 100m/h
+				float ailron_intensity,				// degrees/sec at speed 100m/h
 				float mass, 						// kg
 				float engine_power,					// N
 				float drag,
@@ -44,9 +44,9 @@ struct PlainParams {
 	const std::string& get_texture_file() const { return m_texture_file; }
 	const irr::core::vector3df& get_scale() const { return m_scale; }
 	const irr::core::vector3df& get_rot() const { return m_rot; }
-	float get_rudder_speed() const { return m_rudder_speed; }
-	float get_elevator_speed() const { return m_elevator_speed; }
-	float get_ailron_speed() const { return m_ailron_speed; }
+	float get_rudder_intensity() const { return m_rudder_intensity; }
+	float get_elevator_intensity() const { return m_elevator_intensity; }
+	float get_ailron_intensity() const { return m_ailron_intensity; }
 
 	float get_mass() const { return m_mass; }
 	float get_engine_power() const { return m_engine_power; }
@@ -63,9 +63,9 @@ private:
 	std::string m_texture_file;
 	const irr::core::vector3df m_scale;
 	const irr::core::vector3df m_rot;
-	float m_rudder_speed;
-	float m_elevator_speed;
-	float m_ailron_speed;
+	float m_rudder_intensity;
+	float m_elevator_intensity;
+	float m_ailron_intensity;
 
 	float m_mass;
 	float m_engine_power;
