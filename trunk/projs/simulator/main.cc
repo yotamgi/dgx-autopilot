@@ -246,7 +246,7 @@ int main()
 	// how long it was since the last frame
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
-	double then = tv.tv_sec + tv.tv_usec;
+	double then = tv.tv_sec*1000. + tv.tv_usec/1000.;
 	double frameDeltaTime = 0.;
 
 	while(device->run())
@@ -255,7 +255,7 @@ int main()
 		double now;
 		do {
 			gettimeofday(&tv, NULL);
-			now = tv.tv_sec * 1000. +  tv.tv_usec/1000.;
+			now = tv.tv_sec*1000. +  tv.tv_usec/1000.;
 			frameDeltaTime = (now - then) / 1000.;
 			usleep(1000);
 		} while (frameDeltaTime < 0.01);
