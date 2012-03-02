@@ -34,7 +34,10 @@ struct PlainParams {
 				float engine_power,					// N
 				float drag,
 				float wings_area,					// m^2
-				float wings_lift);					// min angle (degree) for the wing to lift
+				float wings_lift,					// min angle (degree) for the wing to lift
+				float sideslide_yaw_effect_strenth,
+				float dihedral_effect_strenth
+	);
 
 
 	const std::string& get_mesh_file() const { return m_mesh_file; }
@@ -51,6 +54,9 @@ struct PlainParams {
 	float get_wings_area() const { return m_wings_area; }
 	float get_wings_lift() const { return m_wings_lift; }
 
+	float get_sideslide_yaw_effect_strenth() const { return m_sideslide_yaw_effect_strenth; }
+	float get_dihedral_effect_strenth() const { return m_dihedral_effect_strenth; }
+
 private:
 
 	std::string m_mesh_file;
@@ -66,6 +72,10 @@ private:
 	float m_drag;
 	float m_wings_area;
 	float m_wings_lift;
+
+	// sideslide effects
+	float m_sideslide_yaw_effect_strenth;
+	float m_dihedral_effect_strenth;
 };
 
 typedef boost::shared_ptr<stream::DataPushStream<float> > servo_stream_ptr_t;
