@@ -37,14 +37,12 @@ Plane::Plane(irr::IrrlichtDevice* device,
 		irrvec3f start_pos,
 		const PlainParams plane_params):
 		FlyingObject(device),
-		m_tilt_servo(new stream::PushToPopConv<float>(50.)),
-		m_pitch_servo(new Servo(90.0, 50.)),
-		m_yaw_servo(new stream::PushToPopConv<float>(50.)),
-		m_gas_servo(new stream::PushToPopConv<float>(0.)),
+		m_tilt_servo(new Servo(100.0, 50.)),
+		m_pitch_servo(new Servo(100.0, 50.)),
+		m_yaw_servo(new Servo(100.0, 50.)),
+		m_gas_servo(new Servo(50.0, 0.)),
 		m_velocity(irrvec3f(0.0f, 0.0f, 0.0f)),
 		m_params(plane_params),
-		m_forced_tilt(-1.),
-		m_forced_pitch(-1.),
 		m_print_timer(0.),
 		m_data_ready(false)
 {
@@ -67,9 +65,9 @@ Plane::Plane(irr::IrrlichtDevice* device,
 
 irrvec3f Plane::calc_angle_vel(float time_delta) {
 
-	float pitch_data = m_forced_pitch > 0 ? m_forced_pitch : m_pitch_servo->get_data(time_delta);
-	float tilt_data  = m_forced_tilt  > 0 ? m_forced_tilt  : m_tilt_servo->get_data();
-	float yaw_data = m_yaw_servo->get_data();
+	float pitch_data = m_pitch_servo->get_data(time_delta);
+	float tilt_data  = m_tilt_servo->get_data(time_delta);
+	float yaw_data = m_yaw_servo->get_data(time_delta);
 
 	irrvec3f servo_angle_speed(
 				((pitch_data - 50.)/50.)*m_params.get_pitch_speed(),
@@ -87,7 +85,7 @@ irrvec3f Plane::calc_angle_vel(float time_delta) {
 	return servo_angle_speed;
 }
 
-irrvec3f Plane::calc_plane_acceleration() {
+irrvec3f Plane::calc_plane_acceleration(float time_delta) {
 	// TODO : the calc_angle_vel should consieder the attack
 	const float ATTACK_DRAG_AFFECTION = 1.2;
 	const float AIR_DENSITY = 1.293;
@@ -116,7 +114,7 @@ irrvec3f Plane::calc_plane_acceleration() {
 
 	// calculate the engine force
 	irrvec3f engine_force = plane_heading;
-	engine_force *= (m_gas_servo->get_data()/100.) * m_params.get_engine_power();
+	engine_force *= (m_gas_servo->get_data(time_delta)/100.) * m_params.get_engine_power();
 
 	// calculate the drag force
 	irrvec3f drag_force = -1. * vel_dir;
@@ -156,7 +154,7 @@ void Plane::update(float time_delta) {
 	m_transformation *= rot_mat;
 
 	// update the speed by the acceleration
-	irrvec3f acceleration = calc_plane_acceleration();
+	irrvec3f acceleration = calc_plane_acceleration(time_delta);
 	m_velocity += acceleration * time_delta;
 
 	// update the position by the velocity
@@ -199,22 +197,38 @@ Plane::~Plane() {
 Plane::Servo::Servo(float speed, float initial_val):
 		m_speed(speed),
 		m_state(initial_val),
-		m_new_state(initial_val)
+		m_override(false),
+		m_override_target(0.),
+		m_target(initial_val)
 {}
 
 void Plane::Servo::set_data(const float& data) {
 	if (data > 100.1 || data < -0.1) {
 		throw std::runtime_error("Tried to set the servo with unsuported value");
 	}
-	m_new_state = data;
+	m_target = data;
+}
+
+void Plane::Servo::override(const float& data) {
+	if (data > 100.1 || data < -0.1) {
+		throw std::runtime_error("Tried to set the servo with unsuported value");
+	}
+	m_override = true;
+	m_override_target = data;
+}
+
+void Plane::Servo::stop_override() {
+	m_override = false;
 }
 
 float Plane::Servo::get_data(float time_delta) {
 
+	float target = m_override? m_override_target:m_target;
+
 	// update the state
-	if (fabs(m_new_state - m_state) > 0.01) {
-		m_state += ((m_new_state - m_state) > 0)?
-				time_delta*m_speed: -time_delta*m_speed;
+	if (fabs(target - m_state) > 0.2) {
+		m_state += ((target - m_state) > 0)?
+				time_delta*m_speed : -time_delta*m_speed;
 	}
 	return m_state;
 }
