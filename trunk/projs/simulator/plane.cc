@@ -18,7 +18,9 @@ PlainParams::PlainParams(const std::string& mesh_file,
 		float engine_power,
 		float drag,
 		float wings_area,
-		float wings_lift):
+		float wings_lift,
+		float sideslide_yaw_effect_strenth,
+		float dihedral_effect_strenth):
 	m_mesh_file(mesh_file),
 	m_texture_file(texture_file),
 	m_scale(scale),
@@ -30,17 +32,19 @@ PlainParams::PlainParams(const std::string& mesh_file,
     m_engine_power(engine_power),
 	m_drag(drag),
 	m_wings_area(wings_area),
-	m_wings_lift(wings_lift)
+	m_wings_lift(wings_lift),
+	m_sideslide_yaw_effect_strenth(sideslide_yaw_effect_strenth),
+	m_dihedral_effect_strenth(dihedral_effect_strenth)
 {}
 
 Plane::Plane(irr::IrrlichtDevice* device,
 		irrvec3f start_pos,
 		const PlainParams plane_params):
 		FlyingObject(device),
-		m_tilt_servo(new Servo(100.0, 50.)),
-		m_pitch_servo(new Servo(100.0, 50.)),
-		m_yaw_servo(new Servo(100.0, 50.)),
-		m_gas_servo(new Servo(50.0, 0.)),
+		m_tilt_servo(new Servo(130.0, 50.)),
+		m_pitch_servo(new Servo(130.0, 50.)),
+		m_yaw_servo(new Servo(130.0, 50.)),
+		m_gas_servo(new Servo(80.0, 0.)),
 		m_velocity(irrvec3f(0.0f, 0.0f, 0.0f)),
 		m_params(plane_params),
 		m_print_timer(0.),
@@ -69,20 +73,29 @@ irrvec3f Plane::calc_angle_vel(float time_delta) {
 	float tilt_data  = m_tilt_servo->get_data(time_delta);
 	float yaw_data = m_yaw_servo->get_data(time_delta);
 
-	irrvec3f servo_angle_speed(
+	irrvec3f angle_vel(
 				((pitch_data - 50.)/50.)*m_params.get_pitch_speed(),
 				((yaw_data   - 50.)/50.)*m_params.get_yaw_speed(),
 				((tilt_data  - 50.)/50.)*m_params.get_ailron_speed()
 	);
 
+	// calc the plane's side slide
 	irr::core::matrix4 inverse_trans;
 	m_transformation.getInverse(inverse_trans);
 	irrvec3f velocity_plane = m_velocity;
+	float vel_len = m_velocity.getLength();
 	inverse_trans.rotateVect(velocity_plane);
 	velocity_plane.normalize();
-	servo_angle_speed.Y += velocity_plane.X*1000.;
+	velocity_plane *= vel_len;
+	float side_slide = velocity_plane.X;
 
-	return servo_angle_speed;
+	// sideslide to yaw effect
+	angle_vel.Y += side_slide*m_params.get_sideslide_yaw_effect_strenth();
+
+	// dihedral effect
+	angle_vel.Z += side_slide*m_params.get_dihedral_effect_strenth();
+
+	return angle_vel;
 }
 
 irrvec3f Plane::calc_plane_acceleration(float time_delta) {

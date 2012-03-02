@@ -149,14 +149,16 @@ int main()
 			 "media/pf-cessna-182.bmp",
 			 irr::core::vector3df(1., 1., 1.),
 			 irr::core::vector3df(0., 180., 0.),
-			 200.0f,
+			 50.0f,
 			 100.0f,
 			 100.0f,
-			 6.5f,  // mass
-			 40.0f,  // engine power
-			 0.15f, // drag
-			 1.4f, // wing area
-			 -3.); // lift
+			 6.5f,  	// mass
+			 40.0f,  	// engine power
+			 0.15f, 	// drag
+			 1.4f, 		// wing area
+			 -3.,  		// lift
+ 			 30.,		// sideslide to yaw effect strenth
+			 40.); 		// dihedral effect strenth
 
 //	simulator::PlainParams plane_params(
 //			 "media/pf-cessna-182.x",
@@ -291,6 +293,10 @@ int main()
 		if (receiver.IsKeyDown(KEY_LEFT))  p.force_tilt(90.);
 		else if (receiver.IsKeyDown(KEY_RIGHT)) p.force_tilt(10.);
 		else p.unforce_tilt();
+
+		if (receiver.IsKeyDown(KEY_KEY_M))  p.get_yaw_servo()->set_data(90.);
+		else if (receiver.IsKeyDown(KEY_KEY_N)) p.get_yaw_servo()->set_data(10.);
+		else p.get_yaw_servo()->set_data(50.);
 
 		if (receiver.IsKeyDown(KEY_KEY_V)) c.setType(simulator::Camera::FPS);
 		if (receiver.IsKeyDown(KEY_KEY_X)) c.setType(simulator::Camera::TRACK_BEHIND);
