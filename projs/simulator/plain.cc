@@ -25,9 +25,9 @@ PlainParams::PlainParams(const std::string& mesh_file,
 	m_texture_file(texture_file),
 	m_scale(scale),
 	m_rot(rot),
-	m_rudder_speed(yaw_speed),
-	m_elevator_speed(pitch_speed),
-	m_ailron_speed(ailron_speed),
+	m_rudder_intensity(yaw_speed),
+	m_elevator_intensity(pitch_speed),
+	m_ailron_intensity(ailron_speed),
 	m_mass(mass),
     m_engine_power(engine_power),
 	m_drag(drag),
@@ -73,17 +73,18 @@ irrvec3f Plain::calc_angle_vel(float time_delta) {
 	float tilt_data  = m_ailron_servo->get_data(time_delta);
 	float yaw_data = m_rudder_servo->get_data(time_delta);
 
-	irrvec3f angle_vel(
-				((pitch_data - 50.)/50.)*m_params.get_elevator_speed(),
-				((yaw_data   - 50.)/50.)*m_params.get_rudder_speed(),
-				((tilt_data  - 50.)/50.)*m_params.get_ailron_speed()
+	float vel_len = m_velocity.getLength();
+	irrvec3f servo_data(
+				((pitch_data - 50.)/50.)*m_params.get_elevator_intensity(),
+				((yaw_data   - 50.)/50.)*m_params.get_rudder_intensity(),
+				((tilt_data  - 50.)/50.)*m_params.get_ailron_intensity()
 	);
+	irrvec3f angle_vel = (vel_len/100.)*servo_data;
 
 	// calc the plane's side slide
 	irr::core::matrix4 inverse_trans;
 	m_transformation.getInverse(inverse_trans);
 	irrvec3f velocity_plane = m_velocity;
-	float vel_len = m_velocity.getLength();
 	inverse_trans.rotateVect(velocity_plane);
 	velocity_plane.normalize();
 	velocity_plane *= vel_len;

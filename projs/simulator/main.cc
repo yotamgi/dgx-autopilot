@@ -135,7 +135,7 @@ int main()
 	MyEventReceiver receiver;
 
 	IrrlichtDevice* device = createDevice(driverType,
-			core::dimension2d<u32>(640, 480), 16, false, false, false, &receiver);
+			core::dimension2d<u32>(800, 600), 16, false, false, false, &receiver);
 
 	if (device == 0)
 		return 1; // could not create selected driver.
@@ -149,9 +149,9 @@ int main()
 			 "media/pf-cessna-182.bmp",
 			 irr::core::vector3df(1., 1., 1.),
 			 irr::core::vector3df(0., 180., 0.),
-			 100.0f,
-			 100.0f,
-			 100.0f,
+			 500.0f,
+			 500.0f,
+			 500.0f,
 			 6.5f,  	// mass
 			 40.0f,  	// engine power
 			 0.15f, 	// drag
