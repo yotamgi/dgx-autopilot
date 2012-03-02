@@ -27,8 +27,8 @@ struct PlainParams {
 				const std::string& texture_file,
 				const irr::core::vector3df scale,
 				const irr::core::vector3df rot,
-				float yaw_speed,					// degrees/sec
-				float pitch_speed,					// degrees/sec
+				float rudder_speed,					// degrees/sec
+				float elevator_speed,					// degrees/sec
 				float ailron_speed,					// degrees/sec
 				float mass, 						// kg
 				float engine_power,					// N
@@ -44,8 +44,8 @@ struct PlainParams {
 	const std::string& get_texture_file() const { return m_texture_file; }
 	const irr::core::vector3df& get_scale() const { return m_scale; }
 	const irr::core::vector3df& get_rot() const { return m_rot; }
-	float get_yaw_speed() const { return m_yaw_speed; }
-	float get_pitch_speed() const { return m_pitch_speed; }
+	float get_rudder_speed() const { return m_rudder_speed; }
+	float get_elevator_speed() const { return m_elevator_speed; }
 	float get_ailron_speed() const { return m_ailron_speed; }
 
 	float get_mass() const { return m_mass; }
@@ -63,8 +63,8 @@ private:
 	std::string m_texture_file;
 	const irr::core::vector3df m_scale;
 	const irr::core::vector3df m_rot;
-	float m_yaw_speed;
-	float m_pitch_speed;
+	float m_rudder_speed;
+	float m_elevator_speed;
 	float m_ailron_speed;
 
 	float m_mass;
@@ -78,41 +78,19 @@ private:
 	float m_dihedral_effect_strenth;
 };
 
-typedef boost::shared_ptr<stream::DataPushStream<float> > servo_stream_ptr_t;
+
 typedef boost::shared_ptr<stream::DataPopStream<lin_algebra::vec3f> > sensor_stream_ptr_t;
 
 /**
  * The plane class - gets a plane param and creates a plane in the field.
  */
-class Plane : public FlyingObject, private boost::noncopyable {
+class Plain : public FlyingObject, private boost::noncopyable {
 public:
-	Plane(irr::IrrlichtDevice* device,
+	Plain(irr::IrrlichtDevice* device,
 			irr::core::vector3df start_pos,
 			const PlainParams plane_params);
 
-	~Plane();
-
-	virtual void update(float time_delta);
-
-	virtual irr::core::vector3df get_pos() const { return m_object->getPosition(); }
-
-	bool data_ready() { return m_data_ready; }
-
-	// controlling the plane
-	servo_stream_ptr_t get_pitch_servo() { return m_pitch_servo; 	}
-	servo_stream_ptr_t get_yaw_servo()   { return m_yaw_servo; 		}
-	servo_stream_ptr_t get_tilt_servo()  { return m_tilt_servo; 	}
-	servo_stream_ptr_t get_gas_servo()   { return m_gas_servo; 		}
-
-	// forcing servos methods
-	void force_tilt(float howmuch) 		{ m_tilt_servo->override(howmuch); 	}
-	void unforce_tilt() 				{ m_tilt_servo->stop_override();	}
-	void force_pitch(float howmuch) 	{ m_pitch_servo->override(howmuch); }
-	void unforce_pitch()				{ m_pitch_servo->stop_override(); 	}
-
-	void carry(boost::shared_ptr<Carriable> carried);
-
-private:
+	~Plain();
 
 	class Servo : public stream::DataPushStream<float> {
 	public:
@@ -133,16 +111,34 @@ private:
 		float m_target;
 	};
 
+	typedef boost::shared_ptr<Servo> servo_stream_ptr_t;
+
+	virtual void update(float time_delta);
+
+	virtual irr::core::vector3df get_pos() const { return m_object->getPosition(); }
+
+	bool data_ready() { return m_data_ready; }
+
+	// controlling the plane
+	servo_stream_ptr_t get_elevator_servo() { return m_elevator_servo; 	}
+	servo_stream_ptr_t get_rudder_servo()   { return m_rudder_servo; 	}
+	servo_stream_ptr_t get_ailron_servo()  	{ return m_ailron_servo; 	}
+	servo_stream_ptr_t get_throttle_servo() { return m_throttle_servo; 	}
+
+	void carry(boost::shared_ptr<Carriable> carried);
+
+private:
+
 	irr::core::vector3df calc_plane_acceleration(float time_delta);
 	irr::core::vector3df calc_angle_vel(float time_delta);
 
 	/**
 	 * The plain's servos
 	 */
-	boost::shared_ptr<Servo> m_tilt_servo;
-	boost::shared_ptr<Servo> m_pitch_servo;
-	boost::shared_ptr<Servo> m_yaw_servo;
-	boost::shared_ptr<Servo> m_gas_servo;
+	boost::shared_ptr<Servo> m_ailron_servo;
+	boost::shared_ptr<Servo> m_elevator_servo;
+	boost::shared_ptr<Servo> m_rudder_servo;
+	boost::shared_ptr<Servo> m_throttle_servo;
 
 	irr::core::vector3df m_velocity;
 

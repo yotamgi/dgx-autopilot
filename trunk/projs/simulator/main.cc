@@ -17,7 +17,7 @@ and tell the linker to link with the .lib file.
 #pragma comment(lib, "Irrlicht.lib")
 #endif
 
-#include "plane.h"
+#include "plain.h"
 #include "camera.h"
 #include "sensors/simulator_gyro.h"
 #include "sensors/simulator_accelerometer.h"
@@ -85,7 +85,7 @@ private:
 	bool KeyIsDown[KEY_KEY_CODES_COUNT];
 };
 
-void export_import(simulator::Plane& p,
+void export_import(simulator::Plain& p,
 		vec3stream_ptr gyro,
 		vec3stream_ptr acc,
 		vec3stream_ptr magneto,
@@ -104,9 +104,9 @@ void export_import(simulator::Plane& p,
 			conn.export_pop_stream<lin_algebra::vec3f>(magneto, "simulator_compass");
 			conn.export_pop_stream<float>(alt, "simulator_alt");
 
-			conn.export_push_stream<float>(p.get_pitch_servo(), "simulator_pitch_servo");
-			conn.export_push_stream<float>(p.get_tilt_servo(), "simulator_tilt_servo");
-			conn.export_push_stream<float>(p.get_gas_servo(), "simulator_gas_servo");
+			conn.export_push_stream<float>(p.get_elevator_servo(), "simulator_pitch_servo");
+			conn.export_push_stream<float>(p.get_ailron_servo(), "simulator_tilt_servo");
+			conn.export_push_stream<float>(p.get_throttle_servo(), "simulator_gas_servo");
 			conn.run(true);
 
 			gps_sensor->set_pos_listener(conn.import_push_stream<lin_algebra::vec3f>("gps_pos_reciever"));
@@ -149,7 +149,7 @@ int main()
 			 "media/pf-cessna-182.bmp",
 			 irr::core::vector3df(1., 1., 1.),
 			 irr::core::vector3df(0., 180., 0.),
-			 50.0f,
+			 100.0f,
 			 100.0f,
 			 100.0f,
 			 6.5f,  	// mass
@@ -158,7 +158,7 @@ int main()
 			 1.4f, 		// wing area
 			 -3.,  		// lift
  			 30.,		// sideslide to yaw effect strenth
-			 40.); 		// dihedral effect strenth
+			 20.); 		// dihedral effect strenth
 
 //	simulator::PlainParams plane_params(
 //			 "media/pf-cessna-182.x",
@@ -174,7 +174,7 @@ int main()
 //			 -5.); // lift
 
 
-	simulator::Plane p(device, core::vector3df(0.0f, 0.0f, 0.0f), plane_params);
+	simulator::Plain p(device, core::vector3df(0.0f, 0.0f, 0.0f), plane_params);
 	boost::shared_ptr<simulator::SimulatorGyroSensor> gyro_sensor(
 			new simulator::SimulatorGyroSensor(plane_params.get_rot())
 	);
@@ -198,9 +198,9 @@ int main()
 	p.carry(alt_sensor);
 
 	// inital servo data
-	p.get_pitch_servo()->set_data(50.);
-	p.get_tilt_servo()->set_data(50.);
-	p.get_yaw_servo()->set_data(50.);
+	p.get_elevator_servo()->set_data(50.);
+	p.get_ailron_servo()->set_data(50.);
+	p.get_rudder_servo()->set_data(50.);
 
 	// export all the sensors
 	boost::thread t(export_import, boost::ref(p), gyro_sensor, acc_sensor, magneto_sensor, alt_sensor, gps_sensor);
@@ -286,23 +286,23 @@ int main()
 		///////////////////////////////////////
 		// Update the plane according to the keys
 		//////////////
-		if (receiver.IsKeyDown(KEY_UP)) p.force_pitch(90.);
-		else if (receiver.IsKeyDown(KEY_DOWN)) p.force_pitch(10.);
-		else p.unforce_pitch();
+		if (receiver.IsKeyDown(KEY_UP)) p.get_elevator_servo()->override(90.);
+		else if (receiver.IsKeyDown(KEY_DOWN)) p.get_elevator_servo()->override(10.);
+		else p.get_elevator_servo()->stop_override();
 
-		if (receiver.IsKeyDown(KEY_LEFT))  p.force_tilt(90.);
-		else if (receiver.IsKeyDown(KEY_RIGHT)) p.force_tilt(10.);
-		else p.unforce_tilt();
+		if (receiver.IsKeyDown(KEY_LEFT))  p.get_ailron_servo()->override(90.);
+		else if (receiver.IsKeyDown(KEY_RIGHT)) p.get_ailron_servo()->override(10.);
+		else p.get_ailron_servo()->stop_override();
 
-		if (receiver.IsKeyDown(KEY_KEY_M))  p.get_yaw_servo()->set_data(90.);
-		else if (receiver.IsKeyDown(KEY_KEY_N)) p.get_yaw_servo()->set_data(10.);
-		else p.get_yaw_servo()->set_data(50.);
+		if (receiver.IsKeyDown(KEY_KEY_M))  p.get_rudder_servo()->override(90.);
+		else if (receiver.IsKeyDown(KEY_KEY_N)) p.get_rudder_servo()->override(10.);
+		else p.get_rudder_servo()->stop_override();
 
 		if (receiver.IsKeyDown(KEY_KEY_V)) c.setType(simulator::Camera::FPS);
 		if (receiver.IsKeyDown(KEY_KEY_X)) c.setType(simulator::Camera::TRACK_BEHIND);
 		if (receiver.IsKeyDown(KEY_KEY_C)) c.setType(simulator::Camera::TRACK_FIXED);
-		if (receiver.IsKeyDown(KEY_KEY_A)) p.get_gas_servo()->set_data(100.);
-		if (receiver.IsKeyDown(KEY_KEY_Z)) p.get_gas_servo()->set_data(0.);
+		if (receiver.IsKeyDown(KEY_KEY_A)) p.get_throttle_servo()->set_data(100.);
+		if (receiver.IsKeyDown(KEY_KEY_Z)) p.get_throttle_servo()->set_data(0.);
 	}
 
 	/*
