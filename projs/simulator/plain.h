@@ -141,6 +141,7 @@ private:
 	boost::shared_ptr<Servo> m_throttle_servo;
 
 	irr::core::vector3df m_velocity;
+	irr::core::vector3df m_acceleration;
 
 	irr::scene::ISceneNode * m_object;
 	irr::core::matrix4 m_transformation;
