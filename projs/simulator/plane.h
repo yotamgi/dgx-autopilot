@@ -89,16 +89,16 @@ public:
 	bool data_ready() { return m_data_ready; }
 
 	// controlling the plane
-	servo_stream_ptr_t get_pitch_servo() { return m_pitch_servo; }
-	servo_stream_ptr_t get_yaw_servo()   { return m_yaw_servo; }
-	servo_stream_ptr_t get_tilt_servo()  { return m_tilt_servo; }
-	servo_stream_ptr_t get_gas_servo()  { return m_gas_servo; }
+	servo_stream_ptr_t get_pitch_servo() { return m_pitch_servo; 	}
+	servo_stream_ptr_t get_yaw_servo()   { return m_yaw_servo; 		}
+	servo_stream_ptr_t get_tilt_servo()  { return m_tilt_servo; 	}
+	servo_stream_ptr_t get_gas_servo()   { return m_gas_servo; 		}
 
 	// forcing servos methods
-	void force_tilt(float howmuch) 		{ m_forced_tilt = howmuch; 	}
-	void unforce_tilt() 				{ m_forced_tilt = -1.; 		}
-	void force_pitch(float howmuch) 	{ m_forced_pitch = howmuch; }
-	void unforce_pitch()				{ m_forced_pitch = -1.; 	}
+	void force_tilt(float howmuch) 		{ m_tilt_servo->override(howmuch); 	}
+	void unforce_tilt() 				{ m_tilt_servo->stop_override();	}
+	void force_pitch(float howmuch) 	{ m_pitch_servo->override(howmuch); }
+	void unforce_pitch()				{ m_pitch_servo->stop_override(); 	}
 
 	void carry(boost::shared_ptr<Carriable> carried);
 
@@ -109,23 +109,30 @@ private:
 		Servo(float speed, float inital_val=0.); // speed deg/sec
 
 		void set_data(const float& data);
+		void override(const float& data);
+		void stop_override();
+
 		float get_data(float time_delta);
+
 	private:
 		float m_speed;
 		float m_state;
-		float m_new_state;
+
+		bool m_override;
+		float m_override_target;
+		float m_target;
 	};
 
-	irr::core::vector3df calc_plane_acceleration();
+	irr::core::vector3df calc_plane_acceleration(float time_delta);
 	irr::core::vector3df calc_angle_vel(float time_delta);
 
 	/**
 	 * The plain's servos
 	 */
-	boost::shared_ptr<stream::PushToPopConv<float> > m_tilt_servo;
+	boost::shared_ptr<Servo> m_tilt_servo;
 	boost::shared_ptr<Servo> m_pitch_servo;
-	boost::shared_ptr<stream::PushToPopConv<float> > m_yaw_servo;
-	boost::shared_ptr<stream::PushToPopConv<float> > m_gas_servo;
+	boost::shared_ptr<Servo> m_yaw_servo;
+	boost::shared_ptr<Servo> m_gas_servo;
 
 	irr::core::vector3df m_velocity;
 
@@ -133,9 +140,6 @@ private:
 	irr::core::matrix4 m_transformation;
 
 	PlainParams m_params;
-
-	float m_forced_tilt;
-	float m_forced_pitch;
 
 	float m_print_timer;
 
