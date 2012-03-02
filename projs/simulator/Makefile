@@ -25,8 +25,8 @@ $(OBJDIR):
 $(OBJDIR)/main.o: main.cc 
 	$(CXX) -c main.cc $(CXXFLAGS) -o $(OBJDIR)/main.o
 
-$(OBJDIR)/plane.o: plane.cc 
-	$(CXX) -c plane.cc $(CXXFLAGS) -o $(OBJDIR)/plane.o
+$(OBJDIR)/plain.o: plain.cc 
+	$(CXX) -c plain.cc $(CXXFLAGS) -o $(OBJDIR)/plain.o
 
 $(OBJDIR)/camera.o: camera.cc
 	$(CXX) -c camera.cc $(CXXFLAGS) -o $(OBJDIR)/camera.o
@@ -46,7 +46,7 @@ $(OBJDIR)/simulator_gps.o: sensors/simulator_gps.cc
 $(OBJDIR)/simulator_altmeter.o: sensors/simulator_altmeter.cc
 	$(CXX) -c sensors/simulator_altmeter.cc $(CXXFLAGS) -o $(OBJDIR)/simulator_altmeter.o		
 
-sim: $(OBJDIR)/main.o $(OBJDIR)/plane.o $(OBJDIR)/camera.o $(OBJDIR)/simulator_gyro.o $(OBJDIR)/simulator_accelerometer.o $(OBJDIR)/simulator_magnetometer.o $(OBJDIR)/simulator_gps.o $(OBJDIR)/simulator_altmeter.o
-	$(CXX) $(OBJDIR)/main.o $(OBJDIR)/plane.o $(OBJDIR)/camera.o $(OBJDIR)/simulator_gyro.o $(OBJDIR)/simulator_accelerometer.o $(OBJDIR)/simulator_magnetometer.o $(OBJDIR)/simulator_gps.o $(OBJDIR)/simulator_altmeter.o $(LDFLAGS) -o sim 
+sim: $(OBJDIR)/main.o $(OBJDIR)/plain.o $(OBJDIR)/camera.o $(OBJDIR)/simulator_gyro.o $(OBJDIR)/simulator_accelerometer.o $(OBJDIR)/simulator_magnetometer.o $(OBJDIR)/simulator_gps.o $(OBJDIR)/simulator_altmeter.o
+	$(CXX) $(OBJDIR)/main.o $(OBJDIR)/plain.o $(OBJDIR)/camera.o $(OBJDIR)/simulator_gyro.o $(OBJDIR)/simulator_accelerometer.o $(OBJDIR)/simulator_magnetometer.o $(OBJDIR)/simulator_gps.o $(OBJDIR)/simulator_altmeter.o $(LDFLAGS) -o sim 
 
 

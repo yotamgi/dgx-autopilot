@@ -1,4 +1,4 @@
-#include "plane.h"
+#include "plain.h"
 #include <iostream>
 #include <boost/foreach.hpp>
 
@@ -25,8 +25,8 @@ PlainParams::PlainParams(const std::string& mesh_file,
 	m_texture_file(texture_file),
 	m_scale(scale),
 	m_rot(rot),
-	m_yaw_speed(yaw_speed),
-	m_pitch_speed(pitch_speed),
+	m_rudder_speed(yaw_speed),
+	m_elevator_speed(pitch_speed),
 	m_ailron_speed(ailron_speed),
 	m_mass(mass),
     m_engine_power(engine_power),
@@ -37,14 +37,14 @@ PlainParams::PlainParams(const std::string& mesh_file,
 	m_dihedral_effect_strenth(dihedral_effect_strenth)
 {}
 
-Plane::Plane(irr::IrrlichtDevice* device,
+Plain::Plain(irr::IrrlichtDevice* device,
 		irrvec3f start_pos,
 		const PlainParams plane_params):
 		FlyingObject(device),
-		m_tilt_servo(new Servo(130.0, 50.)),
-		m_pitch_servo(new Servo(130.0, 50.)),
-		m_yaw_servo(new Servo(130.0, 50.)),
-		m_gas_servo(new Servo(80.0, 0.)),
+		m_ailron_servo(new Servo(130.0, 50.)),
+		m_elevator_servo(new Servo(130.0, 50.)),
+		m_rudder_servo(new Servo(130.0, 50.)),
+		m_throttle_servo(new Servo(80.0, 0.)),
 		m_velocity(irrvec3f(0.0f, 0.0f, 0.0f)),
 		m_params(plane_params),
 		m_print_timer(0.),
@@ -67,15 +67,15 @@ Plane::Plane(irr::IrrlichtDevice* device,
 						lin_algebra::frand()/10., lin_algebra::frand()/10)); // it cant be actual zeors
 }
 
-irrvec3f Plane::calc_angle_vel(float time_delta) {
+irrvec3f Plain::calc_angle_vel(float time_delta) {
 
-	float pitch_data = m_pitch_servo->get_data(time_delta);
-	float tilt_data  = m_tilt_servo->get_data(time_delta);
-	float yaw_data = m_yaw_servo->get_data(time_delta);
+	float pitch_data = m_elevator_servo->get_data(time_delta);
+	float tilt_data  = m_ailron_servo->get_data(time_delta);
+	float yaw_data = m_rudder_servo->get_data(time_delta);
 
 	irrvec3f angle_vel(
-				((pitch_data - 50.)/50.)*m_params.get_pitch_speed(),
-				((yaw_data   - 50.)/50.)*m_params.get_yaw_speed(),
+				((pitch_data - 50.)/50.)*m_params.get_elevator_speed(),
+				((yaw_data   - 50.)/50.)*m_params.get_rudder_speed(),
 				((tilt_data  - 50.)/50.)*m_params.get_ailron_speed()
 	);
 
@@ -98,7 +98,7 @@ irrvec3f Plane::calc_angle_vel(float time_delta) {
 	return angle_vel;
 }
 
-irrvec3f Plane::calc_plane_acceleration(float time_delta) {
+irrvec3f Plain::calc_plane_acceleration(float time_delta) {
 	// TODO : the calc_angle_vel should consieder the attack
 	const float ATTACK_DRAG_AFFECTION = 1.2;
 	const float AIR_DENSITY = 1.293;
@@ -127,7 +127,7 @@ irrvec3f Plane::calc_plane_acceleration(float time_delta) {
 
 	// calculate the engine force
 	irrvec3f engine_force = plane_heading;
-	engine_force *= (m_gas_servo->get_data(time_delta)/100.) * m_params.get_engine_power();
+	engine_force *= (m_throttle_servo->get_data(time_delta)/100.) * m_params.get_engine_power();
 
 	// calculate the drag force
 	irrvec3f drag_force = -1. * vel_dir;
@@ -157,7 +157,7 @@ irrvec3f Plane::calc_plane_acceleration(float time_delta) {
 	return acc;
 }
 
-void Plane::update(float time_delta) {
+void Plain::update(float time_delta) {
 	irrvec3f pos = m_object->getPosition();
 
 	irrvec3f angle_vel = calc_angle_vel(time_delta);
@@ -196,18 +196,18 @@ void Plane::update(float time_delta) {
 
 }
 
-void Plane::carry(boost::shared_ptr<simulator::Carriable> carried)  {
+void Plain::carry(boost::shared_ptr<simulator::Carriable> carried)  {
 	carried->setSensedObject(m_object);
 	m_stuff.push_back(carried);
 }
 
-Plane::~Plane() {
+Plain::~Plain() {
 	BOOST_FOREACH(boost::shared_ptr<Carriable> carried, m_stuff) {
 		carried->setSensedObject(NULL);
 	}
 }
 
-Plane::Servo::Servo(float speed, float initial_val):
+Plain::Servo::Servo(float speed, float initial_val):
 		m_speed(speed),
 		m_state(initial_val),
 		m_override(false),
@@ -215,14 +215,14 @@ Plane::Servo::Servo(float speed, float initial_val):
 		m_target(initial_val)
 {}
 
-void Plane::Servo::set_data(const float& data) {
+void Plain::Servo::set_data(const float& data) {
 	if (data > 100.1 || data < -0.1) {
 		throw std::runtime_error("Tried to set the servo with unsuported value");
 	}
 	m_target = data;
 }
 
-void Plane::Servo::override(const float& data) {
+void Plain::Servo::override(const float& data) {
 	if (data > 100.1 || data < -0.1) {
 		throw std::runtime_error("Tried to set the servo with unsuported value");
 	}
@@ -230,11 +230,11 @@ void Plane::Servo::override(const float& data) {
 	m_override_target = data;
 }
 
-void Plane::Servo::stop_override() {
+void Plain::Servo::stop_override() {
 	m_override = false;
 }
 
-float Plane::Servo::get_data(float time_delta) {
+float Plain::Servo::get_data(float time_delta) {
 
 	float target = m_override? m_override_target:m_target;
 
