@@ -46,6 +46,7 @@ Plain::Plain(irr::IrrlichtDevice* device,
 		m_rudder_servo(new Servo(130.0, 50.)),
 		m_throttle_servo(new Servo(80.0, 0.)),
 		m_velocity(irrvec3f(0.0f, 0.0f, 0.0f)),
+		m_acceleration(irrvec3f(0.0f, 0.0f, 0.0f)),
 		m_params(plane_params),
 		m_print_timer(0.),
 		m_data_ready(false)
@@ -146,7 +147,6 @@ irrvec3f Plain::calc_plane_acceleration(float time_delta) {
 	// calculate the acceleration
 	irrvec3f acc = (engine_force + drag_force + lift_force + gravity_force) / m_params.get_mass();
 
-
 	if (m_print_timer > 0.1) {
 		m_print_timer = 0.;
 		std::cout << std::setprecision(2) << std::fixed <<
@@ -167,12 +167,14 @@ void Plain::update(float time_delta) {
 	rot_mat.setRotationDegrees(angle_diff);
 	m_transformation *= rot_mat;
 
-	// update the speed by the acceleration
-	irrvec3f acceleration = calc_plane_acceleration(time_delta);
-	m_velocity += acceleration * time_delta;
+	// update the velocity by the acceleration
+	m_velocity += m_acceleration * time_delta;
 
 	// update the position by the velocity
 	pos  += m_velocity * time_delta;
+
+	// update acceleration
+	m_acceleration = calc_plane_acceleration(time_delta);
 
 	// make sure we are not on the ground
 	if (pos.Y < 0.) {
@@ -238,11 +240,20 @@ float Plain::Servo::get_data(float time_delta) {
 
 	float target = m_override? m_override_target:m_target;
 
-	// update the state
-	if (fabs(target - m_state) > 0.2) {
-		m_state += ((target - m_state) > 0)?
-				time_delta*m_speed : -time_delta*m_speed;
+	float distance = target - m_state;
+
+	// calc the needed diff
+	float new_state;
+	if (fabs(distance) > 1.0) {
+		new_state = m_state + lin_algebra::sign(distance) * time_delta*m_speed;
+
+		if (lin_algebra::sign(target - m_state) != lin_algebra::sign(target - new_state)) {
+			m_state = target;
+		} else {
+			m_state = new_state;
+		}
 	}
+
 	return m_state;
 }
 
