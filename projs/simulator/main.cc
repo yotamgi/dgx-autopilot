@@ -105,6 +105,7 @@ void export_import(simulator::Plain& p,
 			conn.export_pop_stream<float>(alt, "simulator_alt");
 
 			conn.export_push_stream<float>(p.get_elevator_servo(), "simulator_pitch_servo");
+			conn.export_push_stream<float>(p.get_rudder_servo(), "simulator_yaw_servo");
 			conn.export_push_stream<float>(p.get_ailron_servo(), "simulator_tilt_servo");
 			conn.export_push_stream<float>(p.get_throttle_servo(), "simulator_gas_servo");
 			conn.run(true);
@@ -294,8 +295,8 @@ int main()
 		else if (receiver.IsKeyDown(KEY_RIGHT)) p.get_ailron_servo()->override(10.);
 		else p.get_ailron_servo()->stop_override();
 
-		if (receiver.IsKeyDown(KEY_KEY_M))  p.get_rudder_servo()->override(90.);
-		else if (receiver.IsKeyDown(KEY_KEY_N)) p.get_rudder_servo()->override(10.);
+		if (receiver.IsKeyDown(KEY_KEY_N))  p.get_rudder_servo()->override(90.);
+		else if (receiver.IsKeyDown(KEY_KEY_M)) p.get_rudder_servo()->override(10.);
 		else p.get_rudder_servo()->stop_override();
 
 		if (receiver.IsKeyDown(KEY_KEY_V)) c.setType(simulator::Camera::FPS);
