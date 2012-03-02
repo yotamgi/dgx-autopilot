@@ -75,9 +75,9 @@ irrvec3f Plain::calc_angle_vel(float time_delta) {
 
 	float vel_len = m_velocity.getLength();
 	irrvec3f servo_data(
-				((pitch_data - 50.)/50.)*m_params.get_elevator_intensity(),
-				((yaw_data   - 50.)/50.)*m_params.get_rudder_intensity(),
-				((tilt_data  - 50.)/50.)*m_params.get_ailron_intensity()
+				 ((pitch_data - 50.)/50.)*m_params.get_elevator_intensity(),
+				-((yaw_data   - 50.)/50.)*m_params.get_rudder_intensity(),
+				 ((tilt_data  - 50.)/50.)*m_params.get_ailron_intensity()
 	);
 	irrvec3f angle_vel = (vel_len/100.)*servo_data;
 
@@ -217,18 +217,17 @@ Plain::Servo::Servo(float speed, float initial_val):
 {}
 
 void Plain::Servo::set_data(const float& data) {
-	if (data > 100.1 || data < -0.1) {
-		throw std::runtime_error("Tried to set the servo with unsuported value");
-	}
-	m_target = data;
+	if (data > 100.) 	m_target = 100.;
+	if (data < 0.)		m_target = 0.;
+	else m_target = data;
 }
 
 void Plain::Servo::override(const float& data) {
-	if (data > 100.1 || data < -0.1) {
-		throw std::runtime_error("Tried to set the servo with unsuported value");
-	}
 	m_override = true;
-	m_override_target = data;
+
+	if (data > 100.) 	m_override_target = 100.;
+	if (data < 0.)		m_override_target = 0.;
+	else m_override_target = data;
 }
 
 void Plain::Servo::stop_override() {
