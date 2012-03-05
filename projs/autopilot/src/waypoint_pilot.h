@@ -31,6 +31,7 @@ public:
 
 	struct waypoint {
 		waypoint(lin_algebra::vec2f target_, float altitude_);
+		waypoint() {}
 
 		lin_algebra::vec2f target;
 		float altitude;

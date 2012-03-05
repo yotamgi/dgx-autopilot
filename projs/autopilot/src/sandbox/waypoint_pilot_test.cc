@@ -5,10 +5,10 @@
 #include <gs/map_stream_view.h>
 
 #include <boost/thread.hpp>
-#include <boost/assign/std/vector.hpp>
 
 #include <iostream>
 #include <string>
+#include <cstdlib>
 
 using namespace boost::assign;
 
@@ -16,6 +16,37 @@ using namespace boost::assign;
 void usage_and_exit(std::string argv0) {
 	std::cerr << "usage: " << argv0 << " [--sensor-sim <address>]" << std::endl;
 	exit(1);
+}
+
+float frand() {
+	return float(std::rand())/float(RAND_MAX);
+}
+
+autopilot::WaypointPilot::waypoint_list create_rand_path(
+		size_t size,
+		lin_algebra::vec2f begin)
+{
+	autopilot::WaypointPilot::waypoint_list ans;
+
+	lin_algebra::vec2f curr_point = begin;
+
+	for (size_t i=0; i<size; i++) {
+
+		// create the direction
+		lin_algebra::vec2f direction;
+		direction[0] = 1. - 2.*frand();
+		direction[1] = 1. - 2.*frand();
+		direction = lin_algebra::normalize(direction);
+
+		autopilot::WaypointPilot::waypoint new_point;
+		new_point.target = curr_point + (150. + 200*frand())*direction;
+		new_point.altitude = 100. + 100.*(frand() - 0.5);
+
+		curr_point = new_point.target;
+		ans.push_back(new_point);
+	}
+
+	return ans;
 }
 
 void create_gs(boost::shared_ptr<autopilot::Cockpit> cockpit, int argc, char** argv) {
@@ -63,11 +94,11 @@ int main(int argc, char** argv) {
 	boost::shared_ptr<autopilot::Cockpit> cockpit(boost::make_shared<autopilot::Cockpit>(platform));
 	autopilot::WaypointPilot pilot(pilot_params, cockpit);
 
-	autopilot::WaypointPilot::waypoint_list path;
-	path += autopilot::WaypointPilot::waypoint(lin_algebra::create_vec2f(300., 300.), 100.),
-			autopilot::WaypointPilot::waypoint(lin_algebra::create_vec2f(300., -300.), 100.),
-			autopilot::WaypointPilot::waypoint(lin_algebra::create_vec2f(-300., -300.), 100.),
-			autopilot::WaypointPilot::waypoint(lin_algebra::create_vec2f(-300., 300.), 100.);
+	autopilot::WaypointPilot::waypoint_list path =
+			create_rand_path(
+					1000,
+					lin_algebra::create_vec2f(0., 0.)
+	);
 
 	pilot.set_path(path);
 
