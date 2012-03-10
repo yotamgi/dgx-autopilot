@@ -10,8 +10,6 @@
 #include <string>
 #include <cstdlib>
 
-using namespace boost::assign;
-
 
 void usage_and_exit(std::string argv0) {
 	std::cerr << "usage: " << argv0 << " [--sensor-sim <address>]" << std::endl;
