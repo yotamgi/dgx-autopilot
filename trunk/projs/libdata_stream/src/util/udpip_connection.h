@@ -11,12 +11,12 @@ namespace stream {
 class UdpipConnection : public Connection {
 public:
 	UdpipConnection(int sock_fd, sockaddr_in address);
-	virtual ~UdpipConnection();
+	virtual ~UdpipConnection() {}
 
 	void write(std::string data);
 	std::string read();
 
-	int fd();
+	int fd() { return m_sock_fd; }
 
 private:
 	int m_sock_fd;
@@ -27,12 +27,14 @@ private:
 
 class UdpipConnectionFactory : public ConnectionFactory {
 public:
-	UdpipConnectionFactory(std::string address, size_t port);
+	UdpipConnectionFactory(size_t my_port, std::string my_addr, size_t to_port, std::string to_addr);
 	virtual ~UdpipConnectionFactory();
 
 	boost::shared_ptr<Connection> get_connection();
+
 private:
 	struct sockaddr_in m_sockaddr;
+	struct sockaddr_in m_to_addr;
 };
 
 } // namepsace stream

@@ -5,6 +5,7 @@ LIBDIR = ./lib
 
 DATA_STREAM_OBJS = src/stream_connection.o \
 				   src/util/tcpip_connection.o \
+				   src/util/udpip_connection.o \
 				   src/filters/gyro_to_av_matrix.o \
 				   src/filters/matrix_to_euler_filter.o \
 				   src/filters/acc_compass_rot.o 
@@ -14,6 +15,7 @@ GTEST_OBJS = tests/integral_test.o \
 			 tests/low_pass_test.o \
 			 tests/watch_test.o \
 			 tests/tcpip_conn_test.o \
+			 tests/udpip_conn_test.o \
 			 tests/stream_conn_test.o \
 			 tests/func_filter_test.o \
 			 tests/recorder_test.o \
