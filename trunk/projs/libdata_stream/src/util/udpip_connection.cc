@@ -56,24 +56,33 @@ std::string UdpipConnection::read() {
 	return std::string(buff, read_bytes);
 }
 
-UdpipConnectionFactory::UdpipConnectionFactory(size_t my_port, std::string my_addr, size_t to_port, std::string to_addr) {
+UdpipConnectionFactory::UdpipConnectionFactory(size_t my_port_begin, std::string my_addr, size_t to_port_begin, std::string to_addr):
+	m_port_offset(0),
+	m_my_port_begin(my_port_begin),
+	m_to_port_begin(to_port_begin)
+{
 
 	// create the socket address struct
 	bzero(&m_sockaddr, sizeof(m_sockaddr));
 
 	m_sockaddr.sin_addr.s_addr = inet_addr(my_addr.c_str());
-	m_sockaddr.sin_port = htons(my_port); // htons for network byte order
 	m_sockaddr.sin_family = AF_INET;
 
 	m_to_addr.sin_addr.s_addr = inet_addr(to_addr.c_str());
-	m_to_addr.sin_port = htons(to_port);
 	m_to_addr.sin_family = AF_INET;
 }
 
 boost::shared_ptr<Connection> UdpipConnectionFactory::get_connection() {
 	int s = socket(AF_INET, SOCK_DGRAM, 0);
 
+	// set the curr port and advance it
+	m_sockaddr.sin_port = htons(m_my_port_begin + m_port_offset); // htons for network byte order
 	validate(bind(s, (sockaddr*)&m_sockaddr, sizeof(m_sockaddr)), 0, "bind");
+
+	m_to_addr.sin_port = htons(m_to_port_begin + m_port_offset);
+
+	// advance the port offset
+	m_port_offset++;
 
 	return boost::make_shared<UdpipConnection>(s, m_to_addr);
 }
