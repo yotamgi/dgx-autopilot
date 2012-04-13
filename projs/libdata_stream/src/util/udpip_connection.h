@@ -25,14 +25,26 @@ private:
 	static const size_t MAX_UDP_PACKET_DATA_SIZE = 65507;
 };
 
+/**
+ * Udpip connection factory.
+ * Gets the source and dest addresses and can create as many udp connection to
+ * the dest as you want.
+ * This class assures you that the other side will get the connected sockets at
+ * the same order you got them, so your first socket will talk to his socket
+ * and etc.
+ */
 class UdpipConnectionFactory : public ConnectionFactory {
 public:
-	UdpipConnectionFactory(size_t my_port, std::string my_addr, size_t to_port, std::string to_addr);
+	UdpipConnectionFactory(size_t my_port_begin, std::string my_addr, size_t to_port_begin, std::string to_addr);
 	virtual ~UdpipConnectionFactory();
 
 	boost::shared_ptr<Connection> get_connection();
 
 private:
+	size_t m_port_offset;
+	const size_t m_my_port_begin;
+	const size_t m_to_port_begin;
+
 	struct sockaddr_in m_sockaddr;
 	struct sockaddr_in m_to_addr;
 };
