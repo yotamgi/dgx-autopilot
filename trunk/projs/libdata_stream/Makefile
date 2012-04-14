@@ -17,6 +17,7 @@ GTEST_OBJS = tests/integral_test.o \
 			 tests/tcpip_conn_test.o \
 			 tests/udpip_conn_test.o \
 			 tests/stream_conn_test.o \
+			 tests/async_stream_conn_test.o \
 			 tests/func_filter_test.o \
 			 tests/recorder_test.o \
 			 tests/fps_test.o

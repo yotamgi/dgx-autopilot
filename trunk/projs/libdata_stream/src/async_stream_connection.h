@@ -3,45 +3,94 @@
 
 #include <stream/data_pop_stream.h>
 #include <stream/data_push_stream.h>
+#include <stream/connection.h>
 #include <boost/shared_ptr.hpp>
 #include <iostream>
+#include <vector>
 
 namespace stream {
 
 class AsyncStreamConnection {
 public:
 
-	/**
-	 * Classes for getting reed of the bloody template arguments in the streams
-	 */
-	class AnyStream {
+	//
+	// Classes for getting reed of the bloody template arguments in the streams
+	//
+
+	class SendStream {
 	public:
 		virtual void serialize(std::ostream&) = 0;
-		virtual void deserialize(std::istream&) = 0;
 	};
 
-	template <typename T>
-	class AnyPopStream : public AnyStream {
+	class RecvStream {
 	public:
-		AnyPopStream(boost::shared_ptr<stream::DataPopStream<T> > s): m_s(s) {}
+		virtual void deserialize(std::ostream&) = 0;
+	};
+
+	typedef std::vector<boost::shared_ptr<SendStream> > send_streams_t;
+	typedef std::vector<boost::shared_ptr<RecvStream> > recv_streams_t;
+
+	//
+	// Methods
+	//
+
+	AsyncStreamConnection(send_streams_t send_streams, recv_streams_t recv_streams);
+
+	void start();
+	void stop();
+
+	//
+	// Classes specifications for the specific streams
+	//
+
+	template <typename T>
+	class SendPopStream : public SendStream {
+	public:
+		SendPopStream(boost::shared_ptr<DataPopStream<T> > s): m_s(s) {}
 
 		virtual void serialize(std::ostream& os);
-		virtual void deserialize(std::istream& is);
 	private:
 		boost::shared_ptr<stream::DataPopStream<T> > m_s;
 	};
 
 	template <typename T>
-	class AnyPushStream : public AnyStream {
+	class SendPushStream : public SendStream, public DataPushStream<T> {
 	public:
-		AnyPushStream(boost::shared_ptr<stream::DataPushStream<T> > s): m_s(s) {}
+		SendPushStream():m_counter(0) {}
 
+		virtual void set_data(const T& data);
 		virtual void serialize(std::ostream& os);
-		virtual void deserialize(std::istream& is);
 	private:
-		boost::shared_ptr<stream::DataPopStream<T> > m_s;
+		size_t m_counter;
+		size_t m_curr_data;
 	};
+
+	template <typename T>
+	class RecvPopStream : public RecvStream, public DataPopStream<T> {
+	public:
+		virtual T get_data();
+		virtual void deserialize(std::istream&);
+	public:
+		T m_curr_data;
+	};
+
+	template <typename T>
+	class RecvPushStream : public RecvStream {
+	public:
+		RecvPushStream(boost::shared_ptr<DataPushStream<T> > s): m_s(s), m_counter(0) {}
+
+		virtual void deserialize(std::istream&);
+	public:
+		boost::shared_ptr<DataPushStream<T> > m_s;
+		size_t m_counter;
+	};
+
 private:
+
+	std::string create_send_packet();
+
+	send_streams_t m_send_streams;
+	recv_streams_t m_recv_streams;
 };
 
 } // namespace stream
