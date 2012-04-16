@@ -4,9 +4,10 @@
 #include <stream/data_pop_stream.h>
 #include <stream/data_push_stream.h>
 #include <stream/connection.h>
-#include <boost/shared_ptr.hpp>
 #include <iostream>
 #include <vector>
+#include <boost/shared_ptr.hpp>
+#include <boost/thread.hpp>
 
 namespace stream {
 
@@ -24,7 +25,7 @@ public:
 
 	class RecvStream {
 	public:
-		virtual void deserialize(std::ostream&) = 0;
+		virtual void deserialize(std::istream&) = 0;
 	};
 
 	typedef std::vector<boost::shared_ptr<SendStream> > send_streams_t;
@@ -34,7 +35,11 @@ public:
 	// Methods
 	//
 
-	AsyncStreamConnection(send_streams_t send_streams, recv_streams_t recv_streams);
+	AsyncStreamConnection(send_streams_t send_streams,
+						  recv_streams_t recv_streams,
+						  boost::shared_ptr<ConnectionFactory> conn_factory,
+						  bool side,
+						  float rate); // in Hz
 
 	void start();
 	void stop();
@@ -88,9 +93,24 @@ public:
 private:
 
 	std::string create_send_packet();
+	void parse_recv_packet(std::string packet);
+	void run_exporting();
+	void run_importing();
 
+	// the streams to export
 	send_streams_t m_send_streams;
 	recv_streams_t m_recv_streams;
+
+	// the connections
+	boost::shared_ptr<Connection> m_send_conn;
+	boost::shared_ptr<Connection> m_recv_conn;
+
+	// threads stuff
+	boost::thread m_exporting_thread;
+	boost::thread m_importing_thread;
+	volatile bool m_running;
+
+	size_t m_wait_time;
 };
 
 } // namespace stream

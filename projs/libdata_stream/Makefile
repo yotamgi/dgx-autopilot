@@ -4,6 +4,7 @@ LDFLAGS = -lboost_thread
 LIBDIR = ./lib
 
 DATA_STREAM_OBJS = src/stream_connection.o \
+				   src/async_stream_connection.o \
 				   src/util/tcpip_connection.o \
 				   src/util/udpip_connection.o \
 				   src/filters/gyro_to_av_matrix.o \
