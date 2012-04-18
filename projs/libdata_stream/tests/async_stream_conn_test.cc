@@ -71,7 +71,7 @@ void echo_stream_server() {
 									recv_streams,
 									conn_factory,
 									false,
-									1000.);
+									500.);
 	c.start();
 
 	//
@@ -82,6 +82,7 @@ void echo_stream_server() {
 		send_int_pop->set_data(recv_int_pop->get_data());
 		send_int_push->set_data(recv_int_push->get_data());
 		send_double_pop->set_data(recv_double_pop->get_data());
+		usleep(1000);
 	}
 }
 
@@ -149,7 +150,7 @@ TEST(async_conn, basic) {
 									recv_streams,
 									conn_factory,
 									true,
-									1000.);
+									500.);
 	c.start();
 
 	//
@@ -166,10 +167,14 @@ TEST(async_conn, basic) {
 		ASSERT_EQ(recv_double_pop->get_data(), (double)i*3);
 	}
 
+	ASSERT_NEAR(c.get_quality_stream()->get_data(), 1.0, 0.5);
 
 	// stop the helper
 	send_control->set_data(false);
 	helper.join();
+
+	usleep(1200000);
+	ASSERT_NEAR(c.get_quality_stream()->get_data(), 0.0, 0.5);
 }
 
 
