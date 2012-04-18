@@ -4,6 +4,7 @@
 #include <stream/data_pop_stream.h>
 #include <stream/data_push_stream.h>
 #include <stream/connection.h>
+#include <stream/util/time.h>
 #include <iostream>
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -45,6 +46,8 @@ public:
 
 	void start();
 	void stop();
+
+	boost::shared_ptr<stream::DataPopStream<float> > get_quality_stream();
 
 	//
 	// Classes specifications for the specific streams
@@ -94,6 +97,21 @@ public:
 
 private:
 
+	class QualityStream : public stream::DataPopStream<float> {
+	public:
+		QualityStream(float expected_rate);
+
+		float get_data();
+		void got_sample();
+	private:
+		void update();
+		size_t m_counter;
+		float m_curr_rate;
+		Timer m_timer;
+		const float m_expected_rate;
+		static const float INTERVAL = 1.0f; // seconds
+	};
+
 	std::string create_send_packet();
 	void parse_recv_packet(std::string packet);
 	void run_exporting();
@@ -113,6 +131,7 @@ private:
 	volatile bool m_running;
 
 	size_t m_wait_time;
+	boost::shared_ptr<QualityStream> m_quality_stream;
 };
 
 } // namespace stream

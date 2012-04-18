@@ -1,6 +1,7 @@
 #include "async_stream_connection.h"
 #include <sstream>
 #include <boost/bind.hpp>
+#include <boost/make_shared.hpp>
 
 namespace stream {
 
@@ -11,7 +12,8 @@ AsyncStreamConnection::AsyncStreamConnection(send_streams_t send_streams,
     										 float rate):
 		m_send_streams(send_streams),
 		m_recv_streams(recv_streams),
-		m_running(false)
+		m_running(false),
+		m_quality_stream(boost::make_shared<AsyncStreamConnection::QualityStream>(rate))
 {
 	if (side) {
 		m_send_conn = conn_factory->get_connection();
@@ -73,7 +75,35 @@ void AsyncStreamConnection::run_importing() {
 		//std::cout << "Got " << recv_packet << std::endl;
 		parse_recv_packet(recv_packet);
 		usleep(m_wait_time);
+		m_quality_stream->got_sample();
 	}
+}
+
+boost::shared_ptr<stream::DataPopStream<float> > AsyncStreamConnection::get_quality_stream() {
+	return m_quality_stream;
+}
+
+AsyncStreamConnection::QualityStream::QualityStream(float expected_rate):
+		m_counter(0),
+		m_curr_rate(0.0f),
+		m_expected_rate(expected_rate)
+{}
+
+void AsyncStreamConnection::QualityStream::got_sample() {
+	m_counter++;
+	update();
+}
+void AsyncStreamConnection::QualityStream::update() {
+	if (m_timer.passed() > INTERVAL) {
+		m_curr_rate = m_counter/m_timer.passed();
+		m_timer.reset();
+		m_counter = 0;
+	}
+}
+
+float AsyncStreamConnection::QualityStream::get_data() {
+	update();
+	return m_curr_rate/m_expected_rate;
 }
 
 
