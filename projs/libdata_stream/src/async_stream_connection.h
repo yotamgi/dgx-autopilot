@@ -41,6 +41,8 @@ public:
 						  bool side,
 						  float rate); // in Hz
 
+	~AsyncStreamConnection();
+
 	void start();
 	void stop();
 

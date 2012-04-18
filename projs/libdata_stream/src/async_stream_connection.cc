@@ -24,6 +24,10 @@ AsyncStreamConnection::AsyncStreamConnection(send_streams_t send_streams,
 	m_wait_time = (int)((1. / rate) * 1000000.);
 }
 
+AsyncStreamConnection::~AsyncStreamConnection() {
+	stop();
+}
+
 std::string AsyncStreamConnection::create_send_packet() {
 	std::stringstream packet;
 	for (size_t i=0; i<m_send_streams.size(); i++) {
@@ -49,7 +53,7 @@ void AsyncStreamConnection::stop() {
 	if (m_running) {
 		m_running = false;
 		m_exporting_thread.join();
-		m_importing_thread.join();
+		m_importing_thread.detach();
 	}
 }
 
