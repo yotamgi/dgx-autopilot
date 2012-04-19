@@ -132,6 +132,8 @@ private:
 
 	size_t m_wait_time;
 	boost::shared_ptr<QualityStream> m_quality_stream;
+
+	static const std::string ALIVE_MESSAGE;
 };
 
 } // namespace stream

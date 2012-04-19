@@ -5,6 +5,8 @@
 
 namespace stream {
 
+const std::string AsyncStreamConnection::ALIVE_MESSAGE = "ALIVE";
+
 AsyncStreamConnection::AsyncStreamConnection(send_streams_t send_streams,
     										 recv_streams_t recv_streams,
     										 boost::shared_ptr<ConnectionFactory> conn_factory,
@@ -32,6 +34,7 @@ AsyncStreamConnection::~AsyncStreamConnection() {
 
 std::string AsyncStreamConnection::create_send_packet() {
 	std::stringstream packet;
+	packet << ALIVE_MESSAGE << std::endl;
 	for (size_t i=0; i<m_send_streams.size(); i++) {
 		m_send_streams[i]->serialize(packet);
 	}
@@ -40,6 +43,11 @@ std::string AsyncStreamConnection::create_send_packet() {
 
 void AsyncStreamConnection::parse_recv_packet(std::string p) {
 	std::stringstream packet(p);
+	std::string alive;
+	packet >> alive;
+	if (alive != ALIVE_MESSAGE) {
+		throw ConnectionExceptioin("The other did not return a proper alive message: " + alive);
+	}
 	for (size_t i=0; i<m_recv_streams.size(); i++) {
 		m_recv_streams[i]->deserialize(packet);
 	}
