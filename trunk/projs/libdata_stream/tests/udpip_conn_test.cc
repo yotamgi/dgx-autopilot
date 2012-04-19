@@ -36,8 +36,8 @@ TEST(udpip, basic) {
 }
 
 TEST(udpip, uniqueness) {
-	stream::UdpipConnectionFactory f_a(2000, "127.0.0.1", 3000, "127.0.0.1");
-	stream::UdpipConnectionFactory f_b(3000, "127.0.0.1", 2000, "127.0.0.1");
+	stream::UdpipConnectionFactory f_a(2000, "127.0.0.1", 3000);
+	stream::UdpipConnectionFactory f_b(3000, "127.0.0.1", 2000);
 	std::vector<std::pair<conn_ptr, conn_ptr> > conn_pairs;
 
 	for (size_t i=0; i<100; i++) {

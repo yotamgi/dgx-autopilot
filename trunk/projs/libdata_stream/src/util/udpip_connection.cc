@@ -56,7 +56,7 @@ std::string UdpipConnection::read() {
 	return std::string(buff, read_bytes);
 }
 
-UdpipConnectionFactory::UdpipConnectionFactory(size_t my_port_begin, std::string my_addr, size_t to_port_begin, std::string to_addr):
+UdpipConnectionFactory::UdpipConnectionFactory(size_t to_port_begin, std::string to_addr, size_t my_port_begin, std::string my_addr):
 	m_port_offset(0),
 	m_my_port_begin(my_port_begin),
 	m_to_port_begin(to_port_begin)
@@ -65,7 +65,11 @@ UdpipConnectionFactory::UdpipConnectionFactory(size_t my_port_begin, std::string
 	// create the socket address struct
 	bzero(&m_sockaddr, sizeof(m_sockaddr));
 
-	m_sockaddr.sin_addr.s_addr = inet_addr(my_addr.c_str());
+	if (my_addr != "") {
+		m_sockaddr.sin_addr.s_addr = inet_addr(my_addr.c_str());
+	} else {
+		m_sockaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	}
 	m_sockaddr.sin_family = AF_INET;
 
 	m_to_addr.sin_addr.s_addr = inet_addr(to_addr.c_str());
