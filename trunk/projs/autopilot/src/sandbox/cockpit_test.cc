@@ -64,7 +64,8 @@ void open_gs(
 		vec3_pop_stream_ptr orientation,
 		float_pop_stream_ptr reliability,
 		float_pop_stream_ptr fps,
-		vec2_pop_stream_ptr position
+		vec2_pop_stream_ptr position,
+		float_pop_stream_ptr link_quality = float_pop_stream_ptr()
 	)
 {
 
@@ -97,9 +98,13 @@ void open_gs(
 	gs::MapStreamView map_view(position, 1.0f, stream3d_dimention,
 					std::string("../ground_station/data/map"));
 
+	// the link quality
+	gs::SizeStreamView view_link_quality(link_quality, 0.1f , 0., 1.);
+
 
 	// create the window itself
 	QHBoxLayout* layout = new QHBoxLayout();
+	if (link_quality) layout->addWidget(&view_link_quality);
 	layout->addWidget(&view3d);
 	layout->addWidget(&view_size);
 	if (fps) layout->addWidget(&view_fps);
@@ -110,6 +115,7 @@ void open_gs(
 	view3d.start();
 	view_size.start();
 	if (fps) view_fps.start();
+	if (link_quality) view_link_quality.start();
 	app.exec();
 }
 
@@ -346,7 +352,8 @@ int main(int argc, char** argv) {
 				orientation,
 				reliability,
 				gyro_fps,
-				posisition
+				posisition,
+				c.get_quality_stream()
 		);
 	}
 
