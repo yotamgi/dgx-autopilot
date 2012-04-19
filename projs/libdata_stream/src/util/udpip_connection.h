@@ -35,7 +35,11 @@ private:
  */
 class UdpipConnectionFactory : public ConnectionFactory {
 public:
-	UdpipConnectionFactory(size_t my_port_begin, std::string my_addr, size_t to_port_begin, std::string to_addr);
+	UdpipConnectionFactory(size_t to_port_begin,
+						   std::string to_addr,
+						   size_t my_port_begin,
+						   std::string my_addr = "");
+
 	virtual ~UdpipConnectionFactory();
 
 	boost::shared_ptr<Connection> get_connection();

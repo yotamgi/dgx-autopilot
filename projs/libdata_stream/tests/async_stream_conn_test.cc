@@ -64,7 +64,7 @@ void echo_stream_server() {
 
 	// creating the udp connection stuff
 	boost::shared_ptr<UdpipConnectionFactory> conn_factory =
-			boost::make_shared<UdpipConnectionFactory>(5555, "127.0.0.1", 4444, "127.0.0.1");
+			boost::make_shared<UdpipConnectionFactory>(5555, "127.0.0.1", 4444);
 
 	// create the async stream connection
 	AsyncStreamConnection c(send_streams,
@@ -143,7 +143,7 @@ TEST(async_conn, basic) {
 
 	// creating the udp connection stuff
 	boost::shared_ptr<stream::UdpipConnectionFactory> conn_factory =
-			boost::make_shared<stream::UdpipConnectionFactory>(4444, "127.0.0.1", 5555, "127.0.0.1");
+			boost::make_shared<stream::UdpipConnectionFactory>(4444, "127.0.0.1", 5555);
 
 	// create the async stream connection
 	stream::AsyncStreamConnection c(send_streams,
