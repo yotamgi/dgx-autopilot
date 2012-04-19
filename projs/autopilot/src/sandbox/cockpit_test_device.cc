@@ -1,11 +1,14 @@
 #include <stream/stream_connection.h>
+#include <stream/async_stream_connection.h>
 #include <stream/util/tcpip_connection.h>
+#include <stream/util/udpip_connection.h>
 #include <stream/filters/stream_recorder.h>
 #include <stream/filters/fps_filter.h>
 #include <stream/util/stream_player.h>
 #include <platform/dgx1_platform.h>
 #include <cockpit.h>
 #include <boost/filesystem.hpp>
+#include <boost/assign/list_of.hpp>
 
 #include <string>
 #include <iostream>
@@ -68,17 +71,30 @@ autopilot::NormalPlainPlatform record_platform(autopilot::NormalPlainPlatform pl
 }
 
 int main(int argc, char** argv) {
-	if (argc != 2 && argc != 4) {
-		std::cout << "Please enter the address to export to" << std::endl;
+	if (argc < 3) {
+		std::cout << argv[0] << " <export_addr> [--udp <from_addr>] [--record <dir>]" << std::endl;
 		exit(1);
 	}
 
 	std::string record_dir = "";
-	if (argc == 4 && std::string(argv[2]) == "--record") {
-		record_dir = std::string(argv[3]);
+	std::string export_addr = argv[1];
+	std::string udp_from_addr;
+	bool use_udp;
+	for (size_t i=2; i<(size_t)argc; i++) {
+		if (std::string(argv[i]) == "--record" && ((size_t)argc > i+1)) {
+			record_dir = std::string(argv[i+1]);
+			i++;
+		}
+		else if (std::string(argv[i]) == "--udp" && ((size_t)argc > i+1)) {
+			use_udp = true;
+			udp_from_addr = std::string(argv[i+1]);
+			i++;
+		}
 	}
 
 	autopilot::NormalPlainPlatform platform = autopilot::create_dgx1_platform();
+//	autopilot::NormalPlainPlatform platform = autopilot::create_dgx1_simulator_platform(
+//			boost::make_shared<stream::TcpipServer>("localhost", 0x6060));
 
 	// if the user asked to record, record!
 	if (record_dir != "") {
@@ -103,20 +119,53 @@ int main(int argc, char** argv) {
 	boost::thread update_thread(stream_popper<lin_algebra::vec3f>, cockpit.orientation());
 
 
-	// export all the data
-	std::cout << "Exporting all data" << std::endl;
-	boost::shared_ptr<stream::TcpipClient> client = boost::make_shared<stream::TcpipClient>(argv[1], 0x6060);
-	stream::StreamConnection conn(client);
-	conn.export_pop_stream<lin_algebra::vec3f>(cockpit.watch_gyro_orientation(), "gyro_watch_orientation");
-	conn.export_pop_stream<lin_algebra::vec3f>(cockpit.watch_rest_orientation(), "watch_rest_orientation");
-	conn.export_pop_stream<lin_algebra::vec3f>(acc_watch->get_watch_stream(), "watch_acc_sensor");
-	conn.export_pop_stream<lin_algebra::vec3f>(compass_watch->get_watch_stream(), "watch_compass_sensor");
-	conn.export_pop_stream<lin_algebra::vec3f>(cockpit.orientation()->get_watch_stream(), "orientation");
-	conn.export_pop_stream<float>(cockpit.watch_rest_reliability(), "reliability");
-	conn.export_pop_stream<lin_algebra::vec2f>(cockpit.position(), "position");
-	conn.export_pop_stream<float>(fpsed_gyro->get_fps_stream(), "gyro_fps");
+	if (use_udp) {
+		std::cout << "Exporting all data in UDP" << std::endl;
+		typedef boost::shared_ptr<stream::AsyncStreamConnection::SendStream> send_stream_ptr;
+		typedef stream::AsyncStreamConnection::SendPopStream<lin_algebra::vec3f> vec3_send_stream;
+		typedef stream::AsyncStreamConnection::SendPopStream<lin_algebra::vec2f> vec2_send_stream;
+		typedef stream::AsyncStreamConnection::SendPopStream<float> float_send_stream;
 
-	// run connection and make it block
-	conn.run(false);
+		// create the streams list
+		stream::AsyncStreamConnection::send_streams_t send_streams = boost::assign::list_of
+			((send_stream_ptr)boost::make_shared<vec3_send_stream>(compass_watch->get_watch_stream()))
+			((send_stream_ptr)boost::make_shared<vec3_send_stream>(acc_watch->get_watch_stream()))
+			((send_stream_ptr)boost::make_shared<vec3_send_stream>(cockpit.watch_gyro_orientation()))
+			((send_stream_ptr)boost::make_shared<vec3_send_stream>(cockpit.watch_rest_orientation()))
+			((send_stream_ptr)boost::make_shared<vec3_send_stream>(cockpit.orientation()->get_watch_stream()))
+			((send_stream_ptr)boost::make_shared<float_send_stream>(cockpit.watch_rest_reliability()))
+			((send_stream_ptr)boost::make_shared<float_send_stream>(fpsed_gyro->get_fps_stream()))
+			((send_stream_ptr)boost::make_shared<vec2_send_stream>(cockpit.position()));
+
+		// creating the udp connection stuff
+		boost::shared_ptr<stream::UdpipConnectionFactory> conn_factory =
+				boost::make_shared<stream::UdpipConnectionFactory>(5555, udp_from_addr, 4444, export_addr);
+
+		// create the async stream connection
+		stream::AsyncStreamConnection c(send_streams,
+										stream::AsyncStreamConnection::recv_streams_t(),
+										conn_factory,
+										false,
+										50.);
+		c.start();
+		while (true);
+
+	} else {
+		// export all the data
+		std::cout << "Exporting all data" << std::endl;
+		boost::shared_ptr<stream::TcpipClient> client = boost::make_shared<stream::TcpipClient>(export_addr, 0x6060);
+		stream::StreamConnection conn(client);
+		conn.export_pop_stream<lin_algebra::vec3f>(cockpit.watch_gyro_orientation(), "gyro_watch_orientation");
+		conn.export_pop_stream<lin_algebra::vec3f>(cockpit.watch_rest_orientation(), "watch_rest_orientation");
+		conn.export_pop_stream<lin_algebra::vec3f>(acc_watch->get_watch_stream(), "watch_acc_sensor");
+		conn.export_pop_stream<lin_algebra::vec3f>(compass_watch->get_watch_stream(), "watch_compass_sensor");
+		conn.export_pop_stream<lin_algebra::vec3f>(cockpit.orientation()->get_watch_stream(), "orientation");
+		conn.export_pop_stream<float>(cockpit.watch_rest_reliability(), "reliability");
+		conn.export_pop_stream<lin_algebra::vec2f>(cockpit.position(), "position");
+		conn.export_pop_stream<float>(fpsed_gyro->get_fps_stream(), "gyro_fps");
+
+		// run connection and make it block
+		conn.run(false);
+	}
 	return 0;
 }
