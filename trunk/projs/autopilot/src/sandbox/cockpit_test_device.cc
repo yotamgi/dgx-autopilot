@@ -72,23 +72,20 @@ autopilot::NormalPlainPlatform record_platform(autopilot::NormalPlainPlatform pl
 
 int main(int argc, char** argv) {
 	if (argc < 3) {
-		std::cout << argv[0] << " <export_addr> [--udp <from_addr>] [--record <dir>]" << std::endl;
+		std::cout << argv[0] << " <export_addr> [--udp] [--record <dir>]" << std::endl;
 		exit(1);
 	}
 
 	std::string record_dir = "";
 	std::string export_addr = argv[1];
-	std::string udp_from_addr;
 	bool use_udp;
 	for (size_t i=2; i<(size_t)argc; i++) {
 		if (std::string(argv[i]) == "--record" && ((size_t)argc > i+1)) {
 			record_dir = std::string(argv[i+1]);
 			i++;
 		}
-		else if (std::string(argv[i]) == "--udp" && ((size_t)argc > i+1)) {
+		else if (std::string(argv[i]) == "--udp") {
 			use_udp = true;
-			udp_from_addr = std::string(argv[i+1]);
-			i++;
 		}
 	}
 
@@ -139,7 +136,7 @@ int main(int argc, char** argv) {
 
 		// creating the udp connection stuff
 		boost::shared_ptr<stream::UdpipConnectionFactory> conn_factory =
-				boost::make_shared<stream::UdpipConnectionFactory>(5555, udp_from_addr, 4444, export_addr);
+				boost::make_shared<stream::UdpipConnectionFactory>(5555, export_addr, 4444);
 
 		// create the async stream connection
 		stream::AsyncStreamConnection c(send_streams,

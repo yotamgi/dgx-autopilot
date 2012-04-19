@@ -22,7 +22,7 @@ typedef stream::filters::WatchFilter<lin_algebra::vec3f> vec3_watch_stream;
 
 void usage(std::string arg0) {
 	std::cout << arg0 << " --sensor-sim <address>  [--present-from <address> ] "
-			"[--present-from-udp <from_addr> <to_address> ] "
+			"[--present-from-udp <address> ] "
 			"[--record <folder> ] [--play <folder> ] [--help] " << std::endl;
 }
 
@@ -178,7 +178,6 @@ int main(int argc, char** argv) {
 	std::string sim_addr;
 	std::string present_addr;
 	std::string present_addr_udp;
-	std::string udp_from_addr;
 	if (argc > 2) {
 		for (size_t i=1; i<(size_t)argc; i++) {
 
@@ -224,13 +223,12 @@ int main(int argc, char** argv) {
 				continue;
 			}
 			else if (std::string(argv[i]) == "--present-from-udp") {
-				if ((size_t)argc < i+2) {
+				if ((size_t)argc < i+1) {
 					usage(argv[0]);
 					exit(3);
 				} else {
-					udp_from_addr = argv[i+1];
-					present_addr_udp = argv[i+2];
-					i+=2;
+					present_addr_udp = argv[i+1];
+					i++;
 				}
 				continue;
 			}
@@ -329,7 +327,7 @@ int main(int argc, char** argv) {
 
 		// creating the udp connection stuff
 		boost::shared_ptr<stream::UdpipConnectionFactory> conn_factory =
-				boost::make_shared<stream::UdpipConnectionFactory>(4444, udp_from_addr, 5555, present_addr_udp);
+				boost::make_shared<stream::UdpipConnectionFactory>(4444, present_addr_udp, 5555);
 
 		// create the async stream connection
 		stream::AsyncStreamConnection c(stream::AsyncStreamConnection::send_streams_t(),
