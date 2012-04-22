@@ -28,23 +28,29 @@ StreamReader<T>::StreamReader(boost::shared_ptr<std::istream> in):m_in(in)
 }
 
 template <typename T>
-typename StreamReader<T>::sample StreamReader<T>::next_sample() {
+boost::optional<typename StreamReader<T>::sample> StreamReader<T>::next_sample() {
 	typename StreamReader<T>::sample s;
 	char c;
 	(*m_in) >> s.time;
 	(*m_in) >> c;
-	if (c != ',') {
+
+	if (m_in->eof()) {
+		return boost::optional<sample>();
+	}
+	else if (c != ',') {
 		std::stringstream error;
 		error << "Could not parse the std::stream as a stream format - Expected ',' as seperator, but got " << c;
-		throw PopStreamException(error.str());
+		throw StreamException(error.str());
 	}
+
 	(*m_in) >> s.data;
-	return s;
+
+	return boost::optional<sample>(s);
 }
 
 template <typename T>
 inline PopStreamPlayer<T>::PopStreamPlayer(boost::shared_ptr<std::istream> in, bool blocking):
-		m_reader(in), m_blocking(blocking)
+		m_reader(in), m_blocking(blocking), m_ended(false)
 {
 	if (!blocking) {
 		m_curr_sample.time = -1.;
@@ -53,8 +59,22 @@ inline PopStreamPlayer<T>::PopStreamPlayer(boost::shared_ptr<std::istream> in, b
 
 template <typename T>
 inline T PopStreamPlayer<T>::get_data() {
+
+	// if the stream has already ended, just return the old sample
+	if (m_ended) {
+		return m_curr_sample.data;
+	}
+
 	if (m_blocking) {
-		typename StreamReader<T>::sample curr_sample = m_reader.next_sample();
+
+		// if there is no more to give, set the m_ended bit, and return the old sample
+		boost::optional<typename StreamReader<T>::sample> curr_sample_optional = m_reader.next_sample();
+		if (!curr_sample_optional) {
+			m_ended = true;
+			return m_curr_sample.data;
+		}
+
+		typename StreamReader<T>::sample curr_sample = *curr_sample_optional;
 
 		// block until the time comes
 		float time_diff = curr_sample.time - m_timer.passed();
@@ -63,12 +83,19 @@ inline T PopStreamPlayer<T>::get_data() {
 			time_diff = curr_sample.time - m_timer.passed();
 		}
 
+		m_curr_sample = curr_sample;
 		return curr_sample.data;
 	}
 	else {
-		// read from file untill we got to the correct time
+		// read from file until we got to the correct time
 		while (m_curr_sample.time < m_timer.passed()) {
-			m_curr_sample = m_reader.next_sample();
+
+			boost::optional<typename StreamReader<T>::sample> curr_sample_optional = m_reader.next_sample();
+			if (!curr_sample_optional) {
+				m_ended = true;
+				return m_curr_sample.data;
+			}
+			m_curr_sample = *curr_sample_optional;
 		}
 
 		// return the data
@@ -89,9 +116,10 @@ void PushStreamPlayer<T>::set_receiver(boost::shared_ptr<DataPushStream<T> > rec
 
 template <typename T>
 void PushStreamPlayer<T>::run() {
-	typename StreamReader<T>::sample curr_sample = m_reader.next_sample();
+	boost::optional<typename StreamReader<T>::sample > curr_sample_optional = m_reader.next_sample();
 
-	while (true) {
+	while (curr_sample_optional) {
+		typename StreamReader<T>::sample curr_sample = *curr_sample_optional;
 
 		// block until the time comes
 		while (curr_sample.time > m_timer.passed()) {
@@ -104,7 +132,7 @@ void PushStreamPlayer<T>::run() {
 		}
 
 		// read the next sample
-		curr_sample = m_reader.next_sample();
+		curr_sample_optional = m_reader.next_sample();
 
 	}
 }

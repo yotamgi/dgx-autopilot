@@ -6,6 +6,7 @@
 #include <stream/util/time.h>
 #include <boost/thread.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/optional.hpp>
 #include <istream>
 
 namespace stream {
@@ -30,7 +31,12 @@ public:
 		float time;
 	};
 
-	sample next_sample();
+	/**
+	 * The next sample function.
+	 * @returns the next sample if exists, or NULL if the stream ended.
+	 * @throws StreamException if the file does not meets the format requirments
+	 */
+	boost::optional<sample> next_sample();
 
 private:
 	boost::shared_ptr<std::istream> m_in;
@@ -53,6 +59,8 @@ public:
 	 */
 	PopStreamPlayer(boost::shared_ptr<std::istream> in, bool blocking = true);
 
+	bool ended() { return m_ended; }
+
 	T get_data();
 
 private:
@@ -64,6 +72,8 @@ private:
 	Timer m_timer;
 
 	typename StreamReader<T>::sample m_curr_sample;
+
+	bool m_ended;
 };
 
 
