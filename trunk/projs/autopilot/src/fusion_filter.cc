@@ -1,4 +1,6 @@
 #include "fusion_filter.h"
+#include <stream/filters/low_pass_filter.h>
+#include <boost/make_shared.hpp>
 
 namespace autopilot {
 
@@ -14,7 +16,7 @@ FusionFilter::FusionFilter(boost::shared_ptr<vec_stream_t> acc,
 						   boost::shared_ptr<vec_stream_t> compass,
 						   boost::shared_ptr<vec_stream_t> gyro,
 						   boost::shared_ptr<float_stream_t> speed):
-			m_acc(acc),
+			m_acc(boost::make_shared<stream::filters::LowPassFilter<lin_algebra::vec3f> >(acc, ACC_LOW_PASS)),
 			m_compass(compass),
 			m_gyro(gyro),
 			m_speed(speed),
@@ -33,7 +35,7 @@ FusionFilter::FusionFilter(boost::shared_ptr<vec_stream_t> acc,
 						   boost::shared_ptr<vec_stream_t> gyro,
 						   lin_algebra::vec3f expected_north,
 						   boost::shared_ptr<float_stream_t> speed):
-		m_acc(acc),
+		m_acc(boost::make_shared<stream::filters::LowPassFilter<lin_algebra::vec3f> >(acc, ACC_LOW_PASS)),
 		m_compass(compass),
 		m_gyro(gyro),
 		m_speed(speed),
@@ -50,7 +52,7 @@ FusionFilter::FusionFilter(boost::shared_ptr<vec_stream_t> acc,
 						   boost::shared_ptr<vec_stream_t> gyro,
 						   float north_pitch_angle,
 						   boost::shared_ptr<float_stream_t> speed):
-		m_acc(acc),
+		m_acc(boost::make_shared<stream::filters::LowPassFilter<lin_algebra::vec3f> >(acc, ACC_LOW_PASS)),
 		m_compass(compass),
 		m_gyro(gyro),
 		m_speed(speed),
@@ -80,6 +82,10 @@ lin_algebra::vec3f FusionFilter::filter(lin_algebra::vec3f acc_data,
 	// calculate time delta
 	float time_delta = m_timer.passed();
 	m_timer.reset();
+
+	if (time_delta > 0.1f) {
+		time_delta = 0.1f;
+	}
 
 	if (m_speed) {
 		// fix the acc with the gyro data:
@@ -124,6 +130,9 @@ float FusionFilter::understand_reliability(lin_algebra::vec3f ground, lin_algebr
 //
 //	float angle = lin_algebra::angle_between(ground, north);
 //	float angle_closeness = fabs((m_north_pitch_angle - angle)/(m_north_pitch_angle));
+	if ((acc_len_closeness < 0.05) && (acc_len_closeness > -0.05)) {
+		acc_len_closeness = 0.0;
+	}
 
 	return lim(
 			1. - (acc_len_closeness*12.),// + compass_len_closeness/5. + angle_closeness/50.),

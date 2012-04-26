@@ -130,7 +130,7 @@ void WaypointPilot::fly() {
 
 	while (m_running) {
 
-		// update the path synchronusly, to avoid thread safty problems
+		// update the path synchronously, to avoid thread safety problems
 		if (m_waiting_path) {
 			m_path = m_new_path;
 			m_waiting_path = false;
