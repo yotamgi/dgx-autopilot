@@ -82,6 +82,7 @@ private:
 	boost::shared_ptr<stream::PushToPopConv<lin_algebra::vec3f> > m_rest_orientation;
 	boost::shared_ptr<stream::PushToPopConv<lin_algebra::vec3f> > m_fixed_acc;
 
+	static const size_t ACC_LOW_PASS = 20;
 };
 
 }  // namespace autopilot
