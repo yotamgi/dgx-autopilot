@@ -18,13 +18,12 @@ and tell the linker to link with the .lib file.
 #endif
 
 #include "plain.h"
-#include "camera.h"
+#include "simulator.h"
 #include "sensors/simulator_gyro.h"
 #include "sensors/simulator_accelerometer.h"
 #include "sensors/simulator_magnetometer.h"
 #include "sensors/simulator_gps.h"
 #include "sensors/simulator_altmeter.h"
-#include <irrlicht/irrlicht.h>
 #include <cmath>
 #include <boost/make_shared.hpp>
 #include <sys/time.h>
@@ -38,54 +37,13 @@ and tell the linker to link with the .lib file.
 
 #include <boost/thread.hpp>
 
-using namespace irr;
 
 typedef stream::DataPopStream<lin_algebra::vec3f> vec3stream;
 typedef stream::DataPopStream<float> floatstream;
 typedef boost::shared_ptr<vec3stream> vec3stream_ptr;
 typedef boost::shared_ptr<floatstream> floatstream_ptr;
 
-
-
-/*
-To receive events like mouse and keyboard input, or GUI events like "the OK
-button has been clicked", we need an object which is derived from the
-irr::IEventReceiver object. There is only one method to override:
-irr::IEventReceiver::OnEvent(). This method will be called by the engine once
-when an event happens. What we really want to know is whether a key is being
-held down, and so we will remember the current state of each key.
-*/
-class MyEventReceiver : public IEventReceiver
-{
-public:
-	// This is the one method that we have to implement
-	virtual bool OnEvent(const SEvent& event)
-	{
-		// Remember whether each key is down or up
-		if (event.EventType == irr::EET_KEY_INPUT_EVENT)
-			KeyIsDown[event.KeyInput.Key] = event.KeyInput.PressedDown;
-
-		return false;
-	}
-
-	// This is used to check whether a key is being held down
-	virtual bool IsKeyDown(EKEY_CODE keyCode) const
-	{
-		return KeyIsDown[keyCode];
-	}
-	
-	MyEventReceiver()
-	{
-		for (u32 i=0; i<KEY_KEY_CODES_COUNT; ++i)
-			KeyIsDown[i] = false;
-	}
-
-private:
-	// We use this array to store the current state of each key
-	bool KeyIsDown[KEY_KEY_CODES_COUNT];
-};
-
-void export_import(simulator::Plain& p,
+void export_import(boost::shared_ptr<simulator::Plain> plain,
 		vec3stream_ptr gyro,
 		vec3stream_ptr acc,
 		vec3stream_ptr magneto,
@@ -94,7 +52,7 @@ void export_import(simulator::Plain& p,
 {
 
 	while (true) {
-		while (!p.data_ready());
+		while (!plain->data_ready());
 		try {
 			boost::shared_ptr<stream::TcpipClient> client =
 					boost::make_shared<stream::TcpipClient>("localhost", 0x6060);
@@ -104,10 +62,10 @@ void export_import(simulator::Plain& p,
 			conn.export_pop_stream<lin_algebra::vec3f>(magneto, "simulator_compass");
 			conn.export_pop_stream<float>(alt, "simulator_alt");
 
-			conn.export_push_stream<float>(p.get_elevator_servo(), "simulator_pitch_servo");
-			conn.export_push_stream<float>(p.get_rudder_servo(), "simulator_yaw_servo");
-			conn.export_push_stream<float>(p.get_ailron_servo(), "simulator_tilt_servo");
-			conn.export_push_stream<float>(p.get_throttle_servo(), "simulator_gas_servo");
+			conn.export_push_stream<float>(plain->get_elevator_servo(), "simulator_pitch_servo");
+			conn.export_push_stream<float>(plain->get_rudder_servo(), "simulator_yaw_servo");
+			conn.export_push_stream<float>(plain->get_ailron_servo(), "simulator_tilt_servo");
+			conn.export_push_stream<float>(plain->get_throttle_servo(), "simulator_gas_servo");
 			conn.run(true);
 
 			gps_sensor->set_pos_listener(conn.import_push_stream<lin_algebra::vec3f>("gps_pos_reciever"));
@@ -131,19 +89,6 @@ different possibilities to move and animate scene nodes.
 */
 int main()
 {
-	// create device
-	video::E_DRIVER_TYPE driverType=video::EDT_OPENGL;
-	MyEventReceiver receiver;
-
-	IrrlichtDevice* device = createDevice(driverType,
-			core::dimension2d<u32>(800, 600), 16, false, false, false, &receiver);
-
-	if (device == 0)
-		return 1; // could not create selected driver.
-
-	video::IVideoDriver* driver = device->getVideoDriver();
-	scene::ISceneManager* smgr = device->getSceneManager();
-
 
 	simulator::PlainParams plane_params(
 			 "media/pf-cessna-182.x",
@@ -174,8 +119,10 @@ int main()
 //			 13.0f, // wing area
 //			 -5.); // lift
 
+	simulator::Simulator sim(plane_params);
 
-	simulator::Plain p(device, core::vector3df(0.0f, 0.0f, 0.0f), plane_params);
+	boost::shared_ptr<simulator::Plain> plain = sim.get_plane();
+
 	boost::shared_ptr<simulator::SimulatorGyroSensor> gyro_sensor(
 			new simulator::SimulatorGyroSensor(plane_params.get_rot())
 	);
@@ -192,130 +139,23 @@ int main()
 			new simulator::SimulatorGpsSensor()
 	);
 
-	p.carry(gyro_sensor);
-	p.carry(acc_sensor);
-	p.carry(magneto_sensor);
-	p.carry(gps_sensor);
-	p.carry(alt_sensor);
+	plain->carry(gyro_sensor);
+	plain->carry(acc_sensor);
+	plain->carry(magneto_sensor);
+	plain->carry(gps_sensor);
+	plain->carry(alt_sensor);
 
 	// inital servo data
-	p.get_elevator_servo()->set_data(50.);
-	p.get_ailron_servo()->set_data(50.);
-	p.get_rudder_servo()->set_data(50.);
+	plain->get_elevator_servo()->set_data(50.);
+	plain->get_ailron_servo()->set_data(50.);
+	plain->get_rudder_servo()->set_data(50.);
 
 	// export all the sensors
-	boost::thread t(export_import, boost::ref(p), gyro_sensor, acc_sensor, magneto_sensor, alt_sensor, gps_sensor);
+	boost::thread t(export_import, plain, gyro_sensor, acc_sensor, magneto_sensor, alt_sensor, gps_sensor);
 
-    // add terrain scene node
-    scene::ITerrainSceneNode* terrain = smgr->addTerrainSceneNode(
-        "media/terrain-heightmap.bmp",
-        0,                  // parent node
-        -1,                 // node id
-        core::vector3df(-5000.0f, -30., -5000.f),     // position
-        core::vector3df(0.f, 0.f, 0.f),     // rotation
-        core::vector3df(40.f, 0.2f, 40.f),  // scale
-        video::SColor ( 255, 255, 255, 255 ),   // vertexColor
-        5,                  // maxLOD
-        scene::ETPS_17,             // patchSize
-        4                   // smoothFactor
-        );
-
-    terrain->setMaterialFlag(video::EMF_LIGHTING, false);
-
-    terrain->setMaterialTexture(0,
-            driver->getTexture("media/terrain-texture.jpg"));
-    terrain->setMaterialTexture(1,
-            driver->getTexture("media/detailmap3.jpg"));
-
-    terrain->setMaterialType(video::EMT_DETAIL_MAP);
-
-    terrain->scaleTexture(1.0f, 20.0f);
-
-
-    simulator::Camera c(device, &p, irr::core::vector3df(4.0, 4.0, -4.0), 2.0);
-    c.setType(simulator::Camera::TRACK_FIXED);
-
-	/*
-	We have done everything, so lets draw it. We also write the current
-	frames per second and the name of the driver to the caption of the
-	window.
-	*/
-	int lastFPS = -1;
-
-	// In order to do framerate independent movement, we have to know
-	// how long it was since the last frame
-	struct timeval tv;
-	gettimeofday(&tv, NULL);
-	double then = tv.tv_sec*1000. + tv.tv_usec/1000.;
-	double frameDeltaTime = 0.;
-
-	while(device->run())
-	{
-		// calculate the delta time, and make sure it does not exceed 100 fps
-		double now;
-		do {
-			gettimeofday(&tv, NULL);
-			now = tv.tv_sec*1000. +  tv.tv_usec/1000.;
-			frameDeltaTime = (now - then) / 1000.;
-			usleep(1000);
-		} while (frameDeltaTime < 0.01);
-		then = now;
-
-		p.update(frameDeltaTime);
-		c.update(frameDeltaTime);
-
-		driver->beginScene(true, true, video::SColor(255,113,113,133));
-
-		smgr->drawAll(); // draw the 3d scene
-		device->getGUIEnvironment()->drawAll(); // draw the gui environment (the logo)
-
-		driver->endScene();
-
-		int fps = driver->getFPS();
-
-		if (lastFPS != fps)
-		{
-			core::stringw tmp(L"DGX Project Plane Simulator");
-			tmp += driver->getName();
-			tmp += L"] fps: ";
-			tmp += fps;
-
-			device->setWindowCaption(tmp.c_str());
-			lastFPS = fps;
-		}
-
-		///////////////////////////////////////
-		// Update the plane according to the keys
-		//////////////
-		if (receiver.IsKeyDown(KEY_UP)) p.get_elevator_servo()->override(90.);
-		else if (receiver.IsKeyDown(KEY_DOWN)) p.get_elevator_servo()->override(10.);
-		else p.get_elevator_servo()->stop_override();
-
-		if (receiver.IsKeyDown(KEY_LEFT))  p.get_ailron_servo()->override(90.);
-		else if (receiver.IsKeyDown(KEY_RIGHT)) p.get_ailron_servo()->override(10.);
-		else p.get_ailron_servo()->stop_override();
-
-		if (receiver.IsKeyDown(KEY_KEY_N))  p.get_rudder_servo()->override(90.);
-		else if (receiver.IsKeyDown(KEY_KEY_M)) p.get_rudder_servo()->override(10.);
-		else p.get_rudder_servo()->stop_override();
-
-		if (receiver.IsKeyDown(KEY_KEY_V)) c.setType(simulator::Camera::FPS);
-		if (receiver.IsKeyDown(KEY_KEY_X)) c.setType(simulator::Camera::TRACK_BEHIND);
-		if (receiver.IsKeyDown(KEY_KEY_C)) c.setType(simulator::Camera::TRACK_FIXED);
-		if (receiver.IsKeyDown(KEY_KEY_A)) p.get_throttle_servo()->set_data(100.);
-		if (receiver.IsKeyDown(KEY_KEY_Z)) p.get_throttle_servo()->set_data(0.);
-	}
-
-	/*
-	In the end, delete the Irrlicht device.
-	*/
-	device->drop();
-	
+	sim.run();
 	t.detach();
 
 	return 0;
 }
 
-/*
-That's it. Compile and play around with the program.
-**/

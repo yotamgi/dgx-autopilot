@@ -2,7 +2,7 @@
 
 namespace simulator {
 
-Camera::Camera(irr::IrrlichtDevice* device, FlyingObject* tracked, irr::core::vector3df pos, float closeness):
+Camera::Camera(irr::IrrlichtDevice* device, boost::shared_ptr<FlyingObject> tracked, irr::core::vector3df pos, float closeness):
 		m_type(Camera::TRACK_BEHIND),
 		m_fixed_pos(pos),
 		m_closeness(closeness),

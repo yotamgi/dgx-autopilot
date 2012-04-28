@@ -1,6 +1,6 @@
-#include <platform/dgx1_platform.h>
-#include <cockpit.h>
-#include <waypoint_pilot.h>
+#include <autopilot/platform/dgx1_platform.h>
+#include <autopilot/cockpit.h>
+#include <autopilot/waypoint_pilot.h>
 #include <stream/util/tcpip_connection.h>
 #include <gs/map_stream_view.h>
 
@@ -53,7 +53,7 @@ void create_gs(boost::shared_ptr<autopilot::Cockpit> cockpit, int argc, char** a
 	QWidget* window = new QWidget();
 	QHBoxLayout* layout = new QHBoxLayout();
 	gs::MapStreamView* map_view = new gs::MapStreamView(cockpit->position(),
-			0.2, QSize(400, 300), std::string("../ground_station/data/map"));
+			0.2, QSize(400, 300), std::string("../../projs/ground_station/data/map"));
 	layout->addWidget(map_view);
 	window->setLayout(layout);
 	window->show();

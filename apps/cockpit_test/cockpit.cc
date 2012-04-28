@@ -5,8 +5,8 @@
 #include <stream/util/tcpip_connection.h>
 #include <stream/util/udpip_connection.h>
 #include <stream/util/stream_player.h>
-#include <platform/dgx1_platform.h>
-#include <cockpit.h>
+#include <autopilot/platform/dgx1_platform.h>
+#include <autopilot/cockpit.h>
 #include <gs/3d_stream_view.h>
 #include <gs/size_stream_view.h>
 #include <gs/map_stream_view.h>
@@ -96,7 +96,7 @@ void open_gs(
 
 	// the position
 	gs::MapStreamView map_view(position, 1.0f, stream3d_dimention,
-					std::string("../ground_station/data/map"));
+					std::string("../../projs/ground_station/data/map"));
 
 	// the link quality
 	gs::SizeStreamView view_link_quality(link_quality, 0.1f , 0., 1.);
