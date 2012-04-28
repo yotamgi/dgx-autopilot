@@ -1,16 +1,12 @@
 LIBDS_PATH = ../libdata_stream/
 include $(LIBDS_PATH)/Makefile.include
 
-GROUND_STATION_PATH = ../ground_station/
-include $(GROUND_STATION_PATH)/Makefile.include
-
 LIBDIR = ./lib
 SRCDIR = ./src
 
 CXX = g++
-ARCHIVE = ar
 CXXFLAGS += -g -I$(SRCDIR) -Wall  $(LIBDS_CXXFLAGS) -O3 -fPIC
-LDFLAGS += -L./lib -fPIC -Wl,--rpath,$(LIBDS_LIBDIRS):$(GROUND_STATION_LIBDIRS):$(LIBDIR) $(LIBDS_LDFLAGS) \
+LDFLAGS += -L./lib -fPIC -Wl,--rpath,$(LIBDS_LIBDIRS):$(LIBDIR) $(LIBDS_LDFLAGS) \
 			-lboost_thread -lboost_filesystem-mt -lboost_system-mt -lgps
 
 AUTOPILIT_OBJS =  $(SRCDIR)/platform/hw/i2c_interface.o	\
@@ -36,14 +32,14 @@ GTESTS_OBJS=
 all: host device
 
 .PHONY:
-host: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.so sensor_watch_test cockpit_test cockpit_test_device waypoint_pilot_test gtest  
+host: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.so sensor_watch_test 
 
 .PHONY:
-device: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.so sensor_watch_test cockpit_test_device waypoint_pilot_test gtest gps_test servo_test
+device: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.so sensor_watch_test gtest gps_test servo_test
 
 .PHONY:
 clean:
-	rm -fr $(AUTOPILIT_OBJS) */*/*.o */*.o *.o $(LIBDIR) gtest sensor_watch_test watch_test cockpit_test* waypoint_pilot_test gps_test
+	rm -fr $(AUTOPILIT_OBJS) */*/*.o */*.o *.o $(LIBDIR) gtest sensor_watch_test watch_test gps_test
 
 $(LIBDIR):
 	mkdir $(LIBDIR)
@@ -52,13 +48,6 @@ $(LIBDIR):
 
 .cc.o: Makefile
 	$(CXX) -c $(CXXFLAGS) $<  -o $*.o
-
-# specific objs that need different cxxflags
-$(SRCDIR)/sandbox/cockpit_test.o: $(SRCDIR)/sandbox/cockpit_test.cc
-	$(CXX) -c $(CXXFLAGS)  $(GROUND_STATION_CXXFLAGS) $(SRCDIR)/sandbox/cockpit_test.cc -o $(SRCDIR)/sandbox/cockpit_test.o
-$(SRCDIR)/sandbox/waypoint_pilot_test.o: $(SRCDIR)/sandbox/waypoint_pilot_test.cc
-	$(CXX) -c $(CXXFLAGS)  $(GROUND_STATION_CXXFLAGS) $(SRCDIR)/sandbox/waypoint_pilot_test.cc -o $(SRCDIR)/sandbox/waypoint_pilot_test.o
-	
 
 $(LIBDIR)/libautopilot.so: $(AUTOPILIT_OBJS)
 	$(CXX) -shared  -o $(LIBDIR)/libautopilot.so $(AUTOPILIT_OBJS) $(LDFLAGS)
@@ -78,13 +67,4 @@ servo_test: $(SRCDIR)/sandbox/servo_test.o $(LIBDIR) $(LIBDIR)/libautopilot.so
 
 gps_test: $(SRCDIR)/sandbox/gps_test.o $(LIBDIR) $(LIBDIR)/libautopilot.so 
 	$(CXX) $(SRCDIR)/sandbox/gps_test.o -lautopilot $(LDFLAGS) -o gps_test
-	
-cockpit_test: $(SRCDIR)/sandbox/cockpit_test.o $(LIBDIR) $(LIBDIR)/libautopilot.so
-	$(CXX) $(SRCDIR)/sandbox/cockpit_test.o -lautopilot  $(GROUND_STATION_LDFLAGS) $(LDFLAGS) -o cockpit_test
-	
-cockpit_test_device: $(SRCDIR)/sandbox/cockpit_test_device.o $(LIBDIR) $(LIBDIR)/libautopilot.so
-	$(CXX) $(SRCDIR)/sandbox/cockpit_test_device.o -lautopilot  $(LDFLAGS) -o cockpit_test_device
-	
-waypoint_pilot_test: $(SRCDIR)/sandbox/waypoint_pilot_test.o $(LIBDIR) $(LIBDIR)/libautopilot.so
-	$(CXX) $(SRCDIR)/sandbox/waypoint_pilot_test.o -lautopilot $(GROUND_STATION_LDFLAGS) $(LDFLAGS)  -o waypoint_pilot_test
 	

@@ -4,6 +4,7 @@
 
 #include "flying_object.h"
 #include <irrlicht/irrlicht.h>
+#include <boost/shared_ptr.hpp>
 
 namespace simulator {
 
@@ -15,7 +16,7 @@ namespace simulator {
  */
 class Camera {
 public:
-	Camera(irr::IrrlichtDevice* device, FlyingObject* tracked, irr::core::vector3df pos, float closeness);
+	Camera(irr::IrrlichtDevice* device, boost::shared_ptr<FlyingObject> tracked, irr::core::vector3df pos, float closeness);
 
 	enum CameraType {
 		TRACK_BEHIND, TRACK_FIXED, FPS
@@ -35,7 +36,7 @@ private:
 	/** needed for calculating the tracked direction */
 	irr::core::vector3df m_tracked_prev_pos;
 
-	FlyingObject* m_tracked;
+	boost::shared_ptr<FlyingObject> m_tracked;
 
 	irr::scene::ICameraSceneNode* m_tracking_camera_node;
 	irr::scene::ICameraSceneNode* m_fps_camera_node;

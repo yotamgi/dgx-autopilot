@@ -1,0 +1,16 @@
+###########################################################################
+# Include all the projects Makefile
+############################################################################
+
+LIBDS_PATH=$(DGX_PATH)/libdata_stream/
+include $(LIBDS_PATH)/Makefile.include
+
+AUTOPILOT_PATH=$(DGX_PATH)/autopilot
+include $(AUTOPILOT_PATH)/Makefile.include
+
+DGX_SIMULATOR_PATH=$(DGX_PATH)/simulator/
+include $(DGX_SIMULATOR_PATH)/Makefile.include
+
+GROUND_STATION_PATH=$(DGX_PATH)/ground_station/
+include $(GROUND_STATION_PATH)/Makefile.include
+
