@@ -97,23 +97,24 @@ MaestroServoController::MaestroServoChannel::MaestroServoChannel(size_t channel,
 	SERVO_MAX(8000)
 {}
 
-void MaestroServoController::MaestroServoChannel::set_data(const float& statePercentage) {
+void MaestroServoController::MaestroServoChannel::set_data(const float& state_percentage) {
 
-	if ((statePercentage < 0.0f) || (statePercentage > 100.0f)) {
-		throw ServoException("You asked for illegal servo percentage");
-	}
+	// apply the trims
+	float trimmed_state_percentage = trim(state_percentage);
 
+	// convert it to servo units
+	int target = SERVO_MIN + (trimmed_state_percentage/100.0f) * float(SERVO_MAX-SERVO_MIN);
+
+	// build the send packet
 	unsigned char serialBytes[5];
-	int target = SERVO_MIN + (statePercentage/100.0f) * float(SERVO_MAX-SERVO_MIN);
-
-	int a;
-
 	serialBytes[0] = MaestroServoController::MAGIC_OPCODE; // Unknown command.
 	serialBytes[1] = MaestroServoController::SET_STATE_OPCODE; // Command byte: Set Target.
 	serialBytes[2] = m_channel; // First data byte holds channel number.
 	serialBytes[3] = 0x7f&target; // Second byte holds the lower 7 bits of target.
 	serialBytes[4] = 0x7f&(target>>7);   // Third data byte holds the bits 7-13 of target.
 
+	// send the packet
+	int a;
 	a = write(m_father.m_device_fd, serialBytes,5);
 	if (a != 5) {
 		throw ServoException("Could not write to device file");
