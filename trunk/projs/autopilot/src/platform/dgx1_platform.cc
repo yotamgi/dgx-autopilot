@@ -2,6 +2,8 @@
 #include "hw/adxl345_acc.h"
 #include "hw/itg3200_gyro.h"
 #include "hw/hmc5843_compass.h"
+#include "hw/maestro_servo_controller.h"
+#include "flapron_controller.h"
 #include <stream/stream_connection.h>
 #include <stream/stream_utils.h>
 
@@ -9,7 +11,6 @@
 
 typedef stream::PushForwarder<lin_algebra::vec3f> vec3_push_forwarder;
 typedef stream::PushForwarder<float> float_push_forwarder;
-
 
 namespace autopilot {
 
@@ -31,6 +32,14 @@ NormalPlainPlatform create_dgx1_platform() {
 	dgx1_platform.gps_pos_generator = pos_forwarder;
 	dgx1_platform.gps_speed_mag_generator = speed_mag_forwarder;
 	dgx1_platform.gps_speed_dir_generator = speed_dir_forwarder;
+
+	// fill the platform's servos
+	static MaestroServoController maestro("/dev/ttyACM1");
+	FlapronController flapron(maestro.getServoChannel(2), maestro.getServoChannel(5));
+	dgx1_platform.pitch_servo	= maestro.getServoChannel(1);
+	dgx1_platform.tilt_servo 	= flapron.get_ailron_servo();
+	dgx1_platform.gas_servo 	= maestro.getServoChannel(3);
+	dgx1_platform.yaw_servo 	= maestro.getServoChannel(4);
 
 	return dgx1_platform;
 }

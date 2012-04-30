@@ -16,8 +16,9 @@ AUTOPILIT_OBJS =  $(SRCDIR)/platform/hw/i2c_interface.o	\
 		$(SRCDIR)/platform/hw/maestro_servo_controller.o \
 		$(SRCDIR)/platform/hw/gps.o \
 		$(SRCDIR)/platform/dgx1_platform.o \
+		$(SRCDIR)/platform/flapron_controller.o \
 		$(SRCDIR)/waypoint_pilot.o \
-		$(SRCDIR)/fusion_filter.o 
+		$(SRCDIR)/fusion_filter.o
 		
 		
 GTESTS_OBJS= 

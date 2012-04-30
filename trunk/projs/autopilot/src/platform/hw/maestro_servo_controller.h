@@ -2,6 +2,7 @@
 #define __MAESTRO_H__
 
 #include <stream/data_push_stream.h>
+#include <interfaces/servo_stream.h>
 #include <stdint.h>
 #include <iostream>
 #include <vector>
@@ -35,7 +36,7 @@ public:
 	/**
 	 * The servo channel class, that implements the Servo interface.
 	 */
-	class MaestroServoChannel : public stream::DataPushStream<float> {
+	class MaestroServoChannel : public ServoStream {
 	public:
 		MaestroServoChannel(size_t channel, MaestroServoController& father);
 		void set_data(const float& statePercentage);
