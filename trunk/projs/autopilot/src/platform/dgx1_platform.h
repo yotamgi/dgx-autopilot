@@ -11,12 +11,7 @@
 
 namespace autopilot {
 
-
 NormalPlainPlatform create_dgx1_platform();
-
-NormalPlainPlatform create_dgx1_simulator_platform(
-		boost::shared_ptr<stream::ConnectionFactory> conn_factory);
-
 
 } //namespace autopilot
 
