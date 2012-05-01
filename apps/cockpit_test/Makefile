@@ -19,7 +19,7 @@ CXXFLAGS=-Wall
 all: cockpit cockpit_device
 .PHONY:
 clean:
-	rm ./cockpit ./cockpit_device
+	rm -f ./cockpit ./cockpit_device
 
 
 cockpit_device: cockpit_device.cc
