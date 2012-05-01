@@ -1,14 +1,19 @@
 #ifndef PLATFORMS_H_
 #define PLATFORMS_H_
 
+#ifndef MEDIA_DIR
+#error "You must define the MEDIA_DIR macro for this to work"
+#endif
+
+#include "platforms.h"
 #include "plain.h"
 
 namespace simulator {
 namespace platforms {
 
-const PlainParams dgx_platform(
-		 "media/pf-cessna-182.x",
-		 "media/pf-cessna-182.bmp",
+PlainParams dgx_platform(
+		 MEDIA_DIR "/pf-cessna-182.x",
+		 MEDIA_DIR "/pf-cessna-182.bmp",
 		 irr::core::vector3df(1., 1., 1.),
 		 irr::core::vector3df(0., 180., 0.),
 		 500.0f,
@@ -23,9 +28,9 @@ const PlainParams dgx_platform(
 		 20.); 		// dihedral effect strenth
 
 
-const PlainParams cecsna(
-    	 "media/pf-cessna-182.x",
-    	 "media/pf-cessna-182.bmp",
+PlainParams cecsna(
+    	 MEDIA_DIR "/pf-cessna-182.x",
+    	 MEDIA_DIR "/pf-cessna-182.bmp",
     	 irr::core::vector3df(4.0f, 4.0f, 4.0f),
     	 irr::core::vector3df(0., 180., 0.),
     	 200.0f,

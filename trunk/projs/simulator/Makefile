@@ -6,13 +6,15 @@ include $(LIBDS_PATH)/Makefile.include
 AUTOPILOT_PATH = ../autopilot
 include $(AUTOPILOT_PATH)/Makefile.include
 
-
-CXX = g++
-CXXFLAGS +=  -O3 -I/usr/X11R6/include  -g $(LIBDS_CXXFLAGS) $(AUTOPILOT_CXXFLAGS) -I. -fPIC
-LDFLAGS += -L/usr/X11R6/lib -lGL -lXxf86vm -lXext -lX11 -lIrrlicht $(LIBDS_LDFLAGS) -lboost_thread -Wl,-rpath,$(LIBDS_LIBDIRS)
-
 OBJDIR = ./obj
 LIBDIR = ./lib
+SRCDIR = ./src
+
+MEDIA_DIR=`pwd`/media
+
+CXX = g++
+CXXFLAGS +=  -O3 -I/usr/X11R6/include  -g $(LIBDS_CXXFLAGS) $(AUTOPILOT_CXXFLAGS) -I$(SRCDIR) -fPIC -DMEDIA_DIR=\"$(MEDIA_DIR)\"
+LDFLAGS += -L/usr/X11R6/lib -lGL -lXxf86vm -lXext -lX11 -lIrrlicht $(LIBDS_LDFLAGS) $(AUTOPILOT_LDFLAGS) -lboost_thread -Wl,-rpath,$(LIBDS_LIBDIRS):$(AUTOPILOT_LIBDIRS)
 
 
 .PHONY: all clean
@@ -29,38 +31,41 @@ $(LIBDIR):
 $(OBJDIR):
 	mkdir $(OBJDIR)
 
-$(OBJDIR)/main.o: main.cc 
-	$(CXX) -c main.cc $(CXXFLAGS) -o $(OBJDIR)/main.o
+$(OBJDIR)/main.o: $(SRCDIR)/main.cc 
+	$(CXX) -c $(SRCDIR)/main.cc $(CXXFLAGS) -o $(OBJDIR)/main.o
 
-$(OBJDIR)/plain.o: plain.cc 
-	$(CXX) -c plain.cc $(CXXFLAGS) -o $(OBJDIR)/plain.o
+$(OBJDIR)/plain.o: $(SRCDIR)/plain.cc 
+	$(CXX) -c $(SRCDIR)/plain.cc $(CXXFLAGS) -o $(OBJDIR)/plain.o
 
-$(OBJDIR)/camera.o: camera.cc
-	$(CXX) -c camera.cc $(CXXFLAGS) -o $(OBJDIR)/camera.o
+$(OBJDIR)/camera.o: $(SRCDIR)/camera.cc
+	$(CXX) -c $(SRCDIR)/camera.cc $(CXXFLAGS) -o $(OBJDIR)/camera.o
 	
-$(OBJDIR)/simulator_platform.o: simulator_platform.cc
-	$(CXX) -c simulator_platform.cc $(CXXFLAGS) -o $(OBJDIR)/simulator_platform.o
+$(OBJDIR)/simulator_platform.o: $(SRCDIR)/simulator_platform.cc
+	$(CXX) -c $(SRCDIR)/simulator_platform.cc $(CXXFLAGS) -o $(OBJDIR)/simulator_platform.o
 
-$(OBJDIR)/simulator.o: simulator.cc
-	$(CXX) -c simulator.cc $(CXXFLAGS) -o $(OBJDIR)/simulator.o
+$(OBJDIR)/simulator.o: $(SRCDIR)/simulator.cc
+	$(CXX) -c $(SRCDIR)/simulator.cc $(CXXFLAGS) -o $(OBJDIR)/simulator.o
 	
-$(OBJDIR)/simulator_gyro.o: sensors/simulator_gyro.cc
-	$(CXX) -c sensors/simulator_gyro.cc $(CXXFLAGS) -o $(OBJDIR)/simulator_gyro.o
+$(OBJDIR)/platforms.o: $(SRCDIR)/platforms.cc
+	$(CXX) -c $(SRCDIR)/platforms.cc $(CXXFLAGS) -o $(OBJDIR)/platforms.o
+	
+$(OBJDIR)/simulator_gyro.o: $(SRCDIR)/sensors/simulator_gyro.cc
+	$(CXX) -c $(SRCDIR)/sensors/simulator_gyro.cc $(CXXFLAGS) -o $(OBJDIR)/simulator_gyro.o
 
-$(OBJDIR)/simulator_accelerometer.o: sensors/simulator_accelerometer.cc
-	$(CXX) -c sensors/simulator_accelerometer.cc $(CXXFLAGS) -o $(OBJDIR)/simulator_accelerometer.o
+$(OBJDIR)/simulator_accelerometer.o: $(SRCDIR)/sensors/simulator_accelerometer.cc
+	$(CXX) -c $(SRCDIR)/sensors/simulator_accelerometer.cc $(CXXFLAGS) -o $(OBJDIR)/simulator_accelerometer.o
 
-$(OBJDIR)/simulator_magnetometer.o: sensors/simulator_magnetometer.cc
-	$(CXX) -c sensors/simulator_magnetometer.cc $(CXXFLAGS) -o $(OBJDIR)/simulator_magnetometer.o
+$(OBJDIR)/simulator_magnetometer.o: $(SRCDIR)/sensors/simulator_magnetometer.cc
+	$(CXX) -c $(SRCDIR)/sensors/simulator_magnetometer.cc $(CXXFLAGS) -o $(OBJDIR)/simulator_magnetometer.o
 
-$(OBJDIR)/simulator_gps.o: sensors/simulator_gps.cc
-	$(CXX) -c sensors/simulator_gps.cc $(CXXFLAGS) -o $(OBJDIR)/simulator_gps.o		
+$(OBJDIR)/simulator_gps.o: $(SRCDIR)/sensors/simulator_gps.cc
+	$(CXX) -c $(SRCDIR)/sensors/simulator_gps.cc $(CXXFLAGS) -o $(OBJDIR)/simulator_gps.o		
 
-$(OBJDIR)/simulator_altmeter.o: sensors/simulator_altmeter.cc
-	$(CXX) -c sensors/simulator_altmeter.cc $(CXXFLAGS) -o $(OBJDIR)/simulator_altmeter.o		
+$(OBJDIR)/simulator_altmeter.o: $(SRCDIR)/sensors/simulator_altmeter.cc
+	$(CXX) -c $(SRCDIR)/sensors/simulator_altmeter.cc $(CXXFLAGS) -o $(OBJDIR)/simulator_altmeter.o		
 
-$(LIBDIR)/libdgx_simulator.so: $(LIBDIR) $(OBJDIR)/plain.o $(OBJDIR)/camera.o $(OBJDIR)/simulator_platform.o $(OBJDIR)/simulator.o  $(OBJDIR)/simulator_gyro.o $(OBJDIR)/simulator_accelerometer.o $(OBJDIR)/simulator_magnetometer.o $(OBJDIR)/simulator_gps.o $(OBJDIR)/simulator_altmeter.o 
-	$(CXX) -shared -fPIC $(OBJDIR)/plain.o $(OBJDIR)/camera.o $(OBJDIR)/simulator_platform.o  $(OBJDIR)/simulator.o $(OBJDIR)/simulator_gyro.o $(OBJDIR)/simulator_accelerometer.o $(OBJDIR)/simulator_magnetometer.o $(OBJDIR)/simulator_gps.o $(OBJDIR)/simulator_altmeter.o $(LDFLAGS) -o $(LIBDIR)/libdgx_simulator.so
+$(LIBDIR)/libdgx_simulator.so: $(LIBDIR) $(OBJDIR)/plain.o $(OBJDIR)/camera.o $(OBJDIR)/simulator_platform.o $(OBJDIR)/simulator.o $(OBJDIR)/platforms.o  $(OBJDIR)/simulator_gyro.o $(OBJDIR)/simulator_accelerometer.o $(OBJDIR)/simulator_magnetometer.o $(OBJDIR)/simulator_gps.o $(OBJDIR)/simulator_altmeter.o 
+	$(CXX) -shared -fPIC $(OBJDIR)/plain.o $(OBJDIR)/camera.o $(OBJDIR)/simulator_platform.o  $(OBJDIR)/simulator.o $(OBJDIR)/platforms.o $(OBJDIR)/simulator_gyro.o $(OBJDIR)/simulator_accelerometer.o $(OBJDIR)/simulator_magnetometer.o $(OBJDIR)/simulator_gps.o $(OBJDIR)/simulator_altmeter.o $(LDFLAGS) -o $(LIBDIR)/libdgx_simulator.so
 
 sim: $(OBJDIR)/main.o $(LIBDIR)/libdgx_simulator.so
 	$(CXX) $(OBJDIR)/main.o -L$(LIBDIR) $(LDFLAGS),$(LIBDIR)/libdgx_simulator.so -ldgx_simulator -o sim 
