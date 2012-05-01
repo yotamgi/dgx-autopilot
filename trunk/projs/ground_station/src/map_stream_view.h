@@ -7,7 +7,11 @@
 #include <boost/thread.hpp>
 #include <QtGui/QtGui>
 #include <qgis/qgsmapcanvas.h>
+#include <qgis/qgsmaptoolemitpoint.h>
 #include <boost/filesystem.hpp>
+#include <qgis/qgsrubberband.h>
+#include <qgis/qgsvertexmarker.h>
+
 
 namespace gs {
 
@@ -23,16 +27,26 @@ public:
 				  std::string map_dir
 	);
 
+	~MapStreamView();
+
 public slots:
 
 	void update();
+
+	void clicked(const QgsPoint &, Qt::MouseButton);
+
+signals:
+
+	void got_point(const QgsPoint& geo_waypoint, Qt::MouseButton button);
 
 private:
 
 	void load_map(boost::filesystem::path p);
 
 	QgsMapCanvas* m_map_canvas;
-	boost::shared_ptr<QgsRubberBand> m_plane_track;
+	QgsRubberBand* m_plane_track;
+	std::vector<QgsVertexMarker*> m_dots;
+	QgsMapToolEmitPoint* m_emit;
 
 	boost::shared_ptr<pos_stream> m_pos_stream;
 

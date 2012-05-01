@@ -3,7 +3,6 @@
 #include <qgis/qgsvectorlayer.h>
 #include <qgis/qgssinglesymbolrenderer.h>
 #include <qgis/qgsmaplayerregistry.h>
-#include <qgis/qgsrubberband.h>
 #include <stdexcept>
 #include <boost/filesystem.hpp>
 
@@ -34,18 +33,45 @@ MapStreamView::MapStreamView(boost::shared_ptr<pos_stream> pos_stream,
 
 	load_map(fs::path(map_dir));
 
- 	m_plane_track = boost::shared_ptr<QgsRubberBand>(new QgsRubberBand(m_map_canvas, false));
+ 	m_plane_track = new QgsRubberBand(m_map_canvas, false);
  	m_plane_track->setColor(QColor(255, 0, 0, 255));
  	m_plane_track->setWidth(3);
-	m_map_canvas->scene()->addItem(m_plane_track.get());
+	m_map_canvas->scene()->addItem(m_plane_track);
+
+	m_emit = new QgsMapToolEmitPoint(m_map_canvas);
+	m_map_canvas->setMapTool(m_emit);
 
 	QVBoxLayout* layout = new QVBoxLayout();
 	layout->addWidget(m_map_canvas);
 	setLayout(layout);
 
  	m_timer = new QTimer(this);
-	connect(m_timer, SIGNAL(timeout()), this, SLOT(update()));
+ 	connect(m_timer, SIGNAL(timeout()), this, SLOT(update()));
 	m_timer->start(1000*m_update_time);
+
+	m_emit->activate();
+	connect(m_emit, SIGNAL(canvasClicked(const QgsPoint &,Qt::MouseButton)),
+			this, SLOT(clicked(const QgsPoint &, Qt::MouseButton)));
+}
+
+MapStreamView::~MapStreamView() {
+	delete m_map_canvas;
+	delete m_plane_track;
+	for (size_t i=0; i<m_dots.size(); i++) {
+		delete m_dots[i];
+	}
+}
+
+void MapStreamView::clicked(const QgsPoint & p, Qt::MouseButton button) {
+	emit got_point(p , 	button);
+	std::cout << "Clicked " << p.x() <<  ", " << p.y() << std::endl;
+
+	QgsVertexMarker* dot = new QgsVertexMarker(m_map_canvas);
+// 	dot->setColor(QColor(255, 0, 0, 255));
+// 	dot->track->setWidth(3);
+	dot->setCenter(p);
+	m_map_canvas->scene()->addItem(dot);
+	m_dots.push_back(dot);
 }
 
 void MapStreamView::load_map(fs::path dir) {
