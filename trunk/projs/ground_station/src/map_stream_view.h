@@ -46,7 +46,7 @@ private:
 	QgsMapCanvas* m_map_canvas;
 	QgsRubberBand* m_plane_track;
 	std::vector<QgsVertexMarker*> m_dots;
-	QgsMapToolEmitPoint* m_emit;
+	QgsMapToolEmitPoint* m_mouse_emit;
 
 	boost::shared_ptr<pos_stream> m_pos_stream;
 
