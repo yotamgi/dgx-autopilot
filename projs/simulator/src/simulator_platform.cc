@@ -27,6 +27,9 @@ boost::shared_ptr<autopilot::NormalPlainPlatform> create_simulator_platform(
 	// wait until it is ready
 	while (!platform->tilt_servo);
 
+	// let the simulator start...
+	sleep(1);
+
 	return platform;
 }
 
