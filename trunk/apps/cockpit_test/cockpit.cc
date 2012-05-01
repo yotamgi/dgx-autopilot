@@ -399,7 +399,7 @@ int main(int argc, char** argv) {
 				cockpit.orientation()->get_watch_stream(),
 				cockpit.watch_rest_reliability(),
 				fpsed_gyro->get_fps_stream(),
-				cockpit.position()->get_watch_stream()
+				cockpit.position()
 		);
 	}
 	return 0;
