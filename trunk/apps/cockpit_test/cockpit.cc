@@ -1,15 +1,18 @@
 #include <stream/stream_connection.h>
 #include <stream/async_stream_connection.h>
-#include <stream/filters/stream_recorder.h>
-#include <stream/filters/fps_filter.h>
 #include <stream/util/tcpip_connection.h>
 #include <stream/util/udpip_connection.h>
 #include <stream/util/stream_player.h>
+#include <stream/filters/stream_recorder.h>
+#include <stream/filters/fps_filter.h>
 #include <autopilot/platform/dgx1_platform.h>
+#include <autopilot/platform/platform_export_import.h>
 #include <autopilot/cockpit.h>
 #include <gs/3d_stream_view.h>
 #include <gs/size_stream_view.h>
 #include <gs/map_stream_view.h>
+#include <simulator/simulator_platform.h>
+#include <simulator/platforms.h>
 #include <boost/make_shared.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/assign/list_of.hpp>
@@ -21,7 +24,7 @@
 typedef stream::filters::WatchFilter<lin_algebra::vec3f> vec3_watch_stream;
 
 void usage(std::string arg0) {
-	std::cout << arg0 << " --sensor-sim <address>  [--present-from <address> ] "
+	std::cout << arg0 << " --platform hw|sim|ip_addr  [--present-from <address> ] "
 			"[--present-from-udp <address> ] "
 			"[--record <folder> ] [--play <folder> ] [--help] " << std::endl;
 }
@@ -178,24 +181,22 @@ autopilot::NormalPlainPlatform platform_player(std::string play_dir) {
 
 int main(int argc, char** argv) {
 	// commandline parsing
-	bool sim = false;
 	std::string record_dir;
 	std::string play_dir;
-	std::string sim_addr;
+	std::string platform_type = "sim";
 	std::string present_addr;
 	std::string present_addr_udp;
 	if (argc > 2) {
 		for (size_t i=1; i<(size_t)argc; i++) {
 
-			if (std::string(argv[i]) == "--sensor-sim") {
+			if (std::string(argv[i]) == "--platform") {
 				if ((size_t)argc < i+1) {
 					usage(argv[0]);
 					exit(1);
 				} else {
-					sim_addr = argv[i+1];
+					platform_type = argv[i+1];
 					i++;
 				}
-				sim = true;
 				continue;
 			}
 			if (std::string(argv[i]) == "--record") {
@@ -362,10 +363,14 @@ int main(int argc, char** argv) {
 		std::cout << "Opening GS" << std::endl;
 
 		// create the platform according to what the user asked
-		autopilot::NormalPlainPlatform platform =
-			sim?
-				autopilot::create_dgx1_simulator_platform(boost::make_shared<stream::TcpipServer>(sim_addr, 0x6060)):
-				autopilot::create_dgx1_platform();
+		autopilot::NormalPlainPlatform platform;
+		if (platform_type == "hw") {
+		    platform = autopilot::create_dgx1_platform();
+		} else if (platform_type == "sim") {
+		    platform = *simulator::create_simulator_platform(simulator::platforms::dgx_platform);
+		} else {
+		    platform = *autopilot::import_platform(boost::make_shared<stream::TcpipServer>(platform_type , 0x6060));
+		}
 
 		// if the user asked to record, record!
 		if (record_dir != "") {

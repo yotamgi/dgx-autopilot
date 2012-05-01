@@ -1,8 +1,11 @@
 #include <autopilot/platform/dgx1_platform.h>
+#include <autopilot/platform/platform_export_import.h>
 #include <autopilot/cockpit.h>
 #include <autopilot/waypoint_pilot.h>
 #include <stream/util/tcpip_connection.h>
 #include <gs/map_stream_view.h>
+#include <simulator/simulator_platform.h>
+#include <simulator/platforms.h>
 
 #include <boost/thread.hpp>
 
@@ -12,7 +15,7 @@
 
 
 void usage_and_exit(std::string argv0) {
-	std::cerr << "usage: " << argv0 << " [--sensor-sim <address>]" << std::endl;
+	std::cerr << "usage: " << argv0 << " [--platform hw|sim|ip_addr]" << std::endl;
 	exit(1);
 }
 
@@ -63,10 +66,10 @@ void create_gs(boost::shared_ptr<autopilot::Cockpit> cockpit, int argc, char** a
 int main(int argc, char** argv) {
 
 	// parse some args
-	std::string sim_address;
+	std::string platform_type = "sim"; // default is hw
 	if (argc == 3) {
-		if (std::string(argv[1]) != "--sensor-sim") usage_and_exit(argv[0]);
-		sim_address = argv[2];
+		if (std::string(argv[1]) != "--platform") usage_and_exit(argv[0]);
+		platform_type = argv[2];
 	} else if (argc == 1) {
 	} else {
 		usage_and_exit(argv[0]);
@@ -83,11 +86,14 @@ int main(int argc, char** argv) {
 	pilot_params.max_tilt_angle = 20.;
 
 	// create the platform according to the args
-	autopilot::NormalPlainPlatform platform(
-		(sim_address == "") ?
-			autopilot::create_dgx1_platform() :
-			autopilot::create_dgx1_simulator_platform(boost::make_shared<stream::TcpipServer>(sim_address, 0x6060))
-	);
+	autopilot::NormalPlainPlatform platform;
+	if (platform_type == "hw") {
+	    platform = autopilot::create_dgx1_platform();
+	} else if (platform_type == "sim") {
+	    platform = *simulator::create_simulator_platform(simulator::platforms::dgx_platform);
+	} else {
+	    platform = *autopilot::import_platform(boost::make_shared<stream::TcpipServer>(platform_type , 0x6060));
+	}
 
 	boost::shared_ptr<autopilot::Cockpit> cockpit(boost::make_shared<autopilot::Cockpit>(platform));
 	autopilot::WaypointPilot pilot(pilot_params, cockpit);
