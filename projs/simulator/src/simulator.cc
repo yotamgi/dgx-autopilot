@@ -1,6 +1,9 @@
 #include "simulator.h"
 #include <boost/make_shared.hpp>
 
+#ifndef MEDIA_DIR
+#error "You must define the MEDIA_DIR macro for this to work"
+#endif
 
 namespace simulator {
 
@@ -30,7 +33,7 @@ Simulator::Simulator(PlainParams plain_params) {
 
     // add terrain scene node
     m_terrain = smgr->addTerrainSceneNode(
-        "media/terrain-heightmap.bmp",
+        MEDIA_DIR "/terrain-heightmap.bmp",
         0,                  // parent node
         -1,                 // node id
         core::vector3df(-5000.0f, -30., -5000.f),     // position
@@ -45,9 +48,9 @@ Simulator::Simulator(PlainParams plain_params) {
     m_terrain->setMaterialFlag(video::EMF_LIGHTING, false);
 
     m_terrain->setMaterialTexture(0,
-            driver->getTexture("media/terrain-texture.jpg"));
+            driver->getTexture(MEDIA_DIR "/terrain-texture.jpg"));
     m_terrain->setMaterialTexture(1,
-            driver->getTexture("media/detailmap3.jpg"));
+            driver->getTexture(MEDIA_DIR "/detailmap3.jpg"));
 
     m_terrain->setMaterialType(video::EMT_DETAIL_MAP);
 
