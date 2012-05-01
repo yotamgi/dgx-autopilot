@@ -19,7 +19,7 @@ CXXFLAGS=-Wall
 all: waypoint_pilot_test waypoint_pilot_test_device
 .PHONY:
 clean:
-	rm waypoint_pilot_test waypoint_pilot_test_device
+	rm -f waypoint_pilot_test waypoint_pilot_test_device
 
 waypoint_pilot_test: waypoint_pilot_test.cc
 	$(CXX) $(CXXFLAGS) waypoint_pilot_test.cc -o waypoint_pilot_test $(AUTOPILOT_CXXFLAGS) $(AUTOPILOT_LDFLAGS) $(DGX_SIMULATOR_CXXFLAGS) $(DGX_SIMULATOR_LDFLAGS) $(GROUND_STATION_CXXFLAGS) $(GROUND_STATION_LDFLAGS) -Wl,--rpath,$(LIBDS_LIBDIRS):$(GROUND_STATION_LIBDIRS):$(AUTOPILOT_LIBDIRS):$(DGX_SIMULATOR_LIBDIRS) 
