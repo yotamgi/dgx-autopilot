@@ -14,7 +14,9 @@ WaypointPilot::WaypointPilot(const WaypointPilotParams& params, boost::shared_pt
 		m_waiting_path(false),
 		m_running(false),
 		m_params(params)
-{}
+{
+	m_path.push_back(waypoint(m_cockpit->position()->get_data(), 100.0f));
+}
 
 void WaypointPilot::start(bool open_thread) {
 	m_running = true;
@@ -140,7 +142,7 @@ void WaypointPilot::fly() {
 		bool there_yet = nav_to(m_path.at(0));
 
 		// if we got to the point, shrink the vector
-		if (there_yet) {
+		if (there_yet && (m_path.size() != 1)) {
 			m_path.erase(m_path.begin());
 		}
 	}
