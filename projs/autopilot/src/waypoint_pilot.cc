@@ -9,8 +9,9 @@ WaypointPilot::waypoint::waypoint(lin_algebra::vec2f target_, float altitude_):
 		altitude(altitude_)
 {}
 
-WaypointPilot::WaypointPilot(const WaypointPilotParams& params, boost::shared_ptr<NormalPlainCockpit> cockpit):
+WaypointPilot::WaypointPilot(const Params& params, boost::shared_ptr<NormalPlainCockpit> cockpit):
 		m_cockpit(cockpit),
+		m_sas_pilot(params, cockpit),
 		m_waiting_path(false),
 		m_running(false),
 		m_params(params)
@@ -32,12 +33,6 @@ void WaypointPilot::stop() {
 	m_running_thread.join();
 }
 
-void WaypointPilot::maintain_pitch(float wanted_pitch) {
-	float plain_pitch = m_cockpit->orientation()->get_data()[0];
-	float pitch_delta = wanted_pitch - plain_pitch;
-	m_cockpit->pitch_servo()->set_data(50. - 50.*(pitch_delta)/m_params.max_climbing_angle);
-}
-
 void WaypointPilot::maintain_alt(float wanted_altitude){
 
 	servo_stream_ptr gas_servo = m_cockpit->gas_servo();
@@ -47,35 +42,19 @@ void WaypointPilot::maintain_alt(float wanted_altitude){
 	// max climbing
 	if (delta_alt > 5) {
 		gas_servo->set_data(m_params.climbing_gas);
-		maintain_pitch(m_params.max_climbing_angle);
+		m_sas_pilot.get_pitch_control()->set_data(m_params.max_climbing_strength);
 	}
 
 	// max decending
 	else if (delta_alt < -5) {
 		gas_servo->set_data(m_params.decending_gas);
-		maintain_pitch(m_params.max_decending_angle);
+		m_sas_pilot.get_pitch_control()->set_data(m_params.max_decending_strength);
 	}
 
 	// avg flight
 	else {
 		gas_servo->set_data(m_params.avg_gas);
-		maintain_pitch(m_params.avg_pitch);
-	}
-}
-
-void WaypointPilot::maintain_angle(float angle){
-
-	vec3_stream_ptr oreintation = m_cockpit->orientation();
-	servo_stream_ptr tilt = m_cockpit->tilt_servo();
-
-	lin_algebra::vec3f plain_tilt = oreintation->get_data();
-
-	if(plain_tilt[2] > m_params.max_tilt_angle) {
-		tilt->set_data(100.);
-	} else if (plain_tilt[2] < -1.*m_params.max_tilt_angle) {
-		tilt->set_data(0.);
-	} else {
-		tilt->set_data(50. - 50.*(angle - plain_tilt[2])/m_params.max_tilt_angle);
+		m_sas_pilot.get_pitch_control()->set_data(m_params.avg_pitch_strength);
 	}
 }
 
@@ -89,16 +68,17 @@ void WaypointPilot::maintain_heading(float heading){
 	// calc the smaller angle  180 - -180
 	float delta_heading = plain_oreintation[1] - heading;
 	if (delta_heading > 180)
-			delta_heading = delta_heading - 360.;
+		delta_heading = delta_heading - 360.;
 	else if (delta_heading < -180 )
-			delta_heading = 360 + delta_heading;
+		delta_heading = 360 + delta_heading;
 
-	if (delta_heading > 5)
-		maintain_angle(-16);
-	else if (delta_heading < -5)
-		maintain_angle(16);
+	if (delta_heading > 10.0f)
+		m_sas_pilot.get_tilt_control()->set_data(0.0f);
+	else if (delta_heading < -10.0f)
+		m_sas_pilot.get_tilt_control()->set_data(100.0f);
 	else
-		maintain_angle(-delta_heading/2);
+		m_sas_pilot.get_tilt_control()->set_data(50.0f - 25.0f*delta_heading/10.0f);
+
 }
 
 
@@ -117,6 +97,8 @@ void WaypointPilot::maintain_heading(float heading){
 	 maintain_heading(heading);
 
 	 maintain_alt(waypoint.altitude);
+
+	 m_sas_pilot.update();
 
 	 // calc the distance from the waypoint
 	 float distance = lin_algebra::vec_len(wanted_direction);

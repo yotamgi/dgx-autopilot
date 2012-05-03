@@ -76,14 +76,15 @@ int main(int argc, char** argv) {
 	}
 
 	// configure the pilot
-	autopilot::WaypointPilotParams pilot_params;
-	pilot_params.max_climbing_angle = 15.;
+	autopilot::WaypointPilot::Params pilot_params;
+	pilot_params.max_tilt_angle = 20.;
+	pilot_params.max_pitch_angle = 20.;
+	pilot_params.max_climbing_strength = 100.0f;
 	pilot_params.climbing_gas = 100.;
-	pilot_params.max_decending_angle = -10.;
+	pilot_params.max_decending_strength = 25.0f;
 	pilot_params.decending_gas = 20.;
 	pilot_params.avg_gas = 40;
-	pilot_params.avg_pitch = 0.;
-	pilot_params.max_tilt_angle = 20.;
+	pilot_params.avg_pitch_strength = 50.;
 
 	// create the platform according to the args
 	autopilot::NormalPlainPlatform platform;

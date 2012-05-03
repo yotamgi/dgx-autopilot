@@ -8,6 +8,7 @@
 #include <autopilot/platform/dgx1_platform.h>
 #include <autopilot/platform/platform_export_import.h>
 #include <autopilot/cockpit.h>
+#include <autopilot/stability_augmenting_pilot.h>
 #include <autopilot/waypoint_pilot.h>
 #include <boost/make_shared.hpp>
 #include <boost/filesystem.hpp>
@@ -276,18 +277,27 @@ int main(int argc, char** argv) {
 		boost::shared_ptr<autopilot::Cockpit> cockpit = boost::make_shared<autopilot::Cockpit>(platform);
 
 		// configure the pilot
-		autopilot::WaypointPilotParams pilot_params;
-		pilot_params.max_climbing_angle = 15.;
+		autopilot::WaypointPilot::Params pilot_params;
+		pilot_params.max_tilt_angle = 20.;
+		pilot_params.max_pitch_angle = 20.;
+		pilot_params.max_climbing_strength = 100.0f;
 		pilot_params.climbing_gas = 100.;
-		pilot_params.max_decending_angle = -10.;
+		pilot_params.max_decending_strength = 25.0f;
 		pilot_params.decending_gas = 20.;
 		pilot_params.avg_gas = 40;
-		pilot_params.avg_pitch = 0.;
-		pilot_params.max_tilt_angle = 20.;
+		pilot_params.avg_pitch_strength = 50.;
 
 		// create the pilot
 		autopilot::WaypointPilot pilot(pilot_params, cockpit);
 		pilot.start(true);
+//		autopilot::StabilityAugmentingPilot::Params pilot_params;
+//		pilot_params.max_pitch_angle = 15.;
+//		pilot_params.max_tilt_angle = 20.;
+//
+//		// create the pilot
+//		autopilot::StabilityAugmentingPilot pilot(pilot_params, cockpit);
+//		pilot.run(true);
+
 
 		// export all the data
 		export_data(gs_address,
