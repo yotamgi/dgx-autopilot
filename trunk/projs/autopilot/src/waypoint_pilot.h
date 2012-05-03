@@ -2,29 +2,30 @@
 #define WAYPOINT_PILOT_H_
 
 #include "interfaces/plain_cockpit.h"
+#include "stability_augmenting_pilot.h"
 #include <stream/util/lin_algebra.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
 
 namespace autopilot {
 
-struct WaypointPilotParams {
-
-	float max_climbing_angle;
-	float climbing_gas;
-
-	float max_decending_angle;
-	float decending_gas;
-
-	float avg_gas;
-	float avg_pitch;
-
-	float max_tilt_angle;
-};
 
 class WaypointPilot {
 public:
-	WaypointPilot(const WaypointPilotParams& params, boost::shared_ptr<NormalPlainCockpit> cockpit);
+
+	struct Params : public StabilityAugmentingPilot::Params {
+
+		float max_climbing_strength;
+		float climbing_gas;
+
+		float max_decending_strength;
+		float decending_gas;
+
+		float avg_gas;
+		float avg_pitch_strength;
+	};
+
+	WaypointPilot(const Params& params, boost::shared_ptr<NormalPlainCockpit> cockpit);
 
 	void start(bool open_thread=true);
 	void stop();
@@ -46,14 +47,14 @@ private:
 
 	void fly();
 
-	void maintain_angle(float angle);
-	void maintain_pitch(float pitch);
 	void maintain_alt(float altitude);
 	void maintain_heading(float heading);
 	bool nav_to(waypoint waypoint);
 
 
 	boost::shared_ptr<NormalPlainCockpit> m_cockpit;
+
+	StabilityAugmentingPilot m_sas_pilot;
 
 	/**
 	 * The current plain path
@@ -77,7 +78,7 @@ private:
 	boost::thread m_running_thread;
 
 	/** The Pilot params as set in the Ctor */
-	WaypointPilotParams m_params;
+	Params m_params;
 };
 
 

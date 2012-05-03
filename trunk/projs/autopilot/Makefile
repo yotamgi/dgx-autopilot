@@ -18,6 +18,7 @@ AUTOPILIT_OBJS =  $(SRCDIR)/platform/hw/i2c_interface.o	\
 		$(SRCDIR)/platform/dgx1_platform.o \
 		$(SRCDIR)/platform/flapron_controller.o \
 		$(SRCDIR)/platform/platform_export_import.o \
+		$(SRCDIR)/stability_augmenting_pilot.o \
 		$(SRCDIR)/waypoint_pilot.o \
 		$(SRCDIR)/fusion_filter.o
 		
