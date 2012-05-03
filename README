@@ -16,4 +16,11 @@ Video Transmisstion:
  * on Host, install vlc
  * device cmd: gst-launch-0.10 v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=\(fraction\)5/1 ! ffmpegcolorspace ! jpegenc ! multipartmux ! tcpserversink port=5000 &
 
+NetStick:
+ * install network-manaer
+ * ssh -X the device
+ * run nm-connection-editor and add the 3G network
+ * run nmctl con list
+ * find the 3G uuid and run "nmctl con up uuid <uuid>"
+
 
