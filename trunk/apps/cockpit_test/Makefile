@@ -16,7 +16,11 @@ CXXFLAGS=-Wall
 # Targets
 ############################################################################
 .PHONY:
-all:  cockpit_device
+all: device host
+.PHONY:
+host: cockpit device
+.PHONY:
+device: cockpit_device
 .PHONY:
 clean:
 	rm -f ./cockpit ./cockpit_device
