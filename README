@@ -16,11 +16,13 @@ Video Transmisstion:
  * on Host, install vlc
  * device cmd: gst-launch-0.10 v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=\(fraction\)5/1 ! ffmpegcolorspace ! jpegenc ! multipartmux ! tcpserversink port=5000 &
 
+I2C:
+ * In order for the i2c sensors to work, the modules rtc_ds1307 and rtc_twl must be put in the blacklist - they catch the 0x68 address.
+
 NetStick:
  * install network-manaer
  * ssh -X the device
  * run nm-connection-editor and add the 3G network
  * run nmctl con list
  * find the 3G uuid and run "nmctl con up uuid <uuid>"
-
 
