@@ -15,11 +15,14 @@ CXXFLAGS=-Wall
 ############################################################################
 # Targets
 ############################################################################
+all: device host
 .PHONY:
-all: autopilot_device
+host: device autopilot ground_station
+.PHONY:
+device: autopilot_device
 .PHONY:
 clean:
-	rm -f ./autopilot ./autopilot_device
+	rm -f ./autopilot ./autopilot_device ./ground_station
 
 
 autopilot: autopilot.cc

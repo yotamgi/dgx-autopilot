@@ -16,7 +16,11 @@ CXXFLAGS=-Wall
 # Targets
 ############################################################################
 .PHONY:
-all:  waypoint_pilot_test_device
+all: device host
+.PHONY:
+host: device waypoint_pilot_test 
+.PHONY:
+device: waypoint_pilot_test_device
 .PHONY:
 clean:
 	rm -f waypoint_pilot_test waypoint_pilot_test_device
