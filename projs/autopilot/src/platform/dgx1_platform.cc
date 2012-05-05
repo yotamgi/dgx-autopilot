@@ -34,12 +34,12 @@ NormalPlainPlatform create_dgx1_platform() {
 	dgx1_platform.gps_speed_dir_generator = speed_dir_forwarder;
 
 	// fill the platform's servos
-	static MaestroServoController maestro("/dev/ttyACM1");
-	FlapronController flapron(maestro.getServoChannel(2), maestro.getServoChannel(5));
-	dgx1_platform.pitch_servo	= maestro.getServoChannel(1);
+	static MaestroServoController maestro("/dev/ttyACM0");
+	FlapronController flapron(maestro.getServoChannel(1), maestro.getServoChannel(4));
+	dgx1_platform.pitch_servo	= maestro.getServoChannel(0);
 	dgx1_platform.tilt_servo 	= flapron.get_ailron_servo();
-	dgx1_platform.gas_servo 	= maestro.getServoChannel(3);
-	dgx1_platform.yaw_servo 	= maestro.getServoChannel(4);
+	dgx1_platform.gas_servo 	= maestro.getServoChannel(2);
+	dgx1_platform.yaw_servo 	= maestro.getServoChannel(3);
 
 	return dgx1_platform;
 }
