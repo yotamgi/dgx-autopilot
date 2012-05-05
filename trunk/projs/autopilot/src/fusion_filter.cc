@@ -16,6 +16,7 @@ FusionFilter::FusionFilter(boost::shared_ptr<vec_stream_t> acc,
 						   boost::shared_ptr<vec_stream_t> compass,
 						   boost::shared_ptr<vec_stream_t> gyro,
 						   boost::shared_ptr<float_stream_t> speed):
+			m_state(lin_algebra::identity_matrix<lin_algebra::mat3f>(3, 3)),
 			m_acc(boost::make_shared<stream::filters::LowPassFilter<lin_algebra::vec3f> >(acc, ACC_LOW_PASS)),
 			m_compass(compass),
 			m_gyro(gyro),
@@ -35,6 +36,7 @@ FusionFilter::FusionFilter(boost::shared_ptr<vec_stream_t> acc,
 						   boost::shared_ptr<vec_stream_t> gyro,
 						   lin_algebra::vec3f expected_north,
 						   boost::shared_ptr<float_stream_t> speed):
+		m_state(lin_algebra::identity_matrix<lin_algebra::mat3f>(3, 3)),
 		m_acc(boost::make_shared<stream::filters::LowPassFilter<lin_algebra::vec3f> >(acc, ACC_LOW_PASS)),
 		m_compass(compass),
 		m_gyro(gyro),
@@ -52,6 +54,7 @@ FusionFilter::FusionFilter(boost::shared_ptr<vec_stream_t> acc,
 						   boost::shared_ptr<vec_stream_t> gyro,
 						   float north_pitch_angle,
 						   boost::shared_ptr<float_stream_t> speed):
+		m_state(lin_algebra::identity_matrix<lin_algebra::mat3f>(3, 3)),
 		m_acc(boost::make_shared<stream::filters::LowPassFilter<lin_algebra::vec3f> >(acc, ACC_LOW_PASS)),
 		m_compass(compass),
 		m_gyro(gyro),
@@ -98,6 +101,7 @@ lin_algebra::vec3f FusionFilter::filter(lin_algebra::vec3f acc_data,
 
 	// now, understand the reliability
 	float reliability = understand_reliability(acc_data, compass_data);
+
 
 	// save the data for debug resons
 	m_reliable_stream->set_data(reliability);

@@ -112,7 +112,7 @@ inline boost::shared_ptr<vec2_watch_stream> Cockpit::position() {
 	return boost::make_shared<vec2_watch_stream>(
 			stream::create_func_pop_filter<lin_algebra::vec3f,lin_algebra::vec2f> (
 					m_gps_pos,
-					lin_algebra::get<0, 2>
+					lin_algebra::get<0, 1>
 			)
 	);
 }
@@ -121,7 +121,7 @@ inline boost::shared_ptr<float_watch_stream> Cockpit::alt() {
 	return boost::make_shared<float_watch_stream>(
 			stream::create_func_pop_filter<lin_algebra::vec3f,float>(
 				m_gps_pos,
-				lin_algebra::get<1>
+				lin_algebra::get<2>
 		)
 	);
 }
