@@ -67,9 +67,23 @@ FusionFilter::FusionFilter(boost::shared_ptr<vec_stream_t> acc,
 {}
 
 lin_algebra::vec3f FusionFilter::get_data() {
-	lin_algebra::vec3f acc_data 	= m_acc->get_data();
-	lin_algebra::vec3f compass_data = m_compass->get_data();
-	lin_algebra::vec3f gyro_data 	= m_gyro->get_data();
+	lin_algebra::vec3f acc_data 	;
+	lin_algebra::vec3f compass_data ;
+	lin_algebra::vec3f gyro_data 	;
+
+	try	{
+	acc_data 	 =m_acc->get_data();
+	} catch (...) {
+		std::cout << "Acc failed.." << std::endl;
+	} try	{
+		compass_data = m_compass->get_data();
+	} catch (...) {
+		std::cout << "Compass failed.." << std::endl;
+	} try	{
+		gyro_data 	 =m_gyro->get_data();
+	} catch (...) {
+		std::cout << "Gyro failed.." << std::endl;
+	}
 
 	return filter(acc_data, compass_data, gyro_data);
 }
@@ -134,7 +148,7 @@ float FusionFilter::understand_reliability(lin_algebra::vec3f ground, lin_algebr
 //
 //	float angle = lin_algebra::angle_between(ground, north);
 //	float angle_closeness = fabs((m_north_pitch_angle - angle)/(m_north_pitch_angle));
-	if ((acc_len_closeness < 0.05) && (acc_len_closeness > -0.05)) {
+	if ((acc_len_closeness < 0.1) && (acc_len_closeness > -0.1)) {
 		acc_len_closeness = 0.0;
 	}
 
