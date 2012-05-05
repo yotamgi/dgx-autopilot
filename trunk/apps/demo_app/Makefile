@@ -16,7 +16,7 @@ CXXFLAGS=-Wall
 # Targets
 ############################################################################
 .PHONY:
-all: autopilot autopilot_device ground_station
+all: autopilot_device
 .PHONY:
 clean:
 	rm -f ./autopilot ./autopilot_device

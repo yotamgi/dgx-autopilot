@@ -277,26 +277,30 @@ int main(int argc, char** argv) {
 		boost::shared_ptr<autopilot::Cockpit> cockpit = boost::make_shared<autopilot::Cockpit>(platform);
 
 		// configure the pilot
-		autopilot::WaypointPilot::Params pilot_params;
+	//autopilot::WaypointPilot::Params pilot_params;
+	//pilot_params.max_tilt_angle = 20.;
+	//pilot_params.max_pitch_angle = 20.;
+	//pilot_params.max_climbing_strength = 100.0f;
+	//pilot_params.climbing_gas = 100.;
+	//pilot_params.max_decending_strength = 25.0f;
+	//pilot_params.decending_gas = 20.;
+	//pilot_params.avg_gas = 40;
+	//pilot_params.avg_pitch_strength = 50.;
+
+	//// create the pilot
+	//autopilot::WaypointPilot pilot(pilot_params, cockpit);
+	//pilot.start(true);
+		cockpit->gas_servo()->set_data(45.0f);
+		cockpit->yaw_servo()->set_data(50.0f);
+
+		autopilot::StabilityAugmentingPilot::Params pilot_params;
+		pilot_params.max_pitch_angle = 15.;
 		pilot_params.max_tilt_angle = 20.;
-		pilot_params.max_pitch_angle = 20.;
-		pilot_params.max_climbing_strength = 100.0f;
-		pilot_params.climbing_gas = 100.;
-		pilot_params.max_decending_strength = 25.0f;
-		pilot_params.decending_gas = 20.;
-		pilot_params.avg_gas = 40;
-		pilot_params.avg_pitch_strength = 50.;
 
 		// create the pilot
-		autopilot::WaypointPilot pilot(pilot_params, cockpit);
-		pilot.start(true);
-//		autopilot::StabilityAugmentingPilot::Params pilot_params;
-//		pilot_params.max_pitch_angle = 15.;
-//		pilot_params.max_tilt_angle = 20.;
-//
-//		// create the pilot
-//		autopilot::StabilityAugmentingPilot pilot(pilot_params, cockpit);
-//		pilot.run(true);
+		autopilot::StabilityAugmentingPilot pilot(pilot_params, cockpit);
+		pilot.get_pitch_control()->set_data(90.0f);
+		pilot.run(true);
 
 
 		// export all the data
