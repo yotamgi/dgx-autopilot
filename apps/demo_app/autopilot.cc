@@ -290,8 +290,8 @@ int main(int argc, char** argv) {
 	//// create the pilot
 	//autopilot::WaypointPilot pilot(pilot_params, cockpit);
 	//pilot.start(true);
-		cockpit->gas_servo()->set_data(45.0f);
-		cockpit->yaw_servo()->set_data(50.0f);
+//		cockpit->gas_servo()->set_data(45.0f);
+//		cockpit->yaw_servo()->set_data(50.0f);
 
 		autopilot::StabilityAugmentingPilot::Params pilot_params;
 		pilot_params.max_pitch_angle = 15.;
