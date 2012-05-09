@@ -51,7 +51,10 @@ void SimulatorGpsSensor::update(float time_delta) {
 		float speed_angle = std::atan(speed[1]/speed[0])/lin_algebra::PI * 180.;
 
 		if (m_gps_pos_listener) {
-			m_gps_pos_listener->set_data(gps_pos);
+			lin_algebra::vec3f geo_gps_pos = lin_algebra::create_vec3f(
+					gps_pos[0], gps_pos[2], gps_pos[1]
+			);
+			m_gps_pos_listener->set_data(geo_gps_pos);
 		}
 		if (m_gps_speed_dir_listener) {
 			m_gps_speed_dir_listener->set_data(speed_angle);
