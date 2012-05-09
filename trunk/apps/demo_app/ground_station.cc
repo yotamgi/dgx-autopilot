@@ -8,6 +8,8 @@
 #include <boost/make_shared.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/assign/list_of.hpp>
+#include <qt4/Qt/qwidget.h>
+#include <qt4/Qt/qboxlayout.h>
 
 #include <string>
 #include <iostream>
@@ -65,50 +67,64 @@ GroundStation::GroundStation(std::string plane_address):
 			50.);
 	m_connection->start();
 
+
 	//
 	// Create the ground station window
 	//
+	QMainWindow* wnd = new QMainWindow;
+	const QSize frame_size = QApplication::desktop()->size()*0.95;
+	wnd->setWindowState(Qt::WindowMaximized);
 
 	// global parameters
-	const QSize stream3d_dimention(400, 300);
+	const QSize stream3d_dimention(frame_size.width()/2, frame_size.height()/2);
 	const float view_update_time = 0.01;
 
+	// the 3d orientation view
 	gs::StreamView3d *view3d = new gs::StreamView3d(view_update_time, stream3d_dimention);
-
-	// the right one
-	view3d->addAngleStream(orientation, irr::core::vector3df(-20., 0., 0.));
-
-	// the mid one
-	view3d->addAngleStream(watch_rest_orientation, irr::core::vector3df(0., 0., 0.));
+	view3d->addAngleStream(gyro_watch_orientation, irr::core::vector3df(0., 0.,10.));
 	view3d->addVecStream(watch_acc_sensor, irr::core::vector3df(0., 0., 0.));
 	view3d->addVecStream(watch_compass_sensor, irr::core::vector3df(0., 0., 0.));
 
-	// the right one
-	view3d->addAngleStream(gyro_watch_orientation, irr::core::vector3df(20., 0., 0.));
-
 	// the reliable stream
-	gs::SizeStreamView *view_size = new gs::SizeStreamView(reliability, view_update_time, 0., 1.);
+	gs::SizeStreamView *view_size = new gs::SizeStreamView(reliability, "reliability", view_update_time, 0., 1.);
 
 	// the gyro_fps stream
-	gs::SizeStreamView *view_fps = new gs::SizeStreamView(gyro_fps, 1., 0., 4000.);
+	gs::SizeStreamView *view_fps = new gs::SizeStreamView(gyro_fps, "fps", 1., 0., 4000.);
 
 	// the position
-	gs::MapStreamView* map_view = new gs::MapStreamView(position, 1.0f, stream3d_dimention,
+	const QSize map_dimention(frame_size.width()/2, frame_size.height());
+	gs::MapStreamView* map_view = new gs::MapStreamView(position, 1.0f, map_dimention,
 					std::string("../../projs/ground_station/data/map"));
 
 	// the link quality
 	gs::SizeStreamView* view_link_quality = new gs::SizeStreamView(
-			m_connection->get_quality_stream(), 0.1f , 0., 1.);
+			m_connection->get_quality_stream(), "link", 0.1f , 0., 1.);
 
-	// create the window itself
-	QHBoxLayout* layout = new QHBoxLayout();
-	layout->addWidget(view_link_quality);
-	layout->addWidget(view3d);
-	layout->addWidget(view_size);
-	layout->addWidget(view_fps);
-	layout->addWidget(map_view);
-	QWidget* wnd = new QWidget;
-	wnd->setLayout(layout);
+	//
+	// create the window itself and orgenize it
+	//
+
+	QWidget *main_widget = new QWidget;
+
+	QWidget* left_down = new QWidget();
+	QHBoxLayout* left_down_layout = new QHBoxLayout();
+	left_down_layout->addWidget(view_link_quality);
+	left_down_layout->addWidget(view_size);
+	left_down_layout->addWidget(view_fps);
+	left_down->setLayout(left_down_layout);
+
+	QWidget* left = new QWidget;
+	QVBoxLayout* left_layout = new QVBoxLayout();
+	left_layout->addWidget(view3d);
+	left_layout->addWidget(left_down);
+	left->setLayout(left_layout);
+
+	QHBoxLayout* main_layout = new QHBoxLayout();
+	main_layout->addWidget(left);
+	main_layout->addWidget(map_view);
+
+	main_widget->setLayout(main_layout);
+	wnd->setCentralWidget(main_widget);
 	wnd->show();
 	view3d->start();
 	view_size->start();

@@ -92,17 +92,17 @@ void open_gs(
 	view3d.addAngleStream(gyro_orientation, irr::core::vector3df(20., 0., 0.));
 
 	// the reliable stream
-	gs::SizeStreamView view_size(reliability, view_update_time, 0., 1.);
+	gs::SizeStreamView view_size(reliability, "Reliability", view_update_time, 0., 1.);
 
 	// the gyro_fps stream
-	gs::SizeStreamView view_fps(fps, 1., 0., 4000.);
+	gs::SizeStreamView view_fps(fps, "FPS", 1., 0., 4000.);
 
 	// the position
 	gs::MapStreamView map_view(position, 1.0f, stream3d_dimention,
 					std::string("../../projs/ground_station/data/map"));
 
 	// the link quality
-	gs::SizeStreamView view_link_quality(link_quality, 0.1f , 0., 1.);
+	gs::SizeStreamView view_link_quality(link_quality, "Link", 0.1f , 0., 1.);
 
 
 	// create the window itself

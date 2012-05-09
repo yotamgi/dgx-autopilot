@@ -18,6 +18,7 @@ public:
 	};
 
 	SizeStreamView(boost::shared_ptr<size_stream> size_stream,
+				   std::string stream_name,
 			  	   float update_time,
 	   	   	   	   float max_size,
 	   	   	   	   float min_size,
