@@ -60,7 +60,7 @@ int main(int argc, char** argv) {
 
 	gs::MapStreamView* map_view = new gs::MapStreamView(pos_stream, 0.2, QSize(400, 300), "./data/map");
 	gs::StreamView3d* view3d = new gs::StreamView3d(0.1, QSize(400, 300));
-	gs::SizeStreamView* size = new gs::SizeStreamView(size_stream, 0.1, 0., 10.);
+	gs::SizeStreamView* size = new gs::SizeStreamView(size_stream, "stream", 0.1, 0., 10.);
 
 	layout->addWidget(map_view);
 	layout->addWidget(view3d);

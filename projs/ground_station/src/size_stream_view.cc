@@ -1,9 +1,11 @@
 #include "size_stream_view.h"
 #include <sstream>
+#include <qt4/QtGui/qgroupbox.h>
 
 namespace gs {
 
 SizeStreamView::SizeStreamView(boost::shared_ptr<size_stream> size_stream,
+							   std::string stream_name,
 		  	   	   	   	   	   float update_time,
 		  	   	   	   	   	   float min_size,
 		  	   	   	   	   	   float max_size,
@@ -36,7 +38,11 @@ SizeStreamView::SizeStreamView(boost::shared_ptr<size_stream> size_stream,
 	// place the progress bar in the widget
 	QVBoxLayout* layout = new QVBoxLayout();
 	layout->addWidget(m_bar);
-	setLayout(layout);
+	QGroupBox* gb = new QGroupBox(tr(stream_name.c_str()));
+	gb->setLayout(layout);
+	QVBoxLayout* gb_layout = new QVBoxLayout();
+	gb_layout->addWidget(gb);
+	setLayout(gb_layout);
 }
 
 void SizeStreamView::start() {
