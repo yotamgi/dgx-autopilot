@@ -5,6 +5,7 @@
 #include <gs/3d_stream_view.h>
 #include <gs/size_stream_view.h>
 #include <gs/map_stream_view.h>
+#include <gs/size_push_gen.h>
 #include <boost/make_shared.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/assign/list_of.hpp>
@@ -19,6 +20,7 @@
 int stam;
 
 GroundStation::GroundStation(std::string plane_address):
+			m_wanted_alt(boost::make_shared<stream::PushToPopConv<float> >(0.)),
 			m_control_connection(plane_address, commands::port),
 			m_app(stam, (char**)0)
 {
@@ -83,7 +85,7 @@ GroundStation::GroundStation(std::string plane_address):
 
 	// the 3d orientation view
 	gs::StreamView3d *view3d = new gs::StreamView3d(view_update_time, stream3d_dimention);
-	view3d->addAngleStream(gyro_watch_orientation, irr::core::vector3df(0., 0., 8.));
+	view3d->addAngleStream(orientation, irr::core::vector3df(0., 0., 8.));
 	view3d->addVecStream(watch_acc_sensor, irr::core::vector3df(0., 0., 8.));
 	view3d->addVecStream(watch_compass_sensor, irr::core::vector3df(0., 0., 8.));
 
@@ -105,6 +107,8 @@ GroundStation::GroundStation(std::string plane_address):
 	// the plane's alt
 	gs::SizeStreamView* view_alt = new gs::SizeStreamView(alt, "Alt", 0.1f , 0., 200.);
 
+	// the new waypoint's alt
+	gs::SizePushGen* gen_waypoints_alt = new gs::SizePushGen(m_wanted_alt, "Alt", 0, 200., 100.);
 
 	//
 	// create the window itself and orgenize it
@@ -118,6 +122,7 @@ GroundStation::GroundStation(std::string plane_address):
 	left_down_layout->addWidget(view_link_quality);
 	left_down_layout->addWidget(view_fps);
 	left_down_layout->addWidget(view_alt);
+	left_down_layout->addWidget(gen_waypoints_alt);
 	left_down->setLayout(left_down_layout);
 
 	// left up
@@ -163,7 +168,7 @@ void GroundStation::got_waypoint(const QgsPoint& geo_waypoint, Qt::MouseButton b
 
 	lin_algebra::vec2f wp = lin_algebra::create_vec2f(geo_waypoint.x(), geo_waypoint.y());
 	std::stringstream wp_str;
-	wp_str << wp;
+	wp_str << wp << m_wanted_alt->get_data();
 
 	conn->write(commands::NAVIGATE_TO);
 	conn->write(wp_str.str());
