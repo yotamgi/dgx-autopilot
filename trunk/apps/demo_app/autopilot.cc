@@ -82,6 +82,8 @@ autopilot::NormalPlainPlatform record_platform(autopilot::NormalPlainPlatform pl
 typedef boost::shared_ptr<stream::DataPopStream<lin_algebra::vec3f> > vec3_pop_stream_ptr;
 typedef boost::shared_ptr<stream::DataPopStream<lin_algebra::vec2f> > vec2_pop_stream_ptr;
 typedef boost::shared_ptr<stream::DataPopStream<float> > 			  float_pop_stream_ptr;
+typedef boost::shared_ptr<stream::DataPushStream<float> > 			  float_push_stream_ptr;
+
 
 boost::shared_ptr<stream::AsyncStreamConnection>  export_data(std::string export_addr,
 		vec3_pop_stream_ptr compass_sensor,
@@ -92,14 +94,20 @@ boost::shared_ptr<stream::AsyncStreamConnection>  export_data(std::string export
 		float_pop_stream_ptr reliability,
 		float_pop_stream_ptr fps,
 		vec2_pop_stream_ptr position,
-		float_pop_stream_ptr alt
+		float_pop_stream_ptr alt,
+		float_push_stream_ptr tilt_control,
+		float_push_stream_ptr pitch_control,
+		float_push_stream_ptr gas_control,
+		float_push_stream_ptr yaw_control
 	)
 {
 	std::cout << "Exporting all data in UDP" << std::endl;
 	typedef boost::shared_ptr<stream::AsyncStreamConnection::SendStream> send_stream_ptr;
+	typedef boost::shared_ptr<stream::AsyncStreamConnection::RecvStream> recv_stream_ptr;
 	typedef stream::AsyncStreamConnection::SendPopStream<lin_algebra::vec3f> vec3_send_stream;
 	typedef stream::AsyncStreamConnection::SendPopStream<lin_algebra::vec2f> vec2_send_stream;
 	typedef stream::AsyncStreamConnection::SendPopStream<float> float_send_stream;
+	typedef stream::AsyncStreamConnection::RecvPushStream<float> float_recv_stream;
 
 	// create the streams list
 	stream::AsyncStreamConnection::send_streams_t send_streams = boost::assign::list_of
@@ -113,6 +121,11 @@ boost::shared_ptr<stream::AsyncStreamConnection>  export_data(std::string export
 		((send_stream_ptr)boost::make_shared<vec2_send_stream>(position))
 		((send_stream_ptr)boost::make_shared<float_send_stream>(alt));
 
+	stream::AsyncStreamConnection::recv_streams_t recv_streams = boost::assign::list_of
+			((recv_stream_ptr)boost::make_shared<float_recv_stream>(tilt_control)	)
+			((recv_stream_ptr)boost::make_shared<float_recv_stream>(pitch_control)	)
+			((recv_stream_ptr)boost::make_shared<float_recv_stream>(gas_control) 	)
+			((recv_stream_ptr)boost::make_shared<float_recv_stream>(yaw_control) 	);
 
 	// creating the udp connection stuff
 	boost::shared_ptr<stream::UdpipConnectionFactory> conn_factory =
@@ -121,7 +134,7 @@ boost::shared_ptr<stream::AsyncStreamConnection>  export_data(std::string export
 	// create the async stream connection
 	boost::shared_ptr<stream::AsyncStreamConnection> c =
 			boost::make_shared<stream::AsyncStreamConnection>(send_streams,
-									stream::AsyncStreamConnection::recv_streams_t(),
+									recv_streams,
 									conn_factory,
 									false,
 									50.
@@ -232,7 +245,10 @@ int main(int argc, char** argv) {
 
 	// create the sa pilot
 	autopilot::StabilityAugmentingPilot sa_pilot(sa_pilot_params, cockpit);
-	sa_pilot.get_pitch_control()->set_data(90.0f);
+	sa_pilot.get_pitch_control()->set_data(60.0f);
+
+	boost::shared_ptr<stream::PushForwarder<float> > gas_control   = boost::make_shared<stream::PushForwarder<float> >();
+	boost::shared_ptr<stream::PushForwarder<float> > yaw_control   = boost::make_shared<stream::PushForwarder<float> >();
 
 	// export all the data
 	boost::shared_ptr<stream::AsyncStreamConnection> conn = export_data(gs_address,
@@ -244,7 +260,11 @@ int main(int argc, char** argv) {
 			cockpit->watch_rest_reliability(),
 			fpsed_gyro->get_fps_stream(),
 			cockpit->position(),
-			cockpit->alt()
+			cockpit->alt(),
+			sa_pilot.get_tilt_control(),
+			sa_pilot.get_pitch_control(),
+			gas_control,
+			yaw_control
 	);
 
 	conn->start();
@@ -276,6 +296,8 @@ int main(int argc, char** argv) {
 			else if (command == commands::SWITCH_TO_SA_PILOT) {
 				std::cout << "Moving to SA pilot... ";
 				wp_pilot.stop();
+				gas_control->set_receiver(cockpit->gas_servo());
+				yaw_control->set_receiver(cockpit->yaw_servo());
 				sa_pilot.start();
 				std::cout << " Finished." << std::endl;
 			}

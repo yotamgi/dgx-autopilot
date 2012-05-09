@@ -29,11 +29,12 @@ GroundStation::GroundStation(std::string plane_address):
 	//
 	// Import all the streams
 	//
-
+	typedef boost::shared_ptr<stream::AsyncStreamConnection::SendStream> send_stream_ptr;
 	typedef boost::shared_ptr<stream::AsyncStreamConnection::RecvStream> recv_stream_ptr;
 	typedef stream::AsyncStreamConnection::RecvPopStream<lin_algebra::vec3f> vec3_recv_stream;
 	typedef stream::AsyncStreamConnection::RecvPopStream<lin_algebra::vec2f> vec2_recv_stream;
 	typedef stream::AsyncStreamConnection::RecvPopStream<float> float_recv_stream;
+	typedef stream::AsyncStreamConnection::SendPushStream<float> float_send_stream;
 
 	// create the streams
 	boost::shared_ptr<vec3_recv_stream> watch_compass_sensor = 		boost::make_shared<vec3_recv_stream>();
@@ -45,6 +46,17 @@ GroundStation::GroundStation(std::string plane_address):
 	boost::shared_ptr<float_recv_stream> gyro_fps = 				boost::make_shared<float_recv_stream>();
 	boost::shared_ptr<vec2_recv_stream> position = 					boost::make_shared<vec2_recv_stream>();
 	boost::shared_ptr<float_recv_stream> alt = 						boost::make_shared<float_recv_stream>();
+	boost::shared_ptr<float_send_stream> pitch_control = 			boost::make_shared<float_send_stream>();
+	boost::shared_ptr<float_send_stream> tilt_control = 			boost::make_shared<float_send_stream>();
+	boost::shared_ptr<float_send_stream> gas_control = 				boost::make_shared<float_send_stream>();
+	boost::shared_ptr<float_send_stream> yaw_control = 				boost::make_shared<float_send_stream>();
+
+	stream::AsyncStreamConnection::send_streams_t send_streams = boost::assign::list_of
+		((send_stream_ptr)pitch_control		)
+		((send_stream_ptr)tilt_control		)
+		((send_stream_ptr)gas_control		)
+		((send_stream_ptr)yaw_control		);
+
 
 	// fill them into the recv_stream list
 	stream::AsyncStreamConnection::recv_streams_t recv_streams = boost::assign::list_of
@@ -64,7 +76,7 @@ GroundStation::GroundStation(std::string plane_address):
 
 	// create the async stream connection and run it
 	m_connection = boost::make_shared<stream::AsyncStreamConnection>(
-			stream::AsyncStreamConnection::send_streams_t(),
+			send_streams,
 			recv_streams,
 			conn_factory,
 			true,
@@ -75,6 +87,7 @@ GroundStation::GroundStation(std::string plane_address):
 	//
 	// Create the ground station window
 	//
+
 	QMainWindow* wnd = new QMainWindow;
 	const QSize frame_size = QApplication::desktop()->size()*0.95;
 	wnd->setWindowState(Qt::WindowMaximized);
@@ -110,6 +123,10 @@ GroundStation::GroundStation(std::string plane_address):
 	// the new waypoint's alt
 	gs::SizePushGen* gen_waypoints_alt = new gs::SizePushGen(m_wanted_alt, "Alt", 0, 200., 100.);
 
+	// the controllers
+	gs::SizePushGen* sa_pitch_control = new gs::SizePushGen(pitch_control, "SA Pitch", 0, 100., 50., gs::SizePushGen::HORIZONTAL_DIAGRAM);
+	gs::SizePushGen* sa_tilt_control  = new gs::SizePushGen(tilt_control, "SA Tilt", 0, 100., 50.);
+
 	// the radio buttons
 	QRadioButton *wp_pilot_button = new QRadioButton("&Waypoint Pilot");
 	QRadioButton *sa_pilot_button = new QRadioButton("&SA Pilot");
@@ -126,6 +143,13 @@ GroundStation::GroundStation(std::string plane_address):
 	QGroupBox* pilot_chooser = new QGroupBox(tr("Pilot Chooser"));
 	pilot_chooser->setLayout(pilot_chooser_layout);
 
+	// the SA controllers
+	QVBoxLayout* sa_controls_layout = new QVBoxLayout;
+	sa_controls_layout->addWidget(sa_pitch_control);
+	sa_controls_layout->addWidget(sa_tilt_control);
+	QGroupBox* sa_controls = new QGroupBox(tr("SA Pilot Controls"));
+	sa_controls->setLayout(sa_controls_layout);
+
 	// left down
 	QWidget* left_down = new QWidget();
 	QHBoxLayout* left_down_layout = new QHBoxLayout();
@@ -134,6 +158,7 @@ GroundStation::GroundStation(std::string plane_address):
 	left_down_layout->addWidget(view_alt);
 	left_down_layout->addWidget(gen_waypoints_alt);
 	left_down_layout->addWidget(pilot_chooser);
+	left_down_layout->addWidget(sa_controls);
 	left_down->setLayout(left_down_layout);
 
 	// left up
