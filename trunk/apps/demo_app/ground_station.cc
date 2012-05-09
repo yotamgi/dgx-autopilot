@@ -110,11 +110,21 @@ GroundStation::GroundStation(std::string plane_address):
 	// the new waypoint's alt
 	gs::SizePushGen* gen_waypoints_alt = new gs::SizePushGen(m_wanted_alt, "Alt", 0, 200., 100.);
 
-	//
-	// create the window itself and orgenize it
-	//
+	// the radio buttons
+	QRadioButton *wp_pilot_button = new QRadioButton("&Waypoint Pilot");
+	QRadioButton *sa_pilot_button = new QRadioButton("&SA Pilot");
 
+	//
+	// create the window itself and organize it
+	//
 	QWidget *main_widget = new QWidget;
+
+	// the pilot chooser
+	QVBoxLayout* pilot_chooser_layout = new QVBoxLayout;
+	pilot_chooser_layout->addWidget(wp_pilot_button);
+	pilot_chooser_layout->addWidget(sa_pilot_button);
+	QGroupBox* pilot_chooser = new QGroupBox(tr("Pilot Chooser"));
+	pilot_chooser->setLayout(pilot_chooser_layout);
 
 	// left down
 	QWidget* left_down = new QWidget();
@@ -123,6 +133,7 @@ GroundStation::GroundStation(std::string plane_address):
 	left_down_layout->addWidget(view_fps);
 	left_down_layout->addWidget(view_alt);
 	left_down_layout->addWidget(gen_waypoints_alt);
+	left_down_layout->addWidget(pilot_chooser);
 	left_down->setLayout(left_down_layout);
 
 	// left up
@@ -154,6 +165,8 @@ GroundStation::GroundStation(std::string plane_address):
 	view_alt->start();
 
 	// connect signals
+	connect(wp_pilot_button, SIGNAL(toggled(bool)), this, SLOT(to_waypoint_pilot(bool)));
+	connect(sa_pilot_button, SIGNAL(toggled(bool)), this, SLOT(to_sa_pilot(bool)));
 	connect(map_view, SIGNAL(got_point(const QgsPoint&, Qt::MouseButton)),
 			this, SLOT(got_waypoint(const QgsPoint&, Qt::MouseButton)));
 }
@@ -175,3 +188,19 @@ void GroundStation::got_waypoint(const QgsPoint& geo_waypoint, Qt::MouseButton b
 }
 
 GroundStation::~GroundStation() {}
+
+void GroundStation::to_waypoint_pilot(bool activate) {
+	if (activate) {
+		std::cout << "GS: Waypoint pilot activated!" << std::endl;
+		boost::shared_ptr<stream::Connection> conn = m_control_connection.get_connection();
+		conn->write(commands::SWITCH_TO_WAYPOINT_PILOT);
+	}
+}
+
+void GroundStation::to_sa_pilot(bool activate) {
+	if (activate) {
+		std::cout << "GS: SA pilot activated!" << std::endl;
+		boost::shared_ptr<stream::Connection> conn = m_control_connection.get_connection();
+		conn->write(commands::SWITCH_TO_SA_PILOT);
+	}
+}

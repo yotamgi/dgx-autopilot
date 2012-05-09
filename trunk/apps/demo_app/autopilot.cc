@@ -207,32 +207,32 @@ int main(int argc, char** argv) {
 	// create the cockpit
 	boost::shared_ptr<autopilot::Cockpit> cockpit = boost::make_shared<autopilot::Cockpit>(platform);
 
-	// configure the pilot
-	autopilot::WaypointPilot::Params pilot_params;
-	pilot_params.max_tilt_angle = 20.;
-	pilot_params.max_pitch_angle = 20.;
-	pilot_params.max_climbing_strength = 100.0f;
-	pilot_params.climbing_gas = 100.;
-	pilot_params.max_decending_strength = 25.0f;
-	pilot_params.decending_gas = 20.;
-	pilot_params.avg_gas = 40;
-	pilot_params.avg_pitch_strength = 50.;
-
-	// create the pilot
-	autopilot::WaypointPilot pilot(pilot_params, cockpit);
-	pilot.start(true);
 //			cockpit->gas_servo()->set_data(45.0f);
 //			cockpit->yaw_servo()->set_data(50.0f);
 
-//	autopilot::StabilityAugmentingPilot::Params pilot_params;
-//	pilot_params.max_pitch_angle = 15.;
-//	pilot_params.max_tilt_angle = 20.;
-//
-//	// create the pilot
-//	autopilot::StabilityAugmentingPilot pilot(pilot_params, cockpit);
-//	pilot.get_pitch_control()->set_data(90.0f);
-//	pilot.run(true);
+	// configure the wp pilot
+	autopilot::WaypointPilot::Params wp_pilot_params;
+	wp_pilot_params.max_tilt_angle = 15.;
+	wp_pilot_params.max_pitch_angle = 15.;
+	wp_pilot_params.max_climbing_strength = 100.0f;
+	wp_pilot_params.climbing_gas = 100.;
+	wp_pilot_params.max_decending_strength = 25.0f;
+	wp_pilot_params.decending_gas = 20.;
+	wp_pilot_params.avg_gas = 40;
+	wp_pilot_params.avg_pitch_strength = 50.;
 
+	// create the wp pilot
+	autopilot::WaypointPilot wp_pilot(wp_pilot_params, cockpit);
+	wp_pilot.start(true);
+
+	// configure the sa pilot
+	autopilot::StabilityAugmentingPilot::Params sa_pilot_params;
+	sa_pilot_params.max_pitch_angle = 15.;
+	sa_pilot_params.max_tilt_angle = 20.;
+
+	// create the sa pilot
+	autopilot::StabilityAugmentingPilot sa_pilot(sa_pilot_params, cockpit);
+	sa_pilot.get_pitch_control()->set_data(90.0f);
 
 	// export all the data
 	boost::shared_ptr<stream::AsyncStreamConnection> conn = export_data(gs_address,
@@ -261,10 +261,25 @@ int main(int argc, char** argv) {
 				float wp_alt;
 				wp_str >> wp >> wp_alt;
 
-				autopilot::WaypointPilot::waypoint_list path = pilot.get_path();
+				autopilot::WaypointPilot::waypoint_list path = wp_pilot.get_path();
 				path.push_back(autopilot::WaypointPilot::waypoint(wp, wp_alt));
-				pilot.set_path(path);
+				wp_pilot.set_path(path);
 			}
+
+			else if (command == commands::SWITCH_TO_WAYPOINT_PILOT) {
+				std::cout << "Moving to Waypoint pilot... ";
+				sa_pilot.stop();
+				wp_pilot.start();
+				std::cout << " Finished." << std::endl;
+			}
+
+			else if (command == commands::SWITCH_TO_SA_PILOT) {
+				std::cout << "Moving to SA pilot... ";
+				wp_pilot.stop();
+				sa_pilot.start();
+				std::cout << " Finished." << std::endl;
+			}
+
 		} catch (stream::ConnectionExceptioin e) {
 			std::cout << "An exception was thrown : " << e.what() << ". Continuing" << std::endl;
 		}
