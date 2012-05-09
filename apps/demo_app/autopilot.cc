@@ -91,7 +91,8 @@ boost::shared_ptr<stream::AsyncStreamConnection>  export_data(std::string export
 		vec3_pop_stream_ptr orientation,
 		float_pop_stream_ptr reliability,
 		float_pop_stream_ptr fps,
-		vec2_pop_stream_ptr position
+		vec2_pop_stream_ptr position,
+		float_pop_stream_ptr alt
 	)
 {
 	std::cout << "Exporting all data in UDP" << std::endl;
@@ -109,7 +110,9 @@ boost::shared_ptr<stream::AsyncStreamConnection>  export_data(std::string export
 		((send_stream_ptr)boost::make_shared<vec3_send_stream>(orientation))
 		((send_stream_ptr)boost::make_shared<float_send_stream>(reliability))
 		((send_stream_ptr)boost::make_shared<float_send_stream>(fps))
-		((send_stream_ptr)boost::make_shared<vec2_send_stream>(position));
+		((send_stream_ptr)boost::make_shared<vec2_send_stream>(position))
+		((send_stream_ptr)boost::make_shared<float_send_stream>(alt));
+
 
 	// creating the udp connection stuff
 	boost::shared_ptr<stream::UdpipConnectionFactory> conn_factory =
@@ -240,7 +243,8 @@ int main(int argc, char** argv) {
 			cockpit->orientation()->get_watch_stream(),
 			cockpit->watch_rest_reliability(),
 			fpsed_gyro->get_fps_stream(),
-			cockpit->position()
+			cockpit->position(),
+			cockpit->alt()
 	);
 
 	conn->start();
