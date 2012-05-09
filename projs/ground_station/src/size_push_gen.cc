@@ -33,6 +33,7 @@ SizePushGen::SizePushGen(boost::shared_ptr<SizePushGen::size_stream> size_stream
 	m_slider->setMaximum(100);
 	m_slider->setValue(m_min + start_from*m_coeffecient);
 	m_slider->show();
+	m_slider->setTracking(true);
 
 	// place the progress bar in the widget
 	QVBoxLayout* layout = new QVBoxLayout();
@@ -48,6 +49,10 @@ SizePushGen::SizePushGen(boost::shared_ptr<SizePushGen::size_stream> size_stream
 	// the value_changede signal
 	connect(m_slider, SIGNAL(sliderMoved(int)),
 			this, SLOT(value_changed(int)));
+
+	connect(m_slider, SIGNAL(valueChanged(int)),
+			this, SLOT(value_changed(int)));
+
 }
 
 void SizePushGen::value_changed(int value) {
