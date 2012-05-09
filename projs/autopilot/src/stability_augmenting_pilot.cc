@@ -31,9 +31,10 @@ void StabilityAugmentingPilot::update() {
 	m_cockpit->tilt_servo()->set_data(50. - 50.*tilt_delta/m_params.max_tilt_angle);
 }
 
-void StabilityAugmentingPilot::run(bool open_thread) {
+void StabilityAugmentingPilot::start(bool open_thread) {
+	if (m_running) return;
 	if (open_thread) {
-		m_running_thread = boost::thread(&StabilityAugmentingPilot::run, this, false);
+		m_running_thread = boost::thread(&StabilityAugmentingPilot::start, this, false);
 	} else {
 		m_running = true;
 		while (m_running) {
@@ -43,9 +44,7 @@ void StabilityAugmentingPilot::run(bool open_thread) {
 }
 
 void StabilityAugmentingPilot::stop() {
-	if (!m_running) {
-		throw std::runtime_error("StabilityAugmentingPilot::stop function called but it was not ran");
-	}
+	if (!m_running) return;
 	m_running = false;
 	m_running_thread.join();
 }

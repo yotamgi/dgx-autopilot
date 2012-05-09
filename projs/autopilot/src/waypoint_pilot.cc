@@ -20,15 +20,17 @@ WaypointPilot::WaypointPilot(const Params& params, boost::shared_ptr<NormalPlain
 }
 
 void WaypointPilot::start(bool open_thread) {
-	m_running = true;
+	if (m_running) return;
 	if (open_thread) {
 		m_running_thread = boost::thread(&WaypointPilot::start, this, false);
 	} else {
+		m_running = true;
 		fly();
 	}
 }
 
 void WaypointPilot::stop() {
+	if (!m_running) return;
 	m_running = false;
 	m_running_thread.join();
 }

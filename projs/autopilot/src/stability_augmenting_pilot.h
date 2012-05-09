@@ -34,7 +34,7 @@ public:
 	 * It opens a thread and calls the update function in a loop.
 	 * This function can also be asked not to open a thread, and thus be blocking.
 	 */
-	void run(bool open_thread=true);
+	void start(bool open_thread=true);
 
 	/**
 	 * Stopps the run function
