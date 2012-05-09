@@ -41,7 +41,7 @@ public:
 	typedef std::vector<waypoint> waypoint_list;
 
 	void set_path(waypoint_list path);
-	waypoint_list get_path();
+	waypoint_list get_path() { return m_path; }
 
 private:
 
@@ -76,6 +76,8 @@ private:
 
 	/** The flying mech thread */
 	boost::thread m_running_thread;
+
+	waypoint m_roam_waypoint;
 
 	/** The Pilot params as set in the Ctor */
 	Params m_params;
