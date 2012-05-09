@@ -126,6 +126,8 @@ GroundStation::GroundStation(std::string plane_address):
 	// the controllers
 	gs::SizePushGen* sa_pitch_control = new gs::SizePushGen(pitch_control, "SA Pitch", 0, 100., 50., gs::SizePushGen::HORIZONTAL_DIAGRAM);
 	gs::SizePushGen* sa_tilt_control  = new gs::SizePushGen(tilt_control, "SA Tilt", 0, 100., 50.);
+	gs::SizePushGen* sa_gas_control = new gs::SizePushGen(gas_control, "SA Gas", 0, 100., 50., gs::SizePushGen::HORIZONTAL_DIAGRAM);
+	gs::SizePushGen* sa_yaw_control  = new gs::SizePushGen(yaw_control, "SA Yaw", 0, 100., 50., gs::SizePushGen::HORIZONTAL_DIAGRAM);
 
 	// the radio buttons
 	QRadioButton *wp_pilot_button = new QRadioButton("&Waypoint Pilot");
@@ -146,7 +148,9 @@ GroundStation::GroundStation(std::string plane_address):
 	// the SA controllers
 	QVBoxLayout* sa_controls_layout = new QVBoxLayout;
 	sa_controls_layout->addWidget(sa_pitch_control);
+	sa_controls_layout->addWidget(sa_yaw_control);
 	sa_controls_layout->addWidget(sa_tilt_control);
+	sa_controls_layout->addWidget(sa_gas_control);
 	QGroupBox* sa_controls = new QGroupBox(tr("SA Pilot Controls"));
 	sa_controls->setLayout(sa_controls_layout);
 
