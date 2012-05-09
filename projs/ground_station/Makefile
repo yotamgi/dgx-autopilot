@@ -20,7 +20,8 @@ LDFLAGS += -fPIC -L./lib -Wl,--rpath,$(LIBDS_LIBDIRS):$(LIBDIR) -lboost_thread -
 
 STREAMVIEW_OBJS =  $(SRCDIR)/map_stream_view.o 		\
 				   $(SRCDIR)/3d_stream_view.o 		\
-				   $(SRCDIR)/size_stream_view.o
+				   $(SRCDIR)/size_stream_view.o		\
+				   $(SRCDIR)/size_push_gen.o
 
 ###############################################################################
 ## TARGETS 
@@ -57,9 +58,12 @@ $(SRCDIR)/map_stream_view_moc.o: $(SRCDIR)/map_stream_view.h
 $(SRCDIR)/3d_stream_view_moc.o: $(SRCDIR)/3d_stream_view.h
 	$(MOC) $(QT_CXXFLAGS)  $(SRCDIR)/3d_stream_view.h -o $(AUTOGENDIR)/3d_stream_view_moc.cxx -p$(SRCDIR)
 	$(CXX) -c $(CXXFLAGS) $(AUTOGENDIR)/3d_stream_view_moc.cxx  -o $*.o 
+$(SRCDIR)/size_push_gen_moc.o: $(SRCDIR)/size_push_gen.h
+	$(MOC) $(QT_CXXFLAGS)  $(SRCDIR)/size_push_gen.h -o $(AUTOGENDIR)/size_push_gen.cxx -p$(SRCDIR)
+	$(CXX) -c $(CXXFLAGS) $(AUTOGENDIR)/size_push_gen.cxx  -o $*.o 
 
-$(LIBDIR)/libground_station.so: $(STREAMVIEW_OBJS)  $(SRCDIR)/map_stream_view_moc.o $(SRCDIR)/3d_stream_view_moc.o
-	$(CXX) $(LDFLAGS) -shared  $(STREAMVIEW_OBJS) $(SRCDIR)/map_stream_view_moc.o $(SRCDIR)/3d_stream_view_moc.o -o $(LIBDIR)/libground_station.so 
+$(LIBDIR)/libground_station.so: $(STREAMVIEW_OBJS)  $(SRCDIR)/map_stream_view_moc.o $(SRCDIR)/3d_stream_view_moc.o $(SRCDIR)/size_push_gen_moc.o
+	$(CXX) $(LDFLAGS) -shared  $(STREAMVIEW_OBJS) $(SRCDIR)/map_stream_view_moc.o $(SRCDIR)/3d_stream_view_moc.o $(SRCDIR)/size_push_gen_moc.o -o $(LIBDIR)/libground_station.so 
 
 ground_station: $(LIBDIR)/libground_station.so $(SRCDIR)/main.o
 	$(CXX) -L$(LIBDIR) $(SRCDIR)/main.o -lground_station $(LDFLAGS) -o ground_station

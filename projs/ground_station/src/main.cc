@@ -1,20 +1,9 @@
 #include "map_stream_view.h"
 #include "3d_stream_view.h"
 #include "size_stream_view.h"
+#include "size_push_gen.h"
+#include "stream/stream_utils.h"
 #include <QtGui>
-
-class SimpleSizeStream : public stream::DataPopStream<float> {
-public:
-	SimpleSizeStream(): m_num(0.) {}
-
-	float get_data()  {
-		m_num += 0.1;
-		return m_num;
-	}
-
-private:
-	float m_num;
-};
 
 class SimplePosStream : public stream::DataPopStream<lin_algebra::vec2f> {
 public:
@@ -48,8 +37,7 @@ private:
 
 
 int main(int argc, char** argv) {
-
-	boost::shared_ptr<SimpleSizeStream> size_stream(new SimpleSizeStream);
+	boost::shared_ptr<stream::PushToPopConv<float> > push_size_stream(new stream::PushToPopConv<float>(0.));
 	boost::shared_ptr<SimplePosStream> pos_stream(new SimplePosStream);
 	boost::shared_ptr<SimpleVecStream> vec_stream(new SimpleVecStream);
 	QApplication app(argc, argv);
@@ -60,11 +48,13 @@ int main(int argc, char** argv) {
 
 	gs::MapStreamView* map_view = new gs::MapStreamView(pos_stream, 0.2, QSize(400, 300), "./data/map");
 	gs::StreamView3d* view3d = new gs::StreamView3d(0.1, QSize(400, 300));
-	gs::SizeStreamView* size = new gs::SizeStreamView(size_stream, "stream", 0.1, 0., 10.);
+	gs::SizeStreamView* size = new gs::SizeStreamView(push_size_stream, "stream", 0.1, 0., 10.);
+	gs::SizePushGen* size_gen = new gs::SizePushGen(push_size_stream, "stream", 0., 10., 2.);
 
 	layout->addWidget(map_view);
 	layout->addWidget(view3d);
 	layout->addWidget(size);
+	layout->addWidget(size_gen);
 
 	window->setLayout(layout);
 	window->show();
