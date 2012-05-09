@@ -289,6 +289,8 @@ int main(int argc, char** argv) {
 			else if (command == commands::SWITCH_TO_WAYPOINT_PILOT) {
 				std::cout << "Moving to Waypoint pilot... ";
 				sa_pilot.stop();
+				gas_control->set_receiver(boost::shared_ptr<stream::DataPushStream<float> >());
+				yaw_control->set_receiver(boost::shared_ptr<stream::DataPushStream<float> >());
 				wp_pilot.start();
 				std::cout << " Finished." << std::endl;
 			}
