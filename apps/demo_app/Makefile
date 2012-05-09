@@ -12,7 +12,6 @@ include $(DGX_PATH)/Makefile.include
 CXX=g++
 MOC = moc-qt4
 CXXFLAGS=-Wall -g -O3
-QT_CXXFLAGS = -D_REENTRANT -DQT_WEBKIT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4
 OBJDIR=./obj
 AUTOGENDIR = ./autogen
 
@@ -45,7 +44,7 @@ $(OBJDIR)/ground_station.o: ground_station.cc
 	
 $(OBJDIR)/ground_station_moc.o: ground_station.h
 	$(MOC) ground_station.h -o $(AUTOGENDIR)/ground_station_moc.cxx
-	$(CXX) -c $(QT_CXXFLAGS) $(CXXFLAGS) $(AUTOGENDIR)/ground_station_moc.cxx -o $(OBJDIR)/ground_station_moc.o $(AUTOPILOT_CXXFLAGS) $(GROUND_STATION_CXXFLAGS)
+	$(CXX) -c $(CXXFLAGS) $(AUTOGENDIR)/ground_station_moc.cxx -o $(OBJDIR)/ground_station_moc.o $(AUTOPILOT_CXXFLAGS) $(GROUND_STATION_CXXFLAGS)
 
 $(OBJDIR)/gs_main.o: gs_main.cc
 	$(CXX) -c $(CXXFLAGS) gs_main.cc -o $(OBJDIR)/gs_main.o $(AUTOPILOT_CXXFLAGS) $(GROUND_STATION_CXXFLAGS)
