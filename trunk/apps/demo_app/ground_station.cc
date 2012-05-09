@@ -42,6 +42,7 @@ GroundStation::GroundStation(std::string plane_address):
 	boost::shared_ptr<float_recv_stream> reliability = 				boost::make_shared<float_recv_stream>();
 	boost::shared_ptr<float_recv_stream> gyro_fps = 				boost::make_shared<float_recv_stream>();
 	boost::shared_ptr<vec2_recv_stream> position = 					boost::make_shared<vec2_recv_stream>();
+	boost::shared_ptr<float_recv_stream> alt = 						boost::make_shared<float_recv_stream>();
 
 	// fill them into the recv_stream list
 	stream::AsyncStreamConnection::recv_streams_t recv_streams = boost::assign::list_of
@@ -52,7 +53,8 @@ GroundStation::GroundStation(std::string plane_address):
 			((recv_stream_ptr)orientation            )
 	        ((recv_stream_ptr)reliability            )
 	        ((recv_stream_ptr)gyro_fps               )
-            ((recv_stream_ptr)position             	 );
+            ((recv_stream_ptr)position             	 )
+			((recv_stream_ptr)alt               	 );
 
 	// creating the udp connection stuff
 	boost::shared_ptr<stream::UdpipConnectionFactory> conn_factory =
@@ -76,20 +78,20 @@ GroundStation::GroundStation(std::string plane_address):
 	wnd->setWindowState(Qt::WindowMaximized);
 
 	// global parameters
-	const QSize stream3d_dimention(frame_size.width()/2, frame_size.height()/2);
+	const QSize stream3d_dimention(frame_size.width()/2.05, frame_size.height()/2);
 	const float view_update_time = 0.01;
 
 	// the 3d orientation view
 	gs::StreamView3d *view3d = new gs::StreamView3d(view_update_time, stream3d_dimention);
-	view3d->addAngleStream(gyro_watch_orientation, irr::core::vector3df(0., 0.,10.));
-	view3d->addVecStream(watch_acc_sensor, irr::core::vector3df(0., 0., 0.));
-	view3d->addVecStream(watch_compass_sensor, irr::core::vector3df(0., 0., 0.));
+	view3d->addAngleStream(gyro_watch_orientation, irr::core::vector3df(0., 0., 8.));
+	view3d->addVecStream(watch_acc_sensor, irr::core::vector3df(0., 0., 8.));
+	view3d->addVecStream(watch_compass_sensor, irr::core::vector3df(0., 0., 8.));
 
 	// the reliable stream
-	gs::SizeStreamView *view_size = new gs::SizeStreamView(reliability, "reliability", view_update_time, 0., 1.);
+	gs::SizeStreamView *view_reliability = new gs::SizeStreamView(reliability, "Reliability", view_update_time, 0., 1.);
 
 	// the gyro_fps stream
-	gs::SizeStreamView *view_fps = new gs::SizeStreamView(gyro_fps, "fps", 1., 0., 4000.);
+	gs::SizeStreamView *view_fps = new gs::SizeStreamView(gyro_fps, "FPS", 1., 0., 4000.);
 
 	// the position
 	const QSize map_dimention(frame_size.width()/2, frame_size.height());
@@ -98,7 +100,11 @@ GroundStation::GroundStation(std::string plane_address):
 
 	// the link quality
 	gs::SizeStreamView* view_link_quality = new gs::SizeStreamView(
-			m_connection->get_quality_stream(), "link", 0.1f , 0., 1.);
+			m_connection->get_quality_stream(), "Link", 0.1f , 0., 1.);
+
+	// the plane's alt
+	gs::SizeStreamView* view_alt = new gs::SizeStreamView(alt, "Alt", 0.1f , 0., 200.);
+
 
 	//
 	// create the window itself and orgenize it
@@ -106,19 +112,29 @@ GroundStation::GroundStation(std::string plane_address):
 
 	QWidget *main_widget = new QWidget;
 
+	// left down
 	QWidget* left_down = new QWidget();
 	QHBoxLayout* left_down_layout = new QHBoxLayout();
 	left_down_layout->addWidget(view_link_quality);
-	left_down_layout->addWidget(view_size);
 	left_down_layout->addWidget(view_fps);
+	left_down_layout->addWidget(view_alt);
 	left_down->setLayout(left_down_layout);
 
+	// left up
+	QWidget* left_up = new QWidget();
+	QHBoxLayout* left_up_layout = new QHBoxLayout();
+	left_up_layout->addWidget(view3d);
+	left_up_layout->addWidget(view_reliability);
+	left_up->setLayout(left_up_layout);
+
+	// left side
 	QWidget* left = new QWidget;
 	QVBoxLayout* left_layout = new QVBoxLayout();
-	left_layout->addWidget(view3d);
+	left_layout->addWidget(left_up);
 	left_layout->addWidget(left_down);
 	left->setLayout(left_layout);
 
+	// alltogether
 	QHBoxLayout* main_layout = new QHBoxLayout();
 	main_layout->addWidget(left);
 	main_layout->addWidget(map_view);
@@ -127,9 +143,10 @@ GroundStation::GroundStation(std::string plane_address):
 	wnd->setCentralWidget(main_widget);
 	wnd->show();
 	view3d->start();
-	view_size->start();
+	view_reliability->start();
 	view_fps->start();
 	view_link_quality->start();
+	view_alt->start();
 
 	// connect signals
 	connect(map_view, SIGNAL(got_point(const QgsPoint&, Qt::MouseButton)),
