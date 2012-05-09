@@ -1,4 +1,5 @@
 #include "ground_station.h"
+#include "command_protocol.h"
 
 #include <stream/util/udpip_connection.h>
 #include <gs/3d_stream_view.h>
@@ -10,11 +11,13 @@
 
 #include <string>
 #include <iostream>
+#include <sstream>
 #include <fstream>
 
 int stam;
 
 GroundStation::GroundStation(std::string plane_address):
+			m_control_connection(plane_address, commands::port),
 			m_app(stam, (char**)0)
 {
 	std::cout << "Presenting UDP from addr " << plane_address << std::endl;
@@ -113,8 +116,8 @@ GroundStation::GroundStation(std::string plane_address):
 	view_link_quality->start();
 
 	// connect signals
-	connect(map_view, SIGNAL(got_point(const QgsPoint& geo_waypoint, Qt::MouseButton button)),
-			this, SLOT(got_waypoint(const QgsPoint& geo_waypoint, Qt::MouseButton button)));
+	connect(map_view, SIGNAL(got_point(const QgsPoint&, Qt::MouseButton)),
+			this, SLOT(got_waypoint(const QgsPoint&, Qt::MouseButton)));
 }
 
 void GroundStation::run() {
@@ -123,6 +126,14 @@ void GroundStation::run() {
 
 void GroundStation::got_waypoint(const QgsPoint& geo_waypoint, Qt::MouseButton button) {
 	std::cout << "GS: Got point!" << std::endl;
+	boost::shared_ptr<stream::Connection> conn = m_control_connection.get_connection();
+
+	lin_algebra::vec2f wp = lin_algebra::create_vec2f(geo_waypoint.x(), geo_waypoint.y());
+	std::stringstream wp_str;
+	wp_str << wp;
+
+	conn->write(commands::NAVIGATE_TO);
+	conn->write(wp_str.str());
 }
 
 GroundStation::~GroundStation() {}
