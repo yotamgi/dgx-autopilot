@@ -16,7 +16,7 @@ WaypointPilot::WaypointPilot(const Params& params, boost::shared_ptr<NormalPlain
 		m_running(false),
 		m_params(params)
 {
-	m_path.push_back(waypoint(m_cockpit->position()->get_data(), 100.0f));
+	m_roam_waypoint = waypoint(cockpit->position()->get_data(), 100);
 }
 
 void WaypointPilot::start(bool open_thread) {
@@ -118,15 +118,32 @@ void WaypointPilot::fly() {
 		if (m_waiting_path) {
 			m_path = m_new_path;
 			m_waiting_path = false;
+			std::cout << "Got new path, which contains " << m_path.size() << " waypoints" << std::endl;
 		}
 
-		// fly the plane
-		bool there_yet = nav_to(m_path.at(0));
+		if (m_path.size() != 0) {
 
-		// if we got to the point, shrink the vector
-		if (there_yet && (m_path.size() != 1)) {
-			m_path.erase(m_path.begin());
+			// fly the plane
+			bool there_yet = nav_to(m_path.at(0));
+
+			// if we got to the point, shrink the vector
+			if (there_yet) {
+				std::cout << "Got there!" << std::endl;
+
+				if (m_path.size() == 1) {
+					std::cout << "Finished all waypoints - just roam..." << std::endl;
+					m_roam_waypoint = m_path.at(0);
+				}
+
+				m_path.erase(m_path.begin());
+			}
 		}
+
+		else {
+			// roam
+			nav_to(m_roam_waypoint);
+		}
+
 	}
 }
 
