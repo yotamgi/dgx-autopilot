@@ -258,10 +258,11 @@ int main(int argc, char** argv) {
 			if (command == commands::NAVIGATE_TO) {
 				std::stringstream wp_str(conn->read());
 				lin_algebra::vec2f wp;
-				wp_str >> wp;
+				float wp_alt;
+				wp_str >> wp >> wp_alt;
 
 				autopilot::WaypointPilot::waypoint_list path = pilot.get_path();
-				path.push_back(autopilot::WaypointPilot::waypoint(wp, 100.0f));
+				path.push_back(autopilot::WaypointPilot::waypoint(wp, wp_alt));
 				pilot.set_path(path);
 			}
 		} catch (stream::ConnectionExceptioin e) {

@@ -4,6 +4,7 @@
 #include <string>
 #include <stream/async_stream_connection.h>
 #include <stream/util/tcpip_connection.h>
+#include <stream/stream_utils.h>
 #include <boost/shared_ptr.hpp>
 #include <qapplication.h>
 #include <QObject>
@@ -28,6 +29,7 @@ public slots:
 private:
 
 	boost::shared_ptr<stream::AsyncStreamConnection> m_connection;
+	boost::shared_ptr<stream::PushToPopConv<float> > m_wanted_alt;
 	stream::TcpipServer m_control_connection;
 	QApplication m_app;
 };
