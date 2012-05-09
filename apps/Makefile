@@ -15,7 +15,7 @@ device:
 	make -C  cockpit_test/   device
 .PHONY:
 clean:
-	make -C  demo_app/  all
+	make -C  demo_app/  clean
 	make -C  waypoint_pilot_test/  clean
 	make -C  cockpit_test/   clean
  
