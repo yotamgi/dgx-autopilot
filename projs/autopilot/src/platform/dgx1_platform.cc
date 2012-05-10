@@ -41,6 +41,10 @@ NormalPlainPlatform create_dgx1_platform() {
 	dgx1_platform.gas_servo 	= maestro.getServoChannel(2);
 	dgx1_platform.yaw_servo 	= maestro.getServoChannel(3);
 
+	// trim the servos
+	maestro.getServoChannel(3)->trim_middle(52.5f);
+	maestro.getServoChannel(3)->trim_range(95.0f);
+
 	return dgx1_platform;
 }
 
