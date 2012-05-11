@@ -89,7 +89,7 @@ GroundStation::GroundStation(std::string plane_address):
 	//
 
 	QMainWindow* wnd = new QMainWindow;
-	const QSize frame_size = QApplication::desktop()->size()*0.95;
+	const QSize frame_size = QApplication::desktop()->size()*0.80;
 	wnd->setWindowState(Qt::WindowMaximized);
 
 	// global parameters
@@ -121,12 +121,12 @@ GroundStation::GroundStation(std::string plane_address):
 	gs::SizeStreamView* view_alt = new gs::SizeStreamView(alt, "Alt", 0.1f , 0., 200.);
 
 	// the new waypoint's alt
-	gs::SizePushGen* gen_waypoints_alt = new gs::SizePushGen(m_wanted_alt, "Alt", 0, 200., 100.);
+	gs::SizePushGen* gen_waypoints_alt = new gs::SizePushGen(m_wanted_alt, "WP Alt", 0, 200., 100.);
 
 	// the controllers
 	gs::SizePushGen* sa_pitch_control = new gs::SizePushGen(pitch_control, "SA Pitch", 0, 100., 50., gs::SizePushGen::HORIZONTAL_DIAGRAM);
 	gs::SizePushGen* sa_tilt_control  = new gs::SizePushGen(tilt_control, "SA Tilt", 0, 100., 50.);
-	gs::SizePushGen* sa_gas_control = new gs::SizePushGen(gas_control, "SA Gas", 0, 100., 50., gs::SizePushGen::HORIZONTAL_DIAGRAM);
+	gs::SizePushGen* sa_gas_control = new gs::SizePushGen(gas_control, "SA Gas", 0, 100., 50.);
 	gs::SizePushGen* sa_yaw_control  = new gs::SizePushGen(yaw_control, "SA Yaw", 0, 100., 50., gs::SizePushGen::HORIZONTAL_DIAGRAM);
 
 	// the radio buttons
@@ -147,10 +147,14 @@ GroundStation::GroundStation(std::string plane_address):
 
 	// the SA controllers
 	QVBoxLayout* sa_controls_layout = new QVBoxLayout;
+	QHBoxLayout* gas_pitch_control_layout = new QHBoxLayout;
+	gas_pitch_control_layout->addWidget(sa_tilt_control);
+	gas_pitch_control_layout->addWidget(sa_gas_control);
+	QWidget* gas_pitch_control = new QWidget;
+	gas_pitch_control->setLayout(gas_pitch_control_layout);
 	sa_controls_layout->addWidget(sa_pitch_control);
 	sa_controls_layout->addWidget(sa_yaw_control);
-	sa_controls_layout->addWidget(sa_tilt_control);
-	sa_controls_layout->addWidget(sa_gas_control);
+	sa_controls_layout->addWidget(gas_pitch_control);
 	QGroupBox* sa_controls = new QGroupBox(tr("SA Pilot Controls"));
 	sa_controls->setLayout(sa_controls_layout);
 
@@ -160,9 +164,9 @@ GroundStation::GroundStation(std::string plane_address):
 	left_down_layout->addWidget(view_link_quality);
 	left_down_layout->addWidget(view_fps);
 	left_down_layout->addWidget(view_alt);
-	left_down_layout->addWidget(gen_waypoints_alt);
 	left_down_layout->addWidget(pilot_chooser);
 	left_down_layout->addWidget(sa_controls);
+	left_down_layout->addWidget(gen_waypoints_alt);
 	left_down->setLayout(left_down_layout);
 
 	// left up
