@@ -10,7 +10,7 @@ host:
 	make -C  cockpit_test/   host
 .PHONY:
 device:
-	make -C  demo_app/  all
+	make -C  demo_app/  device
 	make -C  waypoint_pilot_test/  device
 	make -C  cockpit_test/   device
 .PHONY:
