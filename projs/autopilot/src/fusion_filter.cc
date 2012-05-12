@@ -72,7 +72,7 @@ lin_algebra::vec3f FusionFilter::get_data() {
 	lin_algebra::vec3f gyro_data 	;
 
 	try	{
-	acc_data 	 =m_acc->get_data();
+	acc_data = m_acc->get_data();
 	} catch (...) {
 		std::cout << "Acc failed.." << std::endl;
 	} try	{
@@ -80,7 +80,7 @@ lin_algebra::vec3f FusionFilter::get_data() {
 	} catch (...) {
 		std::cout << "Compass failed.." << std::endl;
 	} try	{
-		gyro_data 	 =m_gyro->get_data();
+		gyro_data = m_gyro->get_data();
 	} catch (...) {
 		std::cout << "Gyro failed.." << std::endl;
 	}

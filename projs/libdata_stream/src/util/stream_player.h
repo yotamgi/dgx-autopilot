@@ -4,6 +4,7 @@
 #include <stream/data_pop_stream.h>
 #include <stream/data_push_stream.h>
 #include <stream/util/time.h>
+#include <stream/stream_utils.h>
 #include <boost/thread.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/optional.hpp>
@@ -92,7 +93,8 @@ public:
 	 */
 	PushStreamPlayer(boost::shared_ptr<std::istream> in);
 
-	void set_receiver(boost::shared_ptr<DataPushStream<T> > reciever);
+	void register_receiver(boost::shared_ptr<DataPushStream<T> > reciever);
+	void unregister_receiver(boost::shared_ptr<DataPushStream<T> > reciever);
 
 private:
 
@@ -100,7 +102,7 @@ private:
 
 	StreamReader<T> m_reader;
 	boost::thread m_worker_thread;
-	boost::shared_ptr<DataPushStream<T> > m_reciever;
+	PushForwarder<T> m_out_forwarder;
 
 	Timer m_timer;
 };

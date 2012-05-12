@@ -24,9 +24,9 @@ void export_platform(boost::shared_ptr<NormalPlainPlatform> platform,
 	conn.export_push_stream<float>(platform->gas_servo, "gas_servo");
 	conn.run(true);
 
-	platform->gps_pos_generator->set_receiver(conn.import_push_stream<lin_algebra::vec3f>("gps_pos_reciever"));
-	platform->gps_speed_dir_generator->set_receiver(conn.import_push_stream<float>("gps_speed_dir_reciever"));
-	platform->gps_speed_mag_generator->set_receiver(conn.import_push_stream<float>("gps_speed_mag_reciever"));
+	platform->gps_pos_generator->register_receiver(conn.import_push_stream<lin_algebra::vec3f>("gps_pos_reciever"));
+	platform->gps_speed_dir_generator->register_receiver(conn.import_push_stream<float>("gps_speed_dir_reciever"));
+	platform->gps_speed_mag_generator->register_receiver(conn.import_push_stream<float>("gps_speed_mag_reciever"));
 
 	while (true) usleep(10000000);
 }

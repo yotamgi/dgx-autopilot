@@ -110,8 +110,12 @@ PushStreamPlayer<T>::PushStreamPlayer(boost::shared_ptr<std::istream> in):
 {}
 
 template <typename T>
-void PushStreamPlayer<T>::set_receiver(boost::shared_ptr<DataPushStream<T> > reciever) {
-	m_reciever = reciever;
+void PushStreamPlayer<T>::register_receiver(boost::shared_ptr<DataPushStream<T> > reciever) {
+	m_out_forwarder.register_receiver(reciever);
+}
+template <typename T>
+void PushStreamPlayer<T>::unregister_receiver(boost::shared_ptr<DataPushStream<T> > reciever) {
+	m_out_forwarder.unregister_receiver(reciever);
 }
 
 template <typename T>
@@ -127,9 +131,7 @@ void PushStreamPlayer<T>::run() {
 		}
 
 		// set the data, if somone listens
-		if (m_reciever) {
-			m_reciever->set_data(curr_sample.data);
-		}
+		m_out_forwarder.set_data(curr_sample.data);
 
 		// read the next sample
 		curr_sample_optional = m_reader.next_sample();

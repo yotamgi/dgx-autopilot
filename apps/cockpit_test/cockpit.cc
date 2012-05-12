@@ -44,7 +44,7 @@ boost::shared_ptr<stream::PushGenerator<T> > add_push_recorder(
 	boost::shared_ptr<stream::PushForwarder<T> > forwarder(new stream::PushForwarder<T>);
 
 	// bind it through a filter to the generator
-	unfiltered->set_receiver(
+	unfiltered->register_receiver(
 			boost::make_shared<stream::filters::RecorderPushFilter<T> >(
 					out,
 					forwarder
