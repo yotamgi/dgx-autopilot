@@ -33,7 +33,7 @@ Cockpit::Cockpit(NormalPlainPlatform platform):
 		m_platform(platform),
 		m_gps_pos(boost::make_shared<stream::PushToPopConv<lin_algebra::vec3f> >(lin_algebra::vec3f())),
 		m_gps_speed_dir(boost::make_shared<stream::PushToPopConv<float> >(0.)),
-		m_gps_speed_mag(boost::make_shared<stream::PushToPopConv<float> >(0.))
+		m_gps_speed_mag(boost::make_shared<stream::PushForwarder<float> >())
 {
 	// This is the stream schematics:
 	//
@@ -103,9 +103,10 @@ boost::shared_ptr<vec3_stream> 	Cockpit::watch_fixed_acc() {
 }
 
 boost::shared_ptr<float_watch_stream> Cockpit::ground_speed() {
-	return boost::make_shared<float_watch_stream>(
-			(boost::shared_ptr<stream::DataPopStream<float> >)m_gps_speed_mag
-	);
+	return boost::shared_ptr<float_watch_stream>();
+//	return boost::make_shared<float_watch_stream>(
+//			(boost::shared_ptr<stream::DataPopStream<float> >)m_gps_speed_mag
+//	);
 }
 
 boost::shared_ptr<vec2_watch_stream> Cockpit::position() {
