@@ -12,7 +12,7 @@ SizePushGen::SizePushGen(boost::shared_ptr<SizePushGen::size_stream> size_stream
 		  	   	   	   	 SizePushGen::Style style):
 		  m_size_stream(size_stream)
 {
-	// create the wanted bar
+	// create the widgets
 	switch(style) {
 		case VERTICAL_DIAGRAM:
 			m_slider = new QSlider();
@@ -23,40 +23,51 @@ SizePushGen::SizePushGen(boost::shared_ptr<SizePushGen::size_stream> size_stream
 			m_slider->setOrientation(Qt::Horizontal);
 			break;
 	}
+	m_input = new QDoubleSpinBox;
 
 	// calculate the coefficient
 	m_coeffecient = 100./(max_size - min_size);
 	m_min = min_size;
 
 	// configure the bar
-	m_slider->setMinimum(0);
-	m_slider->setMaximum(100);
+	m_slider->setRange(0, 100);
 	m_slider->setValue(m_min + start_from*m_coeffecient);
-	m_slider->show();
 	m_slider->setTracking(true);
+	m_slider->setTickPosition(QSlider::TicksLeft);
+
+	// configure the input
+	m_input->setRange(min_size, max_size);
+	m_input->setValue(start_from);
 
 	// place the progress bar in the widget
 	QVBoxLayout* layout = new QVBoxLayout();
+	layout->addWidget(new QLabel(tr(stream_name.c_str())));
 	layout->addWidget(m_slider);
-	QGroupBox* gb = new QGroupBox(tr(stream_name.c_str()));
-	gb->setLayout(layout);
-	QVBoxLayout* gb_layout = new QVBoxLayout();
-	gb_layout->addWidget(gb);
-	setLayout(gb_layout);
+	layout->addWidget(m_input);
+	setLayout(layout);
 
 	m_size_stream->set_data(start_from);
 
-	// the value_changede signal
+	// the value_changed signals
 	connect(m_slider, SIGNAL(sliderMoved(int)),
 			this, SLOT(value_changed(int)));
 
 	connect(m_slider, SIGNAL(valueChanged(int)),
 			this, SLOT(value_changed(int)));
 
+	connect(m_input, SIGNAL(editingFinished()),
+			this, SLOT(input_value_changed()));
 }
 
 void SizePushGen::value_changed(int value) {
 	m_size_stream->set_data(m_min + value/m_coeffecient);
+	m_input->setValue(m_min + value/m_coeffecient);
 }
+
+void SizePushGen::input_value_changed() {
+	float value = m_input->value();
+	m_slider->setValue(m_min + value*m_coeffecient); // which emits the value changed signal
+}
+
 
 } // namespace gs

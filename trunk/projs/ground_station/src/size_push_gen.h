@@ -28,6 +28,7 @@ public:
 public slots:
 
 	void value_changed(int value);
+	void input_value_changed();
 
 private:
 
@@ -36,6 +37,7 @@ private:
 	float m_coeffecient;
 	float m_min;
 	QSlider* m_slider;
+	QDoubleSpinBox* m_input;
 };
 
 } // namespace gs
