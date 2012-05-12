@@ -80,9 +80,9 @@ void thread(PlainParams plain_params, boost::shared_ptr<autopilot::NormalPlainPl
 	platform->gps_speed_dir_generator = gps_speed_dir;
 	platform->gps_speed_mag_generator = gps_speed_mag;
 	platform->gas_servo = plain->get_throttle_servo();
-	platform->tilt_servo = plain->get_rudder_servo();
-	platform->pitch_servo = plain->get_elevator_servo();
-	platform->tilt_servo = plain->get_ailron_servo();
+	platform->yaw_servo = plain->get_rudder_servo();
+	platform->tilt_servo = plain->get_elevator_servo();
+	platform->pitch_servo = plain->get_ailron_servo();
 	gps_sensor->set_pos_listener(gps_pos);
 	gps_sensor->set_speed_dir_listener(gps_speed_dir);
 	gps_sensor->set_speed_mag_listener(gps_speed_mag);

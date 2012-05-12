@@ -44,19 +44,19 @@ void WaypointPilot::maintain_alt(float wanted_altitude){
 	// max climbing
 	if (delta_alt > 5) {
 		gas_servo->set_data(m_params.climbing_gas);
-		m_sas_pilot.get_pitch_control()->set_data(m_params.max_climbing_strength);
+		m_sas_pilot.get_tilt_control()->set_data(m_params.max_climbing_strength);
 	}
 
 	// max decending
 	else if (delta_alt < -5) {
 		gas_servo->set_data(m_params.decending_gas);
-		m_sas_pilot.get_pitch_control()->set_data(m_params.max_decending_strength);
+		m_sas_pilot.get_tilt_control()->set_data(m_params.max_decending_strength);
 	}
 
 	// avg flight
 	else {
 		gas_servo->set_data(m_params.avg_gas);
-		m_sas_pilot.get_pitch_control()->set_data(m_params.avg_pitch_strength);
+		m_sas_pilot.get_tilt_control()->set_data(m_params.avg_pitch_strength);
 	}
 }
 
@@ -75,11 +75,11 @@ void WaypointPilot::maintain_heading(float heading){
 		delta_heading = 360 + delta_heading;
 
 	if (delta_heading > 10.0f)
-		m_sas_pilot.get_tilt_control()->set_data(0.0f);
+		m_sas_pilot.get_roll_control()->set_data(0.0f);
 	else if (delta_heading < -10.0f)
-		m_sas_pilot.get_tilt_control()->set_data(100.0f);
+		m_sas_pilot.get_roll_control()->set_data(100.0f);
 	else
-		m_sas_pilot.get_tilt_control()->set_data(50.0f - 25.0f*delta_heading/10.0f);
+		m_sas_pilot.get_roll_control()->set_data(50.0f - 25.0f*delta_heading/10.0f);
 
 }
 
