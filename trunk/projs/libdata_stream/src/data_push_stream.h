@@ -36,7 +36,10 @@ class PushGenerator {
 public:
 	virtual ~PushGenerator() {}
 
-	virtual void set_receiver(boost::shared_ptr<DataPushStream<T> >) = 0;
+	virtual void register_receiver(boost::shared_ptr<DataPushStream<T> >) = 0;
+
+	virtual void unregister_receiver(boost::shared_ptr<DataPushStream<T> >) = 0;
+
 };
 
 }  // namespace stream

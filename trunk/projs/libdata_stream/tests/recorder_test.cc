@@ -124,7 +124,7 @@ TEST(player_recorder, push_functional) {
 
 	// play
 	stream::PushStreamPlayer<float> player(ss);
-	player.set_receiver(stream);
+	player.register_receiver(stream);
 	usleep(10000); // 1/100 sec
 
 	t.reset();

@@ -55,9 +55,9 @@ Cockpit::Cockpit(NormalPlainPlatform platform):
 	boost::shared_ptr<vec3_watch_stream> gyro_watch(new vec3_watch_stream(m_platform.gyro_sensor));
 	m_platform.gyro_sensor = gyro_watch;
 
-	m_platform.gps_pos_generator->set_receiver(m_gps_pos);
-	m_platform.gps_speed_dir_generator->set_receiver(m_gps_speed_dir);
-	m_platform.gps_speed_mag_generator->set_receiver(m_gps_speed_mag);
+	m_platform.gps_pos_generator->register_receiver(m_gps_pos);
+	m_platform.gps_speed_dir_generator->register_receiver(m_gps_speed_dir);
+	m_platform.gps_speed_mag_generator->register_receiver(m_gps_speed_mag);
 
 	m_gyro_orientation = boost::make_shared<filter::MatrixToEulerFilter>(
 		boost::make_shared<filter::IntegralFilter<lin_algebra::mat3f> >(

@@ -39,7 +39,7 @@ boost::shared_ptr<stream::PushGenerator<T> > add_push_recorder(
 	boost::shared_ptr<stream::PushForwarder<T> > forwarder(new stream::PushForwarder<T>);
 
 	// bind it through a filter to the generator
-	unfiltered->set_receiver(
+	unfiltered->register_receiver(
 			boost::make_shared<stream::filters::RecorderPushFilter<T> >(
 					out,
 					forwarder
@@ -289,8 +289,8 @@ int main(int argc, char** argv) {
 			else if (command == commands::SWITCH_TO_WAYPOINT_PILOT) {
 				std::cout << "Moving to Waypoint pilot... ";
 				sa_pilot.stop();
-				gas_control->set_receiver(boost::shared_ptr<stream::DataPushStream<float> >());
-				yaw_control->set_receiver(boost::shared_ptr<stream::DataPushStream<float> >());
+				gas_control->unregister_receiver(cockpit->gas_servo());
+				yaw_control->unregister_receiver(cockpit->yaw_servo());
 				wp_pilot.start();
 				std::cout << " Finished." << std::endl;
 			}
@@ -298,8 +298,8 @@ int main(int argc, char** argv) {
 			else if (command == commands::SWITCH_TO_SA_PILOT) {
 				std::cout << "Moving to SA pilot... ";
 				wp_pilot.stop();
-				gas_control->set_receiver(cockpit->gas_servo());
-				yaw_control->set_receiver(cockpit->yaw_servo());
+				gas_control->register_receiver(cockpit->gas_servo());
+				yaw_control->register_receiver(cockpit->yaw_servo());
 				sa_pilot.start();
 				std::cout << " Finished." << std::endl;
 			}

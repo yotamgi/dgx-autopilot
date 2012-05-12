@@ -3,6 +3,9 @@
 
 #include "data_pop_stream.h"
 #include "data_push_stream.h"
+#include <vector>
+#include <algorithm>
+#include <boost/thread/mutex.hpp>
 
 namespace stream {
 
@@ -33,13 +36,33 @@ template <typename T>
 class PushForwarder : public DataPushStream<T>, public PushGenerator<T> {
 public:
 
-	void set_data(const T& data) { if (m_stream) m_stream->set_data(data); }
+	void set_data(const T& data) {
+		m_lock.lock();
+		for (size_t i=0; i<m_recievers.size(); i++)
+			m_recievers[i]->set_data(data);
+		m_lock.unlock();
+	}
 
-	void set_receiver(boost::shared_ptr<DataPushStream<T> > stream) { m_stream = stream; }
+	void register_receiver(boost::shared_ptr<DataPushStream<T> > stream) {
+		m_lock.lock();
+		if (std::find(m_recievers.begin(), m_recievers.end(), stream) == m_recievers.end()) {
+			m_recievers.push_back(stream);
+		}
+		m_lock.unlock();
+	}
+
+	void unregister_receiver(boost::shared_ptr<DataPushStream<T> > stream) {
+		m_lock.lock();
+		if (std::find(m_recievers.begin(), m_recievers.end(), stream) != m_recievers.end()) {
+			m_recievers.erase(std::find(m_recievers.begin(), m_recievers.end(), stream));
+		}
+		m_lock.unlock();
+	}
 
 private:
 
-	boost::shared_ptr<DataPushStream<T> > m_stream;
+	std::vector<boost::shared_ptr<DataPushStream<T> > > m_recievers;
+	boost::mutex m_lock;
 };
 
 } // namespace stream

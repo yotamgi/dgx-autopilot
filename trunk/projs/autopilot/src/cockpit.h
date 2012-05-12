@@ -50,16 +50,16 @@ public:
 
 	boost::shared_ptr<float_stream> 	watch_rest_reliability();
 
-	boost::shared_ptr<vec3_stream> 	watch_fixed_acc();
+	boost::shared_ptr<vec3_stream> 		watch_fixed_acc();
 
 private:
 	NormalPlainPlatform m_platform;
 
-	boost::shared_ptr<vec3_watch_stream> m_orientation;
-	boost::shared_ptr<vec3_stream> 		m_gyro_orientation;
-	boost::shared_ptr<vec3_stream> 		m_rest_orientation;
-	boost::shared_ptr<float_stream> 	m_rest_reliability;
-	boost::shared_ptr<vec3_stream> 		m_fixed_acc;
+	boost::shared_ptr<vec3_watch_stream> 	m_orientation;
+	boost::shared_ptr<vec3_stream> 			m_gyro_orientation;
+	boost::shared_ptr<vec3_stream> 			m_rest_orientation;
+	boost::shared_ptr<float_stream> 		m_rest_reliability;
+	boost::shared_ptr<vec3_stream> 			m_fixed_acc;
 
 	boost::shared_ptr<stream::PushToPopConv<lin_algebra::vec3f> > m_gps_pos;
 	boost::shared_ptr<stream::PushToPopConv<float> > m_gps_speed_dir;
