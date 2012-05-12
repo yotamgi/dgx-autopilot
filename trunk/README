@@ -14,7 +14,8 @@ Video Transmisstion:
  * Install gstreamer0.10-tools and gstreamer0.10-ffmpeg 
  * Install gstreamer0.10-plugins-good
  * on Host, install vlc
- * device cmd: gst-launch-0.10 v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=\(fraction\)5/1 ! ffmpegcolorspace ! jpegenc ! multipartmux ! tcpserversink port=5000 &
+ * device cmd: gst-launch-0.10 v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=\(fraction\)5/1 ! ffmpegcolorspace ! jpegenc ! multipartmux ! udpsink host=? port=5000 &
+ * on host - vlc: udp://@HOST_IP:5000
 
 I2C:
  * In order for the i2c sensors to work, the modules rtc_ds1307 and rtc_twl must be put in the blacklist - they catch the 0x68 address.
