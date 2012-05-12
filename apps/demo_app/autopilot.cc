@@ -245,7 +245,7 @@ int main(int argc, char** argv) {
 
 	// create the sa pilot
 	autopilot::StabilityAugmentingPilot sa_pilot(sa_pilot_params, cockpit);
-	sa_pilot.get_pitch_control()->set_data(60.0f);
+	sa_pilot.get_tilt_control()->set_data(60.0f);
 
 	boost::shared_ptr<stream::PushForwarder<float> > gas_control   = boost::make_shared<stream::PushForwarder<float> >();
 	boost::shared_ptr<stream::PushForwarder<float> > yaw_control   = boost::make_shared<stream::PushForwarder<float> >();
@@ -261,8 +261,8 @@ int main(int argc, char** argv) {
 			fpsed_gyro->get_fps_stream(),
 			cockpit->position(),
 			cockpit->alt(),
+			sa_pilot.get_roll_control(),
 			sa_pilot.get_tilt_control(),
-			sa_pilot.get_pitch_control(),
 			gas_control,
 			yaw_control
 	);
