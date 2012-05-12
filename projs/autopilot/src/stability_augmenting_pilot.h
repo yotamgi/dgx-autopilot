@@ -44,15 +44,15 @@ public:
 	/**
 	 * Functions for getting the control on the plane
 	 */
-	boost::shared_ptr<stream::DataPushStream<float> > get_pitch_control();
 	boost::shared_ptr<stream::DataPushStream<float> > get_tilt_control();
+	boost::shared_ptr<stream::DataPushStream<float> > get_roll_control();
 
 private:
 
 	boost::shared_ptr<NormalPlainCockpit> m_cockpit;
 
-	boost::shared_ptr<stream::PushToPopConv<float> > m_pitch_strenth;
 	boost::shared_ptr<stream::PushToPopConv<float> > m_tilt_strenth;
+	boost::shared_ptr<stream::PushToPopConv<float> > m_roll_strenth;
 
 	boost::thread m_running_thread;
 
