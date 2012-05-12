@@ -82,7 +82,6 @@ void AsyncStreamConnection::run_importing() {
 		std::string recv_packet = m_recv_conn->read();
 		//std::cout << "Got " << recv_packet << std::endl;
 		parse_recv_packet(recv_packet);
-		usleep(m_wait_time);
 		m_quality_stream->got_sample();
 	}
 }
