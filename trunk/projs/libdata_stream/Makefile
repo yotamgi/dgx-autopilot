@@ -25,7 +25,7 @@ GTEST_OBJS = tests/integral_test.o \
 
 all: host device 
 host: $(LIBDIR)/libdata_stream.so gtest
-device: $(LIBDIR)/libdata_stream.so gtest
+device: $(LIBDIR)/libdata_stream.so
 clean:
 	rm -rf $(LIBDIR) $(DATA_STREAM_OBJS) $(GTEST_OBJS) gtest
 
