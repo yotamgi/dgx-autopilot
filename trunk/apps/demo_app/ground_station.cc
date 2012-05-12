@@ -11,6 +11,7 @@
 #include <boost/assign/list_of.hpp>
 #include <qt4/Qt/qwidget.h>
 #include <qt4/Qt/qboxlayout.h>
+#include <qt4/Qt/qgridlayout.h>
 
 #include <string>
 #include <iostream>
@@ -46,13 +47,13 @@ GroundStation::GroundStation(std::string plane_address):
 	boost::shared_ptr<float_recv_stream> gyro_fps = 				boost::make_shared<float_recv_stream>();
 	boost::shared_ptr<vec2_recv_stream> position = 					boost::make_shared<vec2_recv_stream>();
 	boost::shared_ptr<float_recv_stream> alt = 						boost::make_shared<float_recv_stream>();
-	boost::shared_ptr<float_send_stream> pitch_control = 			boost::make_shared<float_send_stream>();
+	boost::shared_ptr<float_send_stream> roll_control = 			boost::make_shared<float_send_stream>();
 	boost::shared_ptr<float_send_stream> tilt_control = 			boost::make_shared<float_send_stream>();
 	boost::shared_ptr<float_send_stream> gas_control = 				boost::make_shared<float_send_stream>();
 	boost::shared_ptr<float_send_stream> yaw_control = 				boost::make_shared<float_send_stream>();
 
 	stream::AsyncStreamConnection::send_streams_t send_streams = boost::assign::list_of
-		((send_stream_ptr)pitch_control		)
+		((send_stream_ptr)roll_control		)
 		((send_stream_ptr)tilt_control		)
 		((send_stream_ptr)gas_control		)
 		((send_stream_ptr)yaw_control		);
@@ -106,7 +107,7 @@ GroundStation::GroundStation(std::string plane_address):
 	gs::SizeStreamView *view_reliability = new gs::SizeStreamView(reliability, "Reliability", view_update_time, 0., 1.);
 
 	// the gyro_fps stream
-	gs::SizeStreamView *view_fps = new gs::SizeStreamView(gyro_fps, "FPS", 1., 0., 4000.);
+	gs::SizeStreamView *view_fps = new gs::SizeStreamView(gyro_fps, "FPS", 1., 0., 400.);
 
 	// the position
 	const QSize map_dimention(frame_size.width()/2, frame_size.height());
@@ -124,8 +125,8 @@ GroundStation::GroundStation(std::string plane_address):
 	gs::SizePushGen* gen_waypoints_alt = new gs::SizePushGen(m_wanted_alt, "WP Alt", 0, 200., 100.);
 
 	// the controllers
-	gs::SizePushGen* sa_pitch_control = new gs::SizePushGen(pitch_control, "SA Pitch", 0, 100., 50., gs::SizePushGen::HORIZONTAL_DIAGRAM);
 	gs::SizePushGen* sa_tilt_control  = new gs::SizePushGen(tilt_control, "SA Tilt", 0, 100., 50.);
+	gs::SizePushGen* sa_roll_control = new gs::SizePushGen(roll_control, "SA Roll", 0, 100., 50., gs::SizePushGen::HORIZONTAL_DIAGRAM);
 	gs::SizePushGen* sa_gas_control = new gs::SizePushGen(gas_control, "SA Gas", 0, 100., 50.);
 	gs::SizePushGen* sa_yaw_control  = new gs::SizePushGen(yaw_control, "SA Yaw", 0, 100., 50., gs::SizePushGen::HORIZONTAL_DIAGRAM);
 
@@ -139,30 +140,26 @@ GroundStation::GroundStation(std::string plane_address):
 	QWidget *main_widget = new QWidget;
 
 	// the pilot chooser
-	QVBoxLayout* pilot_chooser_layout = new QVBoxLayout;
-	pilot_chooser_layout->addWidget(wp_pilot_button);
-	pilot_chooser_layout->addWidget(sa_pilot_button);
+	QGridLayout* pilot_chooser_layout = new QGridLayout;
+	pilot_chooser_layout->addWidget(wp_pilot_button, 0, 0, 1, 2);
+	pilot_chooser_layout->addWidget(sa_pilot_button, 1, 0);
+	pilot_chooser_layout->addWidget(view_link_quality, 2, 0);
+	pilot_chooser_layout->addWidget(view_fps, 2, 1);
 	QGroupBox* pilot_chooser = new QGroupBox(tr("Pilot Chooser"));
 	pilot_chooser->setLayout(pilot_chooser_layout);
 
 	// the SA controllers
-	QVBoxLayout* sa_controls_layout = new QVBoxLayout;
-	QHBoxLayout* gas_pitch_control_layout = new QHBoxLayout;
-	gas_pitch_control_layout->addWidget(sa_tilt_control);
-	gas_pitch_control_layout->addWidget(sa_gas_control);
-	QWidget* gas_pitch_control = new QWidget;
-	gas_pitch_control->setLayout(gas_pitch_control_layout);
-	sa_controls_layout->addWidget(sa_pitch_control);
-	sa_controls_layout->addWidget(sa_yaw_control);
-	sa_controls_layout->addWidget(gas_pitch_control);
+	QGridLayout* sa_controls_layout = new QGridLayout;
+	sa_controls_layout->addWidget(sa_tilt_control, 0, 0, 2, 1);
+	sa_controls_layout->addWidget(sa_roll_control, 0, 1);
+	sa_controls_layout->addWidget(sa_yaw_control, 1, 1);
+	sa_controls_layout->addWidget(sa_gas_control, 0, 2, 2, 1);
 	QGroupBox* sa_controls = new QGroupBox(tr("SA Pilot Controls"));
 	sa_controls->setLayout(sa_controls_layout);
 
 	// left down
 	QWidget* left_down = new QWidget();
 	QHBoxLayout* left_down_layout = new QHBoxLayout();
-	left_down_layout->addWidget(view_link_quality);
-	left_down_layout->addWidget(view_fps);
 	left_down_layout->addWidget(view_alt);
 	left_down_layout->addWidget(pilot_chooser);
 	left_down_layout->addWidget(sa_controls);
