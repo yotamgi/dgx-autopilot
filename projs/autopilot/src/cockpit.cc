@@ -29,7 +29,7 @@ static lin_algebra::mat3f update_matrix(const lin_algebra::mat3f& m1,
 	return rot;
 }
 
-inline Cockpit::Cockpit(NormalPlainPlatform platform):
+Cockpit::Cockpit(NormalPlainPlatform platform):
 		m_platform(platform),
 		m_gps_pos(boost::make_shared<stream::PushToPopConv<lin_algebra::vec3f> >(lin_algebra::vec3f())),
 		m_gps_speed_dir(boost::make_shared<stream::PushToPopConv<float> >(0.)),
@@ -83,32 +83,32 @@ inline Cockpit::Cockpit(NormalPlainPlatform platform):
 	m_fixed_acc = fusion_filter->get_fixed_acc_stream();
 }
 
-inline boost::shared_ptr<vec3_stream> Cockpit::watch_gyro_orientation() {
+boost::shared_ptr<vec3_stream> Cockpit::watch_gyro_orientation() {
 	return m_gyro_orientation;
 }
-inline boost::shared_ptr<vec3_stream> Cockpit::watch_rest_orientation() {
+boost::shared_ptr<vec3_stream> Cockpit::watch_rest_orientation() {
 	return m_rest_orientation;
 }
 
-inline boost::shared_ptr<vec3_watch_stream> Cockpit::orientation() {
+boost::shared_ptr<vec3_watch_stream> Cockpit::orientation() {
 	return m_orientation;
 }
 
-inline boost::shared_ptr<float_stream> Cockpit::watch_rest_reliability() {
+boost::shared_ptr<float_stream> Cockpit::watch_rest_reliability() {
 	return m_rest_reliability;
 }
 
-inline boost::shared_ptr<vec3_stream> 	Cockpit::watch_fixed_acc() {
+boost::shared_ptr<vec3_stream> 	Cockpit::watch_fixed_acc() {
 	return m_fixed_acc;
 }
 
-inline boost::shared_ptr<float_watch_stream> Cockpit::ground_speed() {
+boost::shared_ptr<float_watch_stream> Cockpit::ground_speed() {
 	return boost::make_shared<float_watch_stream>(
 			(boost::shared_ptr<stream::DataPopStream<float> >)m_gps_speed_mag
 	);
 }
 
-inline boost::shared_ptr<vec2_watch_stream> Cockpit::position() {
+boost::shared_ptr<vec2_watch_stream> Cockpit::position() {
 	return boost::make_shared<vec2_watch_stream>(
 			stream::create_func_pop_filter<lin_algebra::vec3f,lin_algebra::vec2f> (
 					m_gps_pos,
@@ -117,7 +117,7 @@ inline boost::shared_ptr<vec2_watch_stream> Cockpit::position() {
 	);
 }
 
-inline boost::shared_ptr<float_watch_stream> Cockpit::alt() {
+boost::shared_ptr<float_watch_stream> Cockpit::alt() {
 	return boost::make_shared<float_watch_stream>(
 			stream::create_func_pop_filter<lin_algebra::vec3f,float>(
 				m_gps_pos,
@@ -126,19 +126,19 @@ inline boost::shared_ptr<float_watch_stream> Cockpit::alt() {
 	);
 }
 
-inline servo_stream_ptr Cockpit::tilt_servo() {
+servo_stream_ptr Cockpit::tilt_servo() {
 	return m_platform.tilt_servo;
 }
 
-inline servo_stream_ptr Cockpit::yaw_servo() {
+servo_stream_ptr Cockpit::yaw_servo() {
 	return m_platform.yaw_servo;
 }
 
-inline servo_stream_ptr Cockpit::pitch_servo(){
+servo_stream_ptr Cockpit::pitch_servo(){
 	return m_platform.pitch_servo;
 }
 
-inline servo_stream_ptr Cockpit::gas_servo() {
+servo_stream_ptr Cockpit::gas_servo() {
 	return m_platform.gas_servo;
 }
 
