@@ -15,12 +15,12 @@ static float lim(float a, float down, float up) {
 FusionFilter::FusionFilter(boost::shared_ptr<vec_stream_t> acc,
 						   boost::shared_ptr<vec_stream_t> compass,
 						   boost::shared_ptr<vec_stream_t> gyro,
-						   boost::shared_ptr<float_stream_t> speed):
+						   boost::shared_ptr<float_push_gen_t> speed):
 			m_state(lin_algebra::identity_matrix<lin_algebra::mat3f>(3, 3)),
 			m_acc(boost::make_shared<stream::filters::LowPassFilter<lin_algebra::vec3f> >(acc, ACC_LOW_PASS)),
 			m_compass(compass),
 			m_gyro(gyro),
-			m_speed(speed),
+			m_curr_speed(new stream::PushToPopConv<float>(0.)),
 			m_reliable_stream(new stream::PushToPopConv<float>(0.)),
 			m_rest_orientation(new stream::PushToPopConv<lin_algebra::vec3f>(lin_algebra::vec3f())),
 			m_fixed_acc(new stream::PushToPopConv<lin_algebra::vec3f>(lin_algebra::vec3f()))
@@ -29,42 +29,52 @@ FusionFilter::FusionFilter(boost::shared_ptr<vec_stream_t> acc,
 {
 	lin_algebra::vec3f expected_north = m_compass->get_data();
 	m_north_pitch_angle = std::asin(expected_north[1]/lin_algebra::vec_len(expected_north));
+	if (speed) {
+		speed->register_receiver(m_curr_speed);
+	}
 }
 
 FusionFilter::FusionFilter(boost::shared_ptr<vec_stream_t> acc,
 						   boost::shared_ptr<vec_stream_t> compass,
 						   boost::shared_ptr<vec_stream_t> gyro,
 						   lin_algebra::vec3f expected_north,
-						   boost::shared_ptr<float_stream_t> speed):
+						   boost::shared_ptr<float_push_gen_t> speed):
 		m_state(lin_algebra::identity_matrix<lin_algebra::mat3f>(3, 3)),
 		m_acc(boost::make_shared<stream::filters::LowPassFilter<lin_algebra::vec3f> >(acc, ACC_LOW_PASS)),
 		m_compass(compass),
 		m_gyro(gyro),
-		m_speed(speed),
+		m_curr_speed(new stream::PushToPopConv<float>(0.)),
 		m_reliable_stream(new stream::PushToPopConv<float>(0.)),
 		m_rest_orientation(new stream::PushToPopConv<lin_algebra::vec3f>(lin_algebra::vec3f())),
 		m_fixed_acc(new stream::PushToPopConv<lin_algebra::vec3f>(lin_algebra::vec3f()))
 
 {
 	m_north_pitch_angle = std::asin(expected_north[1]/lin_algebra::vec_len(expected_north)) * 180./lin_algebra::PI;
+	if (speed) {
+		speed->register_receiver(m_curr_speed);
+	}
 }
 
 FusionFilter::FusionFilter(boost::shared_ptr<vec_stream_t> acc,
 						   boost::shared_ptr<vec_stream_t> compass,
 						   boost::shared_ptr<vec_stream_t> gyro,
 						   float north_pitch_angle,
-						   boost::shared_ptr<float_stream_t> speed):
+						   boost::shared_ptr<float_push_gen_t> speed):
 		m_state(lin_algebra::identity_matrix<lin_algebra::mat3f>(3, 3)),
 		m_acc(boost::make_shared<stream::filters::LowPassFilter<lin_algebra::vec3f> >(acc, ACC_LOW_PASS)),
 		m_compass(compass),
 		m_gyro(gyro),
-		m_speed(speed),
+		m_curr_speed(new stream::PushToPopConv<float>(0.)),
 		m_north_pitch_angle(north_pitch_angle),
 		m_reliable_stream(new stream::PushToPopConv<float>(0.)),
 		m_rest_orientation(new stream::PushToPopConv<lin_algebra::vec3f>(lin_algebra::vec3f())),
 		m_fixed_acc(new stream::PushToPopConv<lin_algebra::vec3f>(lin_algebra::vec3f()))
 
-{}
+{
+	if (speed) {
+		speed->register_receiver(m_curr_speed);
+	}
+}
 
 lin_algebra::vec3f FusionFilter::get_data() {
 	lin_algebra::vec3f acc_data 	;
@@ -104,10 +114,10 @@ lin_algebra::vec3f FusionFilter::filter(lin_algebra::vec3f acc_data,
 		time_delta = 0.1f;
 	}
 
-	if (m_speed) {
+	if (m_curr_speed) {
 		// fix the acc with the gyro data:
-		acc_data[1] -= 0.05 * m_speed->get_data() * gyro_data[0] * lin_algebra::PI / 180.;
-		acc_data[0] += 0.05 * m_speed->get_data() * gyro_data[1] * lin_algebra::PI / 180.;
+		acc_data[1] -= 0.05 * m_curr_speed->get_data() * gyro_data[0] * lin_algebra::PI / 180.;
+		acc_data[0] += 0.05 * m_curr_speed->get_data() * gyro_data[1] * lin_algebra::PI / 180.;
 	}
 
 	// first, understand the orientation from the acc-compass

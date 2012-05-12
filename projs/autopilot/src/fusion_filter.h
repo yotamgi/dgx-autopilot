@@ -9,7 +9,7 @@
 #include <stream/util/time.h>
 
 typedef stream::DataPopStream<lin_algebra::vec3f> vec_stream_t;
-typedef stream::DataPopStream<float> float_stream_t;
+typedef stream::PushGenerator<float> float_push_gen_t;
 
 namespace autopilot {
 
@@ -19,21 +19,21 @@ public:
 			boost::shared_ptr<vec_stream_t> acc,
 			boost::shared_ptr<vec_stream_t> compass,
 			boost::shared_ptr<vec_stream_t> gyro,
-			boost::shared_ptr<float_stream_t> speed = boost::shared_ptr<float_stream_t>());
+			boost::shared_ptr<float_push_gen_t> speed = boost::shared_ptr<float_push_gen_t>());
 
 	FusionFilter(
 			boost::shared_ptr<vec_stream_t> acc,
 			boost::shared_ptr<vec_stream_t> compass,
 			boost::shared_ptr<vec_stream_t> gyro,
 			lin_algebra::vec3f expected_north,
-			boost::shared_ptr<float_stream_t> speed = boost::shared_ptr<float_stream_t>());
+			boost::shared_ptr<float_push_gen_t> speed = boost::shared_ptr<float_push_gen_t>());
 
 	FusionFilter(
 			boost::shared_ptr<vec_stream_t> acc,
 			boost::shared_ptr<vec_stream_t> compass,
 			boost::shared_ptr<vec_stream_t> gyro,
 			float north_pitch_angle,
-			boost::shared_ptr<float_stream_t> speed = boost::shared_ptr<float_stream_t>());
+			boost::shared_ptr<float_push_gen_t> speed = boost::shared_ptr<float_push_gen_t>());
 
 	virtual ~FusionFilter() {}
 
@@ -74,7 +74,7 @@ private:
 	boost::shared_ptr<vec_stream_t> m_acc;
 	boost::shared_ptr<vec_stream_t> m_compass;
 	boost::shared_ptr<vec_stream_t> m_gyro;
-	boost::shared_ptr<float_stream_t> m_speed;
+	boost::shared_ptr<stream::PushToPopConv<float> > m_curr_speed;
 
 	float m_north_pitch_angle;
 

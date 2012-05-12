@@ -63,7 +63,7 @@ private:
 
 	boost::shared_ptr<stream::PushToPopConv<lin_algebra::vec3f> > m_gps_pos;
 	boost::shared_ptr<stream::PushToPopConv<float> > m_gps_speed_dir;
-	boost::shared_ptr<stream::PushToPopConv<float> > m_gps_speed_mag;
+	boost::shared_ptr<stream::PushForwarder<float> > m_gps_speed_mag;
 
 };
 
