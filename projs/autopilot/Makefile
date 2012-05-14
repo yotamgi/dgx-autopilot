@@ -14,6 +14,7 @@ AUTOPILIT_OBJS =  $(SRCDIR)/platform/hw/i2c_interface.o	\
 		$(SRCDIR)/platform/hw/adxl345_acc.o				\
 		$(SRCDIR)/platform/hw/hmc5843_compass.o		 	\
 		$(SRCDIR)/platform/hw/maestro_servo_controller.o \
+		$(SRCDIR)/platform/hw/beagleboard_gpio.o \
 		$(SRCDIR)/platform/hw/gps.o \
 		$(SRCDIR)/platform/dgx1_platform.o \
 		$(SRCDIR)/platform/flapron_controller.o \
