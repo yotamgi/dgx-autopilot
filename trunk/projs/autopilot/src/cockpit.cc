@@ -83,6 +83,8 @@ Cockpit::Cockpit(NormalPlainPlatform platform):
 	m_fixed_acc = fusion_filter->get_fixed_acc_stream();
 }
 
+Cockpit::~Cockpit() {}
+
 boost::shared_ptr<vec3_stream> Cockpit::watch_gyro_orientation() {
 	return m_gyro_orientation;
 }
@@ -125,6 +127,10 @@ boost::shared_ptr<float_watch_stream> Cockpit::alt() {
 				lin_algebra::get<2>
 		)
 	);
+}
+
+void Cockpit::alive() {
+	m_platform.alive();
 }
 
 servo_stream_ptr Cockpit::tilt_servo() {

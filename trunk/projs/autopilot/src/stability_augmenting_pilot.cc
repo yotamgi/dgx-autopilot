@@ -29,6 +29,8 @@ void StabilityAugmentingPilot::update() {
 	float wanted_roll = m_params.max_pitch_angle * (m_roll_strenth->get_data()-50.0f)/50.0f;
 	float roll_delta = wanted_roll - plain_roll;
 	m_cockpit->pitch_servo()->set_data(50. - 50.*roll_delta/m_params.max_pitch_angle);
+
+	m_cockpit->alive();
 }
 
 void StabilityAugmentingPilot::start(bool open_thread) {

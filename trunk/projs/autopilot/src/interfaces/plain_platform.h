@@ -5,6 +5,7 @@
 #include <stream/data_push_stream.h>
 #include <stream/filters/watch_filter.h>
 #include <boost/shared_ptr.hpp>
+#include <boost/function.hpp>
 #include <stream/util/lin_algebra.h>
 
 namespace autopilot {
@@ -38,6 +39,8 @@ struct NormalPlainPlatform {
 	boost::shared_ptr<float_push_stream> yaw_servo;
 	boost::shared_ptr<float_push_stream> pitch_servo;
 	boost::shared_ptr<float_push_stream> gas_servo;
+
+	boost::function<void(void)> alive;
 };
 
 } //namespace autopilot

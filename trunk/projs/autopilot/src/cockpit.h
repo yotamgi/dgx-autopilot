@@ -20,7 +20,7 @@ class Cockpit : public NormalPlainCockpit {
 public:
 
 	Cockpit(NormalPlainPlatform platform);
-	virtual ~Cockpit() {}
+	virtual ~Cockpit();
 
 
 	/* NormalPlainCockpit Implementation */
@@ -41,6 +41,7 @@ public:
 
 	servo_stream_ptr gas_servo();
 
+	void alive();
 
 	/* Extending function */
 
@@ -51,6 +52,7 @@ public:
 	boost::shared_ptr<float_stream> 	watch_rest_reliability();
 
 	boost::shared_ptr<vec3_stream> 		watch_fixed_acc();
+
 
 private:
 	NormalPlainPlatform m_platform;
