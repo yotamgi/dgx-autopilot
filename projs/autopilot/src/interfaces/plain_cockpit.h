@@ -44,6 +44,8 @@ public:
 
 	virtual servo_stream_ptr gas_servo() = 0;
 
+	virtual void alive() = 0;
+
 };
 
 } // namepsace autopilot

@@ -34,6 +34,8 @@ boost::shared_ptr<autopilot::NormalPlainPlatform> create_simulator_platform(
 	return platform;
 }
 
+void nada() {}
+
 
 void thread(PlainParams plain_params, boost::shared_ptr<autopilot::NormalPlainPlatform> platform) {
 
@@ -83,6 +85,7 @@ void thread(PlainParams plain_params, boost::shared_ptr<autopilot::NormalPlainPl
 	platform->yaw_servo = plain->get_rudder_servo();
 	platform->tilt_servo = plain->get_elevator_servo();
 	platform->pitch_servo = plain->get_ailron_servo();
+	platform->alive = nada;
 	gps_sensor->set_pos_listener(gps_pos);
 	gps_sensor->set_speed_dir_listener(gps_speed_dir);
 	gps_sensor->set_speed_mag_listener(gps_speed_mag);

@@ -3,6 +3,7 @@
 #include "hw/itg3200_gyro.h"
 #include "hw/hmc5843_compass.h"
 #include "hw/maestro_servo_controller.h"
+#include "hw/beagleboard_gpio.h"
 #include "flapron_controller.h"
 #include <stream/stream_connection.h>
 #include <stream/stream_utils.h>
@@ -13,6 +14,21 @@ typedef stream::PushForwarder<lin_algebra::vec3f> vec3_push_forwarder;
 typedef stream::PushForwarder<float> float_push_forwarder;
 
 namespace autopilot {
+
+class AliveGpioInformer {
+public:
+	AliveGpioInformer(int port):m_pin(port) {}
+
+	/**
+	 * Shake that pin
+	 */
+	void operator()() {
+		m_pin = !(bool)m_pin;
+	}
+
+private:
+	GpioPin m_pin;
+};
 
 NormalPlainPlatform create_dgx1_platform() {
 	NormalPlainPlatform dgx1_platform;
@@ -32,6 +48,9 @@ NormalPlainPlatform create_dgx1_platform() {
 	dgx1_platform.gps_pos_generator = pos_forwarder;
 	dgx1_platform.gps_speed_mag_generator = speed_mag_forwarder;
 	dgx1_platform.gps_speed_dir_generator = speed_dir_forwarder;
+
+	// the alive
+	dgx1_platform.alive = AliveGpioInformer(150);
 
 	// fill the platform's servos
 	static MaestroServoController maestro("/dev/ttyACM0");

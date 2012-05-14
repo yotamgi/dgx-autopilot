@@ -31,6 +31,8 @@ void export_platform(boost::shared_ptr<NormalPlainPlatform> platform,
 	while (true) usleep(10000000);
 }
 
+void nada() {}
+
 boost::shared_ptr<NormalPlainPlatform> import_platform(boost::shared_ptr<stream::ConnectionFactory> conn_factory) {
 
 	typedef stream::PushForwarder<lin_algebra::vec3f> vec3_push_forwarder;
@@ -61,6 +63,8 @@ boost::shared_ptr<NormalPlainPlatform> import_platform(boost::shared_ptr<stream:
 	platform->gps_pos_generator = pos_forwarder;
 	platform->gps_speed_dir_generator = speed_dir_forwarder;
 	platform->gps_speed_mag_generator = speed_mag_forwarder;
+
+	platform->alive = nada;
 
 	return platform;
 }
