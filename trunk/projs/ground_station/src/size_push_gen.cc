@@ -31,7 +31,7 @@ SizePushGen::SizePushGen(boost::shared_ptr<SizePushGen::size_stream> size_stream
 
 	// configure the bar
 	m_slider->setRange(0, 100);
-	m_slider->setValue(m_min + start_from*m_coeffecient);
+	m_slider->setValue((start_from - m_min)*m_coeffecient);
 	m_slider->setTracking(true);
 	m_slider->setTickPosition(QSlider::TicksLeft);
 
