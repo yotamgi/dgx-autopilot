@@ -226,7 +226,7 @@ int main(int argc, char** argv) {
 	// configure the wp pilot
 	autopilot::WaypointPilot::Params wp_pilot_params;
 	wp_pilot_params.max_tilt_angle = 15.;
-	wp_pilot_params.max_pitch_angle = 15.;
+	wp_pilot_params.max_pitch_angle = 40.;
 	wp_pilot_params.max_climbing_strength = 100.0f;
 	wp_pilot_params.climbing_gas = 100.;
 	wp_pilot_params.max_decending_strength = 25.0f;
@@ -240,8 +240,8 @@ int main(int argc, char** argv) {
 
 	// configure the sa pilot
 	autopilot::StabilityAugmentingPilot::Params sa_pilot_params;
-	sa_pilot_params.max_pitch_angle = 15.;
-	sa_pilot_params.max_tilt_angle = 20.;
+	sa_pilot_params.max_tilt_angle = 15.;
+	sa_pilot_params.max_pitch_angle = 40.;
 
 	// create the sa pilot
 	autopilot::StabilityAugmentingPilot sa_pilot(sa_pilot_params, cockpit);
