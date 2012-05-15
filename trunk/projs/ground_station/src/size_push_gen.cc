@@ -66,7 +66,7 @@ void SizePushGen::value_changed(int value) {
 
 void SizePushGen::input_value_changed() {
 	float value = m_input->value();
-	m_slider->setValue(m_min + value*m_coeffecient); // which emits the value changed signal
+	m_slider->setValue((value - m_min)*m_coeffecient); // which emits the value changed signal
 }
 
 float SizePushGen::get_value() {
@@ -74,7 +74,7 @@ float SizePushGen::get_value() {
 }
 
 void SizePushGen::set_value(float value){
-	m_slider->setValue(m_min + value*m_coeffecient); // which emits the value changed signal
+	m_slider->setValue((value - m_min)*m_coeffecient); // which emits the value changed signal
 }
 
 } // namespace gs
