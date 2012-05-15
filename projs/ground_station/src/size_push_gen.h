@@ -25,6 +25,9 @@ public:
 	   	   	   	   float start_from,
 	   	   	   	   Style style = VERTICAL_DIAGRAM);
 
+	float get_value();
+	void set_value(float value);
+
 public slots:
 
 	void value_changed(int value);

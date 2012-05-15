@@ -9,7 +9,6 @@
 #include <boost/make_shared.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/assign/list_of.hpp>
-#include <qt4/Qt/qwidget.h>
 #include <qt4/Qt/qboxlayout.h>
 #include <qt4/Qt/qgridlayout.h>
 
@@ -19,6 +18,47 @@
 #include <fstream>
 
 int stam;
+
+GroundStation::KeyboardGetterWidget::KeyboardGetterWidget(
+				 gs::SizePushGen* pitch,
+				 gs::SizePushGen* roll):
+		m_pitch(pitch),
+		m_roll(roll)
+{
+	m_last_pitch = m_pitch->get_value();
+	m_last_roll = m_roll->get_value();
+}
+
+
+void GroundStation::KeyboardGetterWidget::keyPressEvent(QKeyEvent *k) {
+	switch (k->key()) {
+		case Qt::Key_Down:
+			m_last_pitch = m_pitch->get_value();
+			m_pitch->set_value(100.);
+			break;
+		case Qt::Key_Up:
+			m_last_pitch = m_pitch->get_value();
+			m_pitch->set_value(0.);
+			break;
+		case Qt::Key_Right:
+			m_last_roll = m_roll->get_value();
+			m_roll->set_value(100.);
+			break;
+		case Qt::Key_Left:
+			m_last_roll = m_roll->get_value();
+			m_roll->set_value(0.);
+			break;
+	}
+}
+
+void GroundStation::KeyboardGetterWidget::keyReleaseEvent(QKeyEvent *k) {
+	switch (k->key()) {
+		case Qt::Key_Down: 		m_pitch->set_value(m_last_pitch); 	break;
+		case Qt::Key_Up: 		m_pitch->set_value(m_last_pitch); 	break;
+		case Qt::Key_Left: 		m_roll->set_value(m_last_roll);		break;
+		case Qt::Key_Right: 	m_roll->set_value(m_last_roll);		break;
+	}
+}
 
 GroundStation::GroundStation(std::string plane_address):
 			m_wanted_alt(boost::make_shared<stream::PushToPopConv<float> >(0.)),
@@ -134,6 +174,8 @@ GroundStation::GroundStation(std::string plane_address):
 	QRadioButton *wp_pilot_button = new QRadioButton("&Waypoint Pilot");
 	QRadioButton *sa_pilot_button = new QRadioButton("&SA Pilot");
 
+	m_keyboard_grabber = new KeyboardGetterWidget(sa_tilt_control, sa_roll_control);
+
 	//
 	// create the window itself and organize it
 	//
@@ -184,6 +226,7 @@ GroundStation::GroundStation(std::string plane_address):
 	QHBoxLayout* main_layout = new QHBoxLayout();
 	main_layout->addWidget(left);
 	main_layout->addWidget(map_view);
+	main_layout->addWidget(m_keyboard_grabber);
 
 	main_widget->setLayout(main_layout);
 	wnd->setCentralWidget(main_widget);
@@ -224,6 +267,8 @@ void GroundStation::to_waypoint_pilot(bool activate) {
 		std::cout << "GS: Waypoint pilot activated!" << std::endl;
 		boost::shared_ptr<stream::Connection> conn = m_control_connection.get_connection();
 		conn->write(commands::SWITCH_TO_WAYPOINT_PILOT);
+
+		m_keyboard_grabber->releaseKeyboard();
 	}
 }
 
@@ -232,5 +277,7 @@ void GroundStation::to_sa_pilot(bool activate) {
 		std::cout << "GS: SA pilot activated!" << std::endl;
 		boost::shared_ptr<stream::Connection> conn = m_control_connection.get_connection();
 		conn->write(commands::SWITCH_TO_SA_PILOT);
+
+		m_keyboard_grabber->grabKeyboard();
 	}
 }
