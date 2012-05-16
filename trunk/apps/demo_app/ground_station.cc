@@ -34,19 +34,19 @@ void GroundStation::KeyboardGetterWidget::keyPressEvent(QKeyEvent *k) {
 	switch (k->key()) {
 		case Qt::Key_Down:
 			m_last_pitch = m_pitch->get_value();
-			m_pitch->set_value(100.);
+			m_pitch->set_value(-15.);
 			break;
 		case Qt::Key_Up:
 			m_last_pitch = m_pitch->get_value();
-			m_pitch->set_value(0.);
+			m_pitch->set_value(15.);
 			break;
 		case Qt::Key_Right:
 			m_last_roll = m_roll->get_value();
-			m_roll->set_value(100.);
+			m_roll->set_value(40.);
 			break;
 		case Qt::Key_Left:
 			m_last_roll = m_roll->get_value();
-			m_roll->set_value(0.);
+			m_roll->set_value(-40.);
 			break;
 	}
 }
@@ -165,8 +165,8 @@ GroundStation::GroundStation(std::string plane_address):
 	gs::SizePushGen* gen_waypoints_alt = new gs::SizePushGen(m_wanted_alt, "WP Alt", 0, 200., 100.);
 
 	// the controllers
-	gs::SizePushGen* sa_tilt_control  = new gs::SizePushGen(tilt_control, "SA Tilt", 0, 100., 50.);
-	gs::SizePushGen* sa_roll_control = new gs::SizePushGen(roll_control, "SA Roll", 0, 100., 50., gs::SizePushGen::HORIZONTAL_DIAGRAM);
+	gs::SizePushGen* sa_tilt_control  = new gs::SizePushGen(tilt_control, "SA Tilt", -15., 15., 0.);
+	gs::SizePushGen* sa_roll_control = new gs::SizePushGen(roll_control, "SA Roll", -40, 40., 0., gs::SizePushGen::HORIZONTAL_DIAGRAM);
 	gs::SizePushGen* sa_gas_control = new gs::SizePushGen(gas_control, "SA Gas", 0, 100., 50.);
 	gs::SizePushGen* sa_yaw_control  = new gs::SizePushGen(yaw_control, "SA Yaw", 0, 100., 50., gs::SizePushGen::HORIZONTAL_DIAGRAM);
 
