@@ -11,7 +11,7 @@ WaypointPilot::waypoint::waypoint(lin_algebra::vec2f target_, float altitude_):
 
 WaypointPilot::WaypointPilot(const Params& params, boost::shared_ptr<NormalPlainCockpit> cockpit):
 		m_cockpit(cockpit),
-		m_sas_pilot(params, cockpit),
+		m_sas_pilot(cockpit, params.pitch_severity, params.roll_severity),
 		m_waiting_path(false),
 		m_running(false),
 		m_params(params)
@@ -44,19 +44,19 @@ void WaypointPilot::maintain_alt(float wanted_altitude){
 	// max climbing
 	if (delta_alt > 5) {
 		gas_servo->set_data(m_params.climbing_gas);
-		m_sas_pilot.get_tilt_control()->set_data(m_params.max_climbing_strength);
+		m_sas_pilot.get_tilt_control()->set_data(m_params.max_climbing_angle);
 	}
 
 	// max decending
 	else if (delta_alt < -5) {
 		gas_servo->set_data(m_params.decending_gas);
-		m_sas_pilot.get_tilt_control()->set_data(m_params.max_decending_strength);
+		m_sas_pilot.get_tilt_control()->set_data(m_params.max_decending_angle);
 	}
 
 	// avg flight
 	else {
 		gas_servo->set_data(m_params.avg_gas);
-		m_sas_pilot.get_tilt_control()->set_data(m_params.avg_pitch_strength);
+		m_sas_pilot.get_tilt_control()->set_data(m_params.avg_pitch_angle);
 	}
 }
 
@@ -75,11 +75,11 @@ void WaypointPilot::maintain_heading(float heading){
 		delta_heading = 360 + delta_heading;
 
 	if (delta_heading > 10.0f)
-		m_sas_pilot.get_roll_control()->set_data(0.0f);
+		m_sas_pilot.get_roll_control()->set_data(-m_params.max_roll_angle);
 	else if (delta_heading < -10.0f)
-		m_sas_pilot.get_roll_control()->set_data(100.0f);
+		m_sas_pilot.get_roll_control()->set_data(m_params.max_roll_angle);
 	else
-		m_sas_pilot.get_roll_control()->set_data(50.0f - 25.0f*delta_heading/10.0f);
+		m_sas_pilot.get_roll_control()->set_data(-m_params.max_roll_angle*delta_heading/20.0f);
 
 }
 

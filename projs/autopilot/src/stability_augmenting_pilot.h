@@ -17,12 +17,9 @@ namespace autopilot {
 class StabilityAugmentingPilot {
 public:
 
-	struct Params {
-		float max_pitch_angle;
-		float max_tilt_angle;
-	};
-
-	StabilityAugmentingPilot(const Params& params, boost::shared_ptr<NormalPlainCockpit> cockpit);
+	StabilityAugmentingPilot(boost::shared_ptr<NormalPlainCockpit> cockpit,
+			float pitch_strength,
+			float roll_strength);
 
 	/**
 	 * Updates one "frame"
@@ -51,12 +48,13 @@ private:
 
 	boost::shared_ptr<NormalPlainCockpit> m_cockpit;
 
-	boost::shared_ptr<stream::PushToPopConv<float> > m_tilt_strenth;
-	boost::shared_ptr<stream::PushToPopConv<float> > m_roll_strenth;
+	boost::shared_ptr<stream::PushToPopConv<float> > m_tilt_angle;
+	boost::shared_ptr<stream::PushToPopConv<float> > m_roll_angle;
 
 	boost::thread m_running_thread;
 
-	const Params m_params;
+	float m_pitch_strength;
+	float m_roll_strength;
 
 	volatile bool m_running;
 };

@@ -13,16 +13,21 @@ namespace autopilot {
 class WaypointPilot {
 public:
 
-	struct Params : public StabilityAugmentingPilot::Params {
+	struct Params {
 
-		float max_climbing_strength;
+		float max_climbing_angle;
 		float climbing_gas;
 
-		float max_decending_strength;
+		float max_decending_angle;
 		float decending_gas;
 
+		float max_roll_angle;
+
+		float pitch_severity;
+		float roll_severity;
+
 		float avg_gas;
-		float avg_pitch_strength;
+		float avg_pitch_angle;
 	};
 
 	WaypointPilot(const Params& params, boost::shared_ptr<NormalPlainCockpit> cockpit);

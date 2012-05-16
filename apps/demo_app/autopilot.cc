@@ -225,26 +225,22 @@ int main(int argc, char** argv) {
 
 	// configure the wp pilot
 	autopilot::WaypointPilot::Params wp_pilot_params;
-	wp_pilot_params.max_tilt_angle = 15.;
-	wp_pilot_params.max_pitch_angle = 40.;
-	wp_pilot_params.max_climbing_strength = 100.0f;
+	wp_pilot_params.max_climbing_angle = 15.;
+	wp_pilot_params.max_decending_angle = -10.;
 	wp_pilot_params.climbing_gas = 100.;
-	wp_pilot_params.max_decending_strength = 25.0f;
 	wp_pilot_params.decending_gas = 20.;
 	wp_pilot_params.avg_gas = 40;
-	wp_pilot_params.avg_pitch_strength = 50.;
+	wp_pilot_params.avg_pitch_angle = 0.;
+	wp_pilot_params.max_roll_angle = 40.;
+	wp_pilot_params.pitch_severity = 20.;
+	wp_pilot_params.roll_severity = 20.;
 
 	// create the wp pilot
 	autopilot::WaypointPilot wp_pilot(wp_pilot_params, cockpit);
 	wp_pilot.start(true);
 
-	// configure the sa pilot
-	autopilot::StabilityAugmentingPilot::Params sa_pilot_params;
-	sa_pilot_params.max_tilt_angle = 15.;
-	sa_pilot_params.max_pitch_angle = 40.;
-
 	// create the sa pilot
-	autopilot::StabilityAugmentingPilot sa_pilot(sa_pilot_params, cockpit);
+	autopilot::StabilityAugmentingPilot sa_pilot(cockpit, 20., 20.);
 	sa_pilot.get_tilt_control()->set_data(60.0f);
 
 	boost::shared_ptr<stream::PushForwarder<float> > gas_control   = boost::make_shared<stream::PushForwarder<float> >();
