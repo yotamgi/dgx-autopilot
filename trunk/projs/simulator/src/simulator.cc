@@ -9,7 +9,7 @@ namespace simulator {
 
 using namespace irr;
 
-Simulator::Simulator(PlainParams plain_params) {
+Simulator::Simulator(PlainParams plain_params, WindGen::Params wind_params) {
 
 	// create device
 	video::E_DRIVER_TYPE driverType=video::EDT_OPENGL;
@@ -24,8 +24,11 @@ Simulator::Simulator(PlainParams plain_params) {
 	video::IVideoDriver* driver = m_device->getVideoDriver();
 	scene::ISceneManager* smgr = m_device->getSceneManager();
 
+	// create the wind_gen
+	boost::shared_ptr<WindGen> wind_gen = boost::make_shared<WindGen>(wind_params);
+
 	// create the plain
-	m_plain = boost::make_shared<simulator::Plain>(m_device, core::vector3df(0.0f, 0.0f, 0.0f), plain_params);
+	m_plain = boost::make_shared<simulator::Plain>(m_device, core::vector3df(0.0f, 0.0f, 0.0f), wind_gen, plain_params);
 
 	// create the camera
 	m_camera = boost::make_shared<Camera>(m_device, m_plain, irr::core::vector3df(4.0, 4.0, -4.0), 2.0);

@@ -4,6 +4,7 @@
 #include <autopilot/interfaces/plain_platform.h>
 #include <boost/shared_ptr.hpp>
 #include "plain.h"
+#include "wind_gen.h"
 
 namespace simulator {
 
@@ -12,7 +13,8 @@ namespace simulator {
  * PlainPlatform struct with all the needed sensors.
  */
 boost::shared_ptr<autopilot::NormalPlainPlatform> create_simulator_platform(
-		PlainParams plain_params
+		PlainParams plain_params,
+		WindGen::Params wind_params
 );
 
 } // namespace simulator

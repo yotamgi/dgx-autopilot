@@ -8,6 +8,7 @@
 #include <stream/stream_utils.h>
 #include <stream/util/lin_algebra.h>
 #include "flying_object.h"
+#include "wind_gen.h"
 
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
@@ -88,6 +89,7 @@ class Plain : public FlyingObject, private boost::noncopyable {
 public:
 	Plain(irr::IrrlichtDevice* device,
 			irr::core::vector3df start_pos,
+			boost::shared_ptr<WindGen> wind_gen,
 			const PlainParams plane_params);
 
 	~Plain();
@@ -153,6 +155,8 @@ private:
 	volatile bool m_data_ready;
 
 	std::vector<boost::shared_ptr<Carriable> > m_stuff;
+
+	boost::shared_ptr<WindGen> m_wind_gen;
 };
 
 }  // namespace simulator

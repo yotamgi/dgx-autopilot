@@ -33,9 +33,23 @@ void export_import(boost::shared_ptr<autopilot::NormalPlainPlatform> platform)
 	}
 }
 
-int main()
+int main(int argc, char** argv)
 {
-	boost::shared_ptr<autopilot::NormalPlainPlatform> platform = simulator::create_simulator_platform(simulator::platforms::dgx_platform);
+	simulator::WindGen::Params wind_params;
+	wind_params.const_wind = lin_algebra::create_vec3f(0., 0, 0);
+	wind_params.long_disturbance_strength = 0.0;
+	wind_params.little_disturbance_strength = 0.0;
+
+	if (argc == 2) {
+		if (argv[1] == std::string("--wind")) {
+			wind_params.const_wind = lin_algebra::create_vec3f(2., 0, 0);
+			wind_params.long_disturbance_strength = 0.5;
+			wind_params.little_disturbance_strength = 0.1;
+		}
+	}
+
+	boost::shared_ptr<autopilot::NormalPlainPlatform> platform =
+			simulator::create_simulator_platform(simulator::platforms::dgx_platform, wind_params);
 	export_import(platform);
 
 	return 0;

@@ -13,16 +13,16 @@
 
 namespace simulator {
 
-void thread(PlainParams plain_params, boost::shared_ptr<autopilot::NormalPlainPlatform> platform);
+void thread(PlainParams plain_params, WindGen::Params wind_params, boost::shared_ptr<autopilot::NormalPlainPlatform> platform);
 
 boost::shared_ptr<autopilot::NormalPlainPlatform> create_simulator_platform(
-		PlainParams plain_params
-)
+		PlainParams plain_params,
+		WindGen::Params wind_params)
 {
 	boost::shared_ptr<autopilot::NormalPlainPlatform> platform =
 			boost::make_shared<autopilot::NormalPlainPlatform>();
 
-	new boost::thread(thread, plain_params, platform);
+	new boost::thread(thread, plain_params, wind_params, platform);
 
 	// wait until it is ready
 	while (!platform->tilt_servo);
@@ -37,9 +37,9 @@ boost::shared_ptr<autopilot::NormalPlainPlatform> create_simulator_platform(
 void nada() {}
 
 
-void thread(PlainParams plain_params, boost::shared_ptr<autopilot::NormalPlainPlatform> platform) {
+void thread(PlainParams plain_params, WindGen::Params wind_params, boost::shared_ptr<autopilot::NormalPlainPlatform> platform) {
 
-	Simulator sim(plain_params);
+	Simulator sim(plain_params, wind_params);
 
 	boost::shared_ptr<Plain> plain = sim.get_plane();
 
