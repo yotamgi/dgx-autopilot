@@ -6,6 +6,9 @@ namespace simulator {
 
 typedef irr::core::vector3df irrvec3f;
 
+static irrvec3f to_irr_vec(const lin_algebra::vec3f& vec) {
+	return irrvec3f(vec[0], vec[1], vec[2]);
+}
 
 PlainParams::PlainParams(const std::string& mesh_file,
 		const std::string& texture_file,
@@ -39,6 +42,7 @@ PlainParams::PlainParams(const std::string& mesh_file,
 
 Plain::Plain(irr::IrrlichtDevice* device,
 		irrvec3f start_pos,
+		boost::shared_ptr<WindGen> wind_gen,
 		const PlainParams plane_params):
 		FlyingObject(device),
 		m_ailron_servo(new Servo(130.0, 50.)),
@@ -49,7 +53,8 @@ Plain::Plain(irr::IrrlichtDevice* device,
 		m_acceleration(irrvec3f(0.0f, 0.0f, 0.0f)),
 		m_params(plane_params),
 		m_print_timer(0.),
-		m_data_ready(false)
+		m_data_ready(false),
+		m_wind_gen(wind_gen)
 {
 	irr::scene::ISceneManager* smgr = m_device->getSceneManager();
 
@@ -70,11 +75,13 @@ Plain::Plain(irr::IrrlichtDevice* device,
 
 irrvec3f Plain::calc_angle_vel(float time_delta) {
 
+	irrvec3f airspeed = m_velocity - to_irr_vec(m_wind_gen->get_wind());
+
 	float pitch_data = m_elevator_servo->get_data(time_delta);
 	float tilt_data  = m_ailron_servo->get_data(time_delta);
 	float yaw_data = m_rudder_servo->get_data(time_delta);
 
-	float vel_len = m_velocity.getLength();
+	float vel_len = airspeed.getLength();
 	irrvec3f servo_data(
 				 ((pitch_data - 50.)/50.)*m_params.get_elevator_intensity(),
 				-((yaw_data   - 50.)/50.)*m_params.get_rudder_intensity(),
@@ -85,7 +92,7 @@ irrvec3f Plain::calc_angle_vel(float time_delta) {
 	// calc the plane's side slide
 	irr::core::matrix4 inverse_trans;
 	m_transformation.getInverse(inverse_trans);
-	irrvec3f velocity_plane = m_velocity;
+	irrvec3f velocity_plane = airspeed;
 	inverse_trans.rotateVect(velocity_plane);
 	velocity_plane.normalize();
 	velocity_plane *= vel_len;
@@ -107,14 +114,15 @@ irrvec3f Plain::calc_plane_acceleration(float time_delta) {
 	const float MIN_LIFT_ATTACK_ANGLE = irr::core::degToRad(m_params.get_wings_lift());
 
 	// calculate some useful params
+	irrvec3f airspeed = m_velocity - to_irr_vec(m_wind_gen->get_wind());
 	irrvec3f plane_heading = irrvec3f(0., 0., 1.);
 	m_transformation.rotateVect(plane_heading);
 	plane_heading.normalize();
 	irrvec3f plane_up = irrvec3f(0., 1., 0.);
 	m_transformation.rotateVect(plane_up);
 	plane_up.normalize();
-	const float vel_length = m_velocity.getLength();
-	irrvec3f vel_dir = m_velocity;
+	const float vel_length = airspeed.getLength();
+	irrvec3f vel_dir = airspeed;
 	vel_dir.normalize();
 
 	// calculate the attack angle

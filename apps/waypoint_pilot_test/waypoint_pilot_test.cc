@@ -92,7 +92,11 @@ int main(int argc, char** argv) {
 	if (platform_type == "hw") {
 	    platform = autopilot::create_dgx1_platform();
 	} else if (platform_type == "sim") {
-	    platform = *simulator::create_simulator_platform(simulator::platforms::dgx_platform);
+		simulator::WindGen::Params wind_params;
+		wind_params.const_wind = lin_algebra::create_vec3f(2., 0, 0);
+		wind_params.long_disturbance_strength = 0.4;
+		wind_params.little_disturbance_strength = 0.1;
+	    platform = *simulator::create_simulator_platform(simulator::platforms::dgx_platform, wind_params);
 	} else {
 	    platform = *autopilot::import_platform(boost::make_shared<stream::TcpipServer>(platform_type , 0x6060));
 	}

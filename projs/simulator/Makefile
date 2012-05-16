@@ -40,6 +40,10 @@ $(OBJDIR)/plain.o: $(SRCDIR)/plain.cc
 $(OBJDIR)/camera.o: $(SRCDIR)/camera.cc
 	$(CXX) -c $(SRCDIR)/camera.cc $(CXXFLAGS) -o $(OBJDIR)/camera.o
 	
+$(OBJDIR)/wind_gen.o: $(SRCDIR)/wind_gen.cc
+	$(CXX) -c $(SRCDIR)/wind_gen.cc $(CXXFLAGS) -o $(OBJDIR)/wind_gen.o
+	
+	
 $(OBJDIR)/simulator_platform.o: $(SRCDIR)/simulator_platform.cc
 	$(CXX) -c $(SRCDIR)/simulator_platform.cc $(CXXFLAGS) -o $(OBJDIR)/simulator_platform.o
 
@@ -64,8 +68,8 @@ $(OBJDIR)/simulator_gps.o: $(SRCDIR)/sensors/simulator_gps.cc
 $(OBJDIR)/simulator_altmeter.o: $(SRCDIR)/sensors/simulator_altmeter.cc
 	$(CXX) -c $(SRCDIR)/sensors/simulator_altmeter.cc $(CXXFLAGS) -o $(OBJDIR)/simulator_altmeter.o		
 
-$(LIBDIR)/libdgx_simulator.so: $(LIBDIR) $(OBJDIR)/plain.o $(OBJDIR)/camera.o $(OBJDIR)/simulator_platform.o $(OBJDIR)/simulator.o $(OBJDIR)/platforms.o  $(OBJDIR)/simulator_gyro.o $(OBJDIR)/simulator_accelerometer.o $(OBJDIR)/simulator_magnetometer.o $(OBJDIR)/simulator_gps.o $(OBJDIR)/simulator_altmeter.o 
-	$(CXX) -shared -fPIC $(OBJDIR)/plain.o $(OBJDIR)/camera.o $(OBJDIR)/simulator_platform.o  $(OBJDIR)/simulator.o $(OBJDIR)/platforms.o $(OBJDIR)/simulator_gyro.o $(OBJDIR)/simulator_accelerometer.o $(OBJDIR)/simulator_magnetometer.o $(OBJDIR)/simulator_gps.o $(OBJDIR)/simulator_altmeter.o $(LDFLAGS) -o $(LIBDIR)/libdgx_simulator.so
+$(LIBDIR)/libdgx_simulator.so: $(LIBDIR) $(OBJDIR)/plain.o $(OBJDIR)/camera.o $(OBJDIR)/wind_gen.o $(OBJDIR)/simulator_platform.o $(OBJDIR)/simulator.o $(OBJDIR)/platforms.o  $(OBJDIR)/simulator_gyro.o $(OBJDIR)/simulator_accelerometer.o $(OBJDIR)/simulator_magnetometer.o $(OBJDIR)/simulator_gps.o $(OBJDIR)/simulator_altmeter.o 
+	$(CXX) -shared -fPIC $(OBJDIR)/plain.o $(OBJDIR)/camera.o $(OBJDIR)/wind_gen.o $(OBJDIR)/simulator_platform.o  $(OBJDIR)/simulator.o $(OBJDIR)/platforms.o $(OBJDIR)/simulator_gyro.o $(OBJDIR)/simulator_accelerometer.o $(OBJDIR)/simulator_magnetometer.o $(OBJDIR)/simulator_gps.o $(OBJDIR)/simulator_altmeter.o $(LDFLAGS) -o $(LIBDIR)/libdgx_simulator.so
 
 sim: $(OBJDIR)/main.o $(LIBDIR)/libdgx_simulator.so
 	$(CXX) $(OBJDIR)/main.o -L$(LIBDIR) $(LDFLAGS),$(LIBDIR)/libdgx_simulator.so -ldgx_simulator -o sim 

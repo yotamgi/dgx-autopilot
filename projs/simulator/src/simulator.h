@@ -2,6 +2,7 @@
 #define SIMULATOR_H_
 
 #include "plain.h"
+#include "wind_gen.h"
 #include "camera.h"
 
 #include <irrlicht/irrlicht.h>
@@ -14,7 +15,7 @@ namespace simulator {
 
 class Simulator {
 public:
-	Simulator(PlainParams plain_params);
+	Simulator(PlainParams plain_params, WindGen::Params wind_params);
 	~Simulator();
 
 	boost::shared_ptr<simulator::Plain> get_plane() { return m_plain; }
