@@ -35,6 +35,8 @@ public slots:
 
 	void clicked(const QgsPoint &, Qt::MouseButton);
 
+	void clear_track();
+
 signals:
 
 	void got_point(const QgsPoint& geo_waypoint, Qt::MouseButton button);
@@ -47,6 +49,7 @@ private:
 	QgsRubberBand* m_plane_track;
 	std::vector<QgsVertexMarker*> m_dots;
 	QgsMapToolEmitPoint* m_mouse_emit;
+	QPushButton* m_clear_button;
 
 	boost::shared_ptr<pos_stream> m_pos_stream;
 

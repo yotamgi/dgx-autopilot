@@ -41,8 +41,11 @@ MapStreamView::MapStreamView(boost::shared_ptr<pos_stream> pos_stream,
 	m_mouse_emit = new QgsMapToolEmitPoint(m_map_canvas);
 	m_map_canvas->setMapTool(m_mouse_emit);
 
+	m_clear_button = new QPushButton("&Clear Track");
+
 	QVBoxLayout* layout = new QVBoxLayout();
 	layout->addWidget(m_map_canvas);
+	layout->addWidget(m_clear_button);
 	setLayout(layout);
 
  	m_timer = new QTimer(this);
@@ -52,6 +55,9 @@ MapStreamView::MapStreamView(boost::shared_ptr<pos_stream> pos_stream,
 	m_mouse_emit->activate();
 	connect(m_mouse_emit, SIGNAL(canvasClicked(const QgsPoint &,Qt::MouseButton)),
 			this, SLOT(clicked(const QgsPoint &, Qt::MouseButton)));
+
+	connect(m_clear_button, SIGNAL(clicked()),
+			this, SLOT(clear_track()));
 }
 
 MapStreamView::~MapStreamView() {
@@ -59,6 +65,7 @@ MapStreamView::~MapStreamView() {
 	delete m_plane_track;
 	delete m_timer;
 	delete m_mouse_emit;
+	delete m_clear_button;
 	for (size_t i=0; i<m_dots.size(); i++) {
 		delete m_dots[i];
 	}
@@ -74,6 +81,10 @@ void MapStreamView::clicked(const QgsPoint & p, Qt::MouseButton button) {
 	dot->setCenter(p);
 	m_map_canvas->scene()->addItem(dot);
 	m_dots.push_back(dot);
+}
+
+void MapStreamView::clear_track() {
+	m_plane_track->reset();
 }
 
 void MapStreamView::load_map(fs::path dir) {
