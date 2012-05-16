@@ -160,11 +160,11 @@ TEST(async_conn, basic) {
 	for (size_t i=0; i<50; i++) {
 		send_int_pop->set_data(i);
 		send_int_push->set_data(i*2);
-		send_double_pop->set_data((double)i*3);
+		send_double_pop->set_data(-10. + (double)i*3);
 		usleep(30000);
 		ASSERT_EQ(recv_int_pop->get_data(), i);
 		ASSERT_EQ(recv_int_push->get_data(), i*2);
-		ASSERT_EQ(recv_double_pop->get_data(), (double)i*3);
+		ASSERT_EQ(recv_double_pop->get_data(), -10 + (double)i*3);
 	}
 
 	ASSERT_NEAR(c.get_quality_stream()->get_data(), 1.0, 0.5);

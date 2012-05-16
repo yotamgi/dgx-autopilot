@@ -72,7 +72,7 @@ void AsyncStreamConnection::run_exporting() {
 	while (m_running) {
 		std::string send_packet = create_send_packet();
 		m_send_conn->write(send_packet);
-		//std::cout << "Sending: " << send_packet << std::endl;
+//		std::cout << "Sending: " << send_packet << std::endl;
 		usleep(m_wait_time);
 	}
 }
@@ -80,7 +80,8 @@ void AsyncStreamConnection::run_importing() {
 	m_running = true;
 	while (m_running) {
 		std::string recv_packet = m_recv_conn->read();
-		//std::cout << "Got " << recv_packet << std::endl;
+		if (!m_running) break; // to fix the boost::thread detaching bug
+//		std::cout << "Got " << recv_packet << std::endl;
 		parse_recv_packet(recv_packet);
 		m_quality_stream->got_sample();
 	}
