@@ -72,7 +72,7 @@ public:
 		virtual void serialize(std::ostream& os);
 	private:
 		size_t m_counter;
-		size_t m_curr_data;
+		T m_curr_data;
 	};
 
 	template <typename T>
