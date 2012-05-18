@@ -50,7 +50,7 @@ NormalPlainPlatform create_dgx1_platform() {
 	dgx1_platform.gps_speed_dir_generator = speed_dir_forwarder;
 
 	// the alive
-	dgx1_platform.alive = AliveGpioInformer(150);
+	dgx1_platform.alive = AliveGpioInformer(130);
 
 	// fill the platform's servos
 	static MaestroServoController maestro("/dev/ttyACM0");
