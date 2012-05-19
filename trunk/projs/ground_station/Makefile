@@ -7,7 +7,7 @@ SRCDIR = ./src
 MEDIADIR=`pwd`/data
 
 QT_CXXFLAGS = -D_REENTRANT -DQT_WEBKIT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4 
-QGIS_CXXFLAGS = -DGUI_EXPORT= -DCORE_EXPORT=
+QGIS_CXXFLAGS = -I/usr/include/qgis -I/usr/include/gdal -DGUI_EXPORT= -DCORE_EXPORT=
 IRRLICHT_CXXFLAGS =  -I/usr/X11R6/include 
 IRRLICHT_LDFLAGS =  -L/usr/X11R6/lib -lGL -lXxf86vm -lXext -lX11 -lIrrlicht 
 QT_LDGLAGS = -L/usr/lib/x86_64-linux-gnu  -lQtXml -lQtGui -lQtCore -lpthread 

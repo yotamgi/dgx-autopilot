@@ -1,6 +1,7 @@
 #include "map_stream_view.h"
 #include <qgis/qgsproviderregistry.h>
 #include <qgis/qgsvectorlayer.h>
+#include <qgis/qgsrasterlayer.h>
 #include <qgis/qgssinglesymbolrenderer.h>
 #include <qgis/qgsmaplayerregistry.h>
 #include <stdexcept>
@@ -104,20 +105,32 @@ void MapStreamView::load_map(fs::path dir) {
 		if (extention == ".shp") {
 			std::cout << "added shp layer " << f->path().filename().c_str() << std::endl;
 			// create the vector layer
-			QgsVectorLayer* map_layer = new QgsVectorLayer(tr(f->path().c_str()), tr(f->path().filename().c_str()), QString("ogr"));
-			QgsSingleSymbolRenderer *map_renderer = new QgsSingleSymbolRenderer(map_layer->geometryType());
-			map_layer->setRenderer(map_renderer);
-			if (!map_layer->isValid()) {
+			QgsVectorLayer* vec_layer = new QgsVectorLayer(tr(f->path().c_str()), tr(f->path().filename().c_str()), QString("ogr"));
+			QgsSingleSymbolRenderer *map_renderer = new QgsSingleSymbolRenderer(vec_layer->geometryType());
+			vec_layer->setRenderer(map_renderer);
+			if (!vec_layer->isValid()) {
 				throw std::runtime_error("Couldn't load the map layer");
 			}
 			// Add the Vector Layer to the Layer Registry
-			QgsMapLayerRegistry::instance()->addMapLayer(map_layer, TRUE);
-			map_layer_set.append(QgsMapCanvasLayer(map_layer));
-			m_map_canvas->setExtent(map_layer->extent());
+			QgsMapLayerRegistry::instance()->addMapLayer(vec_layer, TRUE);
+			map_layer_set.append(QgsMapCanvasLayer(vec_layer));
+			m_map_canvas->setExtent(vec_layer->extent());
 		}
 
 		// if it is a raster layer
 		else if (extention == ".tif" || extention == ".tiff" || extention == ".jpg" || extention == ".jpeg") {
+			std::cout << "added raster layer " << f->path().filename().c_str() << std::endl;
+			QgsRasterLayer* raster_layer = new QgsRasterLayer(
+					tr(f->path().c_str()),
+					tr(f->path().filename().c_str())
+			);
+			if (!raster_layer->isValid()) {
+				throw std::runtime_error("Couldn't load the raster layer");
+			}
+
+			QgsMapLayerRegistry::instance()->addMapLayer(raster_layer, TRUE);
+			map_layer_set.append(QgsMapCanvasLayer(raster_layer));
+			m_map_canvas->setExtent(raster_layer->extent());
 		}
 	}
 
