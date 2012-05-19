@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
 		}
 	}
 
-	autopilot::NormalPlainPlatform platform = autopilot::create_dgx1_platform();
+	autopilot::NormalPlainPlatform platform = autopilot::create_dgx1_2_platform();
 //	autopilot::NormalPlainPlatform platform = autopilot::create_dgx1_simulator_platform(
 //			boost::make_shared<stream::TcpipServer>("localhost", 0x6060));
 
