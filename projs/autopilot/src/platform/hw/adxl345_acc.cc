@@ -34,13 +34,13 @@ lin_algebra::vec3f Adxl345Acc::get_data() {
 	// read the data
 	lin_algebra::vec3f fans;
 	uint16_t ans[3];
-	ans[0] = m_i2c.read_num<uint16_t>(X_READ_ADDRES);
+	ans[0] = m_i2c.read_num<uint16_t>(Y_READ_ADDRES);
 	ans[1] = m_i2c.read_num<uint16_t>(Z_READ_ADDRES);
-	ans[2] = m_i2c.read_num<uint16_t>(Y_READ_ADDRES);
+	ans[2] = m_i2c.read_num<uint16_t>(X_READ_ADDRES);
 	
 	fans[0] =  float((int16_t)((ans[0]<<8)&0xff00) + (ans[0]>>8))*0.008;
 	fans[1] = -float((int16_t)((ans[1]<<8)&0xff00) + (ans[1]>>8))*0.008;
-	fans[2] =  float((int16_t)((ans[2]<<8)&0xff00) + (ans[2]>>8))*0.008;
+	fans[2] = -float((int16_t)((ans[2]<<8)&0xff00) + (ans[2]>>8))*0.008;
 	return fans;
 }
 
