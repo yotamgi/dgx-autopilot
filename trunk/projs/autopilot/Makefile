@@ -10,6 +10,7 @@ LDFLAGS += -L./lib -fPIC -Wl,--rpath,$(LIBDS_LIBDIRS):$(LIBDIR) $(LIBDS_LDFLAGS)
 			-lboost_thread -lboost_filesystem-mt -lboost_system-mt -lgps
 
 AUTOPILIT_OBJS =  $(SRCDIR)/platform/hw/i2c_interface.o	\
+		$(SRCDIR)/platform/hw/l3g4200d_gyro.o			\
 		$(SRCDIR)/platform/hw/itg3200_gyro.o				\
 		$(SRCDIR)/platform/hw/adxl345_acc.o				\
 		$(SRCDIR)/platform/hw/hmc5843_compass.o		 	\

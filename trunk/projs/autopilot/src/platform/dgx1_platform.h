@@ -12,7 +12,7 @@
 namespace autopilot {
 
 NormalPlainPlatform create_dgx1_platform();
-
+NormalPlainPlatform create_dgx1_2_platform();
 } //namespace autopilot
 
 #endif /* DGX1_PLATFORM_H_ */

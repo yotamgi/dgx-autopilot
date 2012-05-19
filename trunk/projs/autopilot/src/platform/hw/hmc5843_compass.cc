@@ -34,9 +34,9 @@ lin_algebra::vec3f Hmc5843Compass::get_data() {
 
 	// read the data
 	lin_algebra::vec3f fans;
-	fans[0] = -(float)m_i2c.read_num<int16_t>(Y_READ_ADDRES)*(100./1620.);
-	fans[1] =  (float)m_i2c.read_num<int16_t>(Z_READ_ADDRES)*(100./1620.);
-	fans[2] =  (float)m_i2c.read_num<int16_t>(X_READ_ADDRES)*(100./1620.);
+	fans[0] =  -(float)m_i2c.read_num<int16_t>(Z_READ_ADDRES)*(100./1620.);
+	fans[1] =   (float)m_i2c.read_num<int16_t>(Y_READ_ADDRES)*(100./1620.);
+	fans[2] =   (float)m_i2c.read_num<int16_t>(X_READ_ADDRES)*(100./1620.);
 	
 	return fans;
 }
