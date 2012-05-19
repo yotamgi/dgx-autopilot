@@ -191,7 +191,7 @@ int main(int argc, char** argv) {
 	// create the platform according to what the user asked
 	autopilot::NormalPlainPlatform platform;
 	if (platform_type == "hw") {
-		platform = autopilot::create_dgx1_platform();
+		platform = autopilot::create_dgx1_2_platform();
 	} else if (platform_type == "sim") {
 #ifndef DEVICE
 		simulator::WindGen::Params wind_params;
