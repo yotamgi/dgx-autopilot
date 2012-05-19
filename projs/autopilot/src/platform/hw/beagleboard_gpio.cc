@@ -1,4 +1,5 @@
 #include "beagleboard_gpio.h"
+#include <iostream>
 #include <sstream>
 #include <fcntl.h>
 #include <stdio.h>
@@ -22,12 +23,11 @@ GpioPin::GpioPin(unsigned int pin_num):
 
 	int ans = write(master_fd, pin_num_ss.str().c_str(), pin_num_ss.str().size());
 	if (ans < 0) {
-		perror("");
-		throw SensorException("Could not write to master gpio file");
+		//std::cout << "The gpio pin already exists?" << std::endl;
 	}
 	close(master_fd);
 
-	m_gpio_fd = open((GPIO_PATH + "gpio" + pin_num_ss.str()).c_str(), O_WRONLY);
+	m_gpio_fd = open((GPIO_PATH + "gpio" + pin_num_ss.str() + "/direction").c_str(), O_WRONLY);
 
 	if (m_gpio_fd < 0) {
 		perror("");
@@ -47,7 +47,8 @@ void GpioPin::operator = (bool state) {
 	int ans = write(m_gpio_fd, m_curr_state? "high":"low", m_curr_state? 4:3);
 	if (ans < 0) {
 		perror("");
-		throw SensorException("Could not write to master gpio file");
+		std::cout << "ANS is " << ans << std::endl;
+		throw SensorException("Could not write to specific gpio file");
 	}
 
 }
