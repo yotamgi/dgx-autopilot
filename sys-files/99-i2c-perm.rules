@@ -1,0 +1,3 @@
+KERNEL=="i2c-1", GROUP="root", MODE="0666" 
+KERNEL=="i2c-2", GROUP="root", MODE="0666" 
+KERNEL=="i2c-3", GROUP="root", MODE="0666" 

@@ -1,0 +1,19 @@
+auto wlan1
+iface wlan1 inet static
+wireless-mode ad-hoc
+wireless-channel 4
+wireless-essid dgx
+wireless-key off
+address 11.0.0.1
+netmask 255.0.0.0
+gateway 11.0.0.2
+
+auto wlan1
+iface wlan1 inet static
+wireless-mode ad-hoc
+wireless-channel 4
+wireless-essid dgx
+wireless-key off
+address 11.0.0.1
+netmask 255.0.0.0
+gateway 11.0.0.2
