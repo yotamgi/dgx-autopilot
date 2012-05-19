@@ -2,6 +2,7 @@
 
 #include <sstream>
 #include <stdlib.h>
+#include <stdio.h>
 #include <unistd.h>  // UNIX standard function definitions
 #include <fcntl.h>   // File control definitions
 #include <termios.h> // POSIX terminal control definitions
@@ -117,7 +118,7 @@ void MaestroServoController::MaestroServoChannel::set_data(const float& state_pe
 	int a;
 	a = write(m_father.m_device_fd, serialBytes,5);
 	if (a != 5) {
-		throw ServoException("Could not write to device file");
+		std::cout << "Writing to servo file failed" << std::endl;
 	}
 
 	m_father.check_errors();
