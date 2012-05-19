@@ -3,6 +3,8 @@ Servo control:
 
 Wireless:
  * install the rt3070 and rt3070-firmeare from opkg
+ * To configure the ad-hoc thing use the "sys-files/network_config.txt" file.
+ * To enable the wireless automatically in ad-hoc mode, you must copy the content of "sys-files/interfaces" file to the /etc/network/interfaces, and make sure the networking and network-interfaces services are enabled on the specific run-level.
 
 GPS:
  * Install kernel-module-pl2303 from opkg
@@ -19,6 +21,7 @@ Video Transmisstion:
 
 I2C:
  * In order for the i2c sensors to work, the modules rtc_ds1307 and rtc_twl must be put in the blacklist - they catch the 0x68 address.
+ * To make the permissions of the device file good, you must copy the "sys-files/99*" file to the /etc/udev/rules.d
 
 NetStick:
  * install network-manaer
