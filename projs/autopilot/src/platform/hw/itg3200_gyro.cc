@@ -42,8 +42,6 @@ Itg3200Gyro::Itg3200Gyro(size_t device_i2c_num,
 
 }
 
-// X, -Z, Y
-
 lin_algebra::vec3f Itg3200Gyro::get_data() {
 
 	// read the data
