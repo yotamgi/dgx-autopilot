@@ -34,9 +34,20 @@ private:
 
 NormalPlainPlatform create_dgx1_platform() {
 	NormalPlainPlatform dgx1_platform;
-	dgx1_platform.acc_sensor = boost::make_shared<Adxl345Acc>(2);
-	dgx1_platform.gyro_sensor = boost::make_shared<Itg3200Gyro>(2);
-	dgx1_platform.compass_sensor = boost::make_shared<Hmc5843Compass>(2);
+	dgx1_platform.acc_sensor = boost::make_shared<Adxl345Acc>(2,
+			(Adxl345Acc::Direction[3]){ Adxl345Acc::X_DIR, Adxl345Acc::Z_DIR, Adxl345Acc::Y_DIR },
+			(bool[3]){ true, false, true}
+	);
+
+	dgx1_platform.gyro_sensor = boost::make_shared<Itg3200Gyro>(2,
+			(Itg3200Gyro::Direction[3]){ Itg3200Gyro::Y_DIR, Itg3200Gyro::Z_DIR, Itg3200Gyro::X_DIR },
+			(bool[3]){ false, true, true }
+	);
+
+	dgx1_platform.compass_sensor = boost::make_shared<Hmc5843Compass>(2,
+			(Hmc5843Compass::Direction[3]){ Hmc5843Compass::X_DIR, Hmc5843Compass::Z_DIR, Hmc5843Compass::Y_DIR },
+			(bool[3]){ true, false, true}
+	);
 
 	boost::shared_ptr<vec3_push_forwarder> pos_forwarder(new vec3_push_forwarder);
 	boost::shared_ptr<float_push_forwarder> speed_dir_forwarder(new float_push_forwarder);
