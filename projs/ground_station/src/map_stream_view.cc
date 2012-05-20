@@ -35,18 +35,27 @@ MapStreamView::MapStreamView(boost::shared_ptr<pos_stream> pos_stream,
 	load_map(fs::path(map_dir));
 
  	m_plane_track = new QgsRubberBand(m_map_canvas, false);
- 	m_plane_track->setColor(QColor(255, 0, 0, 255));
- 	m_plane_track->setWidth(3);
-	m_map_canvas->scene()->addItem(m_plane_track);
+ 	m_plane_track->setColor(QColor(255, 0, 0, 70));
+ 	m_plane_track->setWidth(4);
+
+ 	m_plane_curr_pos = new QgsVertexMarker(m_map_canvas);
+ 	m_plane_curr_pos->setIconType(QgsVertexMarker::ICON_CROSS);
+ 	m_plane_curr_pos->setColor(QColor(150, 0, 0, 255));
+ 	m_plane_curr_pos->setIconSize(20);
+ 	m_plane_curr_pos->setPenWidth(4);
 
 	m_mouse_emit = new QgsMapToolEmitPoint(m_map_canvas);
 	m_map_canvas->setMapTool(m_mouse_emit);
 
 	m_clear_button = new QPushButton("&Clear Track");
 
-	QVBoxLayout* layout = new QVBoxLayout();
-	layout->addWidget(m_map_canvas);
-	layout->addWidget(m_clear_button);
+	m_show_truck_checkbox = new QCheckBox("&Show Track");
+	m_show_truck_checkbox->setChecked(true);
+
+	QGridLayout* layout = new QGridLayout();
+	layout->addWidget(m_clear_button, 0, 0);
+	layout->addWidget(m_show_truck_checkbox, 0, 1);
+	layout->addWidget(m_map_canvas, 1, 0, 1, 2);
 	setLayout(layout);
 
  	m_timer = new QTimer(this);
@@ -59,6 +68,10 @@ MapStreamView::MapStreamView(boost::shared_ptr<pos_stream> pos_stream,
 
 	connect(m_clear_button, SIGNAL(clicked()),
 			this, SLOT(clear_track()));
+
+	connect(m_show_truck_checkbox, SIGNAL(stateChanged(int)),
+			this, SLOT(show_track_cb_changed(int)));
+
 }
 
 MapStreamView::~MapStreamView() {
@@ -80,7 +93,6 @@ void MapStreamView::clicked(const QgsPoint & p, Qt::MouseButton button) {
 // 	dot->setColor(QColor(255, 0, 0, 255));
 // 	dot->track->setWidth(3);
 	dot->setCenter(p);
-	m_map_canvas->scene()->addItem(dot);
 	m_dots.push_back(dot);
 }
 
@@ -147,7 +159,16 @@ void MapStreamView::update() {
 
 	// draw the line of the plane's way
 	m_plane_track->addPoint(p);
+	m_plane_curr_pos->setCenter(p);
 	m_map_canvas->refresh();
+}
+
+void MapStreamView::show_track_cb_changed(int state) {
+	if (m_show_truck_checkbox->isChecked()) {
+		m_map_canvas->scene()->addItem(m_plane_track);
+	} else {
+		m_map_canvas->scene()->removeItem(m_plane_track);
+	}
 }
 
 } // namespace gs
