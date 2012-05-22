@@ -16,12 +16,15 @@ QGIS_LDFLAGS = -lqgis_core -lqgis_gui -lgeos -lgdal1.7.0
 CXX = g++
 MOC = moc-qt4
 CXXFLAGS += -fPIC -g -Wall -pipe $(LIBDS_CXXFLAGS) $(QT_CXXFLAGS) $(QGIS_CXXFLAGS) $(IRRLICHT_CXXFLAGS) -O2 -DMEDIA_DIR=\"$(MEDIADIR)\"
-LDFLAGS += -fPIC -L./lib -Wl,--rpath,$(LIBDS_LIBDIRS):$(LIBDIR) -lboost_thread -lboost_filesystem -lboost_system $(IRRLICHT_LDFLAGS) $(LIBDS_LDFLAGS) $(QT_LDGLAGS) $(QGIS_LDFLAGS)
+LDFLAGS += -fPIC -L./lib -Wl,--rpath,$(LIBDS_LIBDIRS):$(LIBDIR) -lboost_thread -lboost_filesystem -lboost_system -lqwt $(IRRLICHT_LDFLAGS) $(LIBDS_LDFLAGS) $(QT_LDGLAGS) $(QGIS_LDFLAGS)
 
 STREAMVIEW_OBJS =  $(SRCDIR)/map_stream_view.o 		\
 				   $(SRCDIR)/3d_stream_view.o 		\
 				   $(SRCDIR)/size_stream_view.o		\
-				   $(SRCDIR)/size_push_gen.o
+				   $(SRCDIR)/size_push_gen.o		\
+				   $(SRCDIR)/orientation_stream_view.o \
+				   $(SRCDIR)/external_widgets/orientation_widget.o
+				   
 
 ###############################################################################
 ## TARGETS 
@@ -61,9 +64,12 @@ $(SRCDIR)/3d_stream_view_moc.o: $(SRCDIR)/3d_stream_view.h
 $(SRCDIR)/size_push_gen_moc.o: $(SRCDIR)/size_push_gen.h
 	$(MOC) $(QT_CXXFLAGS)  $(SRCDIR)/size_push_gen.h -o $(AUTOGENDIR)/size_push_gen.cxx -p$(SRCDIR)
 	$(CXX) -c $(CXXFLAGS) $(AUTOGENDIR)/size_push_gen.cxx  -o $*.o 
+$(SRCDIR)/orientation_stream_view_moc.o: $(SRCDIR)/orientation_stream_view.h
+	$(MOC) $(QT_CXXFLAGS)  $(SRCDIR)/orientation_stream_view.h -o $(AUTOGENDIR)/orientation_stream_view.cxx -p$(SRCDIR)
+	$(CXX) -c $(CXXFLAGS) $(AUTOGENDIR)/orientation_stream_view.cxx  -o $*.o 
 
-$(LIBDIR)/libground_station.so: $(STREAMVIEW_OBJS)  $(SRCDIR)/map_stream_view_moc.o $(SRCDIR)/3d_stream_view_moc.o $(SRCDIR)/size_push_gen_moc.o
-	$(CXX) $(LDFLAGS) -shared  $(STREAMVIEW_OBJS) $(SRCDIR)/map_stream_view_moc.o $(SRCDIR)/3d_stream_view_moc.o $(SRCDIR)/size_push_gen_moc.o -o $(LIBDIR)/libground_station.so 
+$(LIBDIR)/libground_station.so: $(STREAMVIEW_OBJS)  $(SRCDIR)/map_stream_view_moc.o $(SRCDIR)/3d_stream_view_moc.o $(SRCDIR)/size_push_gen_moc.o $(SRCDIR)/orientation_stream_view_moc.o
+	$(CXX) $(LDFLAGS) -shared  $(STREAMVIEW_OBJS) $(SRCDIR)/map_stream_view_moc.o $(SRCDIR)/3d_stream_view_moc.o $(SRCDIR)/size_push_gen_moc.o $(SRCDIR)/orientation_stream_view_moc.o -o $(LIBDIR)/libground_station.so  
 
 ground_station: $(LIBDIR)/libground_station.so $(SRCDIR)/main.o
 	$(CXX) -L$(LIBDIR) $(SRCDIR)/main.o -lground_station $(LDFLAGS) -o ground_station
