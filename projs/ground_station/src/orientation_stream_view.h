@@ -2,6 +2,7 @@
 #define ORIENTATION_WIDGET_H_
 
 #include "external_widgets/orientation_widget.h"
+#include "external_widgets/heading_widget.h"
 #include <stream/data_pop_stream.h>
 #include <stream/util/lin_algebra.h>
 #include <qt4/QtCore/qtimer.h>
@@ -26,6 +27,7 @@ public slots:
 
 private:
 	OrientationWidget* m_orientation_widget;
+	HeadingWidget* m_heading_widget;
 	QTimer m_timer;
 	boost::shared_ptr<orientation_stream> m_stream;
 };
