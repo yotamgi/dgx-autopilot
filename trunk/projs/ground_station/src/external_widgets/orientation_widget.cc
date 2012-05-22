@@ -43,17 +43,17 @@ OrientationWidget::~OrientationWidget() {
 void OrientationWidget::init() {
     clean();
 
-    item_cas    = new QGraphicsSvgItem("files/qfi/adi_casing.svg");
-    item_bg     = new QGraphicsSvgItem("files/qfi/any_bg.svg");
-    item_shadow = new QGraphicsSvgItem("files/qfi/any_shadow.svg");
-    item_roll   = new QGraphicsSvgItem("files/qfi/adi_rollring.svg");
-    item_shd1   = new QGraphicsSvgItem("files/qfi/adi_shadow1.svg");
-    item_shd2   = new QGraphicsSvgItem("files/qfi/adi_shadow2.svg");
-    item_plt    = new QGraphicsSvgItem("files/qfi/adi_face.svg");
-    item_spr    = new QGraphicsSvgItem("files/qfi/adi_bg.svg");
-    item_mkr    = new QGraphicsSvgItem("files/qfi/adi_markers.svg");
-    item_sky    = new QGraphicsSvgItem("files/qfi/adi_sky.svg");
-    item_grd    = new QGraphicsSvgItem("files/qfi/adi_ground.svg");
+    item_cas    = new QGraphicsSvgItem(MEDIA_DIR "/widget_files/qfi/adi_casing.svg");
+    item_bg     = new QGraphicsSvgItem(MEDIA_DIR "/widget_files/qfi/any_bg.svg");
+    item_shadow = new QGraphicsSvgItem(MEDIA_DIR "/widget_files/qfi/any_shadow.svg");
+    item_roll   = new QGraphicsSvgItem(MEDIA_DIR "/widget_files/qfi/adi_rollring.svg");
+    item_shd1   = new QGraphicsSvgItem(MEDIA_DIR "/widget_files/qfi/adi_shadow1.svg");
+    item_shd2   = new QGraphicsSvgItem(MEDIA_DIR "/widget_files/qfi/adi_shadow2.svg");
+    item_plt    = new QGraphicsSvgItem(MEDIA_DIR "/widget_files/qfi/adi_face.svg");
+    item_spr    = new QGraphicsSvgItem(MEDIA_DIR "/widget_files/qfi/adi_bg.svg");
+    item_mkr    = new QGraphicsSvgItem(MEDIA_DIR "/widget_files/qfi/adi_markers.svg");
+    item_sky    = new QGraphicsSvgItem(MEDIA_DIR "/widget_files/qfi/adi_sky.svg");
+    item_grd    = new QGraphicsSvgItem(MEDIA_DIR "/widget_files/qfi/adi_ground.svg");
 
     double x = 325;
     double y = 325;
