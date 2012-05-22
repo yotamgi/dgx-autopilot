@@ -23,7 +23,8 @@ STREAMVIEW_OBJS =  $(SRCDIR)/map_stream_view.o 		\
 				   $(SRCDIR)/size_stream_view.o		\
 				   $(SRCDIR)/size_push_gen.o		\
 				   $(SRCDIR)/orientation_stream_view.o \
-				   $(SRCDIR)/external_widgets/orientation_widget.o
+				   $(SRCDIR)/external_widgets/orientation_widget.o \
+				   $(SRCDIR)/external_widgets/heading_widget.o 
 				   
 
 ###############################################################################
