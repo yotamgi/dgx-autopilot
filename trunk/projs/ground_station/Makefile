@@ -16,7 +16,7 @@ QGIS_LDFLAGS = -lqgis_core -lqgis_gui -lgeos -lgdal1.7.0
 CXX = g++
 MOC = moc-qt4
 CXXFLAGS += -fPIC -g -Wall -pipe $(LIBDS_CXXFLAGS) $(QT_CXXFLAGS) $(QGIS_CXXFLAGS) $(IRRLICHT_CXXFLAGS) -O2 -DMEDIA_DIR=\"$(MEDIADIR)\"
-LDFLAGS += -fPIC -L./lib -Wl,--rpath,$(LIBDS_LIBDIRS):$(LIBDIR) -lboost_thread -lboost_filesystem -lboost_system -lqwt $(IRRLICHT_LDFLAGS) $(LIBDS_LDFLAGS) $(QT_LDGLAGS) $(QGIS_LDFLAGS)
+LDFLAGS += -fPIC -L./lib -Wl,--rpath,$(LIBDS_LIBDIRS):$(LIBDIR) -lboost_thread -lboost_filesystem -lboost_system $(IRRLICHT_LDFLAGS) $(LIBDS_LDFLAGS) $(QT_LDGLAGS) $(QGIS_LDFLAGS)
 
 STREAMVIEW_OBJS =  $(SRCDIR)/map_stream_view.o 		\
 				   $(SRCDIR)/3d_stream_view.o 		\
