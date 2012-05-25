@@ -5,7 +5,6 @@
 #include "orientation_stream_view.h"
 #include "stream/stream_utils.h"
 #include <QtGui>
-#include <qwt/qwt_analog_clock.h>
 
 class SimplePosStream : public stream::DataPopStream<lin_algebra::vec2f> {
 public:
