@@ -16,6 +16,7 @@ void export_platform(boost::shared_ptr<NormalPlainPlatform> platform,
 	conn.export_pop_stream<lin_algebra::vec3f>(platform->gyro_sensor, "gyro");
 	conn.export_pop_stream<lin_algebra::vec3f>(platform->acc_sensor, "acc");
 	conn.export_pop_stream<lin_algebra::vec3f>(platform->compass_sensor, "compass");
+	conn.export_pop_stream<float>(platform->airspeed_sensor, "airspeed");
 	//conn.export_pop_stream<float>(platform->alt, "simulator_alt");
 
 	conn.export_push_stream<float>(platform->pitch_servo, "pitch_servo");
@@ -55,6 +56,7 @@ boost::shared_ptr<NormalPlainPlatform> import_platform(boost::shared_ptr<stream:
 	platform->acc_sensor = conn.import_pop_stream<lin_algebra::vec3f>("acc");
 	platform->gyro_sensor = conn.import_pop_stream<lin_algebra::vec3f>("gyro");
 	platform->compass_sensor = conn.import_pop_stream<lin_algebra::vec3f>("compass");
+	platform->airspeed_sensor = conn.import_pop_stream<float>("airspeed");
 
 	platform->pitch_servo = conn.import_push_stream<float>("pitch_servo");
 	platform->tilt_servo = conn.import_push_stream<float>("tilt_servo");

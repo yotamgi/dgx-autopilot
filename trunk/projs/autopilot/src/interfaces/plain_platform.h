@@ -11,6 +11,7 @@
 namespace autopilot {
 
 typedef stream::DataPopStream<lin_algebra::vec3f> 	vec3_pop_stream;
+typedef stream::DataPopStream<float> 				float_pop_stream;
 typedef stream::DataPushStream<float> 				float_push_stream;
 typedef stream::PushGenerator<lin_algebra::vec3f> 	vec3_push_gen;
 typedef stream::PushGenerator<float> 				float_push_gen;
@@ -28,6 +29,8 @@ struct NormalPlainPlatform {
 	boost::shared_ptr<vec3_pop_stream> acc_sensor;
 	boost::shared_ptr<vec3_pop_stream> gyro_sensor;
 	boost::shared_ptr<vec3_pop_stream> compass_sensor;
+	boost::shared_ptr<float_pop_stream> airspeed_sensor;
+	boost::shared_ptr<float_pop_stream> alt_sensor;
 
 	// The Gps stream generators
 	boost::shared_ptr<vec3_push_gen>  gps_pos_generator;

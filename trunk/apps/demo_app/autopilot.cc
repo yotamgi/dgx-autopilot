@@ -62,15 +62,18 @@ autopilot::NormalPlainPlatform record_platform(autopilot::NormalPlainPlatform pl
 	file_ptr acc_file 			= boost::make_shared<std::ofstream>((record_dir + "/acc.stream").c_str());
 	file_ptr compass_file 		= boost::make_shared<std::ofstream>((record_dir + "/compass.stream").c_str());
 	file_ptr gyro_file 			= boost::make_shared<std::ofstream>((record_dir + "/gyro.stream").c_str());
+	file_ptr airspeed_file		= boost::make_shared<std::ofstream>((record_dir + "/airspeed.stream").c_str());
 	file_ptr gps_pos_file 		= boost::make_shared<std::ofstream>((record_dir + "/gps_pos.stream").c_str());
 	file_ptr gps_speed_mag_file = boost::make_shared<std::ofstream>((record_dir + "/gps_speed_mag.stream").c_str());
 	file_ptr gps_speed_dir_file = boost::make_shared<std::ofstream>((record_dir + "/gps_speed_dir.stream").c_str());
 
-	typedef stream::filters::RecorderPopFilter<lin_algebra::vec3f> pop_recorder;
+	typedef stream::filters::RecorderPopFilter<lin_algebra::vec3f> vec3f_pop_recorder;
+	typedef stream::filters::RecorderPopFilter<float> float_pop_recorder;
 
-	platform.acc_sensor.reset(new pop_recorder(acc_file, platform.acc_sensor));
-	platform.compass_sensor.reset(new pop_recorder(compass_file, platform.compass_sensor));
-	platform.gyro_sensor.reset(new pop_recorder(gyro_file, platform.gyro_sensor));
+	platform.acc_sensor.reset(new vec3f_pop_recorder(acc_file, platform.acc_sensor));
+	platform.compass_sensor.reset(new vec3f_pop_recorder(compass_file, platform.compass_sensor));
+	platform.gyro_sensor.reset(new vec3f_pop_recorder(gyro_file, platform.gyro_sensor));
+	platform.airspeed_sensor.reset(new float_pop_recorder(airspeed_file, platform.airspeed_sensor));
 
 	platform.gps_pos_generator = add_push_recorder<lin_algebra::vec3f>(platform.gps_pos_generator, gps_pos_file);
 	platform.gps_speed_mag_generator = add_push_recorder<float>(platform.gps_speed_mag_generator, gps_speed_mag_file);
@@ -91,6 +94,7 @@ boost::shared_ptr<stream::AsyncStreamConnection>  export_data(std::string export
 		vec3_pop_stream_ptr gyro_orientation,
 		vec3_pop_stream_ptr rest_orientation,
 		vec3_pop_stream_ptr orientation,
+		float_pop_stream_ptr airspeed,
 		float_pop_stream_ptr reliability,
 		float_pop_stream_ptr fps,
 		vec2_pop_stream_ptr position,
@@ -116,6 +120,7 @@ boost::shared_ptr<stream::AsyncStreamConnection>  export_data(std::string export
 		((send_stream_ptr)boost::make_shared<vec3_send_stream>(gyro_orientation))
 		((send_stream_ptr)boost::make_shared<vec3_send_stream>(rest_orientation))
 		((send_stream_ptr)boost::make_shared<vec3_send_stream>(orientation))
+		((send_stream_ptr)boost::make_shared<float_send_stream>(airspeed))
 		((send_stream_ptr)boost::make_shared<float_send_stream>(reliability))
 		((send_stream_ptr)boost::make_shared<float_send_stream>(fps))
 		((send_stream_ptr)boost::make_shared<vec2_send_stream>(position))
@@ -225,16 +230,13 @@ int main(int argc, char** argv) {
 	// create the cockpit
 	boost::shared_ptr<autopilot::Cockpit> cockpit = boost::make_shared<autopilot::Cockpit>(platform);
 
-//			cockpit->gas_servo()->set_data(45.0f);
-//			cockpit->yaw_servo()->set_data(50.0f);
-
 	// configure the wp pilot
 	autopilot::WaypointPilot::Params wp_pilot_params;
 	wp_pilot_params.max_climbing_angle = 15.;
 	wp_pilot_params.max_decending_angle = -10.;
-	wp_pilot_params.climbing_gas = 100.;
-	wp_pilot_params.decending_gas = 20.;
-	wp_pilot_params.avg_gas = 40;
+	wp_pilot_params.climbing_gas = 75.;//100.;
+	wp_pilot_params.decending_gas = 40.;//20.;
+	wp_pilot_params.avg_gas = 60.;//40;
 	wp_pilot_params.avg_pitch_angle = 0.;
 	wp_pilot_params.max_roll_angle = 40.;
 	wp_pilot_params.pitch_severity = 20.;
@@ -258,6 +260,7 @@ int main(int argc, char** argv) {
 			cockpit->watch_gyro_orientation(),
 			cockpit->watch_rest_orientation(),
 			cockpit->orientation()->get_watch_stream(),
+			platform.airspeed_sensor,
 			cockpit->watch_rest_reliability(),
 			fpsed_gyro->get_fps_stream(),
 			cockpit->position(),
