@@ -83,6 +83,7 @@ GroundStation::GroundStation(std::string plane_address):
 	boost::shared_ptr<vec3_recv_stream> gyro_watch_orientation =	boost::make_shared<vec3_recv_stream>();
 	boost::shared_ptr<vec3_recv_stream> watch_rest_orientation =	boost::make_shared<vec3_recv_stream>();
 	boost::shared_ptr<vec3_recv_stream> orientation = 				boost::make_shared<vec3_recv_stream>();
+	boost::shared_ptr<float_recv_stream> airspeed = 				boost::make_shared<float_recv_stream>();
 	boost::shared_ptr<float_recv_stream> reliability = 				boost::make_shared<float_recv_stream>();
 	boost::shared_ptr<float_recv_stream> gyro_fps = 				boost::make_shared<float_recv_stream>();
 	boost::shared_ptr<vec2_recv_stream> position = 					boost::make_shared<vec2_recv_stream>();
@@ -106,6 +107,7 @@ GroundStation::GroundStation(std::string plane_address):
 			((recv_stream_ptr)gyro_watch_orientation )
 			((recv_stream_ptr)watch_rest_orientation )
 			((recv_stream_ptr)orientation            )
+			((recv_stream_ptr)airspeed               )
 	        ((recv_stream_ptr)reliability            )
 	        ((recv_stream_ptr)gyro_fps               )
             ((recv_stream_ptr)position             	 )
@@ -142,6 +144,9 @@ GroundStation::GroundStation(std::string plane_address):
 	view3d->addAngleStream(orientation, irr::core::vector3df(0., 0., 8.));
 	view3d->addVecStream(watch_acc_sensor, irr::core::vector3df(0., 0., 8.));
 	view3d->addVecStream(watch_compass_sensor, irr::core::vector3df(0., 0., 8.));
+
+	// the airspeed stream
+	gs::SizeStreamView *view_airspeed = new gs::SizeStreamView(reliability, "Airspeed", view_update_time, 0., 20.);
 
 	// the reliable stream
 	gs::SizeStreamView *view_reliability = new gs::SizeStreamView(reliability, "Reliability", view_update_time, 0., 1.);
@@ -213,6 +218,7 @@ GroundStation::GroundStation(std::string plane_address):
 	QHBoxLayout* left_up_layout = new QHBoxLayout();
 	left_up_layout->addWidget(view3d);
 	left_up_layout->addWidget(view_reliability);
+	left_up_layout->addWidget(view_airspeed);
 	left_up->setLayout(left_up_layout);
 
 	// left side
@@ -233,6 +239,7 @@ GroundStation::GroundStation(std::string plane_address):
 	wnd->show();
 	view3d->start();
 	view_reliability->start();
+	view_airspeed->start();
 	view_fps->start();
 	view_link_quality->start();
 	view_alt->start();

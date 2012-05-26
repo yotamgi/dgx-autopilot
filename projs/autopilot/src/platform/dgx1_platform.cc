@@ -5,6 +5,7 @@
 #include "hw/hmc5843_compass.h"
 #include "hw/maestro_servo_controller.h"
 #include "hw/beagleboard_gpio.h"
+#include "hw/mpxv7002_pitot.h"
 #include "flapron_controller.h"
 #include <stream/stream_connection.h>
 #include <stream/stream_utils.h>
@@ -99,6 +100,9 @@ NormalPlainPlatform create_dgx1_2_platform() {
 			(Hmc5843Compass::Direction[3]){ Hmc5843Compass::Z_DIR, Hmc5843Compass::Y_DIR, Hmc5843Compass::X_DIR },
 			(bool[3]){ false, true, true}
 	);
+
+	boost::shared_ptr<autopilot::Ads1115_ADC> adc = boost::make_shared<autopilot::Ads1115_ADC>(2);
+	dgx1_platform.airspeed_sensor = boost::make_shared<autopilot::Mpxv7002Pitot>(adc, 0);
 
 	boost::shared_ptr<vec3_push_forwarder> pos_forwarder(new vec3_push_forwarder);
 	boost::shared_ptr<float_push_forwarder> speed_dir_forwarder(new float_push_forwarder);
