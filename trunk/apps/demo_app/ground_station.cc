@@ -146,7 +146,7 @@ GroundStation::GroundStation(std::string plane_address):
 	view3d->addVecStream(watch_compass_sensor, irr::core::vector3df(0., 0., 8.));
 
 	// the airspeed stream
-	gs::SizeStreamView *view_airspeed = new gs::SizeStreamView(reliability, "Airspeed", view_update_time, 0., 20.);
+	gs::SizeStreamView *view_airspeed = new gs::SizeStreamView(airspeed, "Airspeed", view_update_time, 0., 20.);
 
 	// the reliable stream
 	gs::SizeStreamView *view_reliability = new gs::SizeStreamView(reliability, "Reliability", view_update_time, 0., 1.);
