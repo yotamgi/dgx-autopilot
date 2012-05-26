@@ -8,11 +8,13 @@ CXX = g++
 CXXFLAGS += -g -I$(SRCDIR) -Wall  $(LIBDS_CXXFLAGS) -O3 -fPIC
 LDFLAGS += -L./lib -fPIC -Wl,--rpath,$(LIBDS_LIBDIRS):$(LIBDIR) $(LIBDS_LDFLAGS) \
 			-lboost_thread -lboost_filesystem-mt -lboost_system-mt -lgps
+# $(SRCDIR)/platform/hw/bmp085_baro.o				\
 
 AUTOPILIT_OBJS =  $(SRCDIR)/platform/hw/i2c_interface.o	\
 		$(SRCDIR)/platform/hw/l3g4200d_gyro.o			\
 		$(SRCDIR)/platform/hw/itg3200_gyro.o				\
 		$(SRCDIR)/platform/hw/adxl345_acc.o				\
+		$(SRCDIR)/platform/hw/ads1115_adc.o				\
 		$(SRCDIR)/platform/hw/hmc5843_compass.o		 	\
 		$(SRCDIR)/platform/hw/maestro_servo_controller.o \
 		$(SRCDIR)/platform/hw/beagleboard_gpio.o \
@@ -41,7 +43,7 @@ all: host device
 host: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.so sensor_watch_test 
 
 .PHONY:
-device: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.so sensor_watch_test gtest gps_test servo_test
+device: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.so sensor_watch_test gtest gps_test servo_test baro_test pitot_test
 
 .PHONY:
 clean:
@@ -73,4 +75,10 @@ servo_test: $(SRCDIR)/sandbox/servo_test.o $(LIBDIR) $(LIBDIR)/libautopilot.so
 
 gps_test: $(SRCDIR)/sandbox/gps_test.o $(LIBDIR) $(LIBDIR)/libautopilot.so 
 	$(CXX) $(SRCDIR)/sandbox/gps_test.o -lautopilot $(LDFLAGS) -o gps_test
+	
+baro_test: $(SRCDIR)/sandbox/baro_test.o $(LIBDIR) $(LIBDIR)/libautopilot.so 
+	$(CXX) $(SRCDIR)/sandbox/baro_test.o -lautopilot $(LDFLAGS) -o baro_test
+	
+pitot_test: $(SRCDIR)/sandbox/pitot_test.o $(LIBDIR) $(LIBDIR)/libautopilot.so 
+	$(CXX) $(SRCDIR)/sandbox/pitot_test.o -lautopilot $(LDFLAGS) -o pitot_test
 	
