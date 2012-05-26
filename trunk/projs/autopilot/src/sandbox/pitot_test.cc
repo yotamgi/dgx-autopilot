@@ -1,11 +1,13 @@
 #include <platform/hw/ads1115_adc.h>
+#include <platform/hw/mpxv7002_pitot.h>
 #include <iostream>
+#include <boost/make_shared.hpp>
 
 int main() {
-	autopilot::Ads1115_ADC adc(2);
-	adc.set_channel_range(0, autopilot::Ads1115_ADC::V_4_096);
+	boost::shared_ptr<autopilot::Ads1115_ADC> adc = boost::make_shared<autopilot::Ads1115_ADC>(2);
+	autopilot::Mpxv7002Pitot p(adc, 0);
 
 	while (true) {
-		std::cout << adc.read_channel(0) << std::endl;
+		std::cout << p.get_data() << std::endl;
 	}
 }
