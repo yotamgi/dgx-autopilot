@@ -5,6 +5,7 @@
 #include "sensors/simulator_magnetometer.h"
 #include "sensors/simulator_gps.h"
 #include "sensors/simulator_altmeter.h"
+#include "sensors/simulator_pitot.h"
 #include <boost/thread.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
@@ -59,11 +60,16 @@ void thread(PlainParams plain_params, WindGen::Params wind_params, boost::shared
 			new SimulatorGpsSensor()
 	);
 
+	boost::shared_ptr<SimulatorPitotSensor> pitot_sensor(
+			new SimulatorPitotSensor(sim.get_wind())
+	);
+
 	plain->carry(gyro_sensor);
 	plain->carry(acc_sensor);
 	plain->carry(magneto_sensor);
 	plain->carry(gps_sensor);
 	plain->carry(alt_sensor);
+	plain->carry(pitot_sensor);
 
 	// inital servo data
 	plain->get_elevator_servo()->set_data(50.);
@@ -78,6 +84,7 @@ void thread(PlainParams plain_params, WindGen::Params wind_params, boost::shared
 	platform->acc_sensor = acc_sensor;
 	platform->gyro_sensor = gyro_sensor;
 	platform->compass_sensor = magneto_sensor;
+	platform->airspeed_sensor = pitot_sensor;
 	platform->gps_pos_generator = gps_pos;
 	platform->gps_speed_dir_generator = gps_speed_dir;
 	platform->gps_speed_mag_generator = gps_speed_mag;
