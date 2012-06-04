@@ -68,8 +68,11 @@ $(OBJDIR)/simulator_gps.o: $(SRCDIR)/sensors/simulator_gps.cc
 $(OBJDIR)/simulator_altmeter.o: $(SRCDIR)/sensors/simulator_altmeter.cc
 	$(CXX) -c $(SRCDIR)/sensors/simulator_altmeter.cc $(CXXFLAGS) -o $(OBJDIR)/simulator_altmeter.o		
 
-$(LIBDIR)/libdgx_simulator.so: $(LIBDIR) $(OBJDIR)/plain.o $(OBJDIR)/camera.o $(OBJDIR)/wind_gen.o $(OBJDIR)/simulator_platform.o $(OBJDIR)/simulator.o $(OBJDIR)/platforms.o  $(OBJDIR)/simulator_gyro.o $(OBJDIR)/simulator_accelerometer.o $(OBJDIR)/simulator_magnetometer.o $(OBJDIR)/simulator_gps.o $(OBJDIR)/simulator_altmeter.o 
-	$(CXX) -shared -fPIC $(OBJDIR)/plain.o $(OBJDIR)/camera.o $(OBJDIR)/wind_gen.o $(OBJDIR)/simulator_platform.o  $(OBJDIR)/simulator.o $(OBJDIR)/platforms.o $(OBJDIR)/simulator_gyro.o $(OBJDIR)/simulator_accelerometer.o $(OBJDIR)/simulator_magnetometer.o $(OBJDIR)/simulator_gps.o $(OBJDIR)/simulator_altmeter.o $(LDFLAGS) -o $(LIBDIR)/libdgx_simulator.so
+$(OBJDIR)/simulator_pitot.o: $(SRCDIR)/sensors/simulator_pitot.cc
+	$(CXX) -c $(SRCDIR)/sensors/simulator_pitot.cc $(CXXFLAGS) -o $(OBJDIR)/simulator_pitot.o		
+
+$(LIBDIR)/libdgx_simulator.so: $(LIBDIR) $(OBJDIR)/plain.o $(OBJDIR)/camera.o $(OBJDIR)/wind_gen.o $(OBJDIR)/simulator_platform.o $(OBJDIR)/simulator.o $(OBJDIR)/platforms.o  $(OBJDIR)/simulator_gyro.o $(OBJDIR)/simulator_accelerometer.o $(OBJDIR)/simulator_magnetometer.o $(OBJDIR)/simulator_gps.o $(OBJDIR)/simulator_altmeter.o $(OBJDIR)/simulator_pitot.o 
+	$(CXX) -shared -fPIC $(OBJDIR)/plain.o $(OBJDIR)/camera.o $(OBJDIR)/wind_gen.o $(OBJDIR)/simulator_platform.o  $(OBJDIR)/simulator.o $(OBJDIR)/platforms.o $(OBJDIR)/simulator_gyro.o $(OBJDIR)/simulator_accelerometer.o $(OBJDIR)/simulator_magnetometer.o $(OBJDIR)/simulator_gps.o $(OBJDIR)/simulator_altmeter.o  $(OBJDIR)/simulator_pitot.o $(LDFLAGS) -o $(LIBDIR)/libdgx_simulator.so
 
 sim: $(OBJDIR)/main.o $(LIBDIR)/libdgx_simulator.so
 	$(CXX) $(OBJDIR)/main.o -L$(LIBDIR) $(LDFLAGS),$(LIBDIR)/libdgx_simulator.so -ldgx_simulator -o sim 

@@ -19,6 +19,7 @@ public:
 	~Simulator();
 
 	boost::shared_ptr<simulator::Plain> get_plane() { return m_plain; }
+	boost::shared_ptr<simulator::WindGen> get_wind() { return m_wind_gen; }
 
 	void run();
 private:
@@ -53,6 +54,7 @@ private:
 
     boost::shared_ptr<simulator::Camera> m_camera;
 	boost::shared_ptr<simulator::Plain> m_plain;
+	boost::shared_ptr<WindGen> m_wind_gen;
 
 	EventReceiver receiver;
 };
