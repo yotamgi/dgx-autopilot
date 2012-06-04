@@ -35,6 +35,7 @@ private:
 
 	/** needed for calculating the tracked direction */
 	irr::core::vector3df m_tracked_prev_pos;
+	irr::core::vector3df m_tracked_low_pass;
 
 	boost::shared_ptr<FlyingObject> m_tracked;
 

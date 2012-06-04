@@ -27,9 +27,10 @@ void Camera::update(float time_delta) {
 
 		tracked_pos = m_tracked->get_pos();
 		tracked_dir = (tracked_pos - m_tracked_prev_pos).normalize();
+		m_tracked_low_pass = m_tracked_low_pass*(1 - 4*time_delta) + tracked_dir*4*time_delta;
 
 		m_tracking_camera_node->setTarget(tracked_pos);
-		m_tracking_camera_node->setPosition(tracked_pos - tracked_dir*m_closeness);
+		m_tracking_camera_node->setPosition(tracked_pos - m_tracked_low_pass*m_closeness);
 
 		m_tracked_prev_pos = tracked_pos;
 
