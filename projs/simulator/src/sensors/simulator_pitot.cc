@@ -4,9 +4,14 @@ namespace simulator {
 
 typedef irr::core::vector3df irrvec3f;
 
-SimulatorPitotSensor::SimulatorPitotSensor(boost::shared_ptr<WindGen> simulator_wind):
+lin_algebra::vec3f to_lin(irrvec3f vec) {
+	return lin_algebra::create_vec3f(vec.X, vec.Y, vec.Z);
+}
+
+SimulatorPitotSensor::SimulatorPitotSensor(lin_algebra::vec3f sensor_heading, boost::shared_ptr<WindGen> simulator_wind):
 		m_simulator_wind(simulator_wind),
-		m_traced_object(NULL)
+		m_traced_object(NULL),
+		m_sensor_heading(sensor_heading[0], sensor_heading[1], sensor_heading[2])
 {}
 
 void SimulatorPitotSensor::setSensedObject(irr::scene::ISceneNode *object) {
@@ -24,7 +29,11 @@ void SimulatorPitotSensor::update(float time_delta) {
 			lin_algebra::create_vec3f(ground_speed.X, ground_speed.Y, ground_speed.Z) -
 			m_simulator_wind->get_wind();
 
-	m_pitot_data = lin_algebra::vec_len(airspeed);
+	irrvec3f curr_heading;
+	m_traced_object->getAbsoluteTransformation().rotateVect(curr_heading, m_sensor_heading);
+	curr_heading = curr_heading.normalize();
+
+	m_pitot_data = lin_algebra::dot(airspeed, to_lin(curr_heading)) * curr_heading.getLength();
 
 	m_old_pos = curr_pos;
 }
