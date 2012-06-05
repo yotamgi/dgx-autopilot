@@ -13,7 +13,7 @@ namespace simulator {
 class SimulatorPitotSensor : public Carriable, public stream::DataPopStream<float> {
 public:
 
-	SimulatorPitotSensor(boost::shared_ptr<WindGen> simulator_wind);
+	SimulatorPitotSensor(lin_algebra::vec3f sensor_heading, boost::shared_ptr<WindGen> simulator_wind);
 
 	void setSensedObject(irr::scene::ISceneNode *object);
 
@@ -27,6 +27,8 @@ private:
 	irr::scene::ISceneNode *m_traced_object;
 
 	irr::core::vector3df m_old_pos;
+
+	const irr::core::vector3df m_sensor_heading;
 
 	float m_pitot_data;
 

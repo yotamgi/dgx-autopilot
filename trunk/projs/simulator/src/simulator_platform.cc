@@ -61,7 +61,7 @@ void thread(PlainParams plain_params, WindGen::Params wind_params, boost::shared
 	);
 
 	boost::shared_ptr<SimulatorPitotSensor> pitot_sensor(
-			new SimulatorPitotSensor(sim.get_wind())
+			new SimulatorPitotSensor(lin_algebra::create_vec3f(0., 0., -1.), sim.get_wind())
 	);
 
 	plain->carry(gyro_sensor);
