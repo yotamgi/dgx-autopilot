@@ -6,22 +6,22 @@ namespace gs {
 
 OrientationStreamView::OrientationStreamView(boost::shared_ptr<orientation_stream> stream,
 											float update_time,
-											QSize size,
+											float width,
 											QWidget *parent):
 		QWidget(parent),
 		m_timer(this),
 		m_stream(stream)
 {
-	if (size.width() != 0) setFixedWidth(size.width());
-	if (size.height() != 0) setFixedHeight(size.height());
+	setFixedWidth(width);
+	setFixedHeight(width/2.);
 
 	m_orientation_widget = new OrientationWidget(this);
-	m_orientation_widget->setFixedWidth(width()/2.);
+	m_orientation_widget->setFixedWidth(width/2.);
 	m_orientation_widget->setFixedHeight(height());
 	m_orientation_widget->init();
 
 	m_heading_widget = new HeadingWidget(this);
-	m_heading_widget->setFixedWidth(width()/2.);
+	m_heading_widget->setFixedWidth(width/2.);
 	m_heading_widget->setFixedHeight(height());
 	m_heading_widget->init();
 
