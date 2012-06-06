@@ -176,6 +176,7 @@ GroundStation::GroundStation(std::string plane_address):
 	gs::SizePushGen* sa_yaw_control  = new gs::SizePushGen(yaw_control, "SA Yaw", 0, 100., 50., gs::SizePushGen::HORIZONTAL_DIAGRAM);
 
 	// the radio buttons
+	QRadioButton *no_pilot_button = new QRadioButton("&No Pilot");
 	QRadioButton *wp_pilot_button = new QRadioButton("&Waypoint Pilot");
 	QRadioButton *sa_pilot_button = new QRadioButton("&SA Pilot");
 
@@ -188,10 +189,11 @@ GroundStation::GroundStation(std::string plane_address):
 
 	// the pilot chooser
 	QGridLayout* pilot_chooser_layout = new QGridLayout;
-	pilot_chooser_layout->addWidget(wp_pilot_button, 0, 0, 1, 2);
-	pilot_chooser_layout->addWidget(sa_pilot_button, 1, 0);
-	pilot_chooser_layout->addWidget(view_link_quality, 2, 0);
-	pilot_chooser_layout->addWidget(view_fps, 2, 1);
+	pilot_chooser_layout->addWidget(no_pilot_button, 0, 0, 1, 2);
+	pilot_chooser_layout->addWidget(wp_pilot_button, 1, 0, 1, 2);
+	pilot_chooser_layout->addWidget(sa_pilot_button, 2, 0, 1, 2);
+	pilot_chooser_layout->addWidget(view_link_quality, 3, 0);
+	pilot_chooser_layout->addWidget(view_fps, 3, 1);
 	QGroupBox* pilot_chooser = new QGroupBox(tr("Pilot Chooser"));
 	pilot_chooser->setLayout(pilot_chooser_layout);
 
@@ -247,6 +249,7 @@ GroundStation::GroundStation(std::string plane_address):
 	// connect signals
 	connect(wp_pilot_button, SIGNAL(toggled(bool)), this, SLOT(to_waypoint_pilot(bool)));
 	connect(sa_pilot_button, SIGNAL(toggled(bool)), this, SLOT(to_sa_pilot(bool)));
+	connect(no_pilot_button, SIGNAL(toggled(bool)), this, SLOT(to_no_pilot(bool)));
 	connect(map_view, SIGNAL(got_point(const QgsPoint&, Qt::MouseButton)),
 			this, SLOT(got_waypoint(const QgsPoint&, Qt::MouseButton)));
 }
@@ -286,5 +289,15 @@ void GroundStation::to_sa_pilot(bool activate) {
 		conn->write(commands::SWITCH_TO_SA_PILOT);
 
 		m_keyboard_grabber->grabKeyboard();
+	}
+}
+
+void GroundStation::to_no_pilot(bool activate) {
+	if (activate) {
+		std::cout << "GS: NO pilot activated!" << std::endl;
+		boost::shared_ptr<stream::Connection> conn = m_control_connection.get_connection();
+		conn->write(commands::SWITCH_TO_NO_PILOT);
+
+		m_keyboard_grabber->releaseKeyboard();
 	}
 }

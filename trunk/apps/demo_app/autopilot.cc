@@ -148,11 +148,35 @@ boost::shared_ptr<stream::AsyncStreamConnection>  export_data(std::string export
 	return c;
 }
 
-void update_cockpit(autopilot::Cockpit* cockpit) {
-	while (true) {
-		cockpit->orientation()->get_data();
+class CockpitUpdater {
+public:
+	CockpitUpdater(boost::shared_ptr<autopilot::Cockpit> cockpit):
+		m_running(false),m_cockpit(cockpit) {}
+
+	void start() {
+		if (!m_running) {
+			m_running = true;
+			m_running_thread = boost::thread(&CockpitUpdater::run, this);
+		}
 	}
-}
+	void stop() {
+		if (m_running) {
+			m_running = false;
+			m_running_thread.join();
+		}
+	}
+
+	void run() {
+		m_running = true;
+		while (m_running) {
+			m_cockpit->orientation()->get_data();
+		}
+	}
+private:
+	boost::thread m_running_thread;
+	volatile bool m_running;
+	boost::shared_ptr<autopilot::Cockpit> m_cockpit;
+};
 
 int main(int argc, char** argv) {
 	// commandline parsing
@@ -244,7 +268,6 @@ int main(int argc, char** argv) {
 
 	// create the wp pilot
 	autopilot::WaypointPilot wp_pilot(wp_pilot_params, cockpit);
-	wp_pilot.start(true);
 
 	// create the sa pilot
 	autopilot::StabilityAugmentingPilot sa_pilot(cockpit, 20., 20.);
@@ -252,6 +275,9 @@ int main(int argc, char** argv) {
 
 	boost::shared_ptr<stream::PushForwarder<float> > gas_control   = boost::make_shared<stream::PushForwarder<float> >();
 	boost::shared_ptr<stream::PushForwarder<float> > yaw_control   = boost::make_shared<stream::PushForwarder<float> >();
+
+	CockpitUpdater cockpit_updater(cockpit);
+	cockpit_updater.start();
 
 	// export all the data
 	boost::shared_ptr<stream::AsyncStreamConnection> conn = export_data(gs_address,
@@ -273,6 +299,7 @@ int main(int argc, char** argv) {
 
 	conn->start();
 
+
 	stream::TcpipClient control_connection(gs_address, commands::port);
 	while (true) {
 		try {
@@ -292,6 +319,7 @@ int main(int argc, char** argv) {
 
 			else if (command == commands::SWITCH_TO_WAYPOINT_PILOT) {
 				std::cout << "Moving to Waypoint pilot... ";
+				cockpit_updater.stop();
 				sa_pilot.stop();
 				gas_control->unregister_receiver(cockpit->gas_servo());
 				yaw_control->unregister_receiver(cockpit->yaw_servo());
@@ -301,12 +329,28 @@ int main(int argc, char** argv) {
 
 			else if (command == commands::SWITCH_TO_SA_PILOT) {
 				std::cout << "Moving to SA pilot... ";
+				cockpit_updater.stop();
 				wp_pilot.stop();
 				gas_control->register_receiver(cockpit->gas_servo());
 				yaw_control->register_receiver(cockpit->yaw_servo());
 				sa_pilot.start();
 				std::cout << " Finished." << std::endl;
 			}
+
+			else if (command == commands::SWITCH_TO_NO_PILOT) {
+				std::cout << "Moving to no pilot... ";
+				cockpit_updater.stop();
+				sa_pilot.stop();
+				gas_control->unregister_receiver(cockpit->gas_servo());
+				yaw_control->unregister_receiver(cockpit->yaw_servo());
+				wp_pilot.stop();
+				cockpit->pitch_servo()->set_data(50.);
+				cockpit->tilt_servo()->set_data(50.);
+				cockpit->yaw_servo()->set_data(50.);
+				cockpit_updater.start();
+				std::cout << " Finished." << std::endl;
+			}
+
 
 		} catch (stream::ConnectionExceptioin e) {
 			std::cout << "An exception was thrown : " << e.what() << ". Continuing" << std::endl;
