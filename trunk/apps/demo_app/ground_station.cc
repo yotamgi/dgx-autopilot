@@ -6,6 +6,7 @@
 #include <gs/size_stream_view.h>
 #include <gs/map_stream_view.h>
 #include <gs/size_push_gen.h>
+#include <gs/orientation_stream_view.h>
 #include <boost/make_shared.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/assign/list_of.hpp>
@@ -145,6 +146,10 @@ GroundStation::GroundStation(std::string plane_address):
 	view3d->addVecStream(watch_acc_sensor, irr::core::vector3df(0., 0., 8.));
 	view3d->addVecStream(watch_compass_sensor, irr::core::vector3df(0., 0., 8.));
 
+	// the 2d orientation view
+	gs::OrientationStreamView* view2d = new gs::OrientationStreamView(orientation,
+			view_update_time, stream3d_dimention.width());
+
 	// the airspeed stream
 	gs::SizeStreamView *view_airspeed = new gs::SizeStreamView(airspeed, "Airspeed", view_update_time, 0., 20.);
 
@@ -155,7 +160,7 @@ GroundStation::GroundStation(std::string plane_address):
 	gs::SizeStreamView *view_fps = new gs::SizeStreamView(gyro_fps, "FPS", 1., 0., 400.);
 
 	// the position
-	const QSize map_dimention(frame_size.width()/2, frame_size.height());
+	const QSize map_dimention(frame_size.width()/2.3, frame_size.height());
 	gs::MapStreamView* map_view = new gs::MapStreamView(position, 1.0f, map_dimention,
 					std::string("../../projs/ground_station/data/map"));
 
@@ -222,7 +227,10 @@ GroundStation::GroundStation(std::string plane_address):
 	// left up
 	QWidget* left_up = new QWidget();
 	QHBoxLayout* left_up_layout = new QHBoxLayout();
-	left_up_layout->addWidget(view3d);
+	QTabWidget* orientation_widget = new QTabWidget();
+	orientation_widget->addTab(view3d, "3D orientation view");
+	orientation_widget->addTab(view2d, "2D orientation view");
+	left_up_layout->addWidget(orientation_widget);
 	left_up_layout->addWidget(view_reliability);
 	left_up_layout->addWidget(view_airspeed);
 	left_up->setLayout(left_up_layout);
