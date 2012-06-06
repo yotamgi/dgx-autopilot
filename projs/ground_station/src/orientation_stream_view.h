@@ -18,7 +18,7 @@ class OrientationStreamView : public QWidget {
 public:
 	OrientationStreamView(boost::shared_ptr<orientation_stream> stream,
 			float update_time,
-			QSize size = QSize(0,0),
+			float width,
 			QWidget *parent = NULL);
 
 public slots:

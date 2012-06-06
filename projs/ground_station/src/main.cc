@@ -54,7 +54,7 @@ int main(int argc, char** argv) {
 	gs::SizePushGen* size_gen = new gs::SizePushGen(push_size_stream, "stream", -10., 10., 2.);
 
 	gs::OrientationStreamView* orientation =
-			new gs::OrientationStreamView(vec_stream, 0.1, QSize(400, 200));
+			new gs::OrientationStreamView(vec_stream, 0.1, 400);
 
 	layout->addWidget(map_view);
 	layout->addWidget(view3d);
