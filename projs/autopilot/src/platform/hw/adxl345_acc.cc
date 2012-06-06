@@ -41,7 +41,7 @@ Adxl345Acc::Adxl345Acc(size_t device_i2c_num,
 	SYSTEM_AXIS_HEADING[2] = axis_heading[2]? 1:-1;
 
 }
-// y, -z, -x
+
 lin_algebra::vec3f Adxl345Acc::get_data() {
 
 	// read the data
