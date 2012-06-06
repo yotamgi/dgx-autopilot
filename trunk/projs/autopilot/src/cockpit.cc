@@ -77,10 +77,28 @@ Cockpit::Cockpit(NormalPlainPlatform platform):
 					m_gps_speed_mag
 	);
 
-	m_orientation = boost::make_shared<vec3_watch_stream>(fusion_filter);
+	m_orientation_calibration =
+		boost::make_shared<CalibrationFilter<lin_algebra::vec3f> >(
+			fusion_filter
+		);
+	m_orientation = boost::make_shared<vec3_watch_stream>(m_orientation_calibration);
+
 	m_rest_reliability = fusion_filter->get_reliability_stream();
 	m_rest_orientation = fusion_filter->get_rest_orientation_stream();
 	m_fixed_acc = fusion_filter->get_fixed_acc_stream();
+
+	m_alt_calibration =
+		boost::make_shared<CalibrationFilter<float> >(
+			stream::create_func_pop_filter<lin_algebra::vec3f,float>(
+				m_gps_pos,
+				lin_algebra::get<2>
+			)
+		);
+	m_alt_stream = boost::make_shared<float_watch_stream>(m_alt_calibration);
+
+
+	m_alt_calibration->calibrate(0);
+	m_orientation_calibration->calibrate(lin_algebra::create_vec3f(0., 0., 0.));
 }
 
 Cockpit::~Cockpit() {}
@@ -121,12 +139,7 @@ boost::shared_ptr<vec2_watch_stream> Cockpit::position() {
 }
 
 boost::shared_ptr<float_watch_stream> Cockpit::alt() {
-	return boost::make_shared<float_watch_stream>(
-			stream::create_func_pop_filter<lin_algebra::vec3f,float>(
-				m_gps_pos,
-				lin_algebra::get<2>
-		)
-	);
+	return m_alt_stream;
 }
 
 void Cockpit::alive() {
