@@ -30,6 +30,7 @@ public slots:
 	void to_waypoint_pilot(bool activate);
 	void to_no_pilot(bool activate);
 	void to_sa_pilot(bool activate);
+	void calibrate();
 
 private:
 
