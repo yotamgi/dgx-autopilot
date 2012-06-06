@@ -12,6 +12,8 @@ namespace commands {
 	const std::string SWITCH_TO_WAYPOINT_PILOT = "TOWP";
 
 	const std::string SWITCH_TO_SA_PILOT = "TOSA";
+
+	const std::string SWITCH_TO_NO_PILOT = "TONP";
 }
 
 #endif /* COMMAND_PROTOCOL_H_ */
