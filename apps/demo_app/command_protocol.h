@@ -14,6 +14,9 @@ namespace commands {
 	const std::string SWITCH_TO_SA_PILOT = "TOSA";
 
 	const std::string SWITCH_TO_NO_PILOT = "TONP";
+
+	const std::string CALIBRATE = "CALI";
+
 }
 
 #endif /* COMMAND_PROTOCOL_H_ */

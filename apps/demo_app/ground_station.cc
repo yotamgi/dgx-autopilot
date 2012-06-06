@@ -180,6 +180,9 @@ GroundStation::GroundStation(std::string plane_address):
 	QRadioButton *wp_pilot_button = new QRadioButton("&Waypoint Pilot");
 	QRadioButton *sa_pilot_button = new QRadioButton("&SA Pilot");
 
+	// the calibration button
+	QPushButton* calibration_button = new QPushButton("&Calibrate");
+
 	m_keyboard_grabber = new KeyboardGetterWidget(sa_tilt_control, sa_roll_control);
 
 	//
@@ -208,11 +211,12 @@ GroundStation::GroundStation(std::string plane_address):
 
 	// left down
 	QWidget* left_down = new QWidget();
-	QHBoxLayout* left_down_layout = new QHBoxLayout();
-	left_down_layout->addWidget(view_alt);
-	left_down_layout->addWidget(pilot_chooser);
-	left_down_layout->addWidget(sa_controls);
-	left_down_layout->addWidget(gen_waypoints_alt);
+	QGridLayout* left_down_layout = new QGridLayout();
+	left_down_layout->addWidget(view_alt, 			0, 0, 2, 1);
+	left_down_layout->addWidget(pilot_chooser, 		0, 1, 2, 1);
+	left_down_layout->addWidget(sa_controls, 		0, 2, 2, 1);
+	left_down_layout->addWidget(gen_waypoints_alt, 	1, 3, 1, 1);
+	left_down_layout->addWidget(calibration_button, 0, 3, 1, 1);
 	left_down->setLayout(left_down_layout);
 
 	// left up
@@ -250,6 +254,7 @@ GroundStation::GroundStation(std::string plane_address):
 	connect(wp_pilot_button, SIGNAL(toggled(bool)), this, SLOT(to_waypoint_pilot(bool)));
 	connect(sa_pilot_button, SIGNAL(toggled(bool)), this, SLOT(to_sa_pilot(bool)));
 	connect(no_pilot_button, SIGNAL(toggled(bool)), this, SLOT(to_no_pilot(bool)));
+	connect(calibration_button, SIGNAL(clicked()), this, SLOT(calibrate()));
 	connect(map_view, SIGNAL(got_point(const QgsPoint&, Qt::MouseButton)),
 			this, SLOT(got_waypoint(const QgsPoint&, Qt::MouseButton)));
 }
@@ -300,4 +305,10 @@ void GroundStation::to_no_pilot(bool activate) {
 
 		m_keyboard_grabber->releaseKeyboard();
 	}
+}
+
+void GroundStation::calibrate() {
+	std::cout << "GS: Calibrating plain!" << std::endl;
+	boost::shared_ptr<stream::Connection> conn = m_control_connection.get_connection();
+	conn->write(commands::CALIBRATE);
 }

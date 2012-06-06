@@ -351,6 +351,12 @@ int main(int argc, char** argv) {
 				std::cout << " Finished." << std::endl;
 			}
 
+			else if (command == commands::CALIBRATE) {
+				std::cout << "Calibrating the plain... ";
+				cockpit->calibrate();
+				std::cout << " Finished." << std::endl;
+			}
+
 
 		} catch (stream::ConnectionExceptioin e) {
 			std::cout << "An exception was thrown : " << e.what() << ". Continuing" << std::endl;
