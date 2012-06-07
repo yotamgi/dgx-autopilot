@@ -41,34 +41,39 @@ void HeadingWidget::init( void ) {
     item_markers = new QGraphicsSvgItem(MEDIA_DIR "/widget_files/qfi/hsi_markers.svg");
     item_shadow  = new QGraphicsSvgItem(MEDIA_DIR "/widget_files/qfi/any_shadow.svg");
 
-    double x = 325;
-    double y = 325;
+    double x = 330;
+    double y = 330;
 
     item_bg->setFlags(QGraphicsItem::ItemClipsToShape);
     item_bg->setCacheMode(QGraphicsItem::NoCache);
     item_bg->scale( (double)width()/x, (double)height()/y );
     item_bg->setZValue(250);
+    item_bg->setPos(-width()/2, -height()/2);
 
     item_casing->setFlags(QGraphicsItem::ItemClipsToShape);
     item_casing->setCacheMode(QGraphicsItem::NoCache);
     item_casing->scale( (double)width()/x, (double)height()/y );
     item_casing->setZValue(300);
+    item_casing->setPos(-width()/2, -height()/2);
 
     item_face->setFlags(QGraphicsItem::ItemClipsToShape);
     item_face->setCacheMode(QGraphicsItem::NoCache);
     item_face->scale( (double)width()/x, (double)height()/y );
     item_face->setTransformOriginPoint( x/2, y/2 );
     item_face->setZValue(1);
+    item_face->setPos(-width()/2, -height()/2);
 
     item_markers->setFlags(QGraphicsItem::ItemClipsToShape);
     item_markers->setCacheMode(QGraphicsItem::NoCache);
     item_markers->scale( (double)width()/x, (double)height()/y );
     item_markers->setZValue(50);
+    item_markers->setPos(-width()/2, -height()/2);
 
     item_shadow->setFlags(QGraphicsItem::ItemClipsToShape);
     item_shadow->setCacheMode(QGraphicsItem::NoCache);
     item_shadow->scale( (double)width()/x, (double)height()/y );
     item_shadow->setZValue(100);
+    item_shadow->setPos(-width()/2, -height()/2);
 
     scene()->clear();
 
