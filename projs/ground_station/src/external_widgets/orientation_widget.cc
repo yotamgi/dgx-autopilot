@@ -55,66 +55,77 @@ void OrientationWidget::init() {
     item_sky    = new QGraphicsSvgItem(MEDIA_DIR "/widget_files/qfi/adi_sky.svg");
     item_grd    = new QGraphicsSvgItem(MEDIA_DIR "/widget_files/qfi/adi_ground.svg");
 
-    double x = 325;
-    double y = 325;
+    double x = 330;
+    double y = 330;
 
     item_cas->setFlags(QGraphicsItem::ItemClipsToShape);
     item_cas->setCacheMode(QGraphicsItem::NoCache);
     item_cas->scale( (double)width()/x, (double)height()/y );
     item_cas->setZValue(250);
+    item_cas->setPos(-width()/2, -height()/2);
 
     item_bg->setFlags(QGraphicsItem::ItemClipsToShape);
     item_bg->setCacheMode(QGraphicsItem::NoCache);
     item_bg->scale( (double)width()/x, (double)height()/y );
     item_bg->setZValue(200);
+    item_bg->setPos(-width()/2, -height()/2);
 
     item_shadow->setFlags(QGraphicsItem::ItemClipsToShape);
     item_shadow->setCacheMode(QGraphicsItem::NoCache);
     item_shadow->scale( (double)width()/x, (double)height()/y );
     item_shadow->setZValue(199);
+    item_shadow->setPos(-width()/2, -height()/2);
 
     item_roll->setFlags(QGraphicsItem::ItemClipsToShape);
     item_roll->setCacheMode(QGraphicsItem::NoCache);
     item_roll->scale( (double)width()/x, (double)height()/y );
     item_roll->setTransformOriginPoint( x/2, y/2 );
     item_roll->setZValue(100);
+    item_roll->setPos(-width()/2, -height()/2);
 
     item_shd1->setFlags(QGraphicsItem::ItemClipsToShape);
     item_shd1->setCacheMode(QGraphicsItem::NoCache);
     item_shd1->scale( (double)width()/x, (double)height()/y );
     item_shd1->setZValue(75);
+    item_shd1->setPos(-width()/2, -height()/2);
 
     item_plt->setFlags(QGraphicsItem::ItemClipsToShape);
     item_plt->setCacheMode(QGraphicsItem::NoCache);
     item_plt->scale( (double)width()/x, (double)height()/y );
     item_plt->setTransformOriginPoint( x/2, y/2 );
     item_plt->setZValue(90);
+    item_plt->setPos(-width()/2, -height()/2);
 
     item_shd2->setFlags(QGraphicsItem::ItemClipsToShape);
     item_shd2->setCacheMode(QGraphicsItem::NoCache);
     item_shd2->scale( (double)width()/x, (double)height()/y );
     item_shd2->setZValue(95);
+    item_shd2->setPos(-width()/2, -height()/2);
 
     item_spr->setFlags(QGraphicsItem::ItemClipsToShape);
     item_spr->setCacheMode(QGraphicsItem::NoCache);
     item_spr->scale( (double)width()/x, (double)height()/y );
     item_spr->setTransformOriginPoint( x/2, y/2 );
     item_spr->setZValue(20);
+    item_spr->setPos(-width()/2, -height()/2);
 
     item_mkr->setFlags(QGraphicsItem::ItemClipsToShape);
     item_mkr->setCacheMode(QGraphicsItem::NoCache);
     item_mkr->scale( (double)width()/x, (double)height()/y );
     item_mkr->setZValue(150);
+    item_mkr->setPos(-width()/2, -height()/2);
 
     item_grd->setFlags(QGraphicsItem::ItemClipsToShape);
     item_grd->setCacheMode(QGraphicsItem::NoCache);
     item_grd->scale( (double)width()/x, (double)height()/y );
     item_grd->setZValue(1);
+    item_mkr->setPos(-width()/2, -height()/2);
 
     item_sky->setFlags(QGraphicsItem::ItemClipsToShape);
     item_sky->setCacheMode(QGraphicsItem::NoCache);
     item_sky->scale( (double)width()/x, (double)height()/y );
     item_sky->setZValue(2);
+    item_mkr->setPos(-width()/2, -height()/2);
 
     scene()->clear();
 
