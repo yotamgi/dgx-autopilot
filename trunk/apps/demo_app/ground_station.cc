@@ -12,6 +12,7 @@
 #include <boost/make_shared.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/assign/list_of.hpp>
+#include <boost/bind.hpp>
 #include <qt4/Qt/qboxlayout.h>
 #include <qt4/Qt/qgridlayout.h>
 
@@ -19,6 +20,7 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <functional>
 
 int stam;
 
@@ -168,7 +170,9 @@ GroundStation::GroundStation(std::string plane_address):
 
 
 	// the airspeed stream
-	gs::SizeStreamView *view_airspeed = new gs::SizeStreamView(airspeed, "Airspeed", view_update_time, 0., 20.);
+	gs::SizeStreamView *view_airspeed = new gs::SizeStreamView(
+			stream::create_func_pop_filter<float, float>(airspeed, boost::bind(std::multiplies<float>(), _1, 3.6f)),
+			"Airspeed [km/h]", view_update_time, 0., 100.);
 
 	// the reliable stream
 	gs::SizeStreamView *view_reliability = new gs::SizeStreamView(reliability, "Reliability", view_update_time, 0., 1.);
