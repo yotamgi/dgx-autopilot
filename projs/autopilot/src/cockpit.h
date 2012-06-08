@@ -34,7 +34,7 @@ public:
 	 * data and calibrate the cocktpit.
 	 * @return the calibration data that the plane was calibrated by.
 	 */
-	const calibration_data& calibrate();
+	calibration_data calibrate();
 
 	/**
 	 * Calibrate function
