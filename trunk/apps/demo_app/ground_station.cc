@@ -2,11 +2,13 @@
 #include "command_protocol.h"
 
 #include <stream/util/udpip_connection.h>
+#include <stream/func_filter.h>
 #include <gs/3d_stream_view.h>
 #include <gs/size_stream_view.h>
 #include <gs/map_stream_view.h>
 #include <gs/size_push_gen.h>
 #include <gs/orientation_stream_view.h>
+#include <gs/label_stream_view.h>
 #include <boost/make_shared.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/assign/list_of.hpp>
@@ -150,6 +152,21 @@ GroundStation::GroundStation(std::string plane_address):
 	gs::OrientationStreamView* view2d = new gs::OrientationStreamView(orientation,
 			view_update_time, stream3d_dimention.width());
 
+	// the label orientation view
+	gs::LabelStreamView<float>* pitch_view = new gs::LabelStreamView<float>(
+			stream::create_func_pop_filter<lin_algebra::vec3f, float>(orientation, lin_algebra::get<0>),
+			view_update_time,
+			"Pitch");
+	gs::LabelStreamView<float>* roll_view = new gs::LabelStreamView<float>(
+			stream::create_func_pop_filter<lin_algebra::vec3f, float>(orientation, lin_algebra::get<2>),
+			view_update_time,
+			"Roll");
+	gs::LabelStreamView<float>* yaw_view = new gs::LabelStreamView<float>(
+			stream::create_func_pop_filter<lin_algebra::vec3f, float>(orientation, lin_algebra::get<1>),
+			view_update_time,
+			"Yaw");
+
+
 	// the airspeed stream
 	gs::SizeStreamView *view_airspeed = new gs::SizeStreamView(airspeed, "Airspeed", view_update_time, 0., 20.);
 
@@ -226,13 +243,16 @@ GroundStation::GroundStation(std::string plane_address):
 
 	// left up
 	QWidget* left_up = new QWidget();
-	QHBoxLayout* left_up_layout = new QHBoxLayout();
+	QGridLayout* left_up_layout = new QGridLayout();
 	QTabWidget* orientation_widget = new QTabWidget();
 	orientation_widget->addTab(view3d, "3D orientation view");
 	orientation_widget->addTab(view2d, "2D orientation view");
-	left_up_layout->addWidget(orientation_widget);
-	left_up_layout->addWidget(view_reliability);
-	left_up_layout->addWidget(view_airspeed);
+	left_up_layout->addWidget(orientation_widget,	0, 0, 1, 3);
+	left_up_layout->addWidget(pitch_view, 			1, 0);
+	left_up_layout->addWidget(roll_view, 			1, 1);
+	left_up_layout->addWidget(yaw_view, 			1, 2);
+	left_up_layout->addWidget(view_reliability, 	0, 4);
+	left_up_layout->addWidget(view_airspeed, 		0, 5);
 	left_up->setLayout(left_up_layout);
 
 	// left side
@@ -252,6 +272,9 @@ GroundStation::GroundStation(std::string plane_address):
 	wnd->setCentralWidget(main_widget);
 	wnd->show();
 	view3d->start();
+	pitch_view->start();
+	roll_view->start();
+	yaw_view->start();
 	view_reliability->start();
 	view_airspeed->start();
 	view_fps->start();
