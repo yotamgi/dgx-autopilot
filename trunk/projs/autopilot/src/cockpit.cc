@@ -103,6 +103,20 @@ Cockpit::Cockpit(NormalPlainPlatform platform):
 
 Cockpit::~Cockpit() {}
 
+Cockpit::calibration_data Cockpit::calibrate() {
+	Cockpit::calibration_data cal_data;
+	cal_data.orientation 	= -m_orientation->get_data();
+	cal_data.alt 			= -m_alt_stream->get_data();
+	calibrate(cal_data);
+	return cal_data;
+}
+
+void Cockpit::calibrate(const Cockpit::calibration_data& calibration) {
+	m_orientation_calibration->calibrate(calibration.orientation);
+	m_alt_calibration->calibrate(calibration.alt);
+}
+
+
 boost::shared_ptr<vec3_stream> Cockpit::watch_gyro_orientation() {
 	return m_gyro_orientation;
 }
