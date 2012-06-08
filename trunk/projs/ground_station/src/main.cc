@@ -3,6 +3,7 @@
 #include "size_stream_view.h"
 #include "size_push_gen.h"
 #include "orientation_stream_view.h"
+#include "label_stream_view.h"
 #include "stream/stream_utils.h"
 #include <QtGui>
 
@@ -46,21 +47,23 @@ int main(int argc, char** argv) {
 
 	QWidget* window = new QWidget();
 
-	QHBoxLayout* layout = new QHBoxLayout();
+	QGridLayout* layout = new QGridLayout();
 
 	gs::MapStreamView* map_view = new gs::MapStreamView(pos_stream, 0.2, QSize(400, 300), "./data/map");
 	gs::StreamView3d* view3d = new gs::StreamView3d(0.1, QSize(400, 300));
 	gs::SizeStreamView* size = new gs::SizeStreamView(push_size_stream, "stream", 0.1, -10., 10.);
+	gs::LabelStreamView<lin_algebra::vec3f>* label = new gs::LabelStreamView<lin_algebra::vec3f>(vec_stream, 0.1, "pos");
 	gs::SizePushGen* size_gen = new gs::SizePushGen(push_size_stream, "stream", -10., 10., 2.);
 
 	gs::OrientationStreamView* orientation =
 			new gs::OrientationStreamView(vec_stream, 0.1, 400);
 
-	layout->addWidget(map_view);
-	layout->addWidget(view3d);
-	layout->addWidget(size);
-	layout->addWidget(size_gen);
-	layout->addWidget(orientation);
+	layout->addWidget(map_view, 0, 0);
+	layout->addWidget(view3d, 0, 1);
+	layout->addWidget(size, 0, 2);
+	layout->addWidget(size_gen, 0, 3);
+	layout->addWidget(orientation, 1, 0);
+	layout->addWidget(label, 1, 1);
 
 	window->setLayout(layout);
 	window->show();
@@ -68,6 +71,7 @@ int main(int argc, char** argv) {
 	view3d->addAngleStream(vec_stream);
 	view3d->start();
 	size->start();
+	label->start();
 
 	return app.exec();
 }
