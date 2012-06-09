@@ -39,6 +39,11 @@ public:
 	 */
 	boost::optional<sample> next_sample();
 
+	/**
+	 * @return the stream length in seconds
+	 */
+	float get_stream_length();
+
 private:
 	boost::shared_ptr<std::istream> m_in;
 };
@@ -60,7 +65,22 @@ public:
 	 */
 	PopStreamPlayer(boost::shared_ptr<std::istream> in, bool blocking = true);
 
+	/**
+	 * The start function.
+	 * This funcion must be called in order of the class to start playing the
+	 * stream.
+	 */
+	void start();
+
+	/** Stops the stream playing */
+	void stop();
+
 	bool ended() { return m_ended; }
+
+	/**
+	 * @return the stream length in seconds
+	 */
+	float get_stream_length() { return m_reader.get_stream_length(); }
 
 	T get_data();
 
@@ -92,6 +112,21 @@ public:
 	 * @param in - the stream to play.
 	 */
 	PushStreamPlayer(boost::shared_ptr<std::istream> in);
+
+	/**
+	 * The start function.
+	 * This funcion must be called in order of the class to start playing the
+	 * stream.
+	 */
+	void start();
+
+	/** Stops the stream playing */
+	void stop();
+
+	/**
+	 * @return the stream length in seconds
+	 */
+	float get_stream_length() { return m_reader.get_stream_length(); }
 
 	void register_receiver(boost::shared_ptr<DataPushStream<T> > reciever);
 	void unregister_receiver(boost::shared_ptr<DataPushStream<T> > reciever);
