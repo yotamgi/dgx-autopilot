@@ -103,6 +103,18 @@ CockpitPlayer::CockpitPlayer(std::string play_dir):
 			view_update_time,
 			"Yaw");
 
+	// the control toolbar
+	QToolBar* control_toolbar = wnd->addToolBar(tr("Play Control"));
+	m_play_action = new QAction(QIcon("/usr/share/icons/oxygen/48x48/actions/media-playback-start.png"), tr("&Play"), control_toolbar);
+	QAction* pause_action = new QAction(QIcon("/usr/share/icons/oxygen/48x48/actions/media-playback-pause.png"), tr("&Pause"), control_toolbar);
+	QAction* stop_action = new QAction(QIcon("/usr/share/icons/oxygen/48x48/actions/media-playback-stop.png"), tr("&Stop"), control_toolbar);
+	m_play_action->setShortcut(Qt::Key_Space);
+	m_play_action->setCheckable(true);
+
+	control_toolbar->addAction(m_play_action);
+	control_toolbar->addAction(pause_action);
+	control_toolbar->addAction(stop_action);
+
 //	// the airspeed stream
 //	gs::SizeStreamView *view_airspeed = new gs::SizeStreamView(
 //			stream::create_func_pop_filter<float, float>(m_cockpit->a, boost::bind(std::multiplies<float>(), _1, 3.6f)),
@@ -128,6 +140,7 @@ CockpitPlayer::CockpitPlayer(std::string play_dir):
 	QWidget* left_down = new QWidget();
 	QGridLayout* left_down_layout = new QGridLayout();
 	left_down_layout->addWidget(view_alt, 			0, 0, 1, 1);
+	//left_down_layout->addWidget(control_toolbar,	1, 0, 1, 1);
 	left_down->setLayout(left_down_layout);
 
 	// left up
@@ -166,8 +179,50 @@ CockpitPlayer::CockpitPlayer(std::string play_dir):
 	view_reliability->start();
 	//view_airspeed->start();
 	view_alt->start();
+
+	connect(m_play_action, SIGNAL(toggled(bool)), this, SLOT(play(bool)));
+	connect(pause_action, SIGNAL(triggered()), this, SLOT(pause()));
 }
 
 void CockpitPlayer::run() {
 	m_app.exec();
 };
+
+void CockpitPlayer::update_cockpit() {
+	while (m_play_action->isChecked()) {
+		m_cockpit->orientation()->get_data();
+	}
+}
+
+void CockpitPlayer::play(bool state) {
+
+	if (state) {
+		std::cout << "Playing..." << std::endl;
+		m_acc_sensor_player->start();
+		m_gyro_sensor_player->start();
+		m_compass_sensor_player->start();
+		m_gps_pos_generator_player->start();
+		m_gps_speed_dir_generator_player->start();
+		m_gps_speed_mag_generator_player->start();
+
+		m_update_cockpit_thread = boost::thread(&CockpitPlayer::update_cockpit, this);
+	} else {
+		pause();
+	}
+}
+
+void CockpitPlayer::pause() {
+	std::cout << "Pausing..." << std::endl;
+
+	if (m_play_action->isChecked()) {
+		m_play_action->setChecked(false);
+		m_update_cockpit_thread.join();
+
+		m_acc_sensor_player->stop();
+		m_gyro_sensor_player->stop();
+		m_compass_sensor_player->stop();
+		m_gps_pos_generator_player->stop();
+		m_gps_speed_dir_generator_player->stop();
+		m_gps_speed_mag_generator_player->stop();
+	}
+}
