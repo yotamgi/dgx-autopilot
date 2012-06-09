@@ -49,6 +49,54 @@ boost::optional<typename StreamReader<T>::sample> StreamReader<T>::next_sample()
 }
 
 template <typename T>
+inline float StreamReader<T>::get_stream_length() {
+
+	std::streamsize prev_count = m_in->tellg();
+
+	// go to eof
+	m_in->seekg(-2, std::ios_base::end);
+	long gc = m_in->tellg();
+
+	while (true) {
+		// go to the beginning of this line
+		do {
+			m_in->seekg(gc--);
+		} while ((char)m_in->peek() != '\n');
+
+		// try to parse
+		boost::optional<sample> s;
+		try {
+			s = next_sample();
+		} catch (StreamException& e) {
+			// OK, didn't succeed. just do nothing
+		}
+
+		// if we succeded, go back to the prev_pos and return the sample time
+		if (s) {
+			m_in->seekg(prev_count);
+			return s->time;
+		}
+
+		// There might be some errors, so clear all the error flags
+		m_in->clear();
+
+		// if we did not, go to the former line
+		do {
+			m_in->seekg(gc--);
+		} while ((char)m_in->peek() != '\n');
+	}
+}
+
+template <typename T>
+inline void PopStreamPlayer<T>::start() {
+	m_timer.reset();
+}
+
+template <typename T>
+inline void PopStreamPlayer<T>::stop() {
+}
+
+template <typename T>
 inline PopStreamPlayer<T>::PopStreamPlayer(boost::shared_ptr<std::istream> in, bool blocking):
 		m_reader(in), m_blocking(blocking), m_ended(false)
 {
@@ -106,7 +154,7 @@ inline T PopStreamPlayer<T>::get_data() {
 template <typename T>
 PushStreamPlayer<T>::PushStreamPlayer(boost::shared_ptr<std::istream> in):
 	m_reader(in),
-	m_worker_thread(&PushStreamPlayer<T>::run, this)
+	m_worker_thread()
 {}
 
 template <typename T>
@@ -139,6 +187,16 @@ void PushStreamPlayer<T>::run() {
 	}
 }
 
+template <typename T>
+inline void PushStreamPlayer<T>::start() {
+	m_timer.reset();
+	m_worker_thread = boost::thread(&PushStreamPlayer<T>::run, this);
+}
+
+template <typename T>
+inline void PushStreamPlayer<T>::stop() {
+	m_worker_thread.detach();
+}
 
 } // namespace stream
 
