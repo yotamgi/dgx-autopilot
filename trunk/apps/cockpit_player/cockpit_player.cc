@@ -58,7 +58,12 @@ CockpitPlayer::CockpitPlayer(std::string play_dir):
     platform.gps_speed_dir_generator =  m_gps_speed_dir_generator_player;
     platform.gps_speed_mag_generator =  m_gps_speed_mag_generator_player;
 
+    start_players();
+
     m_cockpit = boost::make_shared<autopilot::Cockpit>(platform);
+
+    pause_players();
+
 
 	//
 	// Create the window
@@ -182,6 +187,7 @@ CockpitPlayer::CockpitPlayer(std::string play_dir):
 
 	connect(m_play_action, SIGNAL(toggled(bool)), this, SLOT(play(bool)));
 	connect(pause_action, SIGNAL(triggered()), this, SLOT(pause()));
+	connect(stop_action, SIGNAL(triggered()), this, SLOT(stop()));
 }
 
 void CockpitPlayer::run() {
@@ -198,12 +204,7 @@ void CockpitPlayer::play(bool state) {
 
 	if (state) {
 		std::cout << "Playing..." << std::endl;
-		m_acc_sensor_player->start();
-		m_gyro_sensor_player->start();
-		m_compass_sensor_player->start();
-		m_gps_pos_generator_player->start();
-		m_gps_speed_dir_generator_player->start();
-		m_gps_speed_mag_generator_player->start();
+		start_players();
 
 		m_update_cockpit_thread = boost::thread(&CockpitPlayer::update_cockpit, this);
 	} else {
@@ -214,15 +215,43 @@ void CockpitPlayer::play(bool state) {
 void CockpitPlayer::pause() {
 	std::cout << "Pausing..." << std::endl;
 
-	if (m_play_action->isChecked()) {
-		m_play_action->setChecked(false);
-		m_update_cockpit_thread.join();
+	m_play_action->setChecked(false);
+	m_update_cockpit_thread.join();
 
-		m_acc_sensor_player->stop();
-		m_gyro_sensor_player->stop();
-		m_compass_sensor_player->stop();
-		m_gps_pos_generator_player->stop();
-		m_gps_speed_dir_generator_player->stop();
-		m_gps_speed_mag_generator_player->stop();
-	}
+	pause_players();
+}
+
+void CockpitPlayer::stop() {
+	std::cout << "Stopping..." << std::endl;
+
+	m_play_action->setChecked(false);
+	m_update_cockpit_thread.join();
+
+	stop_players();
+}
+
+void CockpitPlayer::start_players() {
+	m_acc_sensor_player->start();
+	m_gyro_sensor_player->start();
+	m_compass_sensor_player->start();
+	m_gps_pos_generator_player->start();
+	m_gps_speed_dir_generator_player->start();
+	m_gps_speed_mag_generator_player->start();
+}
+void CockpitPlayer::pause_players() {
+	m_acc_sensor_player->pause();
+	m_gyro_sensor_player->pause();
+	m_compass_sensor_player->pause();
+	m_gps_pos_generator_player->pause();
+	m_gps_speed_dir_generator_player->pause();
+	m_gps_speed_mag_generator_player->pause();
+}
+void CockpitPlayer::stop_players() {
+
+	m_acc_sensor_player->stop();
+	m_gyro_sensor_player->stop();
+	m_compass_sensor_player->stop();
+	m_gps_pos_generator_player->stop();
+	m_gps_speed_dir_generator_player->stop();
+	m_gps_speed_mag_generator_player->stop();
 }

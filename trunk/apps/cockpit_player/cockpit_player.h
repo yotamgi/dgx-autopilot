@@ -26,6 +26,7 @@ public slots:
 
 	void play(bool state);
 	void pause();
+	void stop();
 
 private:
 
@@ -36,6 +37,10 @@ private:
 	void update_cockpit();
 
 	QApplication m_app;
+
+	void start_players();
+	void pause_players();
+	void stop_players();
 
     boost::shared_ptr<vec3_pop_player> 		m_acc_sensor_player;
     boost::shared_ptr<vec3_pop_player> 		m_gyro_sensor_player;
