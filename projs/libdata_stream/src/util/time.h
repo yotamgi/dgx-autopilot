@@ -25,10 +25,24 @@ inline double get_curr_time() {
  */
 class Timer {
 public:
-	Timer() { reset(); }
+	Timer():m_paused(false) { reset(); }
 
 	double passed() const {
-		return get_curr_time() - m_start;
+		if (!m_paused) {
+			return get_curr_time() - m_start;
+		} else {
+			return m_paused_time;
+		}
+	}
+
+	void pause() {
+		m_paused_time = passed();
+		m_paused = true;
+	}
+
+	void cont() {
+		m_paused = false;
+		m_start += (passed() - m_paused_time);
 	}
 
 	void reset() {
@@ -38,6 +52,9 @@ public:
 private:
 
 	double m_start;
+
+	bool m_paused;
+	double m_paused_time;
 
 };
 

@@ -89,11 +89,18 @@ inline float StreamReader<T>::get_stream_length() {
 
 template <typename T>
 inline void PopStreamPlayer<T>::start() {
-	m_timer.reset();
+	m_timer.cont();
+}
+
+template <typename T>
+inline void PopStreamPlayer<T>::pause() {
+	m_timer.pause();
 }
 
 template <typename T>
 inline void PopStreamPlayer<T>::stop() {
+	m_timer.reset();
+	m_timer.pause();
 }
 
 template <typename T>
@@ -103,6 +110,8 @@ inline PopStreamPlayer<T>::PopStreamPlayer(boost::shared_ptr<std::istream> in, b
 	if (!blocking) {
 		m_curr_sample.time = -1.;
 	}
+
+	m_timer.pause();
 }
 
 template <typename T>
@@ -155,7 +164,9 @@ template <typename T>
 PushStreamPlayer<T>::PushStreamPlayer(boost::shared_ptr<std::istream> in):
 	m_reader(in),
 	m_worker_thread()
-{}
+{
+	m_timer.pause();
+}
 
 template <typename T>
 void PushStreamPlayer<T>::register_receiver(boost::shared_ptr<DataPushStream<T> > reciever) {
@@ -189,13 +200,21 @@ void PushStreamPlayer<T>::run() {
 
 template <typename T>
 inline void PushStreamPlayer<T>::start() {
-	m_timer.reset();
-	m_worker_thread = boost::thread(&PushStreamPlayer<T>::run, this);
+	m_timer.cont();
+	if (m_worker_thread == boost::thread()) {
+		boost::thread(&PushStreamPlayer<T>::run, this);
+	}
+}
+
+template <typename T>
+inline void PushStreamPlayer<T>::pause() {
+	m_timer.pause();
 }
 
 template <typename T>
 inline void PushStreamPlayer<T>::stop() {
-	m_worker_thread.detach();
+	m_timer.reset();
+	m_timer.pause();
 }
 
 } // namespace stream

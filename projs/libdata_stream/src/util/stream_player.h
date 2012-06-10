@@ -75,6 +75,9 @@ public:
 	/** Stops the stream playing */
 	void stop();
 
+	/** Pause the stream playing */
+	void pause();
+
 	bool ended() { return m_ended; }
 
 	/**
@@ -122,6 +125,9 @@ public:
 
 	/** Stops the stream playing */
 	void stop();
+
+	/** Pause the stream playing */
+	void pause();
 
 	/**
 	 * @return the stream length in seconds
