@@ -140,6 +140,9 @@ CockpitPlayer::CockpitPlayer(std::string play_dir):
 	m_progress_slider->setOrientation(Qt::Horizontal);
 	m_progress_slider->setRange(0, PROGRESS_RESOLUTION);
 
+	// The progress text
+	m_progress_text = new QLabel("Progress");
+
 	//
 	// create the window itself and organize it
 	//
@@ -173,11 +176,19 @@ CockpitPlayer::CockpitPlayer(std::string play_dir):
 	left_layout->addWidget(left_down);
 	left->setLayout(left_layout);
 
+	// down
+	QWidget* down = new QWidget;
+	QGridLayout* down_layout = new QGridLayout;
+	down_layout->addWidget(m_progress_slider, 	0, 0, 1, 2);
+	down_layout->addWidget(control_toolbar, 	1, 0, 1, 1);
+	down_layout->addWidget(m_progress_text, 	1, 1, 1, 1);
+	down->setLayout(down_layout);
+
 	// alltogether
 	QGridLayout* main_layout = new QGridLayout();
-	main_layout->addWidget(left, 				0, 0);
-	main_layout->addWidget(map_view, 			0, 1);
-	main_layout->addWidget(m_progress_slider, 	1, 0, 1, 2);
+	main_layout->addWidget(left, 		0, 0);
+	main_layout->addWidget(map_view, 	0, 1);
+	main_layout->addWidget(down, 		1, 0, 1, 2);
 
 	main_widget->setLayout(main_layout);
 	wnd->setCentralWidget(main_widget);
@@ -206,6 +217,10 @@ void CockpitPlayer::timerEvent(QTimerEvent *) {
 	m_progress_slider->setValue(PROGRESS_RESOLUTION *
 			(m_acc_sensor_player->get_pos()/m_acc_sensor_player->get_stream_length())
 	);
+
+	std::stringstream ss;
+	ss << m_acc_sensor_player->get_pos() << " / " << m_acc_sensor_player->get_stream_length();
+	m_progress_text->setText(tr(ss.str().c_str()));
 }
 
 void CockpitPlayer::update_cockpit() {
