@@ -48,7 +48,6 @@ CockpitPlayer::CockpitPlayer(std::string play_dir):
     m_gps_speed_dir_generator_player = boost::make_shared<float_push_player>(gps_speed_dir_file);
     m_gps_speed_mag_generator_player = boost::make_shared<float_push_player>(gps_speed_mag_file);
 
-
     // create the player platform
     autopilot::NormalPlainPlatform platform;
     platform.acc_sensor = 				m_acc_sensor_player;
@@ -74,7 +73,7 @@ CockpitPlayer::CockpitPlayer(std::string play_dir):
 	//wnd->setWindowState(Qt::WindowMinimized);
 
 	// global parameters
-	const QSize stream3d_dimention(frame_size.width()/2.05, frame_size.height()/2);
+	const QSize stream3d_dimention(frame_size.width()/2.05, frame_size.height()/2.);
 	const float view_update_time = 0.01;
 
 	// the 3d orientation view
@@ -129,12 +128,17 @@ CockpitPlayer::CockpitPlayer(std::string play_dir):
 	gs::SizeStreamView *view_reliability = new gs::SizeStreamView(m_cockpit->watch_rest_reliability(), "Reliability", view_update_time, 0., 1.);
 
 	// the position
-	const QSize map_dimention(frame_size.width()/2.3, frame_size.height());
+	const QSize map_dimention(frame_size.width()/2.3, frame_size.height()/1.1);
 	gs::MapStreamView* map_view = new gs::MapStreamView(m_cockpit->position(), 1.0f, map_dimention,
 					std::string("../../projs/ground_station/data/map"));
 
 	// the plane's alt
 	gs::SizeStreamView* view_alt = new gs::SizeStreamView(m_cockpit->alt()->get_watch_stream(), "Alt", 0.1f , 0., 200.);
+
+	// the progress bar
+	m_progress_slider = new QSlider();
+	m_progress_slider->setOrientation(Qt::Horizontal);
+	m_progress_slider->setRange(0, PROGRESS_RESOLUTION);
 
 	//
 	// create the window itself and organize it
@@ -170,9 +174,10 @@ CockpitPlayer::CockpitPlayer(std::string play_dir):
 	left->setLayout(left_layout);
 
 	// alltogether
-	QHBoxLayout* main_layout = new QHBoxLayout();
-	main_layout->addWidget(left);
-	main_layout->addWidget(map_view);
+	QGridLayout* main_layout = new QGridLayout();
+	main_layout->addWidget(left, 				0, 0);
+	main_layout->addWidget(map_view, 			0, 1);
+	main_layout->addWidget(m_progress_slider, 	1, 0, 1, 2);
 
 	main_widget->setLayout(main_layout);
 	wnd->setCentralWidget(main_widget);
@@ -185,6 +190,9 @@ CockpitPlayer::CockpitPlayer(std::string play_dir):
 	//view_airspeed->start();
 	view_alt->start();
 
+	// start the worker timer 20 times a second
+	startTimer(1000*(1./20));
+
 	connect(m_play_action, SIGNAL(toggled(bool)), this, SLOT(play(bool)));
 	connect(pause_action, SIGNAL(triggered()), this, SLOT(pause()));
 	connect(stop_action, SIGNAL(triggered()), this, SLOT(stop()));
@@ -193,6 +201,12 @@ CockpitPlayer::CockpitPlayer(std::string play_dir):
 void CockpitPlayer::run() {
 	m_app.exec();
 };
+
+void CockpitPlayer::timerEvent(QTimerEvent *) {
+	m_progress_slider->setValue(PROGRESS_RESOLUTION *
+			(m_acc_sensor_player->get_pos()/m_acc_sensor_player->get_stream_length())
+	);
+}
 
 void CockpitPlayer::update_cockpit() {
 	while (m_play_action->isChecked()) {
