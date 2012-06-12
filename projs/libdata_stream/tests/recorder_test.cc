@@ -181,3 +181,25 @@ TEST(player_recorder, vec_stream_length) {
 	stream::PushStreamPlayer<lin_algebra::vec3f> player(ss);
 	ASSERT_NEAR(player.get_stream_length(), last_time, 0.01);
 }
+
+TEST(player_recorder, seek_functional) {
+	boost::shared_ptr<RunningGen> gen(new RunningGen);
+	boost::shared_ptr<std::ofstream> record_file(new std::ofstream("/tmp/file"));
+
+	stream::filters::RecorderPopFilter<int> filter(record_file, gen);
+
+	// make the recording
+	for (size_t i=0; i<100; i++) {
+		usleep(10000); // 1/100 sec
+		filter.get_data();
+	}
+	record_file->close();
+
+	// play it
+	boost::shared_ptr<std::istream> play_file(new std::ifstream("/tmp/file"));
+
+	stream::PopStreamPlayer<int> player(play_file);
+	player.seek(0.5);
+	player.start();
+	ASSERT_NEAR(player.get_data(), 50, 10);
+}

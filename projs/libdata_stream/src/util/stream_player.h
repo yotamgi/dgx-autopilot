@@ -44,7 +44,21 @@ public:
 	 */
 	float get_stream_length();
 
+	/**
+	 * Jumps to certain time in the stream file.
+	 * @param time to seek to in seconds
+	 */
+	void seek(float time);
+
 private:
+
+	/**
+	 * This is a helper function that align the file counter to a coherent
+	 * position and extract one sample from it.
+	 * NOTE - it does affect the file's get counter.
+	 */
+	sample align_and_extract();
+
 	boost::shared_ptr<std::istream> m_in;
 };
 
@@ -78,6 +92,13 @@ public:
 	/** Pause the stream playing */
 	void pause();
 
+	/**
+	 * Jump to a certain point in the stream, so now the play will continue
+	 * from there.
+	 * @param time to seek to in seconds
+	 */
+	void seek(float seek_t);
+
 	/** @return the current position of the stream in seconds */
 	float get_pos();
 
@@ -97,6 +118,7 @@ private:
 	bool m_blocking;
 
 	Timer m_timer;
+	float m_seek_offset;
 
 	typename StreamReader<T>::sample m_curr_sample;
 
