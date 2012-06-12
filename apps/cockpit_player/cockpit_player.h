@@ -9,6 +9,7 @@
 #include <qapplication.h>
 #include <QObject>
 #include <qt4/Qt/qwidget.h>
+#include <qt4/QtGui/qslider.h>
 
 class CockpitPlayer : public QObject {
 	Q_OBJECT
@@ -28,7 +29,13 @@ public slots:
 	void pause();
 	void stop();
 
+protected:
+
+	void timerEvent(QTimerEvent *);
+
 private:
+
+	static const size_t PROGRESS_RESOLUTION = 1000;
 
 	typedef stream::PopStreamPlayer<lin_algebra::vec3f> vec3_pop_player;
 	typedef stream::PushStreamPlayer<lin_algebra::vec3f> vec3_push_player;
@@ -54,6 +61,7 @@ private:
     boost::thread m_update_cockpit_thread;
 
     QAction* m_play_action;
+    QSlider* m_progress_slider;
 };
 
 #endif /* GROUND_STATION_H_ */
