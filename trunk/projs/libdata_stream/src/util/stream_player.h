@@ -156,6 +156,13 @@ public:
 	/** Pause the stream playing */
 	void pause();
 
+	/**
+	 * Jump to a certain point in the stream, so now the play will continue
+	 * from there.
+	 * @param time to seek to in seconds
+	 */
+	void seek(float seek_t);
+
 	/** @return the current position of the stream in seconds */
 	float get_pos();
 
@@ -176,6 +183,7 @@ private:
 	PushForwarder<T> m_out_forwarder;
 
 	Timer m_timer;
+	float m_seek_offset;
 
 	float m_total_stream_length;
 };
