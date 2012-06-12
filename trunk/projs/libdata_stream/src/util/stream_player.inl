@@ -53,8 +53,67 @@ inline float StreamReader<T>::get_stream_length() {
 
 	std::streamsize prev_count = m_in->tellg();
 
-	// go to eof
+	// go to near eof
 	m_in->seekg(-2, std::ios_base::end);
+
+	// extract the sample
+	sample last_sample = align_and_extract();
+
+	// go back to the prev file position
+	m_in->seekg(prev_count);
+
+	return last_sample.time;
+}
+
+template <typename T>
+void StreamReader<T>::seek(float seek_t) {
+
+	// find the total length
+	m_in->seekg(-2, std::ios_base::end);
+	const std::streamsize total_len = m_in->tellg();
+
+	std::streamsize delta = total_len/2;
+	std::streamsize curr_pos = delta;
+
+
+	// binary search
+	float prev_t, next_t;
+	while (true) {
+
+		// go to the correct place in file
+		m_in->seekg(curr_pos);
+		delta /= 2;
+
+		// find the prev_t
+		prev_t = align_and_extract().time;
+
+		// find the next_t, if it exist
+		boost::optional<sample> next_optional = next_sample();
+		if (!next_optional) {
+			// it means that we got to the eof.
+			next_t = std::numeric_limits<float>::max();
+		} else {
+			next_t = next_optional->time;
+		}
+
+		if ((prev_t <= seek_t) && (next_t <= seek_t)) {
+			curr_pos += delta;
+		}
+		if ((prev_t >= seek_t) && (next_t >= seek_t)) {
+			curr_pos -= delta;
+		}
+		else if ((prev_t <= seek_t) && (next_t >= seek_t)) {
+			m_in->seekg(curr_pos);
+			align_and_extract();
+			return ;
+		}
+
+	}
+}
+
+template <typename T>
+typename StreamReader<T>::sample StreamReader<T>::align_and_extract() {
+
 	long gc = m_in->tellg();
 
 	while (true) {
@@ -71,20 +130,35 @@ inline float StreamReader<T>::get_stream_length() {
 			// OK, didn't succeed. just do nothing
 		}
 
-		// if we succeded, go back to the prev_pos and return the sample time
+		// if we succeded, return the sample
 		if (s) {
-			m_in->seekg(prev_count);
-			return s->time;
+			return *s;
 		}
 
 		// There might be some errors, so clear all the error flags
 		m_in->clear();
 
-		// if we did not, go to the former line
+		// if we did not find a good sample, go to the former line
 		do {
 			m_in->seekg(gc--);
 		} while ((char)m_in->peek() != '\n');
 	}
+
+}
+
+template <typename T>
+inline PopStreamPlayer<T>::PopStreamPlayer(boost::shared_ptr<std::istream> in, bool blocking):
+		m_reader(in),
+		m_blocking(blocking),
+		m_seek_offset(0.),
+		m_ended(false),
+		m_total_stream_length(m_reader.get_stream_length())
+{
+	if (!blocking) {
+		m_curr_sample.time = -1.;
+	}
+
+	m_timer.pause();
 }
 
 template <typename T>
@@ -103,21 +177,18 @@ inline void PopStreamPlayer<T>::stop() {
 	m_timer.pause();
 }
 
-template <typename T>
-inline PopStreamPlayer<T>::PopStreamPlayer(boost::shared_ptr<std::istream> in, bool blocking):
-		m_reader(in), m_blocking(blocking), m_ended(false), m_total_stream_length(m_reader.get_stream_length())
-{
-	if (!blocking) {
-		m_curr_sample.time = -1.;
-	}
-
-	m_timer.pause();
-}
 
 template <typename T>
 inline float PopStreamPlayer<T>::get_pos() {
 	return m_timer.passed();
 }
+
+template <typename T>
+inline void PopStreamPlayer<T>::seek(float seek_t) {
+	m_reader.seek(seek_t);
+	m_seek_offset = seek_t;
+}
+
 
 template <typename T>
 inline T PopStreamPlayer<T>::get_data() {
@@ -139,10 +210,10 @@ inline T PopStreamPlayer<T>::get_data() {
 		typename StreamReader<T>::sample curr_sample = *curr_sample_optional;
 
 		// block until the time comes
-		float time_diff = curr_sample.time - m_timer.passed();
+		float time_diff = curr_sample.time - (m_timer.passed() + m_seek_offset);
 		while (time_diff > 0.) {
 			usleep((uint32_t)(time_diff * 1000000.));
-			time_diff = curr_sample.time - m_timer.passed();
+			time_diff = curr_sample.time - (m_timer.passed() + m_seek_offset);
 		}
 
 		m_curr_sample = curr_sample;
@@ -150,7 +221,7 @@ inline T PopStreamPlayer<T>::get_data() {
 	}
 	else {
 		// read from file until we got to the correct time
-		while (m_curr_sample.time < m_timer.passed()) {
+		while (m_curr_sample.time < (m_timer.passed() + m_seek_offset)) {
 
 			boost::optional<typename StreamReader<T>::sample> curr_sample_optional = m_reader.next_sample();
 			if (!curr_sample_optional) {
