@@ -78,12 +78,15 @@ public:
 	/** Pause the stream playing */
 	void pause();
 
+	/** @return the current position of the stream in seconds */
+	float get_pos();
+
 	bool ended() { return m_ended; }
 
 	/**
 	 * @return the stream length in seconds
 	 */
-	float get_stream_length() { return m_reader.get_stream_length(); }
+	float get_stream_length() { return m_total_stream_length; }
 
 	T get_data();
 
@@ -98,6 +101,8 @@ private:
 	typename StreamReader<T>::sample m_curr_sample;
 
 	bool m_ended;
+
+	float m_total_stream_length;
 };
 
 
@@ -129,10 +134,13 @@ public:
 	/** Pause the stream playing */
 	void pause();
 
+	/** @return the current position of the stream in seconds */
+	float get_pos();
+
 	/**
 	 * @return the stream length in seconds
 	 */
-	float get_stream_length() { return m_reader.get_stream_length(); }
+	float get_stream_length() { return m_total_stream_length; }
 
 	void register_receiver(boost::shared_ptr<DataPushStream<T> > reciever);
 	void unregister_receiver(boost::shared_ptr<DataPushStream<T> > reciever);
@@ -146,6 +154,8 @@ private:
 	PushForwarder<T> m_out_forwarder;
 
 	Timer m_timer;
+
+	float m_total_stream_length;
 };
 
 
