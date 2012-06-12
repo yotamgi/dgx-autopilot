@@ -10,6 +10,8 @@
 #include <QObject>
 #include <qt4/Qt/qwidget.h>
 #include <qt4/QtGui/qslider.h>
+#include <qt4/QtGui/qlabel.h>
+
 
 class CockpitPlayer : public QObject {
 	Q_OBJECT
@@ -62,6 +64,7 @@ private:
 
     QAction* m_play_action;
     QSlider* m_progress_slider;
+    QLabel* m_progress_text;
 };
 
 #endif /* GROUND_STATION_H_ */
