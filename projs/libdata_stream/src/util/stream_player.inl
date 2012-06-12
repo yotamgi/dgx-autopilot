@@ -180,7 +180,7 @@ inline void PopStreamPlayer<T>::stop() {
 
 template <typename T>
 inline float PopStreamPlayer<T>::get_pos() {
-	return m_timer.passed();
+	return m_timer.passed() + m_seek_offset;
 }
 
 template <typename T>
@@ -240,6 +240,7 @@ template <typename T>
 PushStreamPlayer<T>::PushStreamPlayer(boost::shared_ptr<std::istream> in):
 	m_reader(in),
 	m_worker_thread(),
+	m_seek_offset(0.),
 	m_total_stream_length(m_reader.get_stream_length())
 {
 	m_timer.pause();
@@ -262,8 +263,8 @@ void PushStreamPlayer<T>::run() {
 		typename StreamReader<T>::sample curr_sample = *curr_sample_optional;
 
 		// block until the time comes
-		while (curr_sample.time > m_timer.passed()) {
-			usleep((uint32_t)((curr_sample.time - m_timer.passed()) * 1000000.));
+		while (curr_sample.time > (m_timer.passed() + m_seek_offset)) {
+			usleep((uint32_t)((curr_sample.time - (m_timer.passed() + m_seek_offset)) * 1000000.));
 		}
 
 		// set the data, if somone listens
@@ -296,10 +297,14 @@ inline void PushStreamPlayer<T>::stop() {
 
 template <typename T>
 inline float PushStreamPlayer<T>::get_pos() {
-	return m_timer.passed();
+	return (m_timer.passed() + m_seek_offset);
 }
 
-
+template <typename T>
+inline void PushStreamPlayer<T>::seek(float seek_t) {
+	m_reader.seek(seek_t);
+	m_seek_offset = seek_t;
+}
 
 } // namespace stream
 
