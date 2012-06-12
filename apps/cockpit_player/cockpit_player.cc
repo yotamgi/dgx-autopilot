@@ -181,7 +181,7 @@ CockpitPlayer::CockpitPlayer(std::string play_dir):
 	QGridLayout* down_layout = new QGridLayout;
 	down_layout->addWidget(m_progress_slider, 	0, 0, 1, 2);
 	down_layout->addWidget(control_toolbar, 	1, 0, 1, 1);
-	down_layout->addWidget(m_progress_text, 	1, 1, 1, 1);
+	down_layout->addWidget(m_progress_text, 	1, 1, 1, 1, Qt::AlignRight);
 	down->setLayout(down_layout);
 
 	// alltogether
