@@ -105,13 +105,18 @@ inline void PopStreamPlayer<T>::stop() {
 
 template <typename T>
 inline PopStreamPlayer<T>::PopStreamPlayer(boost::shared_ptr<std::istream> in, bool blocking):
-		m_reader(in), m_blocking(blocking), m_ended(false)
+		m_reader(in), m_blocking(blocking), m_ended(false), m_total_stream_length(m_reader.get_stream_length())
 {
 	if (!blocking) {
 		m_curr_sample.time = -1.;
 	}
 
 	m_timer.pause();
+}
+
+template <typename T>
+inline float PopStreamPlayer<T>::get_pos() {
+	return m_timer.passed();
 }
 
 template <typename T>
@@ -163,7 +168,8 @@ inline T PopStreamPlayer<T>::get_data() {
 template <typename T>
 PushStreamPlayer<T>::PushStreamPlayer(boost::shared_ptr<std::istream> in):
 	m_reader(in),
-	m_worker_thread()
+	m_worker_thread(),
+	m_total_stream_length(m_reader.get_stream_length())
 {
 	m_timer.pause();
 }
@@ -216,6 +222,13 @@ inline void PushStreamPlayer<T>::stop() {
 	m_timer.reset();
 	m_timer.pause();
 }
+
+template <typename T>
+inline float PushStreamPlayer<T>::get_pos() {
+	return m_timer.passed();
+}
+
+
 
 } // namespace stream
 
