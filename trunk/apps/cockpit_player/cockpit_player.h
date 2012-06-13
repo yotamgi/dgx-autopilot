@@ -67,6 +67,8 @@ private:
     QAction* m_play_action;
     QSlider* m_progress_slider;
     QLabel* m_progress_text;
+
+    int m_progress_set_data;
 };
 
 #endif /* GROUND_STATION_H_ */
