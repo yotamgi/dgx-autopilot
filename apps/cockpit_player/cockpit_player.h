@@ -30,6 +30,7 @@ public slots:
 	void play(bool state);
 	void pause();
 	void stop();
+	void seek(int pos); // out of PROGRESS_RESOLUTION  field
 
 protected:
 
@@ -50,6 +51,7 @@ private:
 	void start_players();
 	void pause_players();
 	void stop_players();
+	void seek_players(float seek_t);
 
     boost::shared_ptr<vec3_pop_player> 		m_acc_sensor_player;
     boost::shared_ptr<vec3_pop_player> 		m_gyro_sensor_player;
