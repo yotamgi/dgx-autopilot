@@ -99,7 +99,7 @@ void StreamReader<T>::seek(float seek_t) {
 		if ((prev_t <= seek_t) && (next_t <= seek_t)) {
 			curr_pos += delta;
 		}
-		if ((prev_t >= seek_t) && (next_t >= seek_t)) {
+		else if ((prev_t >= seek_t) && (next_t >= seek_t)) {
 			curr_pos -= delta;
 		}
 		else if ((prev_t <= seek_t) && (next_t >= seek_t)) {
@@ -108,11 +108,16 @@ void StreamReader<T>::seek(float seek_t) {
 			return ;
 		}
 
+		if (delta == 0) return;
+
 	}
 }
 
 template <typename T>
 typename StreamReader<T>::sample StreamReader<T>::align_and_extract() {
+
+	// clear any error flag before we start
+	m_in->clear();
 
 	long gc = m_in->tellg();
 
