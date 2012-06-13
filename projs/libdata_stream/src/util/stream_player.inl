@@ -116,7 +116,6 @@ void StreamReader<T>::seek(float seek_t) {
 template <typename T>
 typename StreamReader<T>::sample StreamReader<T>::align_and_extract() {
 
-	// clear any error flag before we start
 	m_in->clear();
 
 	long gc = m_in->tellg();
@@ -124,14 +123,20 @@ typename StreamReader<T>::sample StreamReader<T>::align_and_extract() {
 	while (true) {
 		// go to the beginning of this line
 		do {
+			// clear any error flag before we start
+			m_in->clear();
+
+			// go back one char
 			m_in->seekg(gc--);
-		} while ((char)m_in->peek() != '\n');
+
+		} while (((char)m_in->peek() != '\n') && gc >= 0);
+		if (gc < 0) break;
 
 		// try to parse
 		boost::optional<sample> s;
 		try {
 			s = next_sample();
-		} catch (StreamException& e) {
+		} catch (...) {
 			// OK, didn't succeed. just do nothing
 		}
 
@@ -145,10 +150,19 @@ typename StreamReader<T>::sample StreamReader<T>::align_and_extract() {
 
 		// if we did not find a good sample, go to the former line
 		do {
-			m_in->seekg(gc--);
-		} while ((char)m_in->peek() != '\n');
-	}
+			// clear any error flag before we start
+			m_in->clear();
 
+			// go back one char
+			m_in->seekg(gc--);
+
+		} while (((char)m_in->peek() != '\n') && gc >= 0);
+
+		if (gc < 0) break;
+	}
+	sample s;
+	s.time = 0.;
+	return s;
 }
 
 template <typename T>
