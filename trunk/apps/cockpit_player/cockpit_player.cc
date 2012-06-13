@@ -139,6 +139,7 @@ CockpitPlayer::CockpitPlayer(std::string play_dir):
 	m_progress_slider = new QSlider();
 	m_progress_slider->setOrientation(Qt::Horizontal);
 	m_progress_slider->setRange(0, PROGRESS_RESOLUTION);
+	m_progress_slider->setTracking(false);
 
 	// The progress text
 	m_progress_text = new QLabel("Progress");
@@ -214,9 +215,9 @@ void CockpitPlayer::run() {
 };
 
 void CockpitPlayer::timerEvent(QTimerEvent *) {
-	m_progress_slider->setValue(PROGRESS_RESOLUTION *
-			(m_acc_sensor_player->get_pos()/m_acc_sensor_player->get_stream_length())
-	);
+	int new_progress_pos = PROGRESS_RESOLUTION *
+			(m_acc_sensor_player->get_pos()/m_acc_sensor_player->get_stream_length());
+	m_progress_slider->setValue(new_progress_pos);
 
 	std::stringstream ss;
 	ss << m_acc_sensor_player->get_pos() << " / " << m_acc_sensor_player->get_stream_length();
@@ -259,6 +260,13 @@ void CockpitPlayer::stop() {
 	stop_players();
 }
 
+void CockpitPlayer::seek(int pos) {
+	float seek_t = m_acc_sensor_player->get_stream_length() * (float(pos)/PROGRESS_RESOLUTION);
+	std::cout << "Seeking to " << seek_t << "..." << std::endl;
+
+	//seek_players(seek_t);
+}
+
 void CockpitPlayer::start_players() {
 	m_acc_sensor_player->start();
 	m_gyro_sensor_player->start();
@@ -283,4 +291,12 @@ void CockpitPlayer::stop_players() {
 	m_gps_pos_generator_player->stop();
 	m_gps_speed_dir_generator_player->stop();
 	m_gps_speed_mag_generator_player->stop();
+}
+void CockpitPlayer::seek_players(float seek_t) {
+	m_acc_sensor_player->seek(seek_t);
+	m_gyro_sensor_player->seek(seek_t);
+	m_compass_sensor_player->seek(seek_t);
+	m_gps_pos_generator_player->seek(seek_t);
+	m_gps_speed_dir_generator_player->seek(seek_t);
+	m_gps_speed_mag_generator_player->seek(seek_t);
 }
