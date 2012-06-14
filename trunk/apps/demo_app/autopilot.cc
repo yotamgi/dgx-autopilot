@@ -265,6 +265,7 @@ int main(int argc, char** argv) {
 	wp_pilot_params.max_roll_angle = 40.;
 	wp_pilot_params.pitch_severity = 20.;
 	wp_pilot_params.roll_severity = 20.;
+	wp_pilot_params.heading_fine_tunning = 30.;
 
 	// create the wp pilot
 	autopilot::WaypointPilot wp_pilot(wp_pilot_params, cockpit);

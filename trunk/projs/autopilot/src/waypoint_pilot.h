@@ -26,6 +26,8 @@ public:
 		float pitch_severity;
 		float roll_severity;
 
+		float heading_fine_tunning;
+
 		float avg_gas;
 		float avg_pitch_angle;
 	};
