@@ -25,7 +25,7 @@ host: $(OBJDIR) $(AUTOGENDIR) cockpit_player
 device: 
 .PHONY:
 clean:
-	rm -rf $(AUTOGENDIR) $(OBJDIR) ./autopilot ./autopilot_device ./cockpit_player
+	rm -rf $(AUTOGENDIR) $(OBJDIR) ./cockpit_player
 
 $(OBJDIR):
 	mkdir $(OBJDIR)
