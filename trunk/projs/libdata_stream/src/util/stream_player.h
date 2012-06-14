@@ -52,12 +52,21 @@ public:
 
 private:
 
+	enum SampleState {
+		OK, FAILED, END_OF_FILE
+	};
+
+	/** Parses one sample and return its state */
+	SampleState parse_sample(sample& ans);
+
 	/**
 	 * This is a helper function that align the file counter to a coherent
 	 * position and extract one sample from it.
+	 * If it does not succeed, it returns nothing. A fail means that the stream
+	 * in the current position could not be parsed at all.
 	 * NOTE - it does affect the file's get counter.
 	 */
-	sample align_and_extract();
+	boost::optional<sample> align_and_extract();
 
 	boost::shared_ptr<std::istream> m_in;
 };

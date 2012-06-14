@@ -28,24 +28,39 @@ StreamReader<T>::StreamReader(boost::shared_ptr<std::istream> in):m_in(in)
 }
 
 template <typename T>
-boost::optional<typename StreamReader<T>::sample> StreamReader<T>::next_sample() {
-	typename StreamReader<T>::sample s;
+typename StreamReader<T>::SampleState StreamReader<T>::parse_sample(typename StreamReader<T>::sample& ans) {
 	char c;
-	(*m_in) >> s.time;
+	(*m_in) >> ans.time;
 	(*m_in) >> c;
 
 	if (m_in->eof()) {
-		return boost::optional<sample>();
+		return END_OF_FILE;
 	}
 	else if (c != ',') {
-		std::stringstream error;
-		error << "Could not parse the std::stream as a stream format - Expected ',' as seperator, but got " << c;
-		throw StreamException(error.str());
+		return FAILED;
 	}
 
-	(*m_in) >> s.data;
+	try {
+		(*m_in) >> ans.data;
+	} catch (...) {
+		return FAILED;
+	}
 
-	return boost::optional<sample>(s);
+	return OK;
+}
+
+template <typename T>
+boost::optional<typename StreamReader<T>::sample> StreamReader<T>::next_sample() {
+	typename StreamReader<T>::sample s;
+	SampleState state = parse_sample(s);
+
+	if (state == END_OF_FILE) {
+		return boost::optional<sample>();
+	} else if (state == FAILED) {
+		throw StreamException("Could not parse the std::stream as a stream format - Could not find ','");
+	} else {
+		return boost::optional<sample>(s);
+	}
 }
 
 template <typename T>
@@ -57,16 +72,23 @@ inline float StreamReader<T>::get_stream_length() {
 	m_in->seekg(-2, std::ios_base::end);
 
 	// extract the sample
-	sample last_sample = align_and_extract();
+	boost::optional<sample> last_sample = align_and_extract();
 
 	// go back to the prev file position
 	m_in->seekg(prev_count);
 
-	return last_sample.time;
+	if (last_sample) {
+		return last_sample->time;
+	} else {
+		return 0.;
+	}
 }
 
 template <typename T>
 void StreamReader<T>::seek(float seek_t) {
+
+	m_in->clear();
+	std::streamsize prev_count = m_in->tellg();
 
 	// find the total length
 	m_in->seekg(-2, std::ios_base::end);
@@ -85,17 +107,25 @@ void StreamReader<T>::seek(float seek_t) {
 		delta /= 2;
 
 		// find the prev_t
-		prev_t = align_and_extract().time;
-
-		// find the next_t, if it exist
-		boost::optional<sample> next_optional = next_sample();
-		if (!next_optional) {
-			// it means that we got to the eof.
-			next_t = std::numeric_limits<float>::max();
+		boost::optional<sample> prev_sample = align_and_extract();
+		if (prev_sample) {
+			prev_t = prev_sample->time;
 		} else {
-			next_t = next_optional->time;
+			// if align_and_extract failed, it means that the file has no samples at all
+			m_in->seekg(prev_count);
+			return;
 		}
 
+		// find the next_t, if it exist
+		sample next_sample;
+		SampleState state = parse_sample(next_sample);
+		if (state != OK) {
+			next_t = std::numeric_limits<float>::max();
+		} else {
+			next_t = next_sample.time;
+		}
+
+		// advance the binary search according to the prev_t and next_t
 		if ((prev_t <= seek_t) && (next_t <= seek_t)) {
 			curr_pos += delta;
 		}
@@ -108,13 +138,17 @@ void StreamReader<T>::seek(float seek_t) {
 			return ;
 		}
 
-		if (delta == 0) return;
+		// delta == zero means that we didn't find a correct place. just give up seeking
+		if (delta == 0) {
+			m_in->seekg(prev_count);
+			return;
+		}
 
 	}
 }
 
 template <typename T>
-typename StreamReader<T>::sample StreamReader<T>::align_and_extract() {
+boost::optional<typename StreamReader<T>::sample> StreamReader<T>::align_and_extract() {
 
 	m_in->clear();
 
@@ -133,16 +167,10 @@ typename StreamReader<T>::sample StreamReader<T>::align_and_extract() {
 		if (gc < 0) break;
 
 		// try to parse
-		boost::optional<sample> s;
-		try {
-			s = next_sample();
-		} catch (...) {
-			// OK, didn't succeed. just do nothing
-		}
-
-		// if we succeded, return the sample
-		if (s) {
-			return *s;
+		sample s;
+		if (parse_sample(s) == OK) {
+			// if we succeded, return the sample
+			return boost::optional<sample>(s);
 		}
 
 		// There might be some errors, so clear all the error flags
@@ -160,9 +188,8 @@ typename StreamReader<T>::sample StreamReader<T>::align_and_extract() {
 
 		if (gc < 0) break;
 	}
-	sample s;
-	s.time = 0.;
-	return s;
+	std::cout << "Align and extract failed." << std::endl;
+	return boost::optional<sample>();
 }
 
 template <typename T>
