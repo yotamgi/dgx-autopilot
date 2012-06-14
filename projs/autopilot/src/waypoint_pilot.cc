@@ -74,12 +74,12 @@ void WaypointPilot::maintain_heading(float heading){
 	else if (delta_heading < -180 )
 		delta_heading = 360 + delta_heading;
 
-	if (delta_heading > 10.0f)
+	if (delta_heading > m_params.heading_fine_tunning)
 		m_sas_pilot.get_roll_control()->set_data(-m_params.max_roll_angle);
-	else if (delta_heading < -10.0f)
+	else if (delta_heading < -m_params.heading_fine_tunning)
 		m_sas_pilot.get_roll_control()->set_data(m_params.max_roll_angle);
 	else
-		m_sas_pilot.get_roll_control()->set_data(-m_params.max_roll_angle*delta_heading/20.0f);
+		m_sas_pilot.get_roll_control()->set_data(-m_params.max_roll_angle*delta_heading/m_params.heading_fine_tunning);
 
 }
 
