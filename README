@@ -11,6 +11,10 @@ GPS:
  * Install gpsd libgps-dev
  * for gpsmon install gpsd-clients
 
+Map:
+ * Install libqgis-dev
+ * Create the ~/.qgis directory (Qgis bug).
+
 
 Video Transmisstion:
  * Install gstreamer0.10-tools and gstreamer0.10-ffmpeg 
