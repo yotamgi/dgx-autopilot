@@ -1,4 +1,5 @@
 Servo control:
+ * In first use of a pololu, it must be connected to a GUI computer via USB and configured using the software pololu supplies. The configuration should be to use USB interface (the "chained" one) other than the RS232.
  * install kernel-module-cdc-acm
 
 Wireless:
