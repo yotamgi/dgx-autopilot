@@ -88,7 +88,7 @@ void WaypointPilot::maintain_heading(float heading){
 
 	 vec2_stream_ptr position = m_cockpit->position();
 	 lin_algebra::vec2f plain_pos = position->get_data();
-	 lin_algebra::vec2f wanted_direction = plain_pos - waypoint.target;
+	 lin_algebra::vec2f wanted_direction = waypoint.target - plain_pos;
 
 	 // calc the wanted angle
 	 float heading = 180.*std::atan(wanted_direction[0]/wanted_direction[1])/lin_algebra::PI;
