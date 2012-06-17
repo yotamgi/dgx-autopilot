@@ -22,7 +22,7 @@ void SimulatorMagnetometerSensor::update(float time_delta) {
 	irr::core::matrix4 trans  = obj_trans * sensor_rot;
 
 	// create the vector
-	irrvec3f north(1., -1., 0);
+	irrvec3f north(-1., -1., 0);
 	north *= 10.;
 
 	// move it to the correct coordinate system
