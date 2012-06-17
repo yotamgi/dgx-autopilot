@@ -1,4 +1,5 @@
 #include "waypoint_pilot.h"
+#include <stream/util/time.h>
 #include <cmath>
 #include <iostream>
 
@@ -114,7 +115,10 @@ void WaypointPilot::maintain_heading(float heading){
 
 void WaypointPilot::fly() {
 
+	Timer t;
+
 	while (m_running) {
+		t.reset();
 
 		// update the path synchronously, to avoid thread safety problems
 		if (m_waiting_path) {
@@ -146,6 +150,12 @@ void WaypointPilot::fly() {
 			nav_to(m_roam_waypoint);
 		}
 
+		// maintain constant and not too high FPS
+		float dt = 1./UPDATE_RATE - t.passed();
+		while (dt > 0) {
+			usleep(1000000*dt);
+			dt = 1./UPDATE_RATE - t.passed();
+		}
 	}
 }
 
