@@ -28,13 +28,13 @@ public:
 
 	~NormalPlainCockpit() {}
 
-	virtual boost::shared_ptr<vec3_watch_stream> orientation() = 0;
+	virtual boost::shared_ptr<vec3_stream> orientation() = 0;
 
-	virtual boost::shared_ptr<float_watch_stream> ground_speed() = 0;
+	virtual boost::shared_ptr<float_stream> ground_speed() = 0;
 
-	virtual boost::shared_ptr<vec2_watch_stream> position() = 0;
+	virtual boost::shared_ptr<vec2_stream> position() = 0;
 
-	virtual boost::shared_ptr<float_watch_stream> alt() = 0;
+	virtual boost::shared_ptr<float_stream> alt() = 0;
 
 	virtual servo_stream_ptr tilt_servo() = 0;
 

@@ -1,5 +1,7 @@
 #include "stability_augmenting_pilot.h"
+#include <stream/util/time.h>
 #include <boost/make_shared.hpp>
+
 namespace autopilot {
 
 StabilityAugmentingPilot::StabilityAugmentingPilot(boost::shared_ptr<NormalPlainCockpit> cockpit,
@@ -41,8 +43,20 @@ void StabilityAugmentingPilot::start(bool open_thread) {
 		m_running_thread = boost::thread(&StabilityAugmentingPilot::start, this, false);
 	} else {
 		m_running = true;
+
+		Timer t;
 		while (m_running) {
+
+			t.reset();
+
 			update();
+
+			// maintain constant and not too high FPS
+			float dt = 1./UPDATE_RATE - t.passed();
+			while (dt > 0) {
+				usleep(1000000*dt);
+				dt = 1./UPDATE_RATE - t.passed();
+			}
 		}
 	}
 }
