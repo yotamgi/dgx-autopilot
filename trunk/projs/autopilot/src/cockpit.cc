@@ -98,9 +98,11 @@ Cockpit::Cockpit(NormalPlainPlatform platform):
 		);
 	m_alt_stream = boost::make_shared<float_watch_stream>(m_alt_calibration);
 
-
 	m_alt_calibration->calibrate(0);
 	m_orientation_calibration->calibrate(lin_algebra::create_vec3f(0., 0., 0.));
+
+	m_airspeed_stream = boost::make_shared<float_watch_stream>(platform.airspeed_sensor);
+	m_battery_stream = boost::make_shared<float_watch_stream>(platform.battery_sensor);
 
 	m_running_thread = boost::thread(&Cockpit::run, this);
 }
@@ -122,6 +124,7 @@ void Cockpit::calibrate(const Cockpit::calibration_data& calibration) {
 
 void Cockpit::run() {
 
+	size_t i=0;
 	Timer t;
 	while (true) {
 
@@ -132,6 +135,15 @@ void Cockpit::run() {
 		m_orientation->get_data();
 		m_gyro_orientation->get_data();
 		m_alt_stream->get_data();
+
+		// some things should happen less than others
+		if (i%5 == 0) {
+			m_airspeed_stream->get_data();
+		}
+		if (i%39 == 0) {
+			m_battery_stream->get_data();
+		}
+		i++;
 
 		// maintain constant and not too high FPS
 		float dt = 1./UPDATE_RATE - t.passed();
@@ -167,6 +179,14 @@ boost::shared_ptr<float_stream> Cockpit::ground_speed() {
 //	return boost::make_shared<float_watch_stream>(
 //			(boost::shared_ptr<stream::DataPopStream<float> >)m_gps_speed_mag
 //	);
+}
+
+boost::shared_ptr<float_stream> Cockpit::air_speed() {
+	return m_airspeed_stream->get_watch_stream();
+}
+
+boost::shared_ptr<float_stream> Cockpit::battery_state() {
+	return m_battery_stream->get_watch_stream();
 }
 
 boost::shared_ptr<vec2_stream> Cockpit::position() {

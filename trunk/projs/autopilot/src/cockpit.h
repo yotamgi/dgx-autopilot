@@ -49,9 +49,13 @@ public:
 
 	boost::shared_ptr<float_stream> ground_speed();
 
+	boost::shared_ptr<float_stream> air_speed();
+
 	boost::shared_ptr<vec2_stream> position();
 
 	boost::shared_ptr<float_stream> alt();
+
+	boost::shared_ptr<float_stream> battery_state();
 
 	servo_stream_ptr tilt_servo();
 
@@ -106,6 +110,8 @@ private:
 	boost::shared_ptr<float_stream> 				m_rest_reliability;
 	boost::shared_ptr<vec3_stream> 					m_fixed_acc;
 	boost::shared_ptr<float_watch_stream> 			m_alt_stream;
+	boost::shared_ptr<float_watch_stream> 			m_airspeed_stream;
+	boost::shared_ptr<float_watch_stream> 			m_battery_stream;
 
 	boost::shared_ptr<CalibrationFilter<float> > 				m_alt_calibration;
 	boost::shared_ptr<CalibrationFilter<lin_algebra::vec3f> > 	m_orientation_calibration;

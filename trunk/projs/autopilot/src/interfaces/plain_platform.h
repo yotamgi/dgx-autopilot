@@ -31,6 +31,7 @@ struct NormalPlainPlatform {
 	boost::shared_ptr<vec3_pop_stream> compass_sensor;
 	boost::shared_ptr<float_pop_stream> airspeed_sensor;
 	boost::shared_ptr<float_pop_stream> alt_sensor;
+	boost::shared_ptr<float_pop_stream> battery_sensor;
 
 	// The Gps stream generators
 	boost::shared_ptr<vec3_push_gen>  gps_pos_generator;

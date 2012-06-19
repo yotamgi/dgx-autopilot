@@ -72,6 +72,10 @@ void thread(PlainParams plain_params,
 			new SimulatorPitotSensor(lin_algebra::create_vec3f(0., 0., -1.), sim.get_wind())
 	);
 
+	boost::shared_ptr<stream::PushToPopConv<float> > battery_sensor(
+			new stream::PushToPopConv<float>(1.0f)
+	);
+
 	plain->carry(gyro_sensor);
 	plain->carry(acc_sensor);
 	plain->carry(magneto_sensor);
@@ -101,6 +105,7 @@ void thread(PlainParams plain_params,
 	platform->tilt_servo = plain->get_elevator_servo();
 	platform->pitch_servo = plain->get_ailron_servo();
 	platform->alive = nada;
+	platform->battery_sensor = battery_sensor;
 	gps_sensor->set_pos_listener(gps_pos);
 	gps_sensor->set_speed_dir_listener(gps_speed_dir);
 	gps_sensor->set_speed_mag_listener(gps_speed_mag);
