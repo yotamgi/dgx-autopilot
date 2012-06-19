@@ -193,12 +193,14 @@ int main(int argc, char** argv) {
 		platform = autopilot::create_dgx1_2_platform();
 	} else if (platform_type == "sim") {
 #ifndef DEVICE
+		const lin_algebra::vec3f SHOMRAT_POS = lin_algebra::create_vec3f(35.1043, 32.9432, 0.);
 		simulator::WindGen::Params wind_params;
 		wind_params.const_wind = lin_algebra::create_vec3f(2., 0, 0);
 		wind_params.long_disturbance_strength = 0.4;
 		wind_params.little_disturbance_strength = 0.1;
 
-		platform = *simulator::create_simulator_platform(simulator::platforms::dgx_platform, wind_params);
+		platform = *simulator::create_simulator_platform(simulator::platforms::dgx_platform, wind_params,
+				SHOMRAT_POS);
 #else
 		throw std::runtime_error("Can not open simulator platform on device");
 #endif

@@ -12,7 +12,7 @@ namespace simulator {
 
 class SimulatorGpsSensor : public Carriable {
 public:
-	SimulatorGpsSensor();
+	SimulatorGpsSensor(lin_algebra::vec3f start_pos = lin_algebra::create_vec3f(0., 0., 0.));
 
 	void setSensedObject(irr::scene::ISceneNode *object);
 
@@ -38,6 +38,7 @@ private:
 	boost::shared_ptr<stream::DataPushStream<float> > m_gps_speed_dir_listener;
 	boost::shared_ptr<stream::DataPushStream<float> > m_gps_speed_mag_listener;
 
+	lin_algebra::vec3f m_start_pos;
 };
 
 

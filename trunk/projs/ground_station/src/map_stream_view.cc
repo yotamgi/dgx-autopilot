@@ -154,13 +154,14 @@ void MapStreamView::update() {
 	QgsPoint p(pos[0], pos[1]);
 
 	// go to the current plane pos on the map
-	m_map_canvas->setExtent(QgsRectangle(p, p));
-	m_map_canvas->refresh();
+	if (!m_map_canvas->extent().contains(p)) {
+		m_map_canvas->setExtent(QgsRectangle(p, p));
+		m_map_canvas->refresh();
+	}
 
 	// draw the line of the plane's way
 	m_plane_track->addPoint(p);
 	m_plane_curr_pos->setCenter(p);
-	m_map_canvas->refresh();
 }
 
 void MapStreamView::show_track_cb_changed(int state) {
