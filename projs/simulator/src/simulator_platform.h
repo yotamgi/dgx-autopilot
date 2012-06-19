@@ -14,7 +14,8 @@ namespace simulator {
  */
 boost::shared_ptr<autopilot::NormalPlainPlatform> create_simulator_platform(
 		PlainParams plain_params,
-		WindGen::Params wind_params
+		WindGen::Params wind_params,
+		lin_algebra::vec3f gps_start_pos = lin_algebra::create_vec3f(0., 0., 0.)
 );
 
 } // namespace simulator

@@ -4,12 +4,15 @@ namespace simulator {
 
 typedef irr::core::vector3df irrvec3f;
 
-SimulatorGpsSensor::SimulatorGpsSensor():
+const float METERS_TO_GEO = 111319.4889f;
+
+SimulatorGpsSensor::SimulatorGpsSensor(lin_algebra::vec3f start_pos):
 		m_traced_object(NULL),
 		m_update_timer(0.),
 		UPDATE_TIME_INTERVAL(1.),
 		AVARGE_LEN(3),
-		m_past_samples(AVARGE_LEN)
+		m_past_samples(AVARGE_LEN),
+		m_start_pos(start_pos)
 {}
 
 void SimulatorGpsSensor::setSensedObject(irr::scene::ISceneNode *object) {
@@ -52,9 +55,9 @@ void SimulatorGpsSensor::update(float time_delta) {
 
 		if (m_gps_pos_listener) {
 			lin_algebra::vec3f geo_gps_pos = lin_algebra::create_vec3f(
-					gps_pos[0], gps_pos[2], gps_pos[1]
+					gps_pos[0]/METERS_TO_GEO, gps_pos[2]/METERS_TO_GEO, gps_pos[1]
 			);
-			m_gps_pos_listener->set_data(geo_gps_pos);
+			m_gps_pos_listener->set_data(geo_gps_pos + m_start_pos);
 		}
 		if (m_gps_speed_dir_listener) {
 			m_gps_speed_dir_listener->set_data(speed_angle);

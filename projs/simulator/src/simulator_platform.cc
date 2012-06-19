@@ -14,16 +14,20 @@
 
 namespace simulator {
 
-void thread(PlainParams plain_params, WindGen::Params wind_params, boost::shared_ptr<autopilot::NormalPlainPlatform> platform);
+void thread(PlainParams plain_params,
+		WindGen::Params wind_params,
+		lin_algebra::vec3f gps_start_pos,
+		boost::shared_ptr<autopilot::NormalPlainPlatform> platform);
 
 boost::shared_ptr<autopilot::NormalPlainPlatform> create_simulator_platform(
 		PlainParams plain_params,
-		WindGen::Params wind_params)
+		WindGen::Params wind_params,
+		lin_algebra::vec3f gps_start_pos)
 {
 	boost::shared_ptr<autopilot::NormalPlainPlatform> platform =
 			boost::make_shared<autopilot::NormalPlainPlatform>();
 
-	new boost::thread(thread, plain_params, wind_params, platform);
+	new boost::thread(thread, plain_params, wind_params, gps_start_pos, platform);
 
 	// wait until it is ready
 	while (!platform->tilt_servo);
@@ -38,7 +42,11 @@ boost::shared_ptr<autopilot::NormalPlainPlatform> create_simulator_platform(
 void nada() {}
 
 
-void thread(PlainParams plain_params, WindGen::Params wind_params, boost::shared_ptr<autopilot::NormalPlainPlatform> platform) {
+void thread(PlainParams plain_params,
+		WindGen::Params wind_params,
+		lin_algebra::vec3f gps_start_pos,
+		boost::shared_ptr<autopilot::NormalPlainPlatform> platform)
+{
 
 	Simulator sim(plain_params, wind_params);
 
@@ -57,7 +65,7 @@ void thread(PlainParams plain_params, WindGen::Params wind_params, boost::shared
 			new SimulatorAltmeterSensor()
 	);
 	boost::shared_ptr<SimulatorGpsSensor> gps_sensor(
-			new SimulatorGpsSensor()
+			new SimulatorGpsSensor(gps_start_pos)
 	);
 
 	boost::shared_ptr<SimulatorPitotSensor> pitot_sensor(
