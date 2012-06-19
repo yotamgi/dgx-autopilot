@@ -99,6 +99,7 @@ boost::shared_ptr<stream::AsyncStreamConnection>  export_data(std::string export
 		float_pop_stream_ptr fps,
 		vec2_pop_stream_ptr position,
 		float_pop_stream_ptr alt,
+		float_pop_stream_ptr battery,
 		float_push_stream_ptr tilt_control,
 		float_push_stream_ptr pitch_control,
 		float_push_stream_ptr gas_control,
@@ -124,7 +125,8 @@ boost::shared_ptr<stream::AsyncStreamConnection>  export_data(std::string export
 		((send_stream_ptr)boost::make_shared<float_send_stream>(reliability))
 		((send_stream_ptr)boost::make_shared<float_send_stream>(fps))
 		((send_stream_ptr)boost::make_shared<vec2_send_stream>(position))
-		((send_stream_ptr)boost::make_shared<float_send_stream>(alt));
+		((send_stream_ptr)boost::make_shared<float_send_stream>(alt))
+		((send_stream_ptr)boost::make_shared<float_send_stream>(battery));
 
 	stream::AsyncStreamConnection::recv_streams_t recv_streams = boost::assign::list_of
 			((recv_stream_ptr)boost::make_shared<float_recv_stream>(tilt_control)	)
@@ -256,11 +258,12 @@ int main(int argc, char** argv) {
 			cockpit->watch_gyro_orientation(),
 			cockpit->watch_rest_orientation(),
 			cockpit->orientation(),
-			platform.airspeed_sensor,
+			cockpit->air_speed(),
 			cockpit->watch_rest_reliability(),
 			fpsed_gyro->get_fps_stream(),
 			cockpit->position(),
 			cockpit->alt(),
+			cockpit->battery_state(),
 			sa_pilot.get_roll_control(),
 			sa_pilot.get_tilt_control(),
 			gas_control,

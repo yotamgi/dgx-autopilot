@@ -33,6 +33,24 @@ private:
 	GpioPin m_pin;
 };
 
+class BatteryState : public stream::DataPopStream<float> {
+public:
+	BatteryState(boost::shared_ptr<autopilot::Ads1115_ADC> adc, uint8_t channel):
+		m_adc(adc),
+		m_channel(channel)
+	{
+		m_adc->set_channel_range(m_channel, Ads1115_ADC::V_4_096);
+	}
+
+	float get_data() {
+		return (float(m_adc->read_channel(m_channel)) / 0x7fff) * 4.096f;
+	}
+
+private:
+	boost::shared_ptr<autopilot::Ads1115_ADC> m_adc;
+	uint8_t m_channel;
+};
+
 NormalPlainPlatform create_dgx1_platform() {
 	NormalPlainPlatform dgx1_platform;
 	dgx1_platform.acc_sensor = boost::make_shared<Adxl345Acc>(2,
@@ -82,7 +100,6 @@ NormalPlainPlatform create_dgx1_platform() {
 	return dgx1_platform;
 }
 
-
 NormalPlainPlatform create_dgx1_2_platform() {
 	NormalPlainPlatform dgx1_platform;
 
@@ -103,6 +120,7 @@ NormalPlainPlatform create_dgx1_2_platform() {
 
 	boost::shared_ptr<autopilot::Ads1115_ADC> adc = boost::make_shared<autopilot::Ads1115_ADC>(2);
 	dgx1_platform.airspeed_sensor = boost::make_shared<autopilot::Mpxv7002Pitot>(adc, 0);
+	dgx1_platform.battery_sensor = boost::make_shared<BatteryState>(adc, 1);
 
 	boost::shared_ptr<vec3_push_forwarder> pos_forwarder(new vec3_push_forwarder);
 	boost::shared_ptr<float_push_forwarder> speed_dir_forwarder(new float_push_forwarder);

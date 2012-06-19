@@ -93,6 +93,7 @@ GroundStation::GroundStation(std::string plane_address):
 	boost::shared_ptr<float_recv_stream> gyro_fps = 				boost::make_shared<float_recv_stream>();
 	boost::shared_ptr<vec2_recv_stream> position = 					boost::make_shared<vec2_recv_stream>();
 	boost::shared_ptr<float_recv_stream> alt = 						boost::make_shared<float_recv_stream>();
+	boost::shared_ptr<float_recv_stream> battery = 					boost::make_shared<float_recv_stream>();
 	boost::shared_ptr<float_send_stream> roll_control = 			boost::make_shared<float_send_stream>();
 	boost::shared_ptr<float_send_stream> tilt_control = 			boost::make_shared<float_send_stream>();
 	boost::shared_ptr<float_send_stream> gas_control = 				boost::make_shared<float_send_stream>();
@@ -116,7 +117,8 @@ GroundStation::GroundStation(std::string plane_address):
 	        ((recv_stream_ptr)reliability            )
 	        ((recv_stream_ptr)gyro_fps               )
             ((recv_stream_ptr)position             	 )
-			((recv_stream_ptr)alt               	 );
+			((recv_stream_ptr)alt               	 )
+			((recv_stream_ptr)battery              	 );
 
 	// creating the udp connection stuff
 	boost::shared_ptr<stream::UdpipConnectionFactory> conn_factory =
@@ -192,6 +194,9 @@ GroundStation::GroundStation(std::string plane_address):
 	// the plane's alt
 	gs::SizeStreamView* view_alt = new gs::SizeStreamView(alt, "Alt", 0.1f , 0., 200.);
 
+	// the plane's bat
+	gs::LabelStreamView<float>* view_bat = new gs::LabelStreamView<float>(battery, 1., "Bat");
+
 	// the new waypoint's alt
 	gs::SizePushGen* gen_waypoints_alt = new gs::SizePushGen(m_wanted_alt, "WP Alt", 0, 200., 100.);
 
@@ -251,10 +256,11 @@ GroundStation::GroundStation(std::string plane_address):
 	QTabWidget* orientation_widget = new QTabWidget();
 	orientation_widget->addTab(view3d, "3D orientation view");
 	orientation_widget->addTab(view2d, "2D orientation view");
-	left_up_layout->addWidget(orientation_widget,	0, 0, 1, 3);
+	left_up_layout->addWidget(orientation_widget,	0, 0, 1, 4);
 	left_up_layout->addWidget(pitch_view, 			1, 0);
 	left_up_layout->addWidget(roll_view, 			1, 1);
 	left_up_layout->addWidget(yaw_view, 			1, 2);
+	left_up_layout->addWidget(view_bat, 			1, 3);
 	left_up_layout->addWidget(view_reliability, 	0, 4);
 	left_up_layout->addWidget(view_airspeed, 		0, 5);
 	left_up->setLayout(left_up_layout);
@@ -284,6 +290,7 @@ GroundStation::GroundStation(std::string plane_address):
 	view_fps->start();
 	view_link_quality->start();
 	view_alt->start();
+	view_bat->start();
 
 	// connect signals
 	connect(wp_pilot_button, SIGNAL(toggled(bool)), this, SLOT(to_waypoint_pilot(bool)));

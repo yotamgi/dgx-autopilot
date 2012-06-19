@@ -32,6 +32,8 @@ public:
 
 	virtual boost::shared_ptr<float_stream> ground_speed() = 0;
 
+	virtual boost::shared_ptr<float_stream> air_speed() = 0;
+
 	virtual boost::shared_ptr<vec2_stream> position() = 0;
 
 	virtual boost::shared_ptr<float_stream> alt() = 0;
@@ -43,6 +45,8 @@ public:
 	virtual servo_stream_ptr pitch_servo() = 0;
 
 	virtual servo_stream_ptr gas_servo() = 0;
+
+	virtual boost::shared_ptr<float_stream> battery_state() = 0;
 
 	virtual void alive() = 0;
 
