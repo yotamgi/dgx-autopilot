@@ -37,6 +37,8 @@ public:
 
 	virtual ~FusionFilter() {}
 
+	void calibrate(lin_algebra::vec3f calibration_data);
+
 	lin_algebra::vec3f get_data();
 
 	boost::shared_ptr<stream::DataPopStream<float> > get_reliability_stream()
@@ -81,6 +83,8 @@ private:
 	boost::shared_ptr<stream::PushToPopConv<float> > m_reliable_stream;
 	boost::shared_ptr<stream::PushToPopConv<lin_algebra::vec3f> > m_rest_orientation;
 	boost::shared_ptr<stream::PushToPopConv<lin_algebra::vec3f> > m_fixed_acc;
+
+	lin_algebra::vec3f m_calibration_data;
 
 	static const size_t ACC_LOW_PASS = 20;
 };
