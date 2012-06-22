@@ -80,7 +80,7 @@ CockpitPlayer::CockpitPlayer(std::string play_dir):
 	gs::StreamView3d *view3d = new gs::StreamView3d(view_update_time, stream3d_dimention);
 
 	// the right one
-    view3d->addAngleStream(m_cockpit->orientation()->get_watch_stream(), irr::core::vector3df(-20., 0., 0.));
+    view3d->addAngleStream(m_cockpit->orientation(), irr::core::vector3df(-20., 0., 0.));
 
     // the mid one
     view3d->addAngleStream(m_cockpit->watch_rest_orientation(), irr::core::vector3df(0., 0., 0.));
@@ -90,20 +90,20 @@ CockpitPlayer::CockpitPlayer(std::string play_dir):
     view3d->addAngleStream(m_cockpit->watch_gyro_orientation(), irr::core::vector3df(20., 0., 0.));
 
 	// the 2d orientation view
-	gs::OrientationStreamView* view2d = new gs::OrientationStreamView(m_cockpit->orientation()->get_watch_stream(),
+	gs::OrientationStreamView* view2d = new gs::OrientationStreamView(m_cockpit->orientation(),
 			view_update_time, stream3d_dimention.width());
 
 	// the label orientation view
 	gs::LabelStreamView<float>* pitch_view = new gs::LabelStreamView<float>(
-			stream::create_func_pop_filter<lin_algebra::vec3f, float>(m_cockpit->orientation()->get_watch_stream(), lin_algebra::get<0>),
+			stream::create_func_pop_filter<lin_algebra::vec3f, float>(m_cockpit->orientation(), lin_algebra::get<0>),
 			view_update_time,
 			"Pitch");
 	gs::LabelStreamView<float>* roll_view = new gs::LabelStreamView<float>(
-			stream::create_func_pop_filter<lin_algebra::vec3f, float>(m_cockpit->orientation()->get_watch_stream(), lin_algebra::get<2>),
+			stream::create_func_pop_filter<lin_algebra::vec3f, float>(m_cockpit->orientation(), lin_algebra::get<2>),
 			view_update_time,
 			"Roll");
 	gs::LabelStreamView<float>* yaw_view = new gs::LabelStreamView<float>(
-			stream::create_func_pop_filter<lin_algebra::vec3f, float>(m_cockpit->orientation()->get_watch_stream(), lin_algebra::get<1>),
+			stream::create_func_pop_filter<lin_algebra::vec3f, float>(m_cockpit->orientation(), lin_algebra::get<1>),
 			view_update_time,
 			"Yaw");
 
@@ -133,7 +133,7 @@ CockpitPlayer::CockpitPlayer(std::string play_dir):
 					std::string("../../projs/ground_station/data/map"));
 
 	// the plane's alt
-	gs::SizeStreamView* view_alt = new gs::SizeStreamView(m_cockpit->alt()->get_watch_stream(), "Alt", 0.1f , 0., 200.);
+	gs::SizeStreamView* view_alt = new gs::SizeStreamView(m_cockpit->alt(), "Alt", 0.1f , 0., 200.);
 
 	// the progress bar
 	m_progress_slider = new QSlider();
