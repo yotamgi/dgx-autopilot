@@ -23,7 +23,8 @@ FusionFilter::FusionFilter(boost::shared_ptr<vec_stream_t> acc,
 			m_curr_speed(new stream::PushToPopConv<float>(0.)),
 			m_reliable_stream(new stream::PushToPopConv<float>(0.)),
 			m_rest_orientation(new stream::PushToPopConv<lin_algebra::vec3f>(lin_algebra::vec3f())),
-			m_fixed_acc(new stream::PushToPopConv<lin_algebra::vec3f>(lin_algebra::vec3f()))
+			m_fixed_acc(new stream::PushToPopConv<lin_algebra::vec3f>(lin_algebra::vec3f())),
+			m_calibration_data(lin_algebra::create_vec3f(0., 0., 0.))
 
 
 {
@@ -95,7 +96,23 @@ lin_algebra::vec3f FusionFilter::get_data() {
 		std::cout << "Gyro failed.." << std::endl;
 	}
 
-	return filter(acc_data, compass_data, gyro_data);
+	// filter!
+	lin_algebra::vec3f out = filter(acc_data, compass_data, gyro_data);
+
+	// calibrate
+	out += m_calibration_data;
+	while (out[0] >  180.0f) out[0] -= 360.0f;
+	while (out[0] < -180.0f) out[0] += 360.0f;
+	while (out[1] >  360.0f) out[1] -= 360.0f;
+	while (out[1] <    0.0f) out[1] += 360.0f;
+	while (out[2] >  180.0f) out[2] -= 360.0f;
+	while (out[3] < -180.0f) out[2] += 360.0f;
+
+	return out;
+}
+
+void FusionFilter::calibrate(lin_algebra::vec3f calibration_data) {
+	m_calibration_data = calibration_data;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////

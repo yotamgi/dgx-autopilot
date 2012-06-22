@@ -113,8 +113,8 @@ private:
 	boost::shared_ptr<float_watch_stream> 			m_airspeed_stream;
 	boost::shared_ptr<float_watch_stream> 			m_battery_stream;
 
-	boost::shared_ptr<CalibrationFilter<float> > 				m_alt_calibration;
-	boost::shared_ptr<CalibrationFilter<lin_algebra::vec3f> > 	m_orientation_calibration;
+	boost::shared_ptr<FusionFilter> 				m_orientation_filter;
+	boost::shared_ptr<CalibrationFilter<float> > 	m_alt_calibration;
 
 	boost::shared_ptr<stream::PushToPopConv<lin_algebra::vec3f> > m_gps_pos;
 	boost::shared_ptr<stream::PushToPopConv<float> > m_gps_speed_dir;

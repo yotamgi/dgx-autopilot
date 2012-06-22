@@ -71,7 +71,7 @@ Cockpit::Cockpit(NormalPlainPlatform platform):
 		)
 	);
 
-	boost::shared_ptr<FusionFilter> fusion_filter = boost::make_shared<FusionFilter>(
+	m_orientation_filter = boost::make_shared<FusionFilter>(
 					m_platform.acc_sensor,
 					m_platform.compass_sensor,
 					m_platform.gyro_sensor,
@@ -79,15 +79,11 @@ Cockpit::Cockpit(NormalPlainPlatform platform):
 					m_gps_speed_mag
 	);
 
-	m_orientation_calibration =
-		boost::make_shared<CalibrationFilter<lin_algebra::vec3f> >(
-			fusion_filter
-		);
-	m_orientation = boost::make_shared<vec3_watch_stream>(m_orientation_calibration);
+	m_orientation = boost::make_shared<vec3_watch_stream>(m_orientation_filter);
 
-	m_rest_reliability = fusion_filter->get_reliability_stream();
-	m_rest_orientation = fusion_filter->get_rest_orientation_stream();
-	m_fixed_acc = fusion_filter->get_fixed_acc_stream();
+	m_rest_reliability = m_orientation_filter->get_reliability_stream();
+	m_rest_orientation = m_orientation_filter->get_rest_orientation_stream();
+	m_fixed_acc = m_orientation_filter->get_fixed_acc_stream();
 
 	m_alt_calibration =
 		boost::make_shared<CalibrationFilter<float> >(
@@ -99,7 +95,6 @@ Cockpit::Cockpit(NormalPlainPlatform platform):
 	m_alt_stream = boost::make_shared<float_watch_stream>(m_alt_calibration);
 
 	m_alt_calibration->calibrate(0);
-	m_orientation_calibration->calibrate(lin_algebra::create_vec3f(0., 0., 0.));
 
 	m_airspeed_stream = boost::make_shared<float_watch_stream>(platform.airspeed_sensor);
 	m_battery_stream = boost::make_shared<float_watch_stream>(platform.battery_sensor);
@@ -118,7 +113,7 @@ Cockpit::calibration_data Cockpit::calibrate() {
 }
 
 void Cockpit::calibrate(const Cockpit::calibration_data& calibration) {
-	m_orientation_calibration->calibrate(calibration.orientation);
+	m_orientation_filter->calibrate(calibration.orientation);
 	m_alt_calibration->calibrate(calibration.alt);
 }
 
