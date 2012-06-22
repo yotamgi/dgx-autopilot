@@ -87,8 +87,8 @@ NormalPlainPlatform create_dgx1_platform() {
 
 	// fill the platform's servos
 	static MaestroServoController maestro("/dev/ttyACM0");
-	FlapronController flapron(maestro.getServoChannel(1), maestro.getServoChannel(4));
-	dgx1_platform.tilt_servo	= maestro.getServoChannel(0);
+	FlapronController flapron(maestro.getServoChannel(0), maestro.getServoChannel(4));
+	dgx1_platform.tilt_servo	= maestro.getServoChannel(1);
 	dgx1_platform.pitch_servo 	= flapron.get_ailron_servo();
 	dgx1_platform.gas_servo 	= maestro.getServoChannel(2);
 	dgx1_platform.yaw_servo 	= maestro.getServoChannel(3);
@@ -96,6 +96,8 @@ NormalPlainPlatform create_dgx1_platform() {
 	// trim the servos
 	maestro.getServoChannel(2)->trim_middle(52.5f);
 	maestro.getServoChannel(2)->trim_range(95.0f);
+
+	dgx1_platform.yaw_servo->set_data(50.0f);
 
 	return dgx1_platform;
 }
@@ -141,8 +143,8 @@ NormalPlainPlatform create_dgx1_2_platform() {
 
 	// fill the platform's servos
 	static MaestroServoController maestro("/dev/ttyACM0");
-	FlapronController flapron(maestro.getServoChannel(1), maestro.getServoChannel(4));
-	dgx1_platform.tilt_servo	= maestro.getServoChannel(0);
+	FlapronController flapron(maestro.getServoChannel(0), maestro.getServoChannel(4));
+	dgx1_platform.tilt_servo	= maestro.getServoChannel(1);
 	dgx1_platform.pitch_servo 	= flapron.get_ailron_servo();
 	dgx1_platform.gas_servo 	= maestro.getServoChannel(2);
 	dgx1_platform.yaw_servo 	= maestro.getServoChannel(3);
@@ -150,6 +152,8 @@ NormalPlainPlatform create_dgx1_2_platform() {
 	// trim the servos
 	maestro.getServoChannel(2)->trim_middle(52.5f);
 	maestro.getServoChannel(2)->trim_range(95.0f);
+
+	dgx1_platform.yaw_servo->set_data(50.0f);
 
 	return dgx1_platform;
 }
