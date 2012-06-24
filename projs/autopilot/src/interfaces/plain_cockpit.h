@@ -28,6 +28,15 @@ public:
 
 	~NormalPlainCockpit() {}
 
+	/**
+	 * A method for updating the cockpit.
+	 * If this function wont be called peridically, the cockpit data will not
+	 * be updated.
+	 * It is very important to run this method as many times as possible, in
+	 * order to get the orientation as accurate as possible.
+	 */
+	virtual void update() = 0;
+
 	virtual boost::shared_ptr<vec3_stream> orientation() = 0;
 
 	virtual boost::shared_ptr<float_stream> ground_speed() = 0;

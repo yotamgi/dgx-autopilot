@@ -52,8 +52,6 @@ public:
 
 private:
 
-	static const float UPDATE_RATE = 30.;
-
 	void fly();
 
 	void maintain_alt(float altitude);

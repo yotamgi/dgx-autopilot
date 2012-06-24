@@ -44,19 +44,16 @@ void StabilityAugmentingPilot::start(bool open_thread) {
 	} else {
 		m_running = true;
 
-		Timer t;
 		while (m_running) {
 
-			t.reset();
+			// update the cockpit first, and update it twice because it is
+			// more important
+			m_cockpit->update();
+			m_cockpit->update();
 
+			// update the pilot
 			update();
 
-			// maintain constant and not too high FPS
-			float dt = 1./UPDATE_RATE - t.passed();
-			while (dt > 0) {
-				usleep(1000000*dt);
-				dt = 1./UPDATE_RATE - t.passed();
-			}
 		}
 	}
 }

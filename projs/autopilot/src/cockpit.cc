@@ -33,7 +33,9 @@ Cockpit::Cockpit(NormalPlainPlatform platform):
 		m_platform(platform),
 		m_gps_pos(boost::make_shared<stream::PushToPopConv<lin_algebra::vec3f> >(lin_algebra::vec3f())),
 		m_gps_speed_dir(boost::make_shared<stream::PushToPopConv<float> >(0.)),
-		m_gps_speed_mag(boost::make_shared<stream::PushForwarder<float> >())
+		m_gps_speed_mag(boost::make_shared<stream::PushForwarder<float> >()),
+		m_update_counter(0),
+		m_running(false)
 {
 	// This is the stream schematics:
 	//
@@ -98,8 +100,6 @@ Cockpit::Cockpit(NormalPlainPlatform platform):
 
 	m_airspeed_stream = boost::make_shared<float_watch_stream>(platform.airspeed_sensor);
 	m_battery_stream = boost::make_shared<float_watch_stream>(platform.battery_sensor);
-
-	m_running_thread = boost::thread(&Cockpit::run, this);
 }
 
 Cockpit::~Cockpit() {}
@@ -117,38 +117,43 @@ void Cockpit::calibrate(const Cockpit::calibration_data& calibration) {
 	m_alt_calibration->calibrate(calibration.alt);
 }
 
-void Cockpit::run() {
+void Cockpit::update() {
 
-	size_t i=0;
-	Timer t;
-	while (true) {
+	// update the data
+	m_orientation->get_data();
+	m_gyro_orientation->get_data();
+	m_alt_stream->get_data();
 
-		// reset the timer
-		t.reset();
+	// some things should happen less than others
+	if (m_update_counter % 5 == 0) {
+		m_airspeed_stream->get_data();
+	}
+	if (m_update_counter % 39 == 0) {
+		m_battery_stream->get_data();
+	}
+	m_update_counter++;
+}
 
-		// update the data
-		m_orientation->get_data();
-		m_gyro_orientation->get_data();
-		m_alt_stream->get_data();
+void Cockpit::run(bool open_thread) {
+	if (m_running) return;
+	if (open_thread) {
+		m_running_thread = boost::thread(&Cockpit::run, this, false);
+	} else {
+		m_running = true;
 
-		// some things should happen less than others
-		if (i%5 == 0) {
-			m_airspeed_stream->get_data();
-		}
-		if (i%39 == 0) {
-			m_battery_stream->get_data();
-		}
-		i++;
-
-		// maintain constant and not too high FPS
-		float dt = 1./UPDATE_RATE - t.passed();
-		while (dt > 0) {
-			usleep(1000000*dt);
-			dt = 1./UPDATE_RATE - t.passed();
+		// run the cockpit
+		while (m_running) {
+			// update the cockpit data
+			update();
 		}
 	}
 }
 
+void Cockpit::stop() {
+	if (!m_running) return;
+	m_running = false;
+	m_running_thread.join();
+}
 
 boost::shared_ptr<vec3_stream> Cockpit::watch_gyro_orientation() {
 	return m_gyro_orientation->get_watch_stream();
