@@ -94,16 +94,25 @@ GroundStation::GroundStation(std::string plane_address):
 	boost::shared_ptr<vec2_recv_stream> position = 					boost::make_shared<vec2_recv_stream>();
 	boost::shared_ptr<float_recv_stream> alt = 						boost::make_shared<float_recv_stream>();
 	boost::shared_ptr<float_recv_stream> battery = 					boost::make_shared<float_recv_stream>();
-	boost::shared_ptr<float_send_stream> roll_control = 			boost::make_shared<float_send_stream>();
-	boost::shared_ptr<float_send_stream> tilt_control = 			boost::make_shared<float_send_stream>();
+	boost::shared_ptr<float_send_stream> sa_roll_control = 			boost::make_shared<float_send_stream>();
+	boost::shared_ptr<float_send_stream> sa_tilt_control = 			boost::make_shared<float_send_stream>();
+	boost::shared_ptr<float_send_stream> sa_gas_control = 				boost::make_shared<float_send_stream>();
+	boost::shared_ptr<float_send_stream> sa_yaw_control = 				boost::make_shared<float_send_stream>();
 	boost::shared_ptr<float_send_stream> gas_control = 				boost::make_shared<float_send_stream>();
 	boost::shared_ptr<float_send_stream> yaw_control = 				boost::make_shared<float_send_stream>();
+	boost::shared_ptr<float_send_stream> roll_control = 			boost::make_shared<float_send_stream>();
+	boost::shared_ptr<float_send_stream> pitch_control = 			boost::make_shared<float_send_stream>();
 
 	stream::AsyncStreamConnection::send_streams_t send_streams = boost::assign::list_of
-		((send_stream_ptr)roll_control		)
-		((send_stream_ptr)tilt_control		)
-		((send_stream_ptr)gas_control		)
-		((send_stream_ptr)yaw_control		);
+		((send_stream_ptr)sa_roll_control		)
+		((send_stream_ptr)sa_tilt_control		)
+		((send_stream_ptr)sa_gas_control		)
+		((send_stream_ptr)sa_yaw_control		)
+		((send_stream_ptr)gas_control			)
+		((send_stream_ptr)yaw_control			)
+		((send_stream_ptr)roll_control			)
+		((send_stream_ptr)pitch_control			);
+
 
 
 	// fill them into the recv_stream list
@@ -200,54 +209,87 @@ GroundStation::GroundStation(std::string plane_address):
 	// the new waypoint's alt
 	gs::SizePushGen* gen_waypoints_alt = new gs::SizePushGen(m_wanted_alt, "WP Alt", 0, 200., 100.);
 
-	// the controllers
-	gs::SizePushGen* sa_tilt_control  = new gs::SizePushGen(tilt_control, "SA Tilt", -15., 15., 0.);
-	gs::SizePushGen* sa_roll_control = new gs::SizePushGen(roll_control, "SA Roll", -40, 40., 0., gs::SizePushGen::HORIZONTAL_DIAGRAM);
-	gs::SizePushGen* sa_gas_control = new gs::SizePushGen(gas_control, "SA Gas", 0, 100., 50.);
-	gs::SizePushGen* sa_yaw_control  = new gs::SizePushGen(yaw_control, "SA Yaw", 0, 100., 50., gs::SizePushGen::HORIZONTAL_DIAGRAM);
+	// the SA Pilot controllers
+	gs::SizePushGen* sa_tilt_control_widget  = new gs::SizePushGen(sa_tilt_control, "SA Tilt", -15., 15., 0.);
+	gs::SizePushGen* sa_roll_control_widget  = new gs::SizePushGen(sa_roll_control, "SA Roll", -40, 40., 0., gs::SizePushGen::HORIZONTAL_DIAGRAM);
+	gs::SizePushGen* sa_gas_control_widget   = new gs::SizePushGen(sa_gas_control,  "SA Gas", 0, 100., 50.);
+	gs::SizePushGen* sa_yaw_control_widget   = new gs::SizePushGen(sa_yaw_control,  "SA Yaw", 0, 100., 50., gs::SizePushGen::HORIZONTAL_DIAGRAM);
 
-	// the radio buttons
-	QRadioButton *no_pilot_button = new QRadioButton("&No Pilot");
-	QRadioButton *wp_pilot_button = new QRadioButton("&Waypoint Pilot");
-	QRadioButton *sa_pilot_button = new QRadioButton("&SA Pilot");
+	// the No Pilot controllers
+	gs::SizePushGen* np_tilt_control_widget  = new gs::SizePushGen(pitch_control, "Pitch", 	0., 100., 50.);
+	gs::SizePushGen* np_roll_control_widget  = new gs::SizePushGen(roll_control,  "Roll", 	0., 100., 50., gs::SizePushGen::HORIZONTAL_DIAGRAM);
+	gs::SizePushGen* np_gas_control_widget   = new gs::SizePushGen(gas_control,   "Gas", 	0,  100.,  0.);
+	gs::SizePushGen* np_yaw_control_widget   = new gs::SizePushGen(yaw_control,   "Yaw", 	0,  100., 50., gs::SizePushGen::HORIZONTAL_DIAGRAM);
+
+	// the SA Pilot Chooser buttons buttons
+	QPushButton *no_pilot_button = new QPushButton("&Activate No Pilot");
+	QPushButton *wp_pilot_button = new QPushButton("&Activate Waypoint Pilot");
+	QPushButton *sa_pilot_button = new QPushButton("&Activate SA Pilot");
 
 	// the calibration button
 	QPushButton* calibration_button = new QPushButton("&Calibrate");
 
-	m_keyboard_grabber = new KeyboardGetterWidget(sa_tilt_control, sa_roll_control);
+	m_keyboard_grabber = new KeyboardGetterWidget(sa_tilt_control_widget, sa_roll_control_widget);
 
 	//
 	// create the window itself and organize it
 	//
 	QWidget *main_widget = new QWidget;
 
-	// the pilot chooser
-	QGridLayout* pilot_chooser_layout = new QGridLayout;
-	pilot_chooser_layout->addWidget(no_pilot_button, 0, 0, 1, 2);
-	pilot_chooser_layout->addWidget(wp_pilot_button, 1, 0, 1, 2);
-	pilot_chooser_layout->addWidget(sa_pilot_button, 2, 0, 1, 2);
-	pilot_chooser_layout->addWidget(view_link_quality, 3, 0);
-	pilot_chooser_layout->addWidget(view_fps, 3, 1);
-	QGroupBox* pilot_chooser = new QGroupBox(tr("Pilot Chooser"));
-	pilot_chooser->setLayout(pilot_chooser_layout);
 
 	// the SA controllers
 	QGridLayout* sa_controls_layout = new QGridLayout;
-	sa_controls_layout->addWidget(sa_tilt_control, 0, 0, 2, 1);
-	sa_controls_layout->addWidget(sa_roll_control, 0, 1);
-	sa_controls_layout->addWidget(sa_yaw_control, 1, 1);
-	sa_controls_layout->addWidget(sa_gas_control, 0, 2, 2, 1);
+	sa_controls_layout->addWidget(sa_tilt_control_widget, 0, 0, 2, 1);
+	sa_controls_layout->addWidget(sa_roll_control_widget, 0, 1);
+	sa_controls_layout->addWidget(sa_yaw_control_widget, 1, 1);
+	sa_controls_layout->addWidget(sa_gas_control_widget, 0, 2, 2, 1);
 	QGroupBox* sa_controls = new QGroupBox(tr("SA Pilot Controls"));
 	sa_controls->setLayout(sa_controls_layout);
+
+	// the No Pilot controllers
+	QGridLayout* np_controls_layout = new QGridLayout;
+	np_controls_layout->addWidget(np_tilt_control_widget, 0, 0, 2, 1);
+	np_controls_layout->addWidget(np_roll_control_widget, 0, 1);
+	np_controls_layout->addWidget(np_yaw_control_widget, 1, 1);
+	np_controls_layout->addWidget(np_gas_control_widget, 0, 2, 2, 1);
+	QGroupBox* np_controls = new QGroupBox(tr("No Pilot Controls"));
+	np_controls->setLayout(np_controls_layout);
+
+	// the sa pilot area
+	QGridLayout* sa_area_layout = new QGridLayout;
+	sa_area_layout->addWidget(sa_pilot_button, 0, 0);
+	sa_area_layout->addWidget(sa_controls, 0, 1);
+	QWidget* sa_area = new QWidget;
+	sa_area->setLayout(sa_area_layout);
+
+	// the waypoint pilot area
+	QGridLayout* wp_area_layout = new QGridLayout;
+	wp_area_layout->addWidget(wp_pilot_button, 0, 0);
+	wp_area_layout->addWidget(gen_waypoints_alt, 0, 1);
+	QWidget* wp_area = new QWidget;
+	wp_area->setLayout(wp_area_layout);
+
+	// the no pilot area
+	QGridLayout* np_area_layout = new QGridLayout;
+	np_area_layout->addWidget(no_pilot_button, 0, 0);
+	np_area_layout->addWidget(np_controls, 0, 1);
+	QWidget* np_area = new QWidget;
+	np_area->setLayout(np_area_layout);
+
+	// the pilot's area
+	QTabWidget* pilot_widget = new QTabWidget;
+	pilot_widget->addTab(np_area, "&No Pilot");
+	pilot_widget->addTab(sa_area, "&Stability Augmenting");
+	pilot_widget->addTab(wp_area, "&Waypoint Pilot");
 
 	// left down
 	QWidget* left_down = new QWidget();
 	QGridLayout* left_down_layout = new QGridLayout();
 	left_down_layout->addWidget(view_alt, 			0, 0, 2, 1);
-	left_down_layout->addWidget(pilot_chooser, 		0, 1, 2, 1);
-	left_down_layout->addWidget(sa_controls, 		0, 2, 2, 1);
-	left_down_layout->addWidget(gen_waypoints_alt, 	1, 3, 1, 1);
-	left_down_layout->addWidget(calibration_button, 0, 3, 1, 1);
+	left_down_layout->addWidget(view_link_quality, 	0, 1, 1, 1);
+	left_down_layout->addWidget(view_fps, 			1, 1, 1, 1);
+	left_down_layout->addWidget(calibration_button, 2, 0, 1, 2);
+	left_down_layout->addWidget(pilot_widget, 		0, 2, 3, 1);
 	left_down->setLayout(left_down_layout);
 
 	// left up
@@ -293,9 +335,9 @@ GroundStation::GroundStation(std::string plane_address):
 	view_bat->start();
 
 	// connect signals
-	connect(wp_pilot_button, SIGNAL(toggled(bool)), this, SLOT(to_waypoint_pilot(bool)));
-	connect(sa_pilot_button, SIGNAL(toggled(bool)), this, SLOT(to_sa_pilot(bool)));
-	connect(no_pilot_button, SIGNAL(toggled(bool)), this, SLOT(to_no_pilot(bool)));
+	connect(wp_pilot_button, SIGNAL(clicked()), this, SLOT(to_waypoint_pilot()));
+	connect(sa_pilot_button, SIGNAL(clicked()), this, SLOT(to_sa_pilot()));
+	connect(no_pilot_button, SIGNAL(clicked()), this, SLOT(to_no_pilot()));
 	connect(calibration_button, SIGNAL(clicked()), this, SLOT(calibrate()));
 	connect(map_view, SIGNAL(got_point(const QgsPoint&, Qt::MouseButton)),
 			this, SLOT(got_waypoint(const QgsPoint&, Qt::MouseButton)));
@@ -319,34 +361,28 @@ void GroundStation::got_waypoint(const QgsPoint& geo_waypoint, Qt::MouseButton b
 
 GroundStation::~GroundStation() {}
 
-void GroundStation::to_waypoint_pilot(bool activate) {
-	if (activate) {
-		std::cout << "GS: Waypoint pilot activated!" << std::endl;
-		boost::shared_ptr<stream::Connection> conn = m_control_connection.get_connection();
-		conn->write(commands::SWITCH_TO_WAYPOINT_PILOT);
+void GroundStation::to_waypoint_pilot() {
+	std::cout << "GS: Waypoint pilot activated!" << std::endl;
+	boost::shared_ptr<stream::Connection> conn = m_control_connection.get_connection();
+	conn->write(commands::SWITCH_TO_WAYPOINT_PILOT);
 
-		m_keyboard_grabber->releaseKeyboard();
-	}
+	m_keyboard_grabber->releaseKeyboard();
 }
 
-void GroundStation::to_sa_pilot(bool activate) {
-	if (activate) {
-		std::cout << "GS: SA pilot activated!" << std::endl;
-		boost::shared_ptr<stream::Connection> conn = m_control_connection.get_connection();
-		conn->write(commands::SWITCH_TO_SA_PILOT);
+void GroundStation::to_sa_pilot() {
+	std::cout << "GS: SA pilot activated!" << std::endl;
+	boost::shared_ptr<stream::Connection> conn = m_control_connection.get_connection();
+	conn->write(commands::SWITCH_TO_SA_PILOT);
 
-		m_keyboard_grabber->grabKeyboard();
-	}
+	m_keyboard_grabber->grabKeyboard();
 }
 
-void GroundStation::to_no_pilot(bool activate) {
-	if (activate) {
-		std::cout << "GS: NO pilot activated!" << std::endl;
-		boost::shared_ptr<stream::Connection> conn = m_control_connection.get_connection();
-		conn->write(commands::SWITCH_TO_NO_PILOT);
+void GroundStation::to_no_pilot() {
+	std::cout << "GS: NO pilot activated!" << std::endl;
+	boost::shared_ptr<stream::Connection> conn = m_control_connection.get_connection();
+	conn->write(commands::SWITCH_TO_NO_PILOT);
 
-		m_keyboard_grabber->releaseKeyboard();
-	}
+	m_keyboard_grabber->releaseKeyboard();
 }
 
 void GroundStation::calibrate() {

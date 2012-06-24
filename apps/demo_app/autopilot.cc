@@ -102,10 +102,14 @@ boost::shared_ptr<stream::AsyncStreamConnection>  export_data(std::string export
 		vec2_pop_stream_ptr position,
 		float_pop_stream_ptr alt,
 		float_pop_stream_ptr battery,
-		float_push_stream_ptr tilt_control,
-		float_push_stream_ptr pitch_control,
+		float_push_stream_ptr sa_tilt_control,
+		float_push_stream_ptr sa_pitch_control,
+		float_push_stream_ptr sa_gas_control,
+		float_push_stream_ptr sa_yaw_control,
 		float_push_stream_ptr gas_control,
-		float_push_stream_ptr yaw_control
+		float_push_stream_ptr yaw_control,
+		float_push_stream_ptr roll_control,
+		float_push_stream_ptr pitch_control
 	)
 {
 	std::cout << "Exporting all data in UDP" << std::endl;
@@ -131,10 +135,15 @@ boost::shared_ptr<stream::AsyncStreamConnection>  export_data(std::string export
 		((send_stream_ptr)boost::make_shared<float_send_stream>(battery));
 
 	stream::AsyncStreamConnection::recv_streams_t recv_streams = boost::assign::list_of
-			((recv_stream_ptr)boost::make_shared<float_recv_stream>(tilt_control)	)
-			((recv_stream_ptr)boost::make_shared<float_recv_stream>(pitch_control)	)
-			((recv_stream_ptr)boost::make_shared<float_recv_stream>(gas_control) 	)
-			((recv_stream_ptr)boost::make_shared<float_recv_stream>(yaw_control) 	);
+			((recv_stream_ptr)boost::make_shared<float_recv_stream>(sa_tilt_control)	)
+			((recv_stream_ptr)boost::make_shared<float_recv_stream>(sa_pitch_control)	)
+			((recv_stream_ptr)boost::make_shared<float_recv_stream>(sa_gas_control) 	)
+			((recv_stream_ptr)boost::make_shared<float_recv_stream>(sa_yaw_control) 	)
+			((recv_stream_ptr)boost::make_shared<float_recv_stream>(gas_control) 		)
+			((recv_stream_ptr)boost::make_shared<float_recv_stream>(yaw_control) 		)
+			((recv_stream_ptr)boost::make_shared<float_recv_stream>(roll_control) 		)
+			((recv_stream_ptr)boost::make_shared<float_recv_stream>(pitch_control) 		);
+
 
 	// creating the udp connection stuff
 	boost::shared_ptr<stream::UdpipConnectionFactory> conn_factory =
@@ -250,8 +259,12 @@ int main(int argc, char** argv) {
 	autopilot::StabilityAugmentingPilot sa_pilot(cockpit, 20., 20.);
 	sa_pilot.get_tilt_control()->set_data(60.0f);
 
+	boost::shared_ptr<stream::PushForwarder<float> > sa_gas_control   = boost::make_shared<stream::PushForwarder<float> >();
+	boost::shared_ptr<stream::PushForwarder<float> > sa_yaw_control   = boost::make_shared<stream::PushForwarder<float> >();
 	boost::shared_ptr<stream::PushForwarder<float> > gas_control   = boost::make_shared<stream::PushForwarder<float> >();
 	boost::shared_ptr<stream::PushForwarder<float> > yaw_control   = boost::make_shared<stream::PushForwarder<float> >();
+	boost::shared_ptr<stream::PushForwarder<float> > roll_control  = boost::make_shared<stream::PushForwarder<float> >();
+	boost::shared_ptr<stream::PushForwarder<float> > pitch_control = boost::make_shared<stream::PushForwarder<float> >();
 
 	// export all the data
 	boost::shared_ptr<stream::AsyncStreamConnection> conn = export_data(gs_address,
@@ -268,14 +281,22 @@ int main(int argc, char** argv) {
 			cockpit->battery_state(),
 			sa_pilot.get_roll_control(),
 			sa_pilot.get_tilt_control(),
+			sa_gas_control,
+			sa_yaw_control,
 			gas_control,
-			yaw_control
+			yaw_control,
+			roll_control,
+			pitch_control
 	);
 
 	conn->start();
 
 	// start in no pilot mode
 	cockpit->run();
+	gas_control->register_receiver(cockpit->gas_servo());
+	yaw_control->register_receiver(cockpit->yaw_servo());
+	roll_control->register_receiver(cockpit->pitch_servo());
+	pitch_control->register_receiver(cockpit->tilt_servo());
 
 
 	stream::TcpipClient control_connection(gs_address, commands::port);
@@ -299,8 +320,17 @@ int main(int argc, char** argv) {
 				std::cout << "Moving to Waypoint pilot... ";
 				cockpit->stop();
 				sa_pilot.stop();
+
+				// unregister the no pilot reciever, if registered
 				gas_control->unregister_receiver(cockpit->gas_servo());
 				yaw_control->unregister_receiver(cockpit->yaw_servo());
+				roll_control->unregister_receiver(cockpit->pitch_servo());
+				pitch_control->unregister_receiver(cockpit->tilt_servo());
+
+				// unregister the sa pilot recievers, if registered
+				sa_gas_control->unregister_receiver(cockpit->gas_servo());
+				sa_yaw_control->unregister_receiver(cockpit->yaw_servo());
+
 				wp_pilot.start();
 				std::cout << " Finished." << std::endl;
 			}
@@ -309,8 +339,17 @@ int main(int argc, char** argv) {
 				std::cout << "Moving to SA pilot... ";
 				cockpit->stop();
 				wp_pilot.stop();
-				gas_control->register_receiver(cockpit->gas_servo());
-				yaw_control->register_receiver(cockpit->yaw_servo());
+
+				// unregister the no pilot reciever, if registersd
+				roll_control->unregister_receiver(cockpit->pitch_servo());
+				pitch_control->unregister_receiver(cockpit->tilt_servo());
+				gas_control->unregister_receiver(cockpit->gas_servo());
+				yaw_control->unregister_receiver(cockpit->yaw_servo());
+
+				// register the sa controls
+				sa_gas_control->register_receiver(cockpit->gas_servo());
+				sa_yaw_control->register_receiver(cockpit->yaw_servo());
+
 				sa_pilot.start();
 				std::cout << " Finished." << std::endl;
 			}
@@ -318,12 +357,18 @@ int main(int argc, char** argv) {
 			else if (command == commands::SWITCH_TO_NO_PILOT) {
 				std::cout << "Moving to no pilot... ";
 				sa_pilot.stop();
-				gas_control->unregister_receiver(cockpit->gas_servo());
-				yaw_control->unregister_receiver(cockpit->yaw_servo());
 				wp_pilot.stop();
-				cockpit->pitch_servo()->set_data(50.);
-				cockpit->tilt_servo()->set_data(50.);
-				cockpit->yaw_servo()->set_data(50.);
+
+				// unregister the sa pilot recievers, if registered
+				sa_gas_control->unregister_receiver(cockpit->gas_servo());
+				sa_yaw_control->unregister_receiver(cockpit->yaw_servo());
+
+				// register the no pilot controls
+				gas_control->register_receiver(cockpit->gas_servo());
+				yaw_control->register_receiver(cockpit->yaw_servo());
+				roll_control->register_receiver(cockpit->pitch_servo());
+				pitch_control->register_receiver(cockpit->tilt_servo());
+
 				cockpit->run();
 				std::cout << " Finished." << std::endl;
 			}
