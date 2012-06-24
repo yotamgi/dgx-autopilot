@@ -274,6 +274,9 @@ int main(int argc, char** argv) {
 
 	conn->start();
 
+	// start in no pilot mode
+	cockpit->run();
+
 
 	stream::TcpipClient control_connection(gs_address, commands::port);
 	while (true) {
@@ -294,6 +297,7 @@ int main(int argc, char** argv) {
 
 			else if (command == commands::SWITCH_TO_WAYPOINT_PILOT) {
 				std::cout << "Moving to Waypoint pilot... ";
+				cockpit->stop();
 				sa_pilot.stop();
 				gas_control->unregister_receiver(cockpit->gas_servo());
 				yaw_control->unregister_receiver(cockpit->yaw_servo());
@@ -303,6 +307,7 @@ int main(int argc, char** argv) {
 
 			else if (command == commands::SWITCH_TO_SA_PILOT) {
 				std::cout << "Moving to SA pilot... ";
+				cockpit->stop();
 				wp_pilot.stop();
 				gas_control->register_receiver(cockpit->gas_servo());
 				yaw_control->register_receiver(cockpit->yaw_servo());
@@ -319,6 +324,7 @@ int main(int argc, char** argv) {
 				cockpit->pitch_servo()->set_data(50.);
 				cockpit->tilt_servo()->set_data(50.);
 				cockpit->yaw_servo()->set_data(50.);
+				cockpit->run();
 				std::cout << " Finished." << std::endl;
 			}
 

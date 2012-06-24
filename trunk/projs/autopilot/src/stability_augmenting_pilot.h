@@ -46,8 +46,6 @@ public:
 
 private:
 
-	static const float UPDATE_RATE = 30.;
-
 	boost::shared_ptr<NormalPlainCockpit> m_cockpit;
 
 	boost::shared_ptr<stream::PushToPopConv<float> > m_tilt_angle;

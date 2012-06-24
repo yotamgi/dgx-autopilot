@@ -115,10 +115,12 @@ void WaypointPilot::maintain_heading(float heading){
 
 void WaypointPilot::fly() {
 
-	Timer t;
-
 	while (m_running) {
-		t.reset();
+
+		// update the cockpit first, and update it twice because it is
+		// more important
+		m_cockpit->update();
+		m_cockpit->update();
 
 		// update the path synchronously, to avoid thread safety problems
 		if (m_waiting_path) {
@@ -148,13 +150,6 @@ void WaypointPilot::fly() {
 		else {
 			// roam
 			nav_to(m_roam_waypoint);
-		}
-
-		// maintain constant and not too high FPS
-		float dt = 1./UPDATE_RATE - t.passed();
-		while (dt > 0) {
-			usleep(1000000*dt);
-			dt = 1./UPDATE_RATE - t.passed();
 		}
 	}
 }

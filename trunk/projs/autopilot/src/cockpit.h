@@ -29,6 +29,27 @@ public:
 	virtual ~Cockpit();
 
 	/**
+	 * A method for updating the cockpit.
+	 * If this function wont be called peridically, the cockpit data will not
+	 * be updated.
+	 * It is very important to run this method as many times as possible, in
+	 * order to get the orientation as accurate as possible.
+	 */
+	void update();
+
+	/**
+	 * Run function - runs the update function in a loop.
+	 * It can be asked to open thread and than it does nor block.
+	 */
+	void run(bool open_thread = true);
+
+	/**
+	 * Stops the running.
+	 * Effective only after a call to run.
+	 */
+	void stop();
+
+	/**
 	 * Calibrate function.
 	 * This one reads the data from the sensors, understand the calibration
 	 * data and calibrate the cocktpit.
@@ -82,9 +103,6 @@ private:
 
 	typedef stream::filters::WatchFilter<lin_algebra::vec3f> vec3_watch_stream;
 
-	static const float UPDATE_RATE = 140.;
-
-	void run();
 
 	template <typename T>
 	class CalibrationFilter : public stream::StreamPopFilter<T> {
@@ -121,6 +139,10 @@ private:
 	boost::shared_ptr<stream::PushForwarder<float> > m_gps_speed_mag;
 
 	boost::thread m_running_thread;
+
+	size_t m_update_counter;
+
+	volatile bool m_running;
 
 };
 
