@@ -351,6 +351,7 @@ int main(int argc, char** argv) {
 				sa_yaw_control->register_receiver(cockpit->yaw_servo());
 
 				sa_pilot.start();
+				conn->write(commands::OK);
 				std::cout << " Finished." << std::endl;
 			}
 
@@ -370,6 +371,7 @@ int main(int argc, char** argv) {
 				pitch_control->register_receiver(cockpit->tilt_servo());
 
 				cockpit->run();
+				conn->write(commands::OK);
 				std::cout << " Finished." << std::endl;
 			}
 

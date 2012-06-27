@@ -17,6 +17,8 @@ namespace commands {
 
 	const std::string CALIBRATE = "CALI";
 
+	const std::string OK = "OK";
+
 }
 
 #endif /* COMMAND_PROTOCOL_H_ */
