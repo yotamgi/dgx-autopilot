@@ -48,6 +48,16 @@ private:
 		float m_last_roll;
 	};
 
+	// some widgets that are needed during the class work
+	gs::SizePushGen* m_np_tilt_control_widget;
+	gs::SizePushGen* m_np_roll_control_widget;
+	gs::SizePushGen* m_np_gas_control_widget;
+	gs::SizePushGen* m_np_yaw_control_widget;
+	gs::SizePushGen* m_sa_tilt_control_widget;
+	gs::SizePushGen* m_sa_roll_control_widget;
+	gs::SizePushGen* m_sa_gas_control_widget;
+    gs::SizePushGen* m_sa_yaw_control_widget;
+
 	boost::shared_ptr<stream::AsyncStreamConnection> m_connection;
 	boost::shared_ptr<stream::PushToPopConv<float> > m_wanted_alt;
 	stream::TcpipServer m_control_connection;

@@ -210,16 +210,16 @@ GroundStation::GroundStation(std::string plane_address):
 	gs::SizePushGen* gen_waypoints_alt = new gs::SizePushGen(m_wanted_alt, "WP Alt", 0, 200., 100.);
 
 	// the SA Pilot controllers
-	gs::SizePushGen* sa_tilt_control_widget  = new gs::SizePushGen(sa_tilt_control, "SA Tilt", -15., 15., 0.);
-	gs::SizePushGen* sa_roll_control_widget  = new gs::SizePushGen(sa_roll_control, "SA Roll", -40, 40., 0., gs::SizePushGen::HORIZONTAL_DIAGRAM);
-	gs::SizePushGen* sa_gas_control_widget   = new gs::SizePushGen(sa_gas_control,  "SA Gas", 0, 100., 50.);
-	gs::SizePushGen* sa_yaw_control_widget   = new gs::SizePushGen(sa_yaw_control,  "SA Yaw", 0, 100., 50., gs::SizePushGen::HORIZONTAL_DIAGRAM);
+	m_sa_tilt_control_widget  = new gs::SizePushGen(sa_tilt_control, "SA Tilt", -15., 15., 0.);
+	m_sa_roll_control_widget  = new gs::SizePushGen(sa_roll_control, "SA Roll", -40, 40., 0., gs::SizePushGen::HORIZONTAL_DIAGRAM);
+	m_sa_gas_control_widget   = new gs::SizePushGen(sa_gas_control,  "SA Gas", 0, 100., 50.);
+	m_sa_yaw_control_widget   = new gs::SizePushGen(sa_yaw_control,  "SA Yaw", 0, 100., 50., gs::SizePushGen::HORIZONTAL_DIAGRAM);
 
 	// the No Pilot controllers
-	gs::SizePushGen* np_tilt_control_widget  = new gs::SizePushGen(pitch_control, "Pitch", 	0., 100., 50.);
-	gs::SizePushGen* np_roll_control_widget  = new gs::SizePushGen(roll_control,  "Roll", 	0., 100., 50., gs::SizePushGen::HORIZONTAL_DIAGRAM);
-	gs::SizePushGen* np_gas_control_widget   = new gs::SizePushGen(gas_control,   "Gas", 	0,  100.,  0.);
-	gs::SizePushGen* np_yaw_control_widget   = new gs::SizePushGen(yaw_control,   "Yaw", 	0,  100., 50., gs::SizePushGen::HORIZONTAL_DIAGRAM);
+	m_np_tilt_control_widget  = new gs::SizePushGen(pitch_control, "Pitch", 	0., 100., 50.);
+	m_np_roll_control_widget  = new gs::SizePushGen(roll_control,  "Roll", 	0., 100., 50., gs::SizePushGen::HORIZONTAL_DIAGRAM);
+	m_np_gas_control_widget   = new gs::SizePushGen(gas_control,   "Gas", 	0,  100.,  0.);
+	m_np_yaw_control_widget   = new gs::SizePushGen(yaw_control,   "Yaw", 	0,  100., 50., gs::SizePushGen::HORIZONTAL_DIAGRAM);
 
 	// the SA Pilot Chooser buttons buttons
 	QPushButton *no_pilot_button = new QPushButton("&Activate No Pilot");
@@ -229,7 +229,7 @@ GroundStation::GroundStation(std::string plane_address):
 	// the calibration button
 	QPushButton* calibration_button = new QPushButton("&Calibrate");
 
-	m_keyboard_grabber = new KeyboardGetterWidget(sa_tilt_control_widget, sa_roll_control_widget);
+	m_keyboard_grabber = new KeyboardGetterWidget(m_sa_tilt_control_widget, m_sa_roll_control_widget);
 
 	//
 	// create the window itself and organize it
@@ -239,19 +239,19 @@ GroundStation::GroundStation(std::string plane_address):
 
 	// the SA controllers
 	QGridLayout* sa_controls_layout = new QGridLayout;
-	sa_controls_layout->addWidget(sa_tilt_control_widget, 0, 0, 2, 1);
-	sa_controls_layout->addWidget(sa_roll_control_widget, 0, 1);
-	sa_controls_layout->addWidget(sa_yaw_control_widget, 1, 1);
-	sa_controls_layout->addWidget(sa_gas_control_widget, 0, 2, 2, 1);
+	sa_controls_layout->addWidget(m_sa_tilt_control_widget, 0, 0, 2, 1);
+	sa_controls_layout->addWidget(m_sa_roll_control_widget, 0, 1);
+	sa_controls_layout->addWidget(m_sa_yaw_control_widget, 1, 1);
+	sa_controls_layout->addWidget(m_sa_gas_control_widget, 0, 2, 2, 1);
 	QGroupBox* sa_controls = new QGroupBox(tr("SA Pilot Controls"));
 	sa_controls->setLayout(sa_controls_layout);
 
 	// the No Pilot controllers
 	QGridLayout* np_controls_layout = new QGridLayout;
-	np_controls_layout->addWidget(np_tilt_control_widget, 0, 0, 2, 1);
-	np_controls_layout->addWidget(np_roll_control_widget, 0, 1);
-	np_controls_layout->addWidget(np_yaw_control_widget, 1, 1);
-	np_controls_layout->addWidget(np_gas_control_widget, 0, 2, 2, 1);
+	np_controls_layout->addWidget(m_np_tilt_control_widget, 0, 0, 2, 1);
+	np_controls_layout->addWidget(m_np_roll_control_widget, 0, 1);
+	np_controls_layout->addWidget(m_np_yaw_control_widget, 1, 1);
+	np_controls_layout->addWidget(m_np_gas_control_widget, 0, 2, 2, 1);
 	QGroupBox* np_controls = new QGroupBox(tr("No Pilot Controls"));
 	np_controls->setLayout(np_controls_layout);
 
@@ -373,6 +373,12 @@ void GroundStation::to_sa_pilot() {
 	std::cout << "GS: SA pilot activated!" << std::endl;
 	boost::shared_ptr<stream::Connection> conn = m_control_connection.get_connection();
 	conn->write(commands::SWITCH_TO_SA_PILOT);
+	conn->read();
+
+	m_sa_gas_control_widget->refresh();
+	m_sa_yaw_control_widget->refresh();
+	m_sa_tilt_control_widget->refresh();
+	m_sa_roll_control_widget->refresh();
 
 	m_keyboard_grabber->grabKeyboard();
 }
@@ -381,6 +387,13 @@ void GroundStation::to_no_pilot() {
 	std::cout << "GS: NO pilot activated!" << std::endl;
 	boost::shared_ptr<stream::Connection> conn = m_control_connection.get_connection();
 	conn->write(commands::SWITCH_TO_NO_PILOT);
+	conn->read();
+
+	// update the data
+	m_np_gas_control_widget->refresh();
+	m_np_yaw_control_widget->refresh();
+	m_np_tilt_control_widget->refresh();
+	m_np_roll_control_widget->refresh();
 
 	m_keyboard_grabber->releaseKeyboard();
 }

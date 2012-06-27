@@ -28,6 +28,11 @@ public:
 	float get_value();
 	void set_value(float value);
 
+	/**
+	 * sends the data to the stream again.
+	 */
+	void refresh();
+
 public slots:
 
 	void value_changed(int value);
