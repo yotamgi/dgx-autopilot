@@ -175,12 +175,12 @@ float FusionFilter::understand_reliability(lin_algebra::vec3f ground, lin_algebr
 //
 //	float angle = lin_algebra::angle_between(ground, north);
 //	float angle_closeness = fabs((m_north_pitch_angle - angle)/(m_north_pitch_angle));
-	if ((acc_len_closeness < 0.1) && (acc_len_closeness > -0.1)) {
+	if ((acc_len_closeness < 0.03) && (acc_len_closeness > -0.03)) {
 		acc_len_closeness = 0.0;
 	}
 
 	return lim(
-			1. - (acc_len_closeness*12.),// + compass_len_closeness/5. + angle_closeness/50.),
+			1. - (acc_len_closeness*10.),// + compass_len_closeness/5. + angle_closeness/50.),
 			0., 1.
 	);
 }
