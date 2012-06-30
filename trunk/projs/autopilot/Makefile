@@ -13,10 +13,11 @@ LDFLAGS += -L./lib -fPIC -Wl,--rpath,$(LIBDS_LIBDIRS):$(LIBDIR) $(LIBDS_LDFLAGS)
  		#$(SRCDIR)/platform/hw/bmp085_baro.o				
 AUTOPILIT_OBJS =  $(SRCDIR)/platform/hw/i2c_interface.o	\
 		$(SRCDIR)/platform/hw/l3g4200d_gyro.o			\
-		$(SRCDIR)/platform/hw/itg3200_gyro.o				\
+		$(SRCDIR)/platform/hw/itg3200_gyro.o			\
 		$(SRCDIR)/platform/hw/adxl345_acc.o				\
 		$(SRCDIR)/platform/hw/ads1115_adc.o				\
 		$(SRCDIR)/platform/hw/hmc5843_compass.o		 	\
+		$(SRCDIR)/platform/hw/bmp085_baro.o			    \
 		$(SRCDIR)/platform/hw/maestro_servo_controller.o \
 		$(SRCDIR)/platform/hw/beagleboard_gpio.o \
 		$(SRCDIR)/platform/hw/gps.o \
@@ -44,7 +45,7 @@ all: host device
 host: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.so sensor_watch_test 
 
 .PHONY:
-device: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.so sensor_watch_test gtest gps_test servo_test pitot_test # baro_test 
+device: $(OBJDIR) $(LIBDIR) $(LIBDIR)/libautopilot.so sensor_watch_test gtest gps_test servo_test pitot_test baro_test 
 
 .PHONY:
 clean:

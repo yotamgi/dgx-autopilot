@@ -43,7 +43,7 @@ public:
 	}
 
 	float get_data() {
-		return (float(m_adc->read_channel(m_channel)) / 0x7fff) * 4.096f;
+		return (float(m_adc->read_channel(m_channel)) / 0x7fff) * 4.096f * 4.0f;
 	}
 
 private:
