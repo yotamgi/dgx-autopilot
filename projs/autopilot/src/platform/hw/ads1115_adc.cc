@@ -31,6 +31,7 @@ int16_t Ads1115_ADC::read_channel(uint8_t channel) {
 	if (m_curr_mux != channel) {
 		m_i2c.write_num<uint16_t>(CONFIG_REG, m_config_word | (channel << 12) | (m_channel_ranges[channel] << 9)); 
 		m_curr_mux = channel;
+		usleep(40000);
 	}
 
 
