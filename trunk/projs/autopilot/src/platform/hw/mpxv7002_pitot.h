@@ -20,6 +20,7 @@ public:
 
 		// assume that we start at airspeed 0, so check the zero voltage
 		m_zero_calibration_voltage = (float(m_adc->read_channel(m_channel))/float(0x7fff))*4.096;
+		std::cout << "Calibrated pitot's zero calibration voltage to " << m_zero_calibration_voltage << std::endl;
 	}
 
 	virtual ~Mpxv7002Pitot() {}
