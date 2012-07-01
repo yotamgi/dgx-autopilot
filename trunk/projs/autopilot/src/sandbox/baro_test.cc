@@ -5,7 +5,8 @@
 int main() {
 
 	autopilot::Bmp085baro b(2);
-	while(true)
+	while(true) {
 		std::cout << b.get_data() << std::endl;
+	}
 
 }
