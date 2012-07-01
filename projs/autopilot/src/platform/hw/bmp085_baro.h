@@ -4,6 +4,7 @@
 
 #include <stream/util/lin_algebra.h>
 #include <stream/data_pop_stream.h>
+#include <stream/util/time.h>
 #include "platform/hw/i2c_interface.h"
 
 namespace autopilot {
@@ -11,7 +12,7 @@ namespace autopilot {
 class Bmp085baro : public stream::DataPopStream<float> {
 public:
 
-	Bmp085baro(size_t device_i2c_num);
+	Bmp085baro(size_t device_i2c_num, bool continues_mode = true, float see_level_pressure=100500.);
 
 	virtual ~Bmp085baro() {}
 
@@ -22,11 +23,32 @@ public:
 
 private:
 
+	void update_temperature();
+	void start_updating_pressure();
+	void update_pressure();
+	float calculate_pressure();
+
 	/**
 	 * fixed values.
 	 */
 	const uint8_t I2C_ADDRESS;
+	static const float TEMPERATURE_UPDATE_TIME = 5.0;
+	static const float PRESSURE_UPDATE_TIME = 0.05;
+	const float m_see_level_pressure;
+	const bool m_continous_mode;
 
+	/**
+	 * Opcodes
+	 */
+	static const uint8_t CONTROL_REGISTER 	= 0xF4;
+	static const uint8_t DATA_READ 			= 0xF6;
+	static const uint16_t RESOLUTION 		= 1; // between 0 to 3
+
+	/**
+	 * Control Commands
+	 */
+	static const uint8_t CONVERT_TEMPERATURE 	= 0x2E;
+	static const uint8_t CONVERT_PRESSURE 		= 0x34;
 
 	/**
 	 * barometer to alt params
@@ -47,6 +69,12 @@ private:
 	 * the i2c device communication object.
 	 */
 	I2C_Interface m_i2c;
+
+	int32_t m_current_ut;
+	int32_t m_current_up;
+
+	Timer m_temp_update_timer;
+	Timer m_pressure_update_timer;
 };
 
 }  // namespace autopilot
