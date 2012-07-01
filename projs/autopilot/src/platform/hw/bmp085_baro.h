@@ -23,6 +23,11 @@ public:
 
 private:
 
+	/**
+	 * Working functions
+	 * Those are the functions that does all the work. Get data uses them in
+	 * changing order, according to the contious mode flag and timers.
+	 */
 	void update_temperature();
 	void start_updating_pressure();
 	void update_pressure();
@@ -51,7 +56,7 @@ private:
 	static const uint8_t CONVERT_PRESSURE 		= 0x34;
 
 	/**
-	 * barometer to alt params
+	 * Pressure parameters
 	 */
 	int16_t m_ac1;
 	int16_t m_ac2;
@@ -73,6 +78,9 @@ private:
 	int32_t m_current_ut;
 	int32_t m_current_up;
 
+	/**
+	 * Timers for the pressure calculations
+	 */
 	Timer m_temp_update_timer;
 	Timer m_pressure_update_timer;
 };
