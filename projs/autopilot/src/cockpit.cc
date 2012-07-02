@@ -87,13 +87,20 @@ Cockpit::Cockpit(NormalPlainPlatform platform):
 	m_rest_orientation = m_orientation_filter->get_rest_orientation_stream();
 	m_fixed_acc = m_orientation_filter->get_fixed_acc_stream();
 
-	m_alt_calibration =
-		boost::make_shared<CalibrationFilter<float> >(
-			stream::create_func_pop_filter<lin_algebra::vec3f,float>(
-				m_gps_pos,
-				lin_algebra::get<2>
-			)
-		);
+	// if the platform has an alt sensor - use it. otherwise, use the gps alt
+	if (m_platform.alt_sensor) {
+		std::cout << "Using altitude sensor" << std::endl;
+		m_alt_calibration = boost::make_shared<CalibrationFilter<float> >(m_platform.alt_sensor);
+	} else {
+		std::cout << "Using GPS altitude" << std::endl;
+		m_alt_calibration =
+			boost::make_shared<CalibrationFilter<float> >(
+				stream::create_func_pop_filter<lin_algebra::vec3f,float>(
+					m_gps_pos,
+					lin_algebra::get<2>
+				)
+			);
+	}
 	m_alt_stream = boost::make_shared<float_watch_stream>(m_alt_calibration);
 
 	m_alt_calibration->calibrate(0);
@@ -122,9 +129,11 @@ void Cockpit::update() {
 	// update the data
 	m_orientation->get_data();
 	m_gyro_orientation->get_data();
-	m_alt_stream->get_data();
 
 	// some things should happen less than others
+	if (m_update_counter % 7 == 0) {
+		m_alt_stream->get_data();
+	}
 	if (m_update_counter % 5 == 0) {
 		m_airspeed_stream->get_data();
 	}

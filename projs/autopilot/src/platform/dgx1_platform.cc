@@ -3,6 +3,8 @@
 #include "hw/adxl345_acc.h"
 #include "hw/itg3200_gyro.h"
 #include "hw/hmc5843_compass.h"
+#include "hw/bmp085_baro.h"
+#include "hw/ads1115_adc.h"
 #include "hw/maestro_servo_controller.h"
 #include "hw/beagleboard_gpio.h"
 #include "hw/mpxv7002_pitot.h"
@@ -119,6 +121,8 @@ NormalPlainPlatform create_dgx1_2_platform() {
 			(Hmc5843Compass::Direction[3]){ Hmc5843Compass::Z_DIR, Hmc5843Compass::Y_DIR, Hmc5843Compass::X_DIR },
 			(bool[3]){ false, true, true}
 	);
+
+	dgx1_platform.alt_sensor = boost::make_shared<autopilot::Bmp085baro>(2);
 
 	boost::shared_ptr<autopilot::Ads1115_ADC> adc = boost::make_shared<autopilot::Ads1115_ADC>(2);
 	dgx1_platform.airspeed_sensor = boost::make_shared<autopilot::Mpxv7002Pitot>(adc, 0);
