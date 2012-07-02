@@ -1,6 +1,6 @@
 
-#ifndef BMP085_BARO_H_ 
-#define BMP085_BARO_H_ 
+#ifndef MPXV7002_PITOT_H
+#define MPXV7002_PITOT_H
 
 #include "ads1115_adc.h"
 #include <stream/util/lin_algebra.h>
@@ -42,4 +42,4 @@ private:
 
 }  // namespace autopilot
 
-#endif /* BMP085_BARO_H_ */
+#endif /* MPXV7002_PITOT_H */

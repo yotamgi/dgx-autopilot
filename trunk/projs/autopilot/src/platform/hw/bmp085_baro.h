@@ -87,4 +87,4 @@ private:
 
 }  // namespace autopilot
 
-#endif /* ITG3200_GYRO_H_ */
+#endif /* BMP085_BARO_H_ */
