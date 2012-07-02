@@ -201,7 +201,7 @@ GroundStation::GroundStation(std::string plane_address):
 			m_connection->get_quality_stream(), "Link", 0.1f , 0., 1.);
 
 	// the plane's alt
-	gs::SizeStreamView* view_alt = new gs::SizeStreamView(alt, "Alt", 0.1f , 0., 200.);
+	gs::SizeStreamView* view_alt = new gs::SizeStreamView(alt, "Alt", 0.03f , 0., 200.);
 
 	// the plane's bat
 	gs::LabelStreamView<float>* view_bat = new gs::LabelStreamView<float>(battery, 1., "Bat");

@@ -97,6 +97,7 @@ void thread(PlainParams plain_params,
 	platform->gyro_sensor = gyro_sensor;
 	platform->compass_sensor = magneto_sensor;
 	platform->airspeed_sensor = pitot_sensor;
+	platform->alt_sensor = alt_sensor;
 	platform->gps_pos_generator = gps_pos;
 	platform->gps_speed_dir_generator = gps_speed_dir;
 	platform->gps_speed_mag_generator = gps_speed_mag;
