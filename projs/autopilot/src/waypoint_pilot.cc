@@ -57,7 +57,11 @@ void WaypointPilot::maintain_alt(float wanted_altitude){
 	// avg flight
 	else {
 		gas_servo->set_data(m_params.avg_gas);
-		m_sas_pilot.get_tilt_control()->set_data(m_params.avg_pitch_angle);
+		if (delta_alt > 0.) {
+			m_sas_pilot.get_tilt_control()->set_data((delta_alt/5.)*m_params.max_climbing_angle);
+		} else {
+			m_sas_pilot.get_tilt_control()->set_data(-(delta_alt/5.)*m_params.max_decending_angle);
+		}
 	}
 }
 
