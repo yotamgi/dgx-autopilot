@@ -16,7 +16,7 @@ namespace filters {
 template <typename data_t>
 class FpsFilter : public StreamPopFilter<data_t> {
 public:
-	FpsFilter(boost::shared_ptr<DataPopStream<data_t> > source);
+	FpsFilter(boost::shared_ptr<DataPopStream<data_t> > source, float min_calc_time = 0.05);
 	~FpsFilter();
 
 	data_t get_data();
@@ -46,6 +46,9 @@ private:
 	size_t m_counter;
 	Timer m_timer;
 	boost::shared_ptr<FpsGen> m_fps_gen;
+
+	const float m_min_calc_time;
+	float m_last_value;
 
 	friend class FpsGen;
 };

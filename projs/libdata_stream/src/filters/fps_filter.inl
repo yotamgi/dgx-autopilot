@@ -6,10 +6,12 @@ namespace filters {
 
 
 template <typename data_t>
-FpsFilter<data_t>::FpsFilter(boost::shared_ptr<DataPopStream<data_t> > source):
+FpsFilter<data_t>::FpsFilter(boost::shared_ptr<DataPopStream<data_t> > source, float min_calc_time):
 		StreamPopFilter<data_t>(source),
 		m_counter(0),
-		m_fps_gen(new typename FpsFilter<data_t>::FpsGen(this))
+		m_fps_gen(new typename FpsFilter<data_t>::FpsGen(this)),
+		m_min_calc_time(min_calc_time),
+		m_last_value(0.)
 {}
 
 template <typename data_t>
@@ -30,10 +32,16 @@ boost::shared_ptr<DataPopStream<float> > FpsFilter<data_t>::get_fps_stream() {
 
 template <typename data_t>
 float FpsFilter<data_t>::calc_fps() {
-	float fps = (m_counter/m_timer.passed());
-	m_counter = 0;
-	m_timer.reset();
-	return fps;
+
+	// calc fps only if at least min_calc_time has passed
+	float time_delta = m_timer.passed();
+	if (time_delta > m_min_calc_time) {
+		m_last_value = (m_counter/time_delta);
+		m_counter = 0;
+		m_timer.reset();
+	}
+
+	return m_last_value;
 }
 
 template <typename data_t>

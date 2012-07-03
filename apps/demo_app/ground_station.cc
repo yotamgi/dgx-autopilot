@@ -189,7 +189,7 @@ GroundStation::GroundStation(std::string plane_address):
 	gs::SizeStreamView *view_reliability = new gs::SizeStreamView(reliability, "Reliability", view_update_time, 0., 1.);
 
 	// the gyro_fps stream
-	gs::SizeStreamView *view_fps = new gs::SizeStreamView(gyro_fps, "FPS", 1., 0., 400.);
+	gs::SizeStreamView *view_fps = new gs::SizeStreamView(gyro_fps, "FPS", 0.1, 0., 400.);
 
 	// the position
 	const QSize map_dimention(frame_size.width()/2.3, frame_size.height());
