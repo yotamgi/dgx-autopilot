@@ -232,7 +232,7 @@ int main(int argc, char** argv) {
 
 	// add fps stream to the gyro stream
 	boost::shared_ptr<stream::filters::FpsFilter<lin_algebra::vec3f> > fpsed_gyro(
-			new stream::filters::FpsFilter<lin_algebra::vec3f>(platform.gyro_sensor)
+			new stream::filters::FpsFilter<lin_algebra::vec3f>(platform.gyro_sensor, 0.4f)
 	);
 	platform.gyro_sensor = fpsed_gyro;
 
