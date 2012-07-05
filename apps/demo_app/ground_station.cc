@@ -13,6 +13,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/bind.hpp>
+#include <boost/lexical_cast.hpp>
 #include <qt4/Qt/qboxlayout.h>
 #include <qt4/Qt/qgridlayout.h>
 
@@ -94,6 +95,7 @@ GroundStation::GroundStation(std::string plane_address):
 	boost::shared_ptr<vec2_recv_stream> position = 					boost::make_shared<vec2_recv_stream>();
 	boost::shared_ptr<float_recv_stream> alt = 						boost::make_shared<float_recv_stream>();
 	boost::shared_ptr<float_recv_stream> battery = 					boost::make_shared<float_recv_stream>();
+	boost::shared_ptr<float_recv_stream> gas_servo =				boost::make_shared<float_recv_stream>();
 	boost::shared_ptr<float_send_stream> sa_roll_control = 			boost::make_shared<float_send_stream>();
 	boost::shared_ptr<float_send_stream> sa_tilt_control = 			boost::make_shared<float_send_stream>();
 	boost::shared_ptr<float_send_stream> sa_gas_control = 				boost::make_shared<float_send_stream>();
@@ -127,7 +129,8 @@ GroundStation::GroundStation(std::string plane_address):
 	        ((recv_stream_ptr)gyro_fps               )
             ((recv_stream_ptr)position             	 )
 			((recv_stream_ptr)alt               	 )
-			((recv_stream_ptr)battery              	 );
+			((recv_stream_ptr)battery              	 )
+			((recv_stream_ptr)gas_servo            	 );
 
 	// creating the udp connection stuff
 	boost::shared_ptr<stream::UdpipConnectionFactory> conn_factory =
@@ -183,7 +186,7 @@ GroundStation::GroundStation(std::string plane_address):
 	// the airspeed stream
 	gs::SizeStreamView *view_airspeed = new gs::SizeStreamView(
 			stream::create_func_pop_filter<float, float>(airspeed, boost::bind(std::multiplies<float>(), _1, 3.6f)),
-			"Airspeed [km/h]", view_update_time, 0., 100.);
+			"Airspeed [km/h]", view_update_time, 0., 70.);
 
 	// the reliable stream
 	gs::SizeStreamView *view_reliability = new gs::SizeStreamView(reliability, "Reliability", view_update_time, 0., 1.);
@@ -206,6 +209,9 @@ GroundStation::GroundStation(std::string plane_address):
 	// the plane's bat
 	gs::LabelStreamView<float>* view_bat = new gs::LabelStreamView<float>(battery, 1., "Bat");
 
+	// the plane's gas servo
+	gs::SizeStreamView *view_gas = new gs::SizeStreamView(gas_servo, "Gas", 0.03, 0., 100.);
+
 	// the new waypoint's alt
 	gs::SizePushGen* gen_waypoints_alt = new gs::SizePushGen(m_wanted_alt, "WP Alt", 0, 200., 100.);
 
@@ -225,6 +231,10 @@ GroundStation::GroundStation(std::string plane_address):
 	QPushButton *no_pilot_button = new QPushButton("&Activate No Pilot");
 	QPushButton *wp_pilot_button = new QPushButton("&Activate Waypoint Pilot");
 	QPushButton *sa_pilot_button = new QPushButton("&Activate SA Pilot");
+
+	// the waypoint pilot airspeed chooser
+	m_airspeed_value = new QDoubleSpinBox();
+	QCheckBox* use_airspeed_cb = new QCheckBox("Use Airspeed:");
 
 	// the calibration button
 	QPushButton* calibration_button = new QPushButton("&Calibrate");
@@ -264,8 +274,11 @@ GroundStation::GroundStation(std::string plane_address):
 
 	// the waypoint pilot area
 	QGridLayout* wp_area_layout = new QGridLayout;
-	wp_area_layout->addWidget(wp_pilot_button, 0, 0);
-	wp_area_layout->addWidget(gen_waypoints_alt, 0, 1);
+	wp_area_layout->addWidget(wp_pilot_button, 		0, 0);
+	wp_area_layout->addWidget(gen_waypoints_alt, 	0, 1);
+	wp_area_layout->addWidget(view_gas, 			0, 2);
+	wp_area_layout->addWidget(use_airspeed_cb, 		1, 0);
+	wp_area_layout->addWidget(m_airspeed_value, 	1, 1);
 	QWidget* wp_area = new QWidget;
 	wp_area->setLayout(wp_area_layout);
 
@@ -333,12 +346,14 @@ GroundStation::GroundStation(std::string plane_address):
 	view_link_quality->start();
 	view_alt->start();
 	view_bat->start();
+	view_gas->start();
 
 	// connect signals
 	connect(wp_pilot_button, SIGNAL(clicked()), this, SLOT(to_waypoint_pilot()));
 	connect(sa_pilot_button, SIGNAL(clicked()), this, SLOT(to_sa_pilot()));
 	connect(no_pilot_button, SIGNAL(clicked()), this, SLOT(to_no_pilot()));
 	connect(calibration_button, SIGNAL(clicked()), this, SLOT(calibrate()));
+	connect(use_airspeed_cb, SIGNAL(toggled(bool)), this, SLOT(use_airspeed(bool)));
 	connect(map_view, SIGNAL(got_point(const QgsPoint&, Qt::MouseButton)),
 			this, SLOT(got_waypoint(const QgsPoint&, Qt::MouseButton)));
 }
@@ -396,6 +411,20 @@ void GroundStation::to_no_pilot() {
 	m_np_roll_control_widget->refresh();
 
 	m_keyboard_grabber->releaseKeyboard();
+}
+
+void GroundStation::use_airspeed(bool use) {
+	boost::shared_ptr<stream::Connection> conn = m_control_connection.get_connection();
+	if (use) {
+		float wanted_airspeed = m_airspeed_value->value() / 3.6f; // from km/h to m/s
+		std::cout << "Using airspeed" << wanted_airspeed << std::endl;
+		std::stringstream ss;
+		conn->write(commands::USE_AIRSPEED);
+		conn->write(boost::lexical_cast<std::string>(wanted_airspeed));
+	} else {
+		std::cout << "Stopped using airspeed" << std::endl;
+		conn->write(commands::DONT_USE_AIRSPEED);
+	}
 }
 
 void GroundStation::calibrate() {

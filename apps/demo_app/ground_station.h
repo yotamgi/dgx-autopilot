@@ -7,6 +7,7 @@
 #include <stream/stream_utils.h>
 #include <gs/size_push_gen.h>
 #include <boost/shared_ptr.hpp>
+#include <QtGui/QtGui>
 #include <qapplication.h>
 #include <QObject>
 #include <qt4/Qt/qwidget.h>
@@ -30,6 +31,7 @@ public slots:
 	void to_waypoint_pilot();
 	void to_no_pilot();
 	void to_sa_pilot();
+	void use_airspeed(bool use);
 	void calibrate();
 
 private:
