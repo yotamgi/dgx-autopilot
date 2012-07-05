@@ -12,6 +12,7 @@
 #include <boost/make_shared.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/assign/list_of.hpp>
+#include <boost/lexical_cast.hpp>
 #include "command_protocol.h"
 
 #ifndef DEVICE
@@ -24,6 +25,7 @@
 #include <fstream>
 
 typedef stream::filters::WatchFilter<lin_algebra::vec3f> vec3_watch_stream;
+typedef stream::filters::WatchFilter<float> 			 float_watch_stream;
 
 void usage_and_exit(std::string arg0) {
 	std::cout << arg0 << " <gs_address> [--platform hw|sim|ip_addr] [--record <folder> ] [--help] " << std::endl;
@@ -102,6 +104,7 @@ boost::shared_ptr<stream::AsyncStreamConnection>  export_data(std::string export
 		vec2_pop_stream_ptr position,
 		float_pop_stream_ptr alt,
 		float_pop_stream_ptr battery,
+		float_pop_stream_ptr gas_servo,
 		float_push_stream_ptr sa_tilt_control,
 		float_push_stream_ptr sa_pitch_control,
 		float_push_stream_ptr sa_gas_control,
@@ -132,7 +135,8 @@ boost::shared_ptr<stream::AsyncStreamConnection>  export_data(std::string export
 		((send_stream_ptr)boost::make_shared<float_send_stream>(fps))
 		((send_stream_ptr)boost::make_shared<vec2_send_stream>(position))
 		((send_stream_ptr)boost::make_shared<float_send_stream>(alt))
-		((send_stream_ptr)boost::make_shared<float_send_stream>(battery));
+		((send_stream_ptr)boost::make_shared<float_send_stream>(battery))
+		((send_stream_ptr)boost::make_shared<float_send_stream>(gas_servo));
 
 	stream::AsyncStreamConnection::recv_streams_t recv_streams = boost::assign::list_of
 			((recv_stream_ptr)boost::make_shared<float_recv_stream>(sa_tilt_control)	)
@@ -226,6 +230,10 @@ int main(int argc, char** argv) {
 		platform = record_platform(platform, record_dir);
 	}
 
+	// add a watch stream on the gas servo
+	boost::shared_ptr<float_watch_stream> gas_watch(new float_watch_stream(platform.gas_servo));
+	platform.gas_servo = gas_watch;
+
 	// add a watch stream on the compass stream
 	boost::shared_ptr<vec3_watch_stream> compass_watch(new vec3_watch_stream(platform.compass_sensor));
 	platform.compass_sensor = compass_watch;
@@ -251,6 +259,9 @@ int main(int argc, char** argv) {
 	wp_pilot_params.pitch_severity = 20.;
 	wp_pilot_params.roll_severity = 20.;
 	wp_pilot_params.heading_fine_tunning = 30.;
+	wp_pilot_params.use_airspeed = false;
+	wp_pilot_params.avg_airspeed = 10.;
+	wp_pilot_params.airspeed_severity = 3.;
 
 	// create the wp pilot
 	autopilot::WaypointPilot wp_pilot(wp_pilot_params, cockpit);
@@ -279,6 +290,7 @@ int main(int argc, char** argv) {
 			cockpit->position(),
 			cockpit->alt(),
 			cockpit->battery_state(),
+			gas_watch->get_watch_stream(),
 			sa_pilot.get_roll_control(),
 			sa_pilot.get_tilt_control(),
 			sa_gas_control,
@@ -379,6 +391,18 @@ int main(int argc, char** argv) {
 				std::cout << "Calibrating the plain... ";
 				cockpit->calibrate();
 				std::cout << " Finished." << std::endl;
+			}
+
+			else if (command == commands::USE_AIRSPEED) {
+				float wanted_airspeed = boost::lexical_cast<float>(conn->read());
+				wp_pilot.params().avg_airspeed = wanted_airspeed;
+				wp_pilot.params().use_airspeed = true;
+				std::cout << "Setting airspeed to " << wanted_airspeed << std::endl;
+			}
+
+			else if (command == commands::DONT_USE_AIRSPEED) {
+				wp_pilot.params().use_airspeed = false;
+				std::cout << "Stopped using airspeed" << std::endl;
 			}
 
 

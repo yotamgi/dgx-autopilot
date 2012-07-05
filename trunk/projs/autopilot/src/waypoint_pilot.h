@@ -4,6 +4,7 @@
 #include "interfaces/plain_cockpit.h"
 #include "stability_augmenting_pilot.h"
 #include <stream/util/lin_algebra.h>
+#include <stream/util/time.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
 
@@ -30,6 +31,10 @@ public:
 
 		float avg_gas;
 		float avg_pitch_angle;
+
+		bool use_airspeed;
+		float avg_airspeed;
+		float airspeed_severity;
 	};
 
 	WaypointPilot(const Params& params, boost::shared_ptr<NormalPlainCockpit> cockpit);
@@ -47,6 +52,8 @@ public:
 
 	typedef std::vector<waypoint> waypoint_list;
 
+	Params& params() { return m_params; }
+
 	void set_path(waypoint_list path);
 	waypoint_list get_path() { return m_path; }
 
@@ -56,6 +63,7 @@ private:
 
 	void maintain_alt(float altitude);
 	void maintain_heading(float heading);
+	void maintain_airspeed(float airspeed);
 	bool nav_to(waypoint waypoint);
 
 
@@ -85,6 +93,9 @@ private:
 	boost::thread m_running_thread;
 
 	waypoint m_roam_waypoint;
+
+	Timer m_t;
+	float m_airspeed_low_pass;
 
 	/** The Pilot params as set in the Ctor */
 	Params m_params;

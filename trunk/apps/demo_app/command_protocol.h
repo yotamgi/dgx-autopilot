@@ -15,6 +15,9 @@ namespace commands {
 
 	const std::string SWITCH_TO_NO_PILOT = "TONP";
 
+	const std::string USE_AIRSPEED = "USEAS";
+	const std::string DONT_USE_AIRSPEED = "DUSEAS";
+
 	const std::string CALIBRATE = "CALI";
 
 	const std::string OK = "OK";

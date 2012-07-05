@@ -15,6 +15,7 @@ WaypointPilot::WaypointPilot(const Params& params, boost::shared_ptr<NormalPlain
 		m_sas_pilot(cockpit, params.pitch_severity, params.roll_severity),
 		m_waiting_path(false),
 		m_running(false),
+		m_airspeed_low_pass(-1.),
 		m_params(params)
 {
 	m_roam_waypoint = waypoint(cockpit->position()->get_data(), 100);
@@ -44,19 +45,19 @@ void WaypointPilot::maintain_alt(float wanted_altitude){
 
 	// max climbing
 	if (delta_alt > 5) {
-		gas_servo->set_data(m_params.climbing_gas);
 		m_sas_pilot.get_tilt_control()->set_data(m_params.max_climbing_angle);
+//		gas_servo->set_data(m_params.climbing_gas);
 	}
 
 	// max decending
 	else if (delta_alt < -5) {
-		gas_servo->set_data(m_params.decending_gas);
+//		gas_servo->set_data(m_params.decending_gas);
 		m_sas_pilot.get_tilt_control()->set_data(m_params.max_decending_angle);
 	}
 
 	// avg flight
 	else {
-		gas_servo->set_data(m_params.avg_gas);
+//		gas_servo->set_data(m_params.avg_gas);
 		if (delta_alt > 0.) {
 			m_sas_pilot.get_tilt_control()->set_data((delta_alt/5.)*m_params.max_climbing_angle);
 		} else {
@@ -65,7 +66,38 @@ void WaypointPilot::maintain_alt(float wanted_altitude){
 	}
 }
 
-void WaypointPilot::maintain_heading(float heading){
+void WaypointPilot::maintain_airspeed(float airspeed) {
+
+	float wanted_gas;
+
+	if (m_params.use_airspeed) {
+
+		if (m_airspeed_low_pass < 0) m_airspeed_low_pass = m_cockpit->air_speed()->get_data();
+
+		// make the airpseed low-pass filter
+		m_airspeed_low_pass += 0.7 * (m_cockpit->air_speed()->get_data() - m_airspeed_low_pass) * m_t.passed();
+		m_t.reset();
+
+		// set gas according to the wanted airspeed
+		float airspeed_delta = m_params.avg_airspeed - m_airspeed_low_pass;
+		wanted_gas = 50. + 50 * (airspeed_delta / m_params.airspeed_severity);
+	} else {
+
+		float pitch_angle = m_cockpit->orientation()->get_data()[0];
+
+		if (pitch_angle > 0.75*m_params.max_climbing_angle) {
+			wanted_gas = m_params.climbing_gas;
+		} else if (pitch_angle < 0.75*m_params.max_climbing_angle) {
+			wanted_gas = m_params.decending_gas;
+		} else {
+			wanted_gas = m_params.avg_gas;
+		}
+	}
+
+	m_cockpit->gas_servo()->set_data(wanted_gas);
+}
+
+void WaypointPilot::maintain_heading(float heading) {
 
 	vec3_stream_ptr oreintation = m_cockpit->orientation();
 	vec2_stream_ptr position = m_cockpit->position();
@@ -104,6 +136,8 @@ void WaypointPilot::maintain_heading(float heading){
 	 maintain_heading(heading);
 
 	 maintain_alt(waypoint.altitude);
+
+	 maintain_airspeed(m_params.avg_airspeed);
 
 	 m_sas_pilot.update();
 
