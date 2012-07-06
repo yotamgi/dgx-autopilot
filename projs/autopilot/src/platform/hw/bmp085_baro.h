@@ -12,7 +12,7 @@ namespace autopilot {
 class Bmp085baro : public stream::DataPopStream<float> {
 public:
 
-	Bmp085baro(size_t device_i2c_num, bool continues_mode = true, float see_level_pressure=100500.);
+	Bmp085baro(size_t device_i2c_num, bool continious_mode);
 
 	virtual ~Bmp085baro() {}
 
@@ -24,39 +24,25 @@ public:
 private:
 
 	/**
-	 * Working functions
-	 * Those are the functions that does all the work. Get data uses them in
-	 * changing order, according to the contious mode flag and timers.
+	 * Constants
 	 */
+	static const uint16_t RESOLUTION = 1;
+	static const float TEMP_UPDATE_TIME = 1.5;
+	static const float PRES_UPDATE_TIME = 0.05;
+
 	void update_temperature();
-	void start_updating_pressure();
-	void update_pressure();
-	float calculate_pressure();
+	void prepare_pressure();
+	void read_pressure();
+	void calc_alt();
 
 	/**
 	 * fixed values.
 	 */
 	const uint8_t I2C_ADDRESS;
-	static const float TEMPERATURE_UPDATE_TIME = 5.0;
-	static const float PRESSURE_UPDATE_TIME = 0.05;
-	const float m_see_level_pressure;
-	const bool m_continous_mode;
+
 
 	/**
-	 * Opcodes
-	 */
-	static const uint8_t CONTROL_REGISTER 	= 0xF4;
-	static const uint8_t DATA_READ 			= 0xF6;
-	static const uint16_t RESOLUTION 		= 1; // between 0 to 3
-
-	/**
-	 * Control Commands
-	 */
-	static const uint8_t CONVERT_TEMPERATURE 	= 0x2E;
-	static const uint8_t CONVERT_PRESSURE 		= 0x34;
-
-	/**
-	 * Pressure parameters
+	 * barometer to alt params
 	 */
 	int16_t m_ac1;
 	int16_t m_ac2;
@@ -70,21 +56,24 @@ private:
 	int16_t m_mc;
 	int16_t m_md;
 
+	int32_t m_curr_ut;
+	int32_t m_curr_up;
+	float m_curr_alt;
+
+	/**
+	 * Timers for the calculations
+	 */
+	 Timer m_update_temp_timer;
+	 Timer m_update_pres_timer;
+
+	 const bool m_continious_mode;
+
 	/**
 	 * the i2c device communication object.
 	 */
 	I2C_Interface m_i2c;
-
-	int32_t m_current_ut;
-	int32_t m_current_up;
-
-	/**
-	 * Timers for the pressure calculations
-	 */
-	Timer m_temp_update_timer;
-	Timer m_pressure_update_timer;
 };
 
 }  // namespace autopilot
 
-#endif /* BMP085_BARO_H_ */
+#endif /* ITG3200_GYRO_H_ */
