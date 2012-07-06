@@ -1,4 +1,4 @@
-#include "dgx1_platform.h"
+#include "dgx1_platform.h" 
 #include "hw/l3g4200d_gyro.h"
 #include "hw/adxl345_acc.h"
 #include "hw/itg3200_gyro.h"
@@ -122,7 +122,7 @@ NormalPlainPlatform create_dgx1_2_platform() {
 			(bool[3]){ false, true, true}
 	);
 
-	dgx1_platform.alt_sensor = boost::make_shared<autopilot::Bmp085baro>(2);
+	dgx1_platform.alt_sensor = boost::make_shared<autopilot::Bmp085baro>(2, true);
 
 	boost::shared_ptr<autopilot::Ads1115_ADC> adc = boost::make_shared<autopilot::Ads1115_ADC>(2);
 	dgx1_platform.airspeed_sensor = boost::make_shared<autopilot::Mpxv7002Pitot>(adc, 0);
