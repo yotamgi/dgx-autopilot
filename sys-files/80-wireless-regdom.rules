@@ -1,0 +1,1 @@
+SUBSYSTEMS=="usb", SYSFS{idVendor}=="148f", SYSFS{idProduct}=="3070", RUN+="/usr/sbin/iw reg set BO"

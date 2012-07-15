@@ -7,6 +7,10 @@ Wireless:
  * To configure the ad-hoc thing use the "sys-files/network_config.txt" file.
  * To enable the wireless automatically in ad-hoc mode, you must copy the content of "sys-files/interfaces" file to the /etc/network/interfaces, and make sure the networking and network-interfaces services are enabled on the specific run-level.
 
+In order to enable 30dbm wireless tx power:
+ * install wireless-regdb and crda - both shoud be installed by "sudo apt-get install wireless-regdb"
+ * copy the sys-files/80-wireless-regdom.rules to the /etc/udev/rules.d/ folder - note that it relates to a specific device - you may want to change the vendor id to use other devices.
+
 GPS:
  * Install kernel-module-pl2303 from opkg
  * Install gpsd libgps-dev
