@@ -60,6 +60,8 @@ private:
 	gs::SizePushGen* m_sa_gas_control_widget;
     gs::SizePushGen* m_sa_yaw_control_widget;
 
+    QDoubleSpinBox* m_airspeed_value;
+
 	boost::shared_ptr<stream::AsyncStreamConnection> m_connection;
 	boost::shared_ptr<stream::PushToPopConv<float> > m_wanted_alt;
 	stream::TcpipServer m_control_connection;
