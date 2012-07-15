@@ -40,9 +40,10 @@ private:
 
 	static const size_t PROGRESS_RESOLUTION = 1000;
 
-	typedef stream::PopStreamPlayer<lin_algebra::vec3f> vec3_pop_player;
-	typedef stream::PushStreamPlayer<lin_algebra::vec3f> vec3_push_player;
-	typedef stream::PushStreamPlayer<float> float_push_player;
+	typedef stream::PopStreamPlayer<lin_algebra::vec3f> 	vec3_pop_player;
+	typedef stream::PopStreamPlayer<float> 					float_pop_player;
+	typedef stream::PushStreamPlayer<lin_algebra::vec3f> 	vec3_push_player;
+	typedef stream::PushStreamPlayer<float> 				float_push_player;
 
 	void update_cockpit();
 
@@ -59,6 +60,9 @@ private:
     boost::shared_ptr<vec3_push_player> 	m_gps_pos_generator_player;
     boost::shared_ptr<float_push_player> 	m_gps_speed_dir_generator_player;
     boost::shared_ptr<float_push_player> 	m_gps_speed_mag_generator_player;
+    boost::shared_ptr<float_pop_player> 	m_airspeed_sensor_player;
+    boost::shared_ptr<float_pop_player> 	m_alt_sensor_player;
+    boost::shared_ptr<float_pop_player> 	m_bat_sensor_player;
 
     boost::shared_ptr<autopilot::Cockpit> m_cockpit;
 

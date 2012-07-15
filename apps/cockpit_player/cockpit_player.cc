@@ -1,6 +1,7 @@
 #include "cockpit_player.h"
 
 #include <stream/func_filter.h>
+#include <stream/filters/fps_filter.h>
 #include <gs/3d_stream_view.h>
 #include <gs/size_stream_view.h>
 #include <gs/map_stream_view.h>
@@ -39,6 +40,9 @@ CockpitPlayer::CockpitPlayer(std::string play_dir):
     ifile_ptr gps_pos_file          = boost::make_shared<std::ifstream>((play_dir + "/gps_pos.stream").c_str());
     ifile_ptr gps_speed_mag_file    = boost::make_shared<std::ifstream>((play_dir + "/gps_speed_mag.stream").c_str());
     ifile_ptr gps_speed_dir_file    = boost::make_shared<std::ifstream>((play_dir + "/gps_speed_dir.stream").c_str());
+    ifile_ptr airspeed_file         = boost::make_shared<std::ifstream>((play_dir + "/airspeed.stream").c_str());
+    ifile_ptr alt_file         		= boost::make_shared<std::ifstream>((play_dir + "/alt.stream").c_str());
+    ifile_ptr bat_file         		= boost::make_shared<std::ifstream>((play_dir + "/bat.stream").c_str());
 
     // create the stream players
     m_acc_sensor_player = boost::make_shared<vec3_pop_player>(acc_file);
@@ -47,6 +51,9 @@ CockpitPlayer::CockpitPlayer(std::string play_dir):
     m_gps_pos_generator_player = boost::make_shared<vec3_push_player>(gps_pos_file);
     m_gps_speed_dir_generator_player = boost::make_shared<float_push_player>(gps_speed_dir_file);
     m_gps_speed_mag_generator_player = boost::make_shared<float_push_player>(gps_speed_mag_file);
+    m_airspeed_sensor_player = boost::make_shared<float_pop_player>(airspeed_file);
+    m_alt_sensor_player = boost::make_shared<float_pop_player>(alt_file, false);
+    m_bat_sensor_player = boost::make_shared<float_pop_player>(bat_file, false);
 
     // create the player platform
     autopilot::NormalPlainPlatform platform;
@@ -56,6 +63,15 @@ CockpitPlayer::CockpitPlayer(std::string play_dir):
     platform.gps_pos_generator =        m_gps_pos_generator_player;
     platform.gps_speed_dir_generator =  m_gps_speed_dir_generator_player;
     platform.gps_speed_mag_generator =  m_gps_speed_mag_generator_player;
+    platform.airspeed_sensor = 			m_airspeed_sensor_player;
+    platform.alt_sensor = 				m_alt_sensor_player;
+    platform.battery_sensor = 			m_bat_sensor_player;
+
+	// add fps stream to the gyro stream
+	boost::shared_ptr<stream::filters::FpsFilter<lin_algebra::vec3f> > fpsed_gyro(
+			new stream::filters::FpsFilter<lin_algebra::vec3f>(platform.gyro_sensor, 0.4f)
+	);
+	platform.gyro_sensor = fpsed_gyro;
 
     start_players();
 
@@ -119,10 +135,10 @@ CockpitPlayer::CockpitPlayer(std::string play_dir):
 	control_toolbar->addAction(pause_action);
 	control_toolbar->addAction(stop_action);
 
-//	// the airspeed stream
-//	gs::SizeStreamView *view_airspeed = new gs::SizeStreamView(
-//			stream::create_func_pop_filter<float, float>(m_cockpit->a, boost::bind(std::multiplies<float>(), _1, 3.6f)),
-//			"Airspeed [km/h]", view_update_time, 0., 100.);
+	// the airspeed stream
+	gs::SizeStreamView *view_airspeed = new gs::SizeStreamView(
+			stream::create_func_pop_filter<float, float>(m_cockpit->air_speed(), boost::bind(std::multiplies<float>(), _1, 3.6f)),
+			"Airspeed [km/h]", view_update_time, 0., 100.);
 
 	// the reliable stream
 	gs::SizeStreamView *view_reliability = new gs::SizeStreamView(m_cockpit->watch_rest_reliability(), "Reliability", view_update_time, 0., 1.);
@@ -134,6 +150,9 @@ CockpitPlayer::CockpitPlayer(std::string play_dir):
 
 	// the plane's alt
 	gs::SizeStreamView* view_alt = new gs::SizeStreamView(m_cockpit->alt(), "Alt", 0.1f , 0., 200.);
+
+	// the plane's alt
+	gs::SizeStreamView* view_fps = new gs::SizeStreamView(fpsed_gyro->get_fps_stream(), "fps", 0.3f , 0., 200.);
 
 	// the progress bar
 	m_progress_slider = new QSlider();
@@ -152,8 +171,10 @@ CockpitPlayer::CockpitPlayer(std::string play_dir):
 	// left down
 	QWidget* left_down = new QWidget();
 	QGridLayout* left_down_layout = new QGridLayout();
-	left_down_layout->addWidget(view_alt, 			0, 0, 1, 1);
-	//left_down_layout->addWidget(control_toolbar,	1, 0, 1, 1);
+	left_down_layout->addWidget(view_reliability, 	0, 0, 1, 1);
+	left_down_layout->addWidget(view_alt, 			0, 1, 1, 1);
+	left_down_layout->addWidget(view_airspeed, 		0, 2, 1, 1);
+	left_down_layout->addWidget(view_fps, 			0, 3, 1, 1);
 	left_down->setLayout(left_down_layout);
 
 	// left up
@@ -166,8 +187,6 @@ CockpitPlayer::CockpitPlayer(std::string play_dir):
 	left_up_layout->addWidget(pitch_view, 			1, 0);
 	left_up_layout->addWidget(roll_view, 			1, 1);
 	left_up_layout->addWidget(yaw_view, 			1, 2);
-	left_up_layout->addWidget(view_reliability, 	0, 4);
-	//left_up_layout->addWidget(view_airspeed, 		0, 5);
 	left_up->setLayout(left_up_layout);
 
 	// left side
@@ -199,7 +218,7 @@ CockpitPlayer::CockpitPlayer(std::string play_dir):
 	roll_view->start();
 	yaw_view->start();
 	view_reliability->start();
-	//view_airspeed->start();
+	view_airspeed->start();
 	view_alt->start();
 
 	// start the worker timer 20 times a second
@@ -232,7 +251,7 @@ void CockpitPlayer::timerEvent(QTimerEvent *) {
 
 void CockpitPlayer::update_cockpit() {
 	while (m_play_action->isChecked()) {
-		m_cockpit->orientation()->get_data();
+		m_cockpit->update();
 	}
 }
 
@@ -283,6 +302,9 @@ void CockpitPlayer::start_players() {
 	m_gps_pos_generator_player->start();
 	m_gps_speed_dir_generator_player->start();
 	m_gps_speed_mag_generator_player->start();
+	m_airspeed_sensor_player->start();
+	m_alt_sensor_player->start();
+	m_bat_sensor_player->start();
 }
 void CockpitPlayer::pause_players() {
 	m_acc_sensor_player->pause();
@@ -291,6 +313,9 @@ void CockpitPlayer::pause_players() {
 	m_gps_pos_generator_player->pause();
 	m_gps_speed_dir_generator_player->pause();
 	m_gps_speed_mag_generator_player->pause();
+	m_airspeed_sensor_player->pause();
+	m_alt_sensor_player->pause();
+	m_bat_sensor_player->pause();
 }
 void CockpitPlayer::stop_players() {
 
@@ -300,6 +325,9 @@ void CockpitPlayer::stop_players() {
 	m_gps_pos_generator_player->stop();
 	m_gps_speed_dir_generator_player->stop();
 	m_gps_speed_mag_generator_player->stop();
+	m_airspeed_sensor_player->stop();
+	m_alt_sensor_player->stop();
+	m_bat_sensor_player->stop();
 }
 void CockpitPlayer::seek_players(float seek_t) {
 	m_acc_sensor_player->seek(seek_t);
@@ -308,4 +336,7 @@ void CockpitPlayer::seek_players(float seek_t) {
 	m_gps_pos_generator_player->seek(seek_t);
 	m_gps_speed_dir_generator_player->seek(seek_t);
 	m_gps_speed_mag_generator_player->seek(seek_t);
+	m_airspeed_sensor_player->seek(seek_t);;
+	m_alt_sensor_player->seek(seek_t);;
+	m_bat_sensor_player->seek(seek_t);;
 }
