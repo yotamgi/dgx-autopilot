@@ -8,6 +8,9 @@ Gps::Gps():m_update_thread(&Gps::update, this)
 void Gps::set_pos_reciever_stream(vec3_reciever_ptr reciever) {
 	m_pos = reciever;
 }
+void Gps::set_speed_vec_reciever_stream(vec3_reciever_ptr reciever) {
+	m_speed_vec = reciever;
+}
 void Gps::set_speed_mag_reciever_stream(mag_reciever_ptr reciever) {
 	m_speed_mag = reciever;
 }
@@ -38,6 +41,15 @@ void Gps::update() {
 				);
 				m_pos->set_data(pos);
  			}
+
+			if (m_speed_vec) {
+				lin_algebra::vec3f speed_vec = lin_algebra::create_vec3f(
+						data->fix.speed * std::cos(data->fix.track / 180. * M_PI),
+						data->fix.climb,
+						data->fix.speed * std::sin(data->fix.track / 180. * M_PI)
+				);
+				m_speed_vec->set_data(speed_vec);
+			}
 
 			if (m_speed_dir) {
 				m_speed_dir->set_data(data->fix.track);

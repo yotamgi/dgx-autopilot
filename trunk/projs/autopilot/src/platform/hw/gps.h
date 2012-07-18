@@ -17,6 +17,7 @@ public:
 	Gps();
 
 	void set_pos_reciever_stream(vec3_reciever_ptr reciever);
+	void set_speed_vec_reciever_stream(vec3_reciever_ptr reciever);
 	void set_speed_mag_reciever_stream(mag_reciever_ptr reciever);
 	void set_speed_dir_reciever_stream(mag_reciever_ptr reciever);
 
@@ -28,6 +29,7 @@ private:
 	mag_reciever_ptr m_speed_mag;
 	mag_reciever_ptr m_speed_dir;
 	vec3_reciever_ptr m_pos;
+	vec3_reciever_ptr m_speed_vec;
 	gpsmm m_gpsmm;
 };
 
