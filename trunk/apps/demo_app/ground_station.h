@@ -8,8 +8,7 @@
 #include <gs/size_push_gen.h>
 #include <boost/shared_ptr.hpp>
 #include <QtGui/QtGui>
-#include <qapplication.h>
-#include <QObject>
+#include <QtCore/QObject>
 #include <qt4/Qt/qwidget.h>
 #include <qgis/qgspoint.h>
 

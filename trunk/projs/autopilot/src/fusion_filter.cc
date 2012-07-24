@@ -4,6 +4,8 @@
 
 namespace autopilot {
 
+const size_t FusionFilter::ACC_LOW_PASS = 20;
+
 static float lim(float a, float down, float up) {
 	return std::max(std::min(a, up), down);
 }

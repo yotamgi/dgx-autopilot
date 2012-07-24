@@ -86,7 +86,7 @@ private:
 
 	lin_algebra::vec3f m_calibration_data;
 
-	static const size_t ACC_LOW_PASS = 20;
+	static const size_t ACC_LOW_PASS;
 };
 
 }  // namespace autopilot

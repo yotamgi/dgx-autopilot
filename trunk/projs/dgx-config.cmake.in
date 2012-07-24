@@ -1,0 +1,26 @@
+
+# configurations
+set(DGX_SIMULATOR_EXISTS 		@BUILD_SIMULATOR@)
+set(DGX_GS_EXISTS 				@BUILD_GS@)
+
+# libds stuff
+set(DGX_LIBDS_INCLUDE 		@LIBDS_INCLUDE@)
+set(DGX_LIBDS_LIB     		@LIBDS_LIB@)
+
+# autopilot stuff, which contains inside libds too
+set(DGX_AUTOPILOT_INCLUDE 	@AUTOPILOT_INCLUDE@)
+set(DGX_AUTOPILOT_LIB     	@AUTOPILOT_LIB@)
+
+# simulator stuff, if exist 
+if (DGX_SIMULATOR_EXISTS)
+	set(DGX_SIMULATOR_INCLUDE 	@SIMULATOR_INCLUDE@)
+	set(DGX_SIMULATOR_LIB     	@SIMULATOR_LIB@)
+endif()
+
+# ground station stuff, which also includes the libds, if exist
+if (DGX_GS_EXISTS)
+	set(DGX_GS_INCLUDE 			@GS_INCLUDE@)
+	set(DGX_GS_LIB     			@GS_LIB@)
+	set(DGX_GS_DEFINITIONS 		@GS_DEFINITIONS@)
+endif()
+
