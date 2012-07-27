@@ -88,9 +88,9 @@ void WaypointPilot::maintain_airspeed(float airspeed) {
 		if (pitch_angle > 0.75*m_params.max_climbing_angle) {
 			wanted_gas = m_params.climbing_gas;
 		} else if (pitch_angle < 0.75*m_params.max_climbing_angle) {
-			wanted_gas = m_params.decending_gas;
-		} else {
 			wanted_gas = m_params.avg_gas;
+		} else {
+			wanted_gas = m_params.decending_gas;
 		}
 	}
 
