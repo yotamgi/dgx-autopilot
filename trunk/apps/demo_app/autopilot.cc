@@ -69,6 +69,7 @@ autopilot::NormalPlainPlatform record_platform(autopilot::NormalPlainPlatform pl
 	file_ptr gps_speed_mag_file = boost::make_shared<std::ofstream>((record_dir + "/gps_speed_mag.stream").c_str());
 	file_ptr gps_speed_dir_file = boost::make_shared<std::ofstream>((record_dir + "/gps_speed_dir.stream").c_str());
 	file_ptr bat_file 			= boost::make_shared<std::ofstream>((record_dir + "/bat.stream").c_str());
+	file_ptr alt_file 			= boost::make_shared<std::ofstream>((record_dir + "/alt.stream").c_str());
 
 	typedef stream::filters::RecorderPopFilter<lin_algebra::vec3f> vec3f_pop_recorder;
 	typedef stream::filters::RecorderPopFilter<float> float_pop_recorder;
@@ -78,6 +79,7 @@ autopilot::NormalPlainPlatform record_platform(autopilot::NormalPlainPlatform pl
 	platform.gyro_sensor.reset(new vec3f_pop_recorder(gyro_file, platform.gyro_sensor));
 	platform.airspeed_sensor.reset(new float_pop_recorder(airspeed_file, platform.airspeed_sensor));
 	platform.battery_sensor.reset(new float_pop_recorder(bat_file, platform.battery_sensor));
+	platform.alt_sensor.reset(new float_pop_recorder(alt_file, platform.alt_sensor));
 
 	platform.gps_pos_generator = add_push_recorder<lin_algebra::vec3f>(platform.gps_pos_generator, gps_pos_file);
 	platform.gps_speed_mag_generator = add_push_recorder<float>(platform.gps_speed_mag_generator, gps_speed_mag_file);
