@@ -22,21 +22,31 @@ int main(int argc, char** argv) {
 	}
 
 	autopilot::MaestroServoController m(argv[1]);
-	int target;
 
 	if (stress) {
 		std::cout << "Running stress test..." << std::endl;
-		while(1) {
-			for(target=4000; target < 8001; target++){
-				std::cout << "target is " <<  target << std::endl;
-				for (int i=0; i<1000; i++ ) {
+		float heading = 1.0;
+		float target = 0;
+		for(int i=0; ; i++) {
+			target += heading*0.6;
 
-					try {
-					m.getServoChannel(5)->set_data(float(target-4000)/40); // in percentage
-					} catch (...) {
-					}
-				}
-			}
+			if (target > 100.)
+				heading = -1.;
+			else if (target < 0.)
+				heading = 1.;
+			
+			m.getServoChannel(0)->set_data(target); 
+			usleep(5000);
+			m.getServoChannel(1)->set_data(target); 
+			usleep(5000);
+			m.getServoChannel(2)->set_data(target); 
+			usleep(5000);
+			m.getServoChannel(3)->set_data(target); 
+			usleep(5000);
+			m.getServoChannel(4)->set_data(target); 
+			usleep(5000);
+			m.getServoChannel(5)->set_data(target); 
+			usleep(5000);
 		}
 	} else {
 		while (true) {
