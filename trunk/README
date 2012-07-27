@@ -1,6 +1,7 @@
 Servo control:
  * In first use of a pololu, it must be connected to a GUI computer via USB and configured using the software pololu supplies. The configuration should be to use USB interface (the "chained" one) other than the RS232.
- * install kernel-module-cdc-acm
+ * install kernel-module-cdc-acm - no need in ubuntu.
+ * to get default permission, the user should be added to the group 'dialout' - edit /etc/groups
 
 Wireless:
  * install the rt3070 and rt3070-firmeare from opkg
@@ -38,4 +39,10 @@ NetStick:
  * run nm-connection-editor and add the 3G network
  * run nmctl con list
  * find the 3G uuid and run "nmctl con up uuid <uuid>"
+
+To create a fresh start
+ * adduser digi
+ * apt-get update
+ * install man subversion vim build-essential cmake libgtest-dev libarmadillo-dev libarmadillo2 libboost-all-dev iw wireless-regdb gpsd libgps-dev gpsd-clients liblas-dev liblapack-dev locate chkconfig
+ * configure ccache by making links (man ccache)
 
