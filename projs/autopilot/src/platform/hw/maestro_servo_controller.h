@@ -43,9 +43,11 @@ public:
 	private:
 		size_t m_channel;
 		MaestroServoController& m_father;
-
+	
 		const int SERVO_MIN;
 		const int SERVO_MAX;
+
+		unsigned int m_prev_data;
 	};
 
 	/**
