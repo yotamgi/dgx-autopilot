@@ -40,8 +40,8 @@ void MaestroServoController::configure_port() {
 
    // Set the read and write speed to 19200 BAUD.
    // All speeds can be prefixed with B as a settings.
-   cfsetispeed (&options, B9600);
-   cfsetospeed (&options, B9600);
+   cfsetispeed (&options, B19200);
+   cfsetospeed (&options, B19200);
 
    // Now to set the other settings. Here we use the no parity example. Both will assumme 8-bit words.
 
@@ -95,7 +95,8 @@ MaestroServoController::MaestroServoChannel::MaestroServoChannel(size_t channel,
 	m_channel(channel),
 	m_father(father),
 	SERVO_MIN(4000),
-	SERVO_MAX(8000)
+	SERVO_MAX(8000),
+	m_prev_data(0)
 {}
 
 void MaestroServoController::MaestroServoChannel::set_data(const float& state_percentage) {
@@ -104,7 +105,19 @@ void MaestroServoController::MaestroServoChannel::set_data(const float& state_pe
 	float trimmed_state_percentage = trim(state_percentage);
 
 	// convert it to servo units
-	int target = SERVO_MIN + (trimmed_state_percentage/100.0f) * float(SERVO_MAX-SERVO_MIN);
+	unsigned int target = SERVO_MIN + (trimmed_state_percentage/100.0f) * float(SERVO_MAX-SERVO_MIN);
+
+	// apply the resolution - it is a fix for a WIERD bug: some of the targets made
+	// some wierd servo stuf
+	target /= 32;
+	target *= 32;
+
+	// if nothing changed, don't send it twice
+	if (m_prev_data == target) {
+		return; 
+	} else {
+		m_prev_data = target;
+	}
 
 	// build the send packet
 	unsigned char serialBytes[5];
