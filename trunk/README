@@ -45,4 +45,14 @@ To create a fresh start
  * apt-get update
  * install man subversion vim build-essential cmake libgtest-dev libarmadillo-dev libarmadillo2 libboost-all-dev iw wireless-regdb gpsd libgps-dev gpsd-clients liblas-dev liblapack-dev locate chkconfig
  * configure ccache by making links (man ccache)
+ 
+ 
+ RASPBERRY PI
+ ----------------------------------------
+
+ i2c
+  - install i2c-tools
+  - add comment on the /etc/modeprobe/*blacklist* i2c and spi lines
+  - add the i2c-dev and the i2c-bcm2708 on the /etc/modules
+  - reboot
 
