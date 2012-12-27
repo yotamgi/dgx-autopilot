@@ -56,3 +56,5 @@ To create a fresh start
   - add the i2c-dev and the i2c-bcm2708 on the /etc/modules
   - reboot
 
+GTest 
+  - After installing libgtest-dev, go to /usr/src/gtest and press "cmake" and "make"
