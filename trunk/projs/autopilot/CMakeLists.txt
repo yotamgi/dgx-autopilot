@@ -44,6 +44,7 @@ set(AUTOPILOT_SRC src/platform/hw/i2c_interface.cc
 add_library(autopilot SHARED ${AUTOPILOT_SRC})
 target_link_libraries(autopilot ${LIBDS_LIB} 
 								${Boost_THREAD_LIBRARY} 
+								${ARMADILLO_LIBRARIES}
 								${Boost_FILESYSTEM_LIBRARY} 
 								${Boost_SYSTEM_LIBRARY} 
 								gps blas lapack)
