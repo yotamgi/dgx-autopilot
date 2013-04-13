@@ -12,14 +12,10 @@ namespace fs = boost::filesystem;
 namespace gs {
 
 MapStreamView::MapStreamView(boost::shared_ptr<pos_stream> pos_stream,
-		  	  	  	  	  	 float update_time,
-		  	  	  	  	  	 QSize widget_size,
-		  	  	  	  	  	 std::string map_dir):
-		  	 m_map_canvas(new QgsMapCanvas(0,0)),
-		  	 m_pos_stream(pos_stream),
-		  	 m_update_time(update_time)
+							float update_time, QSize widget_size, std::string map_dir) :
+		m_map_canvas(new QgsMapCanvas(0, 0)), m_pos_stream(pos_stream), m_update_time(update_time)
 {
-	QgsProviderRegistry::instance("/usr/lib/qgis");
+	QgsProviderRegistry::instance("/usr/lib/qgis/plugins/");
 
 	// create and configure the map canvas
 	m_map_canvas = new QgsMapCanvas();
@@ -34,15 +30,15 @@ MapStreamView::MapStreamView(boost::shared_ptr<pos_stream> pos_stream,
 
 	load_map(fs::path(map_dir));
 
- 	m_plane_track = new QgsRubberBand(m_map_canvas, false);
- 	m_plane_track->setColor(QColor(255, 0, 0, 70));
- 	m_plane_track->setWidth(4);
+	m_plane_track = new QgsRubberBand(m_map_canvas, false);
+	m_plane_track->setColor(QColor(255, 0, 0, 70));
+	m_plane_track->setWidth(4);
 
- 	m_plane_curr_pos = new QgsVertexMarker(m_map_canvas);
- 	m_plane_curr_pos->setIconType(QgsVertexMarker::ICON_CROSS);
- 	m_plane_curr_pos->setColor(QColor(150, 0, 0, 255));
- 	m_plane_curr_pos->setIconSize(20);
- 	m_plane_curr_pos->setPenWidth(4);
+	m_plane_curr_pos = new QgsVertexMarker(m_map_canvas);
+	m_plane_curr_pos->setIconType(QgsVertexMarker::ICON_CROSS);
+	m_plane_curr_pos->setColor(QColor(150, 0, 0, 255));
+	m_plane_curr_pos->setIconSize(20);
+	m_plane_curr_pos->setPenWidth(4);
 
 	m_mouse_emit = new QgsMapToolEmitPoint(m_map_canvas);
 	m_map_canvas->setMapTool(m_mouse_emit);
@@ -58,19 +54,18 @@ MapStreamView::MapStreamView(boost::shared_ptr<pos_stream> pos_stream,
 	layout->addWidget(m_map_canvas, 1, 0, 1, 2);
 	setLayout(layout);
 
- 	m_timer = new QTimer(this);
- 	connect(m_timer, SIGNAL(timeout()), this, SLOT(update()));
-	m_timer->start(1000*m_update_time);
+	m_timer = new QTimer(this);
+	connect(m_timer, SIGNAL(timeout()), this, SLOT(update()));
+	m_timer->start(1000 * m_update_time);
 
 	m_mouse_emit->activate();
 	connect(m_mouse_emit, SIGNAL(canvasClicked(const QgsPoint &,Qt::MouseButton)),
 			this, SLOT(clicked(const QgsPoint &, Qt::MouseButton)));
 
-	connect(m_clear_button, SIGNAL(clicked()),
-			this, SLOT(clear_track()));
+	connect(m_clear_button, SIGNAL(clicked()), this, SLOT(clear_track()));
 
-	connect(m_show_truck_checkbox, SIGNAL(stateChanged(int)),
-			this, SLOT(show_track_cb_changed(int)));
+connect(m_show_truck_checkbox, SIGNAL(stateChanged(int)),
+		this, SLOT(show_track_cb_changed(int)));
 
 }
 
@@ -80,14 +75,14 @@ MapStreamView::~MapStreamView() {
 	delete m_timer;
 	delete m_mouse_emit;
 	delete m_clear_button;
-	for (size_t i=0; i<m_dots.size(); i++) {
+	for (size_t i = 0; i < m_dots.size(); i++) {
 		delete m_dots[i];
 	}
 }
 
 void MapStreamView::clicked(const QgsPoint & p, Qt::MouseButton button) {
-	emit got_point(p , 	button);
-	std::cout << "Clicked " << p.x() <<  ", " << p.y() << std::endl;
+	emit got_point(p, button);
+	std::cout << "Clicked " << p.x() << ", " << p.y() << std::endl;
 
 	QgsVertexMarker* dot = new QgsVertexMarker(m_map_canvas);
 // 	dot->setColor(QColor(255, 0, 0, 255));
@@ -107,7 +102,7 @@ void MapStreamView::load_map(fs::path dir) {
 	}
 
 	// create the layer set, where we will put all the layers
-	QList<QgsMapCanvasLayer> map_layer_set;
+	QList < QgsMapCanvasLayer > map_layer_set;
 
 	// iterate over the files in the directory, and fill the layer set
 	for (fs::directory_iterator f(dir); f != fs::directory_iterator(); f++) {
@@ -115,14 +110,20 @@ void MapStreamView::load_map(fs::path dir) {
 
 		// if it is a vector layer
 		if (extention == ".shp") {
-			std::cout << "added shp layer " << f->path().filename().c_str() << std::endl;
+			std::cout << "added shp layer " << f->path().c_str() << std::endl;
+
 			// create the vector layer
-			QgsVectorLayer* vec_layer = new QgsVectorLayer(tr(f->path().c_str()), tr(f->path().filename().c_str()), QString("ogr"));
+			QgsVectorLayer* vec_layer = new QgsVectorLayer(
+					tr(f->path().c_str()), tr(f->path().filename().c_str()),
+					QString("ogr"));
+
 			QgsSingleSymbolRenderer *map_renderer = new QgsSingleSymbolRenderer(vec_layer->geometryType());
 			vec_layer->setRenderer(map_renderer);
+
 			if (!vec_layer->isValid()) {
 				throw std::runtime_error("Couldn't load the map layer");
 			}
+
 			// Add the Vector Layer to the Layer Registry
 			QgsMapLayerRegistry::instance()->addMapLayer(vec_layer, TRUE);
 			map_layer_set.append(QgsMapCanvasLayer(vec_layer));
@@ -130,16 +131,17 @@ void MapStreamView::load_map(fs::path dir) {
 		}
 
 		// if it is a raster layer
-		else if (extention == ".tif" || extention == ".tiff" || extention == ".jpg" || extention == ".jpeg") {
-			std::cout << "added raster layer " << f->path().filename().c_str() << std::endl;
+		else if (extention == ".tif" || extention == ".tiff"
+				|| extention == ".jpg" || extention == ".jpeg") {
+			std::cout << "added raster layer " << f->path().c_str() << std::endl;
+
 			QgsRasterLayer* raster_layer = new QgsRasterLayer(
-					tr(f->path().c_str()),
-					tr(f->path().filename().c_str())
-			);
+					tr(f->path().c_str()), tr(f->path().filename().c_str()));
+
 			if (!raster_layer->isValid()) {
 				throw std::runtime_error("Couldn't load the raster layer");
 			}
-
+	
 			QgsMapLayerRegistry::instance()->addMapLayer(raster_layer, TRUE);
 			map_layer_set.append(QgsMapCanvasLayer(raster_layer));
 			m_map_canvas->setExtent(raster_layer->extent());
