@@ -3,6 +3,7 @@
 #include <sstream>
 #include <fcntl.h>
 #include <stdio.h>
+#include <unistd.h>
 
 namespace autopilot {
 

@@ -3,7 +3,7 @@
 ## For those who want to work with it
 ##
 set(LIBDS_INCLUDE ${CMAKE_SOURCE_DIR}/libdata_stream/include PARENT_SCOPE)
-set(LIBDS_LIB     ${CMAKE_SOURCE_DIR}/libdata_stream/libdata_stream.so PARENT_SCOPE)
+set(LIBDS_LIB     ${CMAKE_BINARY_DIR}/libdata_stream/libdata_stream.so PARENT_SCOPE)
 
 
 ##

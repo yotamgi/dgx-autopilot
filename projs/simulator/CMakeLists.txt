@@ -3,7 +3,7 @@
 ## For those who want to work with it
 ##
 set(SIMULATOR_INCLUDE 	${CMAKE_SOURCE_DIR}/simulator/include 			PARENT_SCOPE)
-set(SIMULATOR_LIB     	${CMAKE_SOURCE_DIR}/simulator/libsimulator.so 	PARENT_SCOPE)
+set(SIMULATOR_LIB     	${CMAKE_BINARY_DIR}/simulator/libsimulator.so 	PARENT_SCOPE)
 
 ##
 ## The library
@@ -30,7 +30,7 @@ set(SIMULATOR_SRC   src/camera.cc
 
 
 add_library(simulator SHARED ${SIMULATOR_SRC})
-target_link_libraries(simulator ${AUTOPILOT_LIB} Irrlicht blas lapack)
+target_link_libraries(simulator ${AUTOPILOT_LIB} Irrlicht)
 
 add_definitions( -DMEDIA_DIR=\"${CMAKE_SOURCE_DIR}/simulator/media\" )
 

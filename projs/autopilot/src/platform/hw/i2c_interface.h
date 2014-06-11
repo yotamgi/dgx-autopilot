@@ -8,6 +8,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <iostream>
+#include <unistd.h>
 
 namespace autopilot {
 

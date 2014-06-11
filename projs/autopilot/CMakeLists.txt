@@ -7,7 +7,10 @@ set(AUTOPILOT_INCLUDE 	${CMAKE_SOURCE_DIR}/autopilot/include
 						${LIBDS_INCLUDE}	
 	PARENT_SCOPE)
 
-set(AUTOPILOT_LIB     	${CMAKE_SOURCE_DIR}/autopilot/libautopilot.so 
+set(AUTOPILOT_LIB     	${BLAS_LIBRARIES} 
+						${LAPACK_LIBRARIES}
+						${ARMADILLO_LIBRARIES}
+						${CMAKE_BINARY_DIR}/autopilot/libautopilot.so 
 						${LIBDS_LIB} 	
 						${Boost_THREAD_LIBRARY}
 						${Boost_FILESYSTEM_LIBRARY}
@@ -42,12 +45,14 @@ set(AUTOPILOT_SRC src/platform/hw/i2c_interface.cc
                   src/fusion_filter.cc)
 
 add_library(autopilot SHARED ${AUTOPILOT_SRC})
-target_link_libraries(autopilot ${LIBDS_LIB} 
+target_link_libraries(autopilot ${BLAS_LIBRARIES}
+								${LAPACK_LIBRARIES}
+							    ${LIBDS_LIB} 
 								${Boost_THREAD_LIBRARY} 
 								${ARMADILLO_LIBRARIES}
 								${Boost_FILESYSTEM_LIBRARY} 
 								${Boost_SYSTEM_LIBRARY} 
-								gps blas lapack)
+								gps)
 
 ##
 ## The executables
