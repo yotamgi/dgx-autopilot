@@ -2,7 +2,7 @@
 #include <qgis/qgsproviderregistry.h>
 #include <qgis/qgsvectorlayer.h>
 #include <qgis/qgsrasterlayer.h>
-#include <qgis/qgssinglesymbolrenderer.h>
+#include <qgis/qgssinglesymbolrendererv2.h>
 #include <qgis/qgsmaplayerregistry.h>
 #include <stdexcept>
 #include <boost/filesystem.hpp>
@@ -117,8 +117,8 @@ void MapStreamView::load_map(fs::path dir) {
 					tr(f->path().c_str()), tr(f->path().filename().c_str()),
 					QString("ogr"));
 
-			QgsSingleSymbolRenderer *map_renderer = new QgsSingleSymbolRenderer(vec_layer->geometryType());
-			vec_layer->setRenderer(map_renderer);
+			QgsSingleSymbolRendererV2 *map_renderer = new QgsSingleSymbolRendererV2(new QgsLineSymbolV2);//->geometryType());
+			vec_layer->setRendererV2(map_renderer);
 
 			if (!vec_layer->isValid()) {
 				throw std::runtime_error("Couldn't load the map layer");

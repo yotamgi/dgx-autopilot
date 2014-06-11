@@ -2,7 +2,7 @@
 
 namespace autopilot {
 
-Gps::Gps():m_update_thread(&Gps::update, this)
+Gps::Gps():m_update_thread(&Gps::update, this), m_gpsmm("localhost", DEFAULT_GPSD_PORT)
 {}
 
 void Gps::set_pos_reciever_stream(vec3_reciever_ptr reciever) {
@@ -21,14 +21,13 @@ void Gps::set_speed_dir_reciever_stream(mag_reciever_ptr reciever) {
 
 void Gps::update() {
 	// init
-	m_gpsmm.open();
 	if (m_gpsmm.stream(WATCH_ENABLE | WATCH_JSON) == NULL) {
 		throw stream::PushStreamException("No GPS Found");
 	}
 
 	float height = 0.;
 	while (true) {
-		struct gps_data_t* data = m_gpsmm.poll();
+		struct gps_data_t* data = m_gpsmm.read();
 
 		if (data->fix.mode == 3) {
 			height = data->fix.altitude;

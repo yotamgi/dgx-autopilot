@@ -19,6 +19,8 @@ void thread(PlainParams plain_params,
 		lin_algebra::vec3f gps_start_pos,
 		boost::shared_ptr<autopilot::NormalPlainPlatform> platform);
 
+volatile bool sim_init_finished;
+
 boost::shared_ptr<autopilot::NormalPlainPlatform> create_simulator_platform(
 		PlainParams plain_params,
 		WindGen::Params wind_params,
@@ -27,10 +29,12 @@ boost::shared_ptr<autopilot::NormalPlainPlatform> create_simulator_platform(
 	boost::shared_ptr<autopilot::NormalPlainPlatform> platform =
 			boost::make_shared<autopilot::NormalPlainPlatform>();
 
+	sim_init_finished = false;
+
 	new boost::thread(thread, plain_params, wind_params, gps_start_pos, platform);
 
 	// wait until it is ready
-	while (!platform->tilt_servo);
+	while (sim_init_finished) { }
 
 	// let the simulator start...
 	// we should wait for the plain->data_ready bit.
@@ -111,6 +115,8 @@ void thread(PlainParams plain_params,
 	gps_sensor->set_speed_dir_listener(gps_speed_dir);
 	gps_sensor->set_speed_mag_listener(gps_speed_mag);
 
+
+	sim_init_finished = true;
 	sim.run();
 }
 

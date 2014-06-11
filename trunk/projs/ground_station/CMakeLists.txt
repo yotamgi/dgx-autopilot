@@ -23,9 +23,10 @@ set(GS_HEADERS src/map_stream_view.h
 
 # qgis stuff
 include_directories(${QT_QTXML_INCLUDE_DIR})
-include_directories(/usr/include/qgis/ /usr/include/gdal/)
+include_directories(${GDAL_INCLUDE_DIR})
+include_directories(/usr/include/qgis/)
 add_definitions(-DGUI_EXPORT= -DCORE_EXPORT=)
-set (QGIS_LIBRARIES qgis_core qgis_gui geos gdal1.7.0)
+set (QGIS_LIBRARIES qgis_core qgis_gui geos_c ${GDAL_LIBRARY})
 
 # qt stuff
 qt4_wrap_cpp(GS_HEADERS_MOC ${GS_HEADERS})
@@ -51,18 +52,19 @@ set(GS_INCLUDE 	${CMAKE_SOURCE_DIR}/ground_station/include
 				${LIBDS_INCLUDE}				
 				${QT_INCLUDES}
 				${QT_QTXML_INCLUDE_DIR}
+				${GDAL_INCLUDE_DIR}
 				/usr/include/qgis/ 
-				/usr/include/gdal/
 	PARENT_SCOPE)
 
-set(GS_LIB     	${CMAKE_SOURCE_DIR}/ground_station/libground_station.so 
+set(GS_LIB     	${CMAKE_BINARY_DIR}/ground_station/libground_station.so 
 				${LIBDS_LIB} 	
 				${QT_LIBRARIES} 
 				${QGIS_LIBRARIES} 
 				${Boost_FILESYSTEM_LIBRARY} 
 				${Boost_SYSTEM_LIBRARY}
+				${GDAL_LIBRARY}
 				Irrlicht 
-				qgis_core qgis_gui geos gdal1.7.0
+				qgis_core qgis_gui geos_c
 	PARENT_SCOPE)
 
 set(GS_DEFINITIONS -DGUI_EXPORT= -DCORE_EXPORT= ${QT_DEFINITIONS} 
